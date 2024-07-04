@@ -4,7 +4,7 @@ export const tickets: Ticket[] = [
   {
     uuid: crypto.randomUUID(),
     fecha: "2021-10-10",
-    volumen: "600",
+    cubicacion: "600",
     checador: "1004",
     createdAt: new Date(),
     empresa: "Logistics Corp",
@@ -16,7 +16,7 @@ export const tickets: Ticket[] = [
   {
     uuid: crypto.randomUUID(),
     fecha: "2021-10-10",
-    volumen: "200",
+    cubicacion: "200",
     checador: "1004",
     createdAt: new Date(),
     empresa: "Logistics Corp",
@@ -28,7 +28,7 @@ export const tickets: Ticket[] = [
   {
     uuid: crypto.randomUUID(),
     fecha: "2021-11-11",
-    volumen: "300",
+    cubicacion: "300",
     checador: "1005",
     createdAt: new Date(),
     empresa: "Transport Solutions",
@@ -40,7 +40,7 @@ export const tickets: Ticket[] = [
   {
     uuid: crypto.randomUUID(),
     fecha: "2021-12-12",
-    volumen: "400",
+    cubicacion: "400",
     checador: "1006",
     createdAt: new Date(),
     empresa: "Heavy Haulers",
@@ -52,7 +52,7 @@ export const tickets: Ticket[] = [
   {
     uuid: crypto.randomUUID(),
     fecha: "2022-01-01",
-    volumen: "500",
+    cubicacion: "500",
     checador: "1007",
     createdAt: new Date(),
     empresa: "Cargo Masters",
@@ -64,7 +64,7 @@ export const tickets: Ticket[] = [
   {
     uuid: crypto.randomUUID(),
     fecha: "2022-02-02",
-    volumen: "600",
+    cubicacion: "600",
     checador: "1008",
     createdAt: new Date(),
     empresa: "Freight Movers",
@@ -76,7 +76,7 @@ export const tickets: Ticket[] = [
   {
     uuid: crypto.randomUUID(),
     fecha: "2022-03-03",
-    volumen: "700",
+    cubicacion: "700",
     checador: "1009",
     createdAt: new Date(),
     empresa: "Rapid Transports",
@@ -88,7 +88,7 @@ export const tickets: Ticket[] = [
   {
     uuid: crypto.randomUUID(),
     fecha: "2022-04-04",
-    volumen: "800",
+    cubicacion: "800",
     checador: "1010",
     createdAt: new Date(),
     empresa: "Swift Haulers",
@@ -100,7 +100,7 @@ export const tickets: Ticket[] = [
   {
     uuid: crypto.randomUUID(),
     fecha: "2022-05-05",
-    volumen: "900",
+    cubicacion: "900",
     checador: "1011",
     createdAt: new Date(),
     empresa: "Logistics Corp",
@@ -112,7 +112,7 @@ export const tickets: Ticket[] = [
   {
     uuid: crypto.randomUUID(),
     fecha: "2022-06-06",
-    volumen: "1000",
+    cubicacion: "1000",
     checador: "1012",
     createdAt: new Date(),
     empresa: "Transport Solutions",
@@ -124,7 +124,7 @@ export const tickets: Ticket[] = [
   {
     uuid: crypto.randomUUID(),
     fecha: "2022-07-07",
-    volumen: "1100",
+    cubicacion: "1100",
     checador: "1013",
     createdAt: new Date(),
     empresa: "Heavy Haulers",
@@ -136,7 +136,7 @@ export const tickets: Ticket[] = [
   {
     uuid: crypto.randomUUID(),
     fecha: "2022-08-08",
-    volumen: "1200",
+    cubicacion: "1200",
     checador: "1014",
     createdAt: new Date(),
     empresa: "Cargo Masters",
@@ -148,7 +148,7 @@ export const tickets: Ticket[] = [
   {
     uuid: crypto.randomUUID(),
     fecha: "2022-09-09",
-    volumen: "1300",
+    cubicacion: "1300",
     checador: "1015",
     createdAt: new Date(),
     empresa: "Freight Movers",
@@ -160,7 +160,7 @@ export const tickets: Ticket[] = [
   {
     uuid: crypto.randomUUID(),
     fecha: "2022-10-10",
-    volumen: "1400",
+    cubicacion: "1400",
     checador: "1016",
     createdAt: new Date(),
     empresa: "Rapid Transports",
@@ -172,7 +172,7 @@ export const tickets: Ticket[] = [
   {
     uuid: crypto.randomUUID(),
     fecha: "2022-11-11",
-    volumen: "1500",
+    cubicacion: "1500",
     checador: "1017",
     createdAt: new Date(),
     empresa: "Swift Haulers",
@@ -184,7 +184,7 @@ export const tickets: Ticket[] = [
   {
     uuid: crypto.randomUUID(),
     fecha: "2022-12-12",
-    volumen: "1600",
+    cubicacion: "1600",
     checador: "1018",
     createdAt: new Date(),
     empresa: "Logistics Corp",
@@ -196,7 +196,7 @@ export const tickets: Ticket[] = [
   {
     uuid: crypto.randomUUID(),
     fecha: "2023-01-01",
-    volumen: "1700",
+    cubicacion: "1700",
     checador: "1019",
     createdAt: new Date(),
     empresa: "Transport Solutions",
@@ -208,7 +208,7 @@ export const tickets: Ticket[] = [
   {
     uuid: crypto.randomUUID(),
     fecha: "2023-02-02",
-    volumen: "1800",
+    cubicacion: "1800",
     checador: "1020",
     createdAt: new Date(),
     empresa: "Heavy Haulers",
@@ -220,7 +220,7 @@ export const tickets: Ticket[] = [
   {
     uuid: crypto.randomUUID(),
     fecha: "2023-03-03",
-    volumen: "1900",
+    cubicacion: "1900",
     checador: "1021",
     createdAt: new Date(),
     empresa: "Cargo Masters",
@@ -232,7 +232,7 @@ export const tickets: Ticket[] = [
   {
     uuid: crypto.randomUUID(),
     fecha: "2023-04-04",
-    volumen: "2000",
+    cubicacion: "2000",
     checador: "1022",
     createdAt: new Date(),
     empresa: "Freight Movers",

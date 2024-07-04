@@ -10,12 +10,14 @@ dotenv.config();
 interface DataRecord {
     empresa: string;
     material: string;
-    volumen: string;
+    cubicacion: string;
     fecha: string;
     placa: string;
     idCamion: string;
     operador: string;
     checador: string;
+    hora: String;
+    banco: String;
 }
 
 class FileProcessor {
@@ -116,17 +118,25 @@ class FileProcessor {
 
     public async csvToSQLite(csvFile: string) {
         const records: DataRecord[] = [];
-        fs.createReadStream(csvFile)
-            .pipe(csvParser())
-            .on('data', (data: DataRecord) => records.push(data))
-            .on('end', async () => {
-                for (const record of records) {
-                    await this.prisma.ticket.create({ data: record });
-                }
-                console.log('CSV data has been uploaded to SQLite');
-                // await this.downloadDatabase('output.xlsx');
-                await this.prisma.$disconnect();
-            });
+        await new Promise<void>((resolve, reject) => {
+            const stream = fs.createReadStream(csvFile)
+                .pipe(csvParser())
+                .on('data', (data: DataRecord) => records.push(data))
+                .on('error', reject)
+                .on('end', () => resolve());
+        });
+
+        try {
+            for (const record of records) {
+                await this.prisma.ticket.create({ data: record });
+            }
+            console.log('CSV data has been uploaded to SQLite');
+        } catch (error) {
+            console.error('Error during database insertion:', error);
+            throw error;
+        } finally {
+            await this.prisma.$disconnect();
+        }
     }
 
     // public async downloadDatabase(outputFile: string) {
@@ -145,12 +155,12 @@ class FileProcessor {
         if (!fs.existsSync(outputFolder)) {
             fs.mkdirSync(outputFolder, { recursive: true });
         }
-
         try {
             const csvFilePaths = await this.excelToCSV('db_input/bbd.xlsx', outputFolder);
             await this.processCSVFiles(csvFilePaths);
         } catch (error) {
-            console.error('Error durante el procesamiento de archivos:', error);
+            console.error('Error during file processing:', error);
+            throw error;
         }
     }
 
@@ -159,6 +169,7 @@ class FileProcessor {
             await this.csvToSQLite(csvFilePath);
         }
     }
+
 }
 
 export default FileProcessor;

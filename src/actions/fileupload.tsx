@@ -1,4 +1,5 @@
 import { Dispatch, SetStateAction } from 'react';
+import { handleDeleteFiles } from '@/actions/deletefiles';
 
 export async function handleFileUpload(
     file: File,
@@ -37,12 +38,20 @@ export async function handleFileUpload(
                 });
                 setTimeout(() => window.location.reload(), 3000);
             } else {
+                const { success, errorMessage } = await handleDeleteFiles(setIsLoading, toast, process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000');
+
+                if (!success) {
+                    console.error("Error deleting files:", errorMessage);
+                    return;
+                }
+
                 const processErrorText = await processResponse.text();
                 toast({
                     title: "Error",
-                    description: `Error al procesar archivo: ${processErrorText}`,
+                    description: `Error al procesar archivo: Campos incorrectos o formato no válido.`,
                     variant: "destructive"
                 });
+                console.log(processErrorText)
             }
         } else {
             const uploadErrorText = await uploadResponse.text();
@@ -63,3 +72,4 @@ export async function handleFileUpload(
         setIsLoading(false);
     }
 }
+

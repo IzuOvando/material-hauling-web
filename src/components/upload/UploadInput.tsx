@@ -34,7 +34,7 @@ const FileUpload: React.FC = () => {
             <Button onClick={triggerFileInput} className="bg-secondary hover:bg-secondary-light active:bg-secondary-dark" disabled={isLoading}>
                 {isLoading ? "Subiendo..." : "Subir Archivo"}
             </Button>
-            {fileName && <p>Archivo seleccionado: {fileName}</p>}
+            {isLoading ? fileName && <p>Archivo seleccionado: {fileName}</p> : ""}
         </div>
     );
 }

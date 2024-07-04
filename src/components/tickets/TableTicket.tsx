@@ -79,9 +79,9 @@ const columns: ColumnDef<Ticket>[] = [
     },
   },
   {
-    accessorKey: "volumen",
+    accessorKey: "cubicacion",
     header: ({ column }) => (
-      <TableTicketColumnHeader column={column} title="Volumen" />
+      <TableTicketColumnHeader column={column} title="Cubicacion" />
     ),
   },
   {
@@ -172,9 +172,9 @@ const TableTicket = ({ tickets }: { tickets: Ticket[] }) => {
                       {header.isPlaceholder
                         ? null
                         : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
                     </TableHead>
                   );
                 })}

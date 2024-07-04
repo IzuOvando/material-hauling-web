@@ -19,12 +19,14 @@ model Ticket {
   uuid    String @default(uuid()) @unique
   empresa  String
   material String
-  volumen String
+  cubicacion String
   fecha String
   placa String
   idCamion String
   operador String
   checador String
+  hora String
+  banco String
   createdAt DateTime @default(now())
 }
 
