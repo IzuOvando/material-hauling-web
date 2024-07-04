@@ -23,7 +23,6 @@ const CardLogin = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    console.log("state: ", state);
     const sendErrorToast = (message: string) => {
       const { dismiss } = toast({
         title: "Error",

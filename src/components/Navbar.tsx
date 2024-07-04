@@ -26,7 +26,9 @@ const Navbar = async () => {
       >
         {session?.user ? (
           <>
-            <span className="">Bienvenido, {session.user.name}</span>
+            <span className="hidden md:block">
+              Bienvenido, {session.user.name}
+            </span>
             <Button className="bg-accent hover:bg-accent-light active:bg-accent-dark">
               Cerrar Sesión
             </Button>
