@@ -14,3 +14,24 @@ model User {
   username String @id
   password String
 }
+
+model Ticket {
+  uuid    String @default(uuid()) @unique
+  empresa  String
+  material String
+  volumen String
+  fecha String
+  placa String
+  idCamion String
+  operador String
+  checador String
+  createdAt DateTime @default(now())
+}
+
+model QueryView {
+  id       Int      @id @default(autoincrement())
+  filterName     String
+  filters  String     
+  username   String
+  createdAt DateTime @default(now())
+}

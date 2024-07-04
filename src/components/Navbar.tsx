@@ -1,3 +1,4 @@
+"use server";
 import Image from "next/image";
 import { Button } from "./ui/button";
 import { signOut, auth } from "@/auth";

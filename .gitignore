@@ -38,3 +38,5 @@ next-env.d.ts
 
 # Databases
 *.db
+/db_input
+/db_output
