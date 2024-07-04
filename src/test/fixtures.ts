@@ -1,5 +1,5 @@
 import { Ticket } from "@prisma/client";
-const crypto = require("crypto");
+
 export const tickets: Ticket[] = [
   {
     uuid: crypto.randomUUID(),
