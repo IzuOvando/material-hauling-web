@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { Toaster } from "@/components/ui/toaster";
 import Navbar from "@/components/Navbar";
 import { PrinterStoreInitializer } from "@/store";
+import EnterprisesImagesInitializer from "@/contexts/EnterprisesImagesInitializer";
 
 const montserrat = Montserrat({ subsets: ["latin"], variable: "--montserrat" });
 
@@ -32,6 +33,7 @@ export default function RootLayout({
         {children}
         <Toaster />
         <PrinterStoreInitializer />
+        <EnterprisesImagesInitializer />
         <Script src="/lib/epos-2.27.0.js" strategy="beforeInteractive" />
       </body>
     </html>

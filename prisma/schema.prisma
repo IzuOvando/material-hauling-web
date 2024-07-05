@@ -16,24 +16,26 @@ model User {
 }
 
 model Ticket {
-  uuid    String @default(uuid()) @unique
-  empresa  String
-  material String
+  uuid       String   @unique @default(uuid())
+  empresa    String
+  material   String
   cubicacion String
-  fecha String
-  placa String
-  idCamion String
-  operador String
-  checador String
-  hora String
-  banco String
-  createdAt DateTime @default(now())
+  fecha      String
+  placas     String
+  noEmpleado String
+  idCamion   String
+  operador   String
+  checador   String
+  hora       String
+  proyecto   String
+  banco      String
+  createdAt  DateTime @default(now())
 }
 
 model QueryView {
-  id       Int      @id @default(autoincrement())
-  filterName     String
-  filters  String     
+  id         Int      @id @default(autoincrement())
+  filterName String
+  filters    String
   username   String
-  createdAt DateTime @default(now())
+  createdAt  DateTime @default(now())
 }

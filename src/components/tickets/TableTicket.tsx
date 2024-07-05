@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Ticket } from "@prisma/client";
 import {
   ColumnDef,
@@ -28,6 +28,8 @@ import { TableTicketPagination } from "./TableTicketPagination";
 import { TableTicketColumnHeader } from "./TableTicketColumnHeader";
 import { TableTicketColumnToggle } from "./TableTicketColumnToggle";
 import { TableTicketFilters } from "./TableTicketFilters";
+import { Button } from "../ui/button";
+import { PrintTicketDialog } from ".";
 
 const columns: ColumnDef<Ticket>[] = [
   {
@@ -70,6 +72,12 @@ const columns: ColumnDef<Ticket>[] = [
     },
   },
   {
+    accessorKey: "hora",
+    header: ({ column }) => (
+      <TableTicketColumnHeader column={column} title="Hora" />
+    ),
+  },
+  {
     accessorKey: "material",
     header: ({ column }) => (
       <TableTicketColumnHeader column={column} title="Material" />
@@ -94,9 +102,18 @@ const columns: ColumnDef<Ticket>[] = [
     },
   },
   {
-    accessorKey: "placa",
+    accessorKey: "banco",
     header: ({ column }) => (
-      <TableTicketColumnHeader column={column} title="Placa" />
+      <TableTicketColumnHeader column={column} title="Banco" />
+    ),
+    filterFn: (row, id, value) => {
+      return value.includes(row.getValue(id));
+    },
+  },
+  {
+    accessorKey: "placas",
+    header: ({ column }) => (
+      <TableTicketColumnHeader column={column} title="Placas" />
     ),
   },
   {
@@ -115,6 +132,12 @@ const columns: ColumnDef<Ticket>[] = [
     },
   },
   {
+    accessorKey: "noEmpleado",
+    header: ({ column }) => (
+      <TableTicketColumnHeader column={column} title="NoEmpleado" />
+    ),
+  },
+  {
     accessorKey: "checador",
     header: ({ column }) => (
       <TableTicketColumnHeader column={column} title="Checador" />
@@ -123,13 +146,26 @@ const columns: ColumnDef<Ticket>[] = [
       return value.includes(row.getValue(id));
     },
   },
+  {
+    accessorKey: "proyecto",
+    header: ({ column }) => (
+      <TableTicketColumnHeader column={column} title="Proyecto" />
+    ),
+    filterFn: (row, id, value) => {
+      return value.includes(row.getValue(id));
+    },
+  },
 ];
 
 const TableTicket = ({ tickets }: { tickets: Ticket[] }) => {
+  // Table states
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
+  // Aux states
+  const [disablePrintTickets, setDisablePrintTickets] = useState(true);
+  const [openPrintTickets, setOpenPrintTickets] = useState(false);
 
   const table = useReactTable({
     data: tickets,
@@ -144,6 +180,7 @@ const TableTicket = ({ tickets }: { tickets: Ticket[] }) => {
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
     onRowSelectionChange: setRowSelection,
+    getRowId: (row) => row.uuid,
     state: {
       sorting,
       columnFilters,
@@ -152,9 +189,21 @@ const TableTicket = ({ tickets }: { tickets: Ticket[] }) => {
     },
   });
 
+  useEffect(() => {
+    if (Object.keys(rowSelection).length === 0) setDisablePrintTickets(true);
+    else setDisablePrintTickets(false);
+  }, [rowSelection]);
+
   return (
     <>
       <div className="flex items-center pb-4">
+        <Button
+          className="bg-accent hover:bg-accent-light active:bg-accent-dark mr-3"
+          disabled={disablePrintTickets}
+          onClick={() => setOpenPrintTickets(true)}
+        >
+          Imprimir Tickets
+        </Button>
         <TableTicketFilters table={table} tickets={tickets} />
         <TableTicketColumnToggle table={table} />
       </div>
@@ -172,9 +221,9 @@ const TableTicket = ({ tickets }: { tickets: Ticket[] }) => {
                       {header.isPlaceholder
                         ? null
                         : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
                     </TableHead>
                   );
                 })}
@@ -215,6 +264,12 @@ const TableTicket = ({ tickets }: { tickets: Ticket[] }) => {
       <div className="mt-3">
         <TableTicketPagination table={table} />
       </div>
+      <PrintTicketDialog
+        open={openPrintTickets}
+        setOpen={setOpenPrintTickets}
+        ticketsSelection={rowSelection}
+        tickets={tickets}
+      />
     </>
   );
 };

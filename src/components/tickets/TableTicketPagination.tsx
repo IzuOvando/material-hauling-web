@@ -58,7 +58,7 @@ export function TableTicketPagination<TData>({
             </SelectContent>
           </Select>
         </div>
-        <div className="flex w-[100px] items-center justify-center text-sm font-semibold text-primary text-end !m-0">
+        <div className="flex w-[115px] items-center justify-center text-sm font-semibold text-primary text-end !m-0">
           Página {table.getState().pagination.pageIndex + 1} de{" "}
           {table.getPageCount()}
         </div>

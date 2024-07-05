@@ -1,8 +1,8 @@
-import EpsonPrinter from "@/lib/epson";
+import { TicketPrinter } from "@/lib/printers";
 
 export type Printer = {
   name: string;
   ip: string;
   status: "online" | "offline" | "connecting";
-  device?: EpsonPrinter;
+  device?: TicketPrinter;
 };

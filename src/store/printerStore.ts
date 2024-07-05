@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { Printer } from "../types";
-import EpsonPrinter from "@/lib/epson";
+import { TicketPrinter } from "@/lib/printers";
 
 interface PrinterState {
   printers: Printer[];
@@ -21,7 +21,7 @@ export const usePrinterStore = create<PrinterState>()(
       printers: [],
       addPrinter: (name, ip) =>
         set((state) => {
-          const device = new EpsonPrinter(ip, (status) => {
+          const device = new TicketPrinter(ip, (status) => {
             state.changePrinterStatus(name, status);
           });
 
@@ -62,7 +62,7 @@ export const usePrinterStore = create<PrinterState>()(
             device = printer.device;
           } else {
             status = "connecting" as "connecting";
-            device = new EpsonPrinter(ip, (status) => {
+            device = new TicketPrinter(ip, (status) => {
               state.changePrinterStatus(name, status);
             });
           }
@@ -107,7 +107,7 @@ export const usePrinterStore = create<PrinterState>()(
               ip: print.ip,
               name: print.name,
               status: "connecting",
-              device: new EpsonPrinter(print.ip, (status) => {
+              device: new TicketPrinter(print.ip, (status) => {
                 state.changePrinterStatus(print.name, status);
               }),
             } as Printer;

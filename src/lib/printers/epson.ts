@@ -76,4 +76,19 @@ export default class EpsonPrinter {
 
     this.device.send(builder.toString());
   };
+
+  private sendPrintJob = (printJobString: string) => {
+    this.device.send(printJobString);
+  };
+
+  protected createPrint = () => {
+    if (this.status === "offline") {
+      throw new Error("Cannot print with printer offline");
+    }
+
+    return {
+      writter: new window.epson.ePOSBuilder(),
+      sender: this.sendPrintJob,
+    };
+  };
 }

@@ -22,6 +22,8 @@ export function TableTicketFilters<TData>({
   const dates = [...new Set(tickets.map((ticket) => ticket.fecha))];
   const operators = [...new Set(tickets.map((ticket) => ticket.operador))];
   const checkers = [...new Set(tickets.map((ticket) => ticket.checador))];
+  const banks = [...new Set(tickets.map((ticket) => ticket.banco))];
+  const projects = [...new Set(tickets.map((ticket) => ticket.proyecto))];
 
   return (
     <div className="flex items-center justify-between">
@@ -38,6 +40,13 @@ export function TableTicketFilters<TData>({
             column={table.getColumn("empresa")}
             title="Empresa"
             options={enterprises}
+          />
+        )}
+        {table.getColumn("banco") && (
+          <TableTicketFacetedFilter
+            column={table.getColumn("banco")}
+            title="Banco"
+            options={banks}
           />
         )}
         {table.getColumn("fecha") && (
@@ -59,6 +68,13 @@ export function TableTicketFilters<TData>({
             column={table.getColumn("checador")}
             title="Checador"
             options={checkers}
+          />
+        )}
+        {table.getColumn("proyecto") && (
+          <TableTicketFacetedFilter
+            column={table.getColumn("proyecto")}
+            title="Proyecto"
+            options={projects}
           />
         )}
         {isFiltered && (

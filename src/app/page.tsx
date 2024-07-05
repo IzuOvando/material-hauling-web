@@ -1,8 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetTrigger } from "@/components/ui/sheet";
 import { PrintersAside } from "@/components";
-import TableTicket from "@/components/tickets/TableTicket";
-import { tickets } from "@/test/fixtures";
+import { TableTicket } from "@/components/tickets";
 
 import FileUpdate from "@/components/upload/UpdateInput";
 import FileUpload from "@/components/upload/UploadInput";
@@ -18,19 +17,16 @@ async function checkTicketsExist() {
   }
 }
 
-async function handler() {
-  const ticketsExist = await checkTicketsExist();
-  return ticketsExist;
-}
-
 export default async function Home() {
-  const showButtons = await handler();
+  const ticketsExists = await checkTicketsExist();
+  const tickets = ticketsExists ? await prisma.ticket.findMany() : [];
+
   return (
     <main className="container my-10">
       <section className="flex justify-center md:justify-between flex-wrap">
         <h1 className="text-4xl font-semibold block w-fit">Ticket Database</h1>
         <div className="flex gap-5 flex-wrap justify-center md:justify-end">
-          {!showButtons ? (
+          {!ticketsExists ? (
             <>
               <FileUpload />
             </>
