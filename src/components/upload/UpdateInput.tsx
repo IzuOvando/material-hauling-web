@@ -1,11 +1,11 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { handleFileUpload } from "@/actions/fileupload";
 import { handleDeleteFiles } from "@/actions/deletefiles";
-import useFrenteStore from "@/contexts/useFrenteStore";
+import useFrenteStore from "@/store/useFrenteStore";
 
 const FileUpdate: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);

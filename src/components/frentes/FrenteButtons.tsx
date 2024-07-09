@@ -1,8 +1,8 @@
 'use client'
 import React, { useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import useFrenteStore from "@/contexts/useFrenteStore";
-import { Frente } from "@/types";
+import useFrenteStore from "@/store/useFrenteStore";
+import { Frente } from '@prisma/client';
 
 const FrenteButtons: React.FC<{ frentes: Frente[] }> = ({ frentes }) => {
     const { selectedFrente, setSelectedFrente } = useFrenteStore();
@@ -24,7 +24,7 @@ const FrenteButtons: React.FC<{ frentes: Frente[] }> = ({ frentes }) => {
                     <Button
                         key={frente.nombre}
                         onClick={() => handleButtonClick(frente)}
-                        isSelected={!!selectedFrente && frente.nombre === selectedFrente.nombre}
+                        variant={selectedFrente && frente.nombre === selectedFrente.nombre ? 'selected' : 'default'}
                     >
                         {frente.nombre}
                     </Button>

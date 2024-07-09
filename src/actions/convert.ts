@@ -4,30 +4,11 @@ import * as path from "path";
 import prisma from "@/lib/db";
 import csvParser from "csv-parser";
 import dotenv from "dotenv";
+import { Ticket } from '@prisma/client';
 
 dotenv.config();
 
-type Frente = {
-    nombre: string;
-    tickets: DataRecord[];
-};
-
-interface DataRecord {
-    empresa: string;
-    material: string;
-    cubicacion: string;
-    fecha: string;
-    placas: string;
-    idCamion: string;
-    operador: string;
-    checador: string;
-    hora: string;
-    banco: string;
-    proyecto: string;
-    noEmpleado: string;
-    frenteNombre: string;
-    frente?: Frente;
-}
+type CreateTicketDto = Omit<Ticket, 'uuid' | 'createdAt'>;
 
 class FileProcessor {
     private prisma = prisma;
@@ -218,12 +199,12 @@ class FileProcessor {
     };
 
     public async csvToSQLite(csvFile: string, fileName: string) {
-        const records: DataRecord[] = [];
+        const records: CreateTicketDto[] = [];
         await new Promise<void>((resolve, reject) => {
             fs.createReadStream(csvFile)
                 .pipe(csvParser())
                 .on("data", (data: any) => {
-                    const filteredData: DataRecord = {
+                    const filteredData: CreateTicketDto = {
                         empresa: this.cleanQuotes(data.empresa),
                         material: this.cleanQuotes(data.material),
                         cubicacion: this.cleanQuotes(data.cubicacion),
@@ -236,7 +217,7 @@ class FileProcessor {
                         checador: this.cleanQuotes(data.checador),
                         hora: this.cleanQuotes(data.hora),
                         banco: this.cleanQuotes(data.banco),
-                        frenteNombre: fileName,
+                        frenteNombre: fileName.substring(fileName.indexOf('_') + 1, fileName.indexOf('.')),
                     };
                     records.push(filteredData);
                 })
@@ -248,41 +229,18 @@ class FileProcessor {
             await this.prisma.$transaction(async (prisma) => {
                 await prisma.ticket.deleteMany({});
 
-                const underscoreIndex = fileName.indexOf('_');
-                const dotIndex = fileName.indexOf('.');
-                const cleanFrenteName = fileName.substring(underscoreIndex + 1, dotIndex);
-
-                if (!cleanFrenteName) {
-                    console.error(`No se pudo extraer un nombre válido del archivo: ${fileName}`);
-                    return;
-                }
-
-                const frente = await prisma.frente.findUnique({
-                    where: { nombre: cleanFrenteName }
-                });
-
-                if (!frente) {
-                    console.error(`No se encontró el frente con el nombre: ${cleanFrenteName}`);
-                    return;
-                }
-
                 for (const record of records) {
+                    const frenteExists = await prisma.frente.findUnique({
+                        where: { nombre: record.frenteNombre }
+                    });
+
+                    if (!frenteExists) {
+                        console.error(`No se encontró el frente con el nombre: ${record.frenteNombre}`);
+                        continue;
+                    }
+
                     await prisma.ticket.create({
-                        data: {
-                            empresa: record.empresa,
-                            material: record.material,
-                            cubicacion: record.cubicacion,
-                            fecha: record.fecha,
-                            placas: record.placas,
-                            idCamion: record.idCamion,
-                            operador: record.operador,
-                            proyecto: record.proyecto,
-                            noEmpleado: record.noEmpleado,
-                            checador: record.checador,
-                            hora: record.hora,
-                            banco: record.banco,
-                            frenteNombre: cleanFrenteName,
-                        },
+                        data: record
                     });
                 }
 
@@ -293,6 +251,7 @@ class FileProcessor {
             throw error;
         }
     }
+
 
 
     public async processFiles(fileName: string) {

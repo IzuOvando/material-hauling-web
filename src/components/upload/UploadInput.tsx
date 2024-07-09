@@ -4,7 +4,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { handleFileUpload } from "@/actions/fileupload";
-import useFrenteStore from "@/contexts/useFrenteStore";
+import useFrenteStore from "@/store/useFrenteStore";
 
 const FileUpload: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);

@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
-import { Frente } from "@/types";
+import { Frente } from '@prisma/client';
 
 const RemoveFrenteForm: React.FC<{ frentes: Frente[] }> = ({ frentes }) => {
     const [selectedFrente, setSelectedFrente] = useState("");

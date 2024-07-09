@@ -1,31 +1,13 @@
-'use client'
+'use client';
 import React from 'react';
 import FileUpload from "@/components/upload/UploadInput";
 import FileUpdate from "@/components/upload/UpdateInput";
-import useFrenteStore from "@/contexts/useFrenteStore";
+import useFrenteStore from '@/store/useFrenteStore';
+import { Frente as PrismaFrente } from '@prisma/client';
+import { Ticket } from '@prisma/client';
 
-type Frente = {
-    nombre: string;
-    tickets: Ticket[];
-};
-
-type Ticket = {
-    uuid: string;
-    empresa: string;
-    material: string;
-    cubicacion: string;
-    fecha: string;
-    placas: string;
-    noEmpleado: string;
-    idCamion: string;
-    operador: string;
-    checador: string;
-    hora: string;
-    proyecto: string;
-    banco: string;
-    createdAt: Date;
-    frenteNombre: string;
-    frente?: Frente;
+type Frente = PrismaFrente & {
+    tickets?: Ticket[];
 };
 
 type Props = {
@@ -57,4 +39,5 @@ const FrenteActionButton: React.FC<Props> = ({ frentes }) => {
 };
 
 export default FrenteActionButton;
+
 

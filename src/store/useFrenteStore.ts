@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { Frente } from '@/types';
+import { Frente } from '@prisma/client';
 
 type FrenteState = {
     selectedFrente: Frente | null;

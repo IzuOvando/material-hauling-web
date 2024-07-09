@@ -2,37 +2,13 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetTrigger } from "@/components/ui/sheet";
 import { PrintersAside } from "@/components";
 import { TableTicket } from "@/components/tickets";
+import { Navbar } from "@/components";
 
 import FrenteActionButton from "@/components/upload/FrenteActionButton";
 import prisma from "@/lib/db";
-import FrentesButtons from "@/components/frentes/SectionFrentes";
+import FrentesButtons from "@/components/frentes/FrenteButtons";
 import AddFrenteForm from "@/components/frentes/AddFrenteForm";
 import RemoveFrenteForm from "@/components/frentes/DeleteFrente";
-
-type Frente = {
-  nombre: string;
-  tickets: Ticket[];
-};
-
-type Ticket = {
-  uuid: string;
-  empresa: string;
-  material: string;
-  cubicacion: string;
-  fecha: string;
-  placas: string;
-  noEmpleado: string;
-  idCamion: string;
-  operador: string;
-  checador: string;
-  hora: string;
-  proyecto: string;
-  banco: string;
-  createdAt: Date;
-  frenteNombre: string;
-  frente: Frente
-};
-
 
 async function checkTicketsExist() {
   try {
@@ -87,9 +63,8 @@ export default async function Home() {
           </Sheet>
         </div>
       </section>
-      <nav>
-        <FrentesButtons frentes={frentesExists} />
-      </nav>
+      <Navbar />
+      <FrentesButtons frentes={frentesExists} />
       <section className="flex items-center mt-4">
         <AddFrenteForm />
         <RemoveFrenteForm frentes={frentesExists} />

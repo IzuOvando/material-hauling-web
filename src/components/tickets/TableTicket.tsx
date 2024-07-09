@@ -30,7 +30,7 @@ import { TableTicketColumnToggle } from "./TableTicketColumnToggle";
 import { TableTicketFilters } from "./TableTicketFilters";
 import { Button } from "../ui/button";
 import { PrintTicketDialog } from ".";
-import useFrenteStore from "@/contexts/useFrenteStore";
+import useFrenteStore from "@/store/useFrenteStore";
 
 const columns: ColumnDef<Ticket>[] = [
   {
