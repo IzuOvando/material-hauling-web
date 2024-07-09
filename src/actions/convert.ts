@@ -132,9 +132,9 @@ class FileProcessor {
                                 const cell = worksheet[cellRef];
                                 let cellValue = cell ? cell.w || cell.v : "";
                                 if (typeof cellValue === 'string') {
-                                    cellValue = cellValue.replace(/"/g, '""'); // Escapa las comillas dobles internas
+                                    cellValue = cellValue.replace(/"/g, '""');
                                     if (cellValue.includes(',') || cellValue.includes('"')) {
-                                        cellValue = `"${cellValue}"`; // Envuelve entre comillas si contiene comas o comillas dobles
+                                        cellValue = `"${cellValue}"`;
                                     }
                                 }
                                 row.push(cellValue);
@@ -226,18 +226,42 @@ class FileProcessor {
             await this.prisma.$transaction(async (prisma) => {
                 await prisma.ticket.deleteMany({});
 
+                const underscoreIndex = fileName.indexOf('_');
+                const dotIndex = fileName.indexOf('.');
+                const cleanFrenteName = fileName.substring(underscoreIndex + 1, dotIndex);
+
+                if (!cleanFrenteName) {
+                    console.error(`No se pudo extraer un nombre válido del archivo: ${fileName}`);
+                    return;
+                }
+
+                const frente = await prisma.frente.findUnique({
+                    where: { nombre: cleanFrenteName }
+                });
+
+                if (!frente) {
+                    console.error(`No se encontró el frente con el nombre: ${cleanFrenteName}`);
+                    return;
+                }
+
+
                 for (const record of records) {
-                    const frenteExists = await prisma.frente.findUnique({
-                        where: { nombre: record.frenteNombre }
-                    });
-
-                    if (!frenteExists) {
-                        console.error(`No se encontró el frente con el nombre: ${record.frenteNombre}`);
-                        continue;
-                    }
-
                     await prisma.ticket.create({
-                        data: record
+                        data: {
+                            empresa: record.empresa,
+                            material: record.material,
+                            cubicacion: record.cubicacion,
+                            fecha: record.fecha,
+                            placas: record.placas,
+                            idCamion: record.idCamion,
+                            operador: record.operador,
+                            proyecto: record.proyecto,
+                            noEmpleado: record.noEmpleado,
+                            checador: record.checador,
+                            hora: record.hora,
+                            banco: record.banco,
+                            frenteNombre: cleanFrenteName,
+                        },
                     });
                 }
 
