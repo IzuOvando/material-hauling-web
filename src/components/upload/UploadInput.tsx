@@ -4,6 +4,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { handleFileUpload } from "@/actions/fileupload";
+import CONFIG from "@/config";
 
 const FileUpload: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -14,12 +15,7 @@ const FileUpload: React.FC = () => {
     const file = event.target.files ? event.target.files[0] : null;
     if (!file) return;
 
-    await handleFileUpload(
-      file,
-      setIsLoading,
-      toast,
-      process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"
-    );
+    await handleFileUpload(file, setIsLoading, toast, CONFIG.BASE_URL);
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 

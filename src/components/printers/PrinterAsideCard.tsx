@@ -49,10 +49,15 @@ const PrinterAsideCard = (printer: Printer) => {
                   <span className="flex h-2 w-2 rounded-full bg-green-500" />
                   Online
                 </span>
-              ) : (
+              ) : printer.status === "offline" ? (
                 <span className="flex gap-2 justify-center items-center text-red-500 font-medium">
                   <span className="flex h-2 w-2 rounded-full bg-red-500" />
                   Offline
+                </span>
+              ) : (
+                <span className="flex gap-2 justify-center items-center text-amber-500 font-medium">
+                  <span className="flex h-2 w-2 rounded-full bg-amber-500" />
+                  Sin Papel
                 </span>
               )}
             </div>

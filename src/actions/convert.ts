@@ -3,9 +3,6 @@ import * as XLSX from "xlsx";
 import * as path from "path";
 import prisma from "@/lib/db";
 import csvParser from "csv-parser";
-import dotenv from "dotenv";
-
-dotenv.config();
 
 interface DataRecord {
   empresa: string;
@@ -184,7 +181,7 @@ class FileProcessor {
           const filteredData: DataRecord = {
             empresa: data.empresa,
             material: data.material,
-            cubicacion: data.cubicacion,
+            cubicacion: `${data.cubicacion} m³`,
             fecha: data.fecha,
             placas: data.placas,
             idCamion: data.idCamion,

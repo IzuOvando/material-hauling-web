@@ -1,5 +1,6 @@
 import { Dispatch, SetStateAction } from "react";
 import { handleDeleteFiles } from "@/actions/deletefiles";
+import CONFIG from "@/config";
 
 export async function handleFileUpload(
   file: File,
@@ -39,7 +40,7 @@ export async function handleFileUpload(
         const { success, errorMessage } = await handleDeleteFiles(
           setIsLoading,
           toast,
-          process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"
+          CONFIG.BASE_URL
         );
 
         if (!success) {

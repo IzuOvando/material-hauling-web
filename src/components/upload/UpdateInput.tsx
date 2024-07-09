@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { handleFileUpload } from "@/actions/fileupload";
 import { handleDeleteFiles } from "@/actions/deletefiles";
+import CONFIG from "@/config";
 
 const FileUpdate: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -17,7 +18,7 @@ const FileUpdate: React.FC = () => {
     const { success, errorMessage } = await handleDeleteFiles(
       setIsLoading,
       toast,
-      process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"
+      CONFIG.BASE_URL
     );
 
     if (!success) {
@@ -25,12 +26,7 @@ const FileUpdate: React.FC = () => {
       return;
     }
 
-    await handleFileUpload(
-      file,
-      setIsLoading,
-      toast,
-      process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"
-    );
+    await handleFileUpload(file, setIsLoading, toast, CONFIG.BASE_URL);
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
