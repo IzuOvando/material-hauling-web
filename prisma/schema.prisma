@@ -11,25 +11,32 @@ datasource db {
 }
 
 model User {
-  username String @id
+  username String @id @unique
   password String
 }
 
+model Frente {
+  nombre  String   @id @unique
+  tickets Ticket[]
+}
+
 model Ticket {
-  uuid       String   @unique @default(uuid())
-  empresa    String
-  material   String
-  cubicacion String
-  fecha      String
-  placas     String
-  noEmpleado String
-  idCamion   String
-  operador   String
-  checador   String
-  hora       String
-  proyecto   String
-  banco      String
-  createdAt  DateTime @default(now())
+  uuid         String   @unique @default(uuid())
+  empresa      String
+  material     String
+  cubicacion   String
+  fecha        String
+  placas       String
+  noEmpleado   String
+  idCamion     String
+  operador     String
+  checador     String
+  hora         String
+  proyecto     String
+  banco        String
+  createdAt    DateTime @default(now())
+  frenteNombre String
+  frente       Frente   @relation(fields: [frenteNombre], references: [nombre])
 }
 
 model QueryView {
