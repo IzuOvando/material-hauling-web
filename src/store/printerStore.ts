@@ -10,7 +10,7 @@ interface PrinterState {
   editPrinter: (name: string, newName: string, ip: string) => void;
   changePrinterStatus: (
     name: string,
-    status: "online" | "offline" | "connecting"
+    status: "online" | "offline" | "connecting" | "paperEnd"
   ) => void;
   reconnectPrinters: () => void;
 }

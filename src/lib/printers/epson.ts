@@ -1,41 +1,44 @@
 type connectionCallbackType = (
-  status: "online" | "offline" | "connecting"
+  status: "online" | "offline" | "connecting" | "paperEnd"
+) => void;
+
+type onReceiveCallbackType = (
+  printJobId: string,
+  success: boolean,
+  error: string,
+  warning: string
 ) => void;
 
 export default class EpsonPrinter {
   private ipAddress: string;
   private device: any;
-  private instruction:
-    | "isOnline"
-    | "paperEnd"
-    | "paperNearEnd"
-    | "print"
-    | null;
-  private status: "online" | "offline" | "connecting";
+  private status: "online" | "offline" | "connecting" | "paperEnd";
 
   private connectionCallback: connectionCallbackType | null = null;
+  private onReceiveCallback: onReceiveCallbackType | null = null;
 
   constructor(ipAddress: string, connectionCallback: connectionCallbackType) {
     this.ipAddress = ipAddress;
-    this.instruction = null;
     this.status = "connecting";
     // Connecting to printer
     this.connect(connectionCallback);
   }
 
   public connect(callback: connectionCallbackType) {
-    console.log(`Connecting to printer (${this.ipAddress})...`);
-    this.instruction = "isOnline";
+    console.debug(`Connecting to printer (${this.ipAddress})...`);
     this.status = "connecting";
     this.connectionCallback = callback;
     // Setting Device
     this.device = new window.epson.ePOSPrint(
-      `http://${this.ipAddress}/cgi-bin/epos/service.cgi?devid=local_printer&timeout=2000`
+      `http://${this.ipAddress}/cgi-bin/epos/service.cgi?devid=local_printer&timeout=5000`
     );
     // Setting Device Handlers
     this.device.ononline = this.onOnline;
     this.device.onoffline = this.onOffline;
     this.device.onpoweroff = this.onOffline;
+    this.device.onreceive = this.onReceive;
+    this.device.onpapernearend = this.onPaperNearEnd;
+    this.device.onpaperend = this.onPaperEnd;
     this.device.send();
   }
 
@@ -47,25 +50,30 @@ export default class EpsonPrinter {
   }
 
   private onOnline = () => {
-    console.log(`Printer (${this.ipAddress}) is online`);
-    if (this.instruction === "isOnline" && this.connectionCallback) {
+    console.debug(`Printer (${this.ipAddress}) is online`);
+    if (this.connectionCallback) {
       this.status = "online";
       this.connectionCallback("online");
     }
   };
 
   private onOffline = () => {
-    console.log(`Printer (${this.ipAddress}) is offline`);
-    if (this.instruction === "isOnline" && this.connectionCallback)
-      this.connectionCallback("offline");
+    console.debug(`Printer (${this.ipAddress}) is offline`);
+    if (this.connectionCallback) this.connectionCallback("offline");
+  };
+
+  private onPaperNearEnd = () => {
+    console.debug(`Paper is near the end for printing`);
+  };
+
+  private onPaperEnd = () => {
+    if (this.connectionCallback) this.connectionCallback("paperEnd");
   };
 
   public printTest = () => {
     if (this.status === "offline") {
       throw new Error("Cannot print with printer offline");
     }
-
-    // TODO: Handle success/failure with callback
 
     var builder = new window.epson.ePOSBuilder();
     builder.addTextAlign(builder.ALIGN_CENTER);
@@ -74,11 +82,11 @@ export default class EpsonPrinter {
     builder.addFeedLine(3);
     builder.addCut(builder.CUT_FEED);
 
-    this.device.send(builder.toString());
+    this.device.send(builder.toString(), "test");
   };
 
-  private sendPrintJob = (printJobString: string) => {
-    this.device.send(printJobString);
+  private sendPrintJob = (printJobString: string, printJobId: string) => {
+    this.device.send(printJobString, printJobId);
   };
 
   protected createPrint = () => {
@@ -90,5 +98,24 @@ export default class EpsonPrinter {
       writter: new window.epson.ePOSBuilder(),
       sender: this.sendPrintJob,
     };
+  };
+
+  public setHandlePrintResponse = (callback: onReceiveCallbackType) => {
+    this.onReceiveCallback = callback;
+  };
+
+  private onReceive = (res: any) => {
+    if (res.printjobid == "test") return;
+
+    var asb = res.status;
+    var warning = "";
+
+    if (asb & this.device.ASB_RECEIPT_NEAR_END) {
+      warning = "Paper near end";
+    }
+
+    if (this.onReceiveCallback) {
+      this.onReceiveCallback(res.printjobid, res.success, res.code, warning);
+    }
   };
 }

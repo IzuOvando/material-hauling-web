@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { handleFileUpload } from "@/actions/fileupload";
 import useFrenteStore from "@/store/useFrenteStore";
+import CONFIG from "@/config";
 
 const FileUpload: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -30,7 +31,7 @@ const FileUpload: React.FC = () => {
       file,
       setIsLoading,
       toast,
-      process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"
+      CONFIG.BASE_URL
     );
     if (fileInputRef.current) fileInputRef.current.value = "";
   };

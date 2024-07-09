@@ -11,26 +11,31 @@ const EnterprisesImagesInitializer = () => {
       });
     };
 
-    const preloadEnterprisesImages = () => {
-      const imageDirectory = "/images/enterprises";
-      const imageNames = [
-        "sedena.png",
-        "comercializadora_san_fernando.jpeg",
-        "concremex.jpeg",
-        "constructora_sunight.jpeg",
-        "edificaciones_inteligentes.jpeg",
-        "la_silla.jpeg",
-        "mabinas.jpeg",
-        "tancol.jpeg",
-        "tierra_firme.jpeg",
-      ];
-      //TODO: Get from API images on folder
+    const getImagesInfo: () => Promise<{
+      directory: string;
+      images: string[];
+    }> = async () => {
+      try {
+        const res = await fetch("/api/enterprises/images", { method: "GET" });
+        return res.json();
+      } catch (error) {
+        return {
+          directory: "",
+          images: [],
+        };
+      }
+    };
+
+    const preloadEnterprisesImages = async () => {
+      const { directory, images } = await getImagesInfo();
+
       window.enterprises = {
         images: {},
+        imagesNames: [],
       };
 
-      for (const imageName of imageNames) {
-        loadImage(`${imageDirectory}/${imageName}`).then((img) => {
+      for (const imageName of images) {
+        loadImage(`${directory}/${imageName}`).then((img) => {
           const imageNameWithoutExtension = imageName.split(".")[0];
           const canvas = document.createElement("canvas");
           const context = canvas.getContext("2d");
@@ -44,6 +49,7 @@ const EnterprisesImagesInitializer = () => {
               context,
               canvas,
             };
+            window.enterprises.imagesNames.push(imageNameWithoutExtension);
           }
         });
       }
