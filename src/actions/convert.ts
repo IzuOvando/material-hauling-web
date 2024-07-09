@@ -3,10 +3,7 @@ import * as XLSX from "xlsx";
 import * as path from "path";
 import prisma from "@/lib/db";
 import csvParser from "csv-parser";
-import dotenv from "dotenv";
 import { Ticket } from '@prisma/client';
-
-dotenv.config();
 
 type CreateTicketDto = Omit<Ticket, 'uuid' | 'createdAt'>;
 

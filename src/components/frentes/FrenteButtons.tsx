@@ -24,7 +24,7 @@ const FrenteButtons: React.FC<{ frentes: Frente[] }> = ({ frentes }) => {
                     <Button
                         key={frente.nombre}
                         onClick={() => handleButtonClick(frente)}
-                        variant={selectedFrente && frente.nombre === selectedFrente.nombre ? 'selected' : 'default'}
+                        className={`p-2 text-sm ${selectedFrente && frente.nombre === selectedFrente.nombre ? 'bg-blue-500 text-white' : 'bg-white text-black'}`}
                     >
                         {frente.nombre}
                     </Button>

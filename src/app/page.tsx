@@ -63,8 +63,9 @@ export default async function Home() {
           </Sheet>
         </div>
       </section>
-      <Navbar />
-      <FrentesButtons frentes={frentesExists} />
+      <section>
+        <FrentesButtons frentes={frentesExists} />
+      </section>
       <section className="flex items-center mt-4">
         <AddFrenteForm />
         <RemoveFrenteForm frentes={frentesExists} />
