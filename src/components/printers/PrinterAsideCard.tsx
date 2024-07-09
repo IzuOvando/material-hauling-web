@@ -16,7 +16,6 @@ import { AlertDialog, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import DialogPrinter from "./DialogPrinter";
 import AlertDialogDeletePrinter from "./AlertDialogDeletePrinter";
 import { Printer } from "@/types";
-import { tickets } from "@/test/fixtures";
 
 const PrinterAsideCard = (printer: Printer) => {
   const [showDialog, setShowDialog] = useState(false);

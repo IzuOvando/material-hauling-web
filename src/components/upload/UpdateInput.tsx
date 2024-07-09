@@ -1,21 +1,34 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { handleFileUpload } from "@/actions/fileupload";
 import { handleDeleteFiles } from "@/actions/deletefiles";
+import useFrenteStore from "@/store/useFrenteStore";
 import CONFIG from "@/config";
 
 const FileUpdate: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const { selectedFrente } = useFrenteStore();
 
   const onFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files ? event.target.files[0] : null;
     if (!file) return;
+
+    if (!selectedFrente) {
+      toast({
+        title: "Error",
+        description: `No se ha seleccionado ningun frente.`,
+        variant: "destructive",
+      });
+      return;
+    }
+
     const { success, errorMessage } = await handleDeleteFiles(
+      selectedFrente,
       setIsLoading,
       toast,
       CONFIG.BASE_URL
@@ -26,7 +39,13 @@ const FileUpdate: React.FC = () => {
       return;
     }
 
-    await handleFileUpload(file, setIsLoading, toast, CONFIG.BASE_URL);
+    await handleFileUpload(
+      selectedFrente,
+      file,
+      setIsLoading,
+      toast,
+      CONFIG.BASE_URL
+    );
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
