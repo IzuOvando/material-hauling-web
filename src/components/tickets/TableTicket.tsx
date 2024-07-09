@@ -38,7 +38,7 @@ const columns: ColumnDef<Ticket>[] = [
     header: ({ table }) => (
       <Checkbox
         checked={
-          table.getIsAllPageRowsSelected() ||
+          table.getIsAllRowsSelected() ||
           (table.getIsSomePageRowsSelected() && "indeterminate")
         }
         onCheckedChange={(value) => table.toggleAllRowsSelected(!!value)}
@@ -206,6 +206,11 @@ const TableTicket = ({ tickets }: { tickets: Ticket[] }) => {
     if (Object.keys(rowSelection).length === 0) setDisablePrintTickets(true);
     else setDisablePrintTickets(false);
   }, [rowSelection]);
+
+  useEffect(() => {
+    table.toggleAllRowsSelected(false);
+    setRowSelection({});
+  }, [columnFilters, table]);
 
   return (
     <>

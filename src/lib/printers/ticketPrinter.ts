@@ -1,6 +1,8 @@
 "use client";
 import { Ticket } from "@prisma/client";
 import EpsonPrinter from "./epson";
+import CONFIG from "@/config";
+import { findClosestMatch } from "@/helpers/strings";
 
 const setPrintableMetanames = (metanames: string[], maxLenght: number) => {
   return metanames.map((metaname) => ({
@@ -28,47 +30,47 @@ export default class TicketPrinter extends EpsonPrinter {
     11
   );
 
-  public printSingleTicket = (ticket: Ticket) => {
+  public printTicket = (ticket: Ticket) => {
     let { writter, sender } = this.createPrint();
 
-    console.log("Printing ticket...");
+    console.debug(`Printing ticket ${ticket.uuid}...`);
 
     this.configTicket(writter);
     this.generateTicket(writter, ticket);
     this.finishTicket(writter);
 
-    sender(writter.toString());
-  };
-
-  public printGroupOfTickets = (tickets: Ticket[]) => {
-    for (let i = 0; i < tickets.length; i++) {
-      console.log(`Printing ticket ${tickets[i].uuid}...`);
-      let { writter, sender } = this.createPrint();
-      this.configTicket(writter);
-      this.generateTicket(writter, tickets[i]);
-      this.finishTicket(writter);
-      sender(writter.toString());
-    }
+    sender(writter.toString(), ticket.uuid.slice(0, 30));
   };
 
   private generateTicket = (writter: any, ticket: Ticket) => {
-    this.addEnterpriseLogo(writter);
+    this.addEnterpriseLogo(writter, ticket.empresa);
     this.addId(writter, ticket.uuid);
     this.addTicketData(writter, ticket);
     this.addProyect(writter, ticket.proyecto);
-    this.addQR(writter, `${ticket.uuid}|${ticket.empresa}`);
+    this.addQR(writter, `${CONFIG.BASE_URL}`);
   };
 
   private configTicket = (writter: any) => {
     writter.addTextLang("es").addTextSize(1, 1).addTextSmooth(true);
   };
 
-  private addEnterpriseLogo = (writter: any) => {
-    const image = window.enterprises.images.concremex;
-    writter
-      .addTextAlign(writter.ALIGN_CENTER)
-      .addImage(image.context, 0, 0, image.canvas.width, image.canvas.height)
-      .addFeedLine(1);
+  private addEnterpriseLogo = (writter: any, enterprise: string) => {
+    const imageKey = findClosestMatch(
+      enterprise,
+      window.enterprises.imagesNames
+    );
+
+    try {
+      const image =
+        window.enterprises.images[imageKey != null ? imageKey : "sedena"];
+
+      writter
+        .addTextAlign(writter.ALIGN_CENTER)
+        .addImage(image.context, 0, 0, image.canvas.width, image.canvas.height)
+        .addFeedLine(1);
+    } catch (error) {
+      console.error("Error loading enterprise logo:", error);
+    }
   };
 
   private addId = (writter: any, id: string) => {

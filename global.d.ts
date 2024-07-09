@@ -8,6 +8,7 @@ declare global {
           context: CanvasRenderingContext2D;
         };
       };
+      imagesNames: string[];
     };
   }
 }

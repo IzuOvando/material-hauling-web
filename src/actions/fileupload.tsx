@@ -1,5 +1,6 @@
 import { Dispatch, SetStateAction } from "react";
 import { handleDeleteFiles } from "@/actions/deletefiles";
+import CONFIG from "@/config";
 
 export async function handleFileUpload(
   frente: any,
@@ -41,7 +42,7 @@ export async function handleFileUpload(
           frente,
           setIsLoading,
           toast,
-          process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"
+          CONFIG.BASE_URL
         );
 
         if (!success) {

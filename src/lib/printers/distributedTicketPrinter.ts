@@ -1,0 +1,178 @@
+import { Ticket } from "@prisma/client";
+import { Printer } from "@/types";
+import { divideArray } from "@/helpers/arrays";
+
+export default class DistributedPrinter {
+  private static MAX_BUFFER_SIZE = 5;
+  private printers: PrinterWithBuffer[];
+  private failedPrinters: PrinterWithBuffer[];
+  private ticketsToPrint: Ticket[]; // UUIDs of tickets to be printed
+  private onPrinterFailed: (printer: string) => void;
+  private onTicketPrinted: () => void;
+
+  public constructor(
+    printers: Printer[],
+    ticketsToPrint: Ticket[],
+    onPrinterFailed: (printer: string) => void,
+    onTicketPrinted: () => void
+  ) {
+    this.ticketsToPrint = [...ticketsToPrint];
+    this.printers = [];
+    this.failedPrinters = [];
+
+    const initialTickets = this.ticketsToPrint.splice(
+      0,
+      DistributedPrinter.MAX_BUFFER_SIZE * printers.length
+    );
+    const initialBuffers = divideArray(initialTickets, printers.length);
+    for (let i = 0; i < printers.length; i++) {
+      this.printers.push(
+        new PrinterWithBuffer(
+          printers[i],
+          this.distributeTickets.bind(this),
+          this.handleOnTicketPrinted.bind(this),
+          this.handleOnTicketFailed.bind(this),
+          initialBuffers[i]
+        )
+      );
+    }
+
+    this.onPrinterFailed = onPrinterFailed;
+    this.onTicketPrinted = onTicketPrinted;
+  }
+
+  public startPrinting() {
+    if (this.printers.length === 0) {
+      console.warn("No printers available.");
+      return;
+    }
+    this.printers.forEach((printer) => printer.printTickets());
+  }
+
+  private distributeTickets() {
+    return this.ticketsToPrint.splice(0, DistributedPrinter.MAX_BUFFER_SIZE);
+  }
+
+  private handleOnTicketPrinted(uuid: string) {
+    console.debug(`Ticket ${uuid} printed successfully.`);
+    this.onTicketPrinted();
+  }
+
+  private handleOnTicketFailed(
+    ticket: Ticket,
+    error: string,
+    printer: PrinterWithBuffer
+  ) {
+    console.error(
+      `Error printing ticket ${ticket.uuid} on ${printer.printer.name}: ${error}`
+    );
+    this.ticketsToPrint.push(ticket);
+
+    const printerIndex = this.printers.findIndex(
+      (printerOnArray) => printerOnArray.printer.name === printer.printer.name
+    );
+
+    if (printerIndex >= 0) {
+      const failedPrinter = this.printers[printerIndex];
+      this.failedPrinters.push(failedPrinter);
+      this.printers.splice(printerIndex, 1);
+      // Callback to notify the caller about the failed printer
+      this.onPrinterFailed(failedPrinter.printer.name);
+    }
+  }
+
+  public retryFailedPrinters() {
+    for (const failedPrinter of this.failedPrinters) {
+      this.printers.push(failedPrinter);
+      failedPrinter.printer.device?.reconnect();
+      setTimeout(() => {
+        failedPrinter.printer.device?.printTest();
+        failedPrinter.continuePrinting();
+      }, 2000);
+    }
+
+    this.failedPrinters = [];
+  }
+}
+
+class PrinterWithBuffer {
+  public printer: Printer;
+  private buffer: Ticket[];
+  private getMoreTickets: () => Ticket[];
+  private onTicketPrinted: (uuid: string) => void;
+  private onTicketFailed: (
+    ticket: Ticket,
+    error: string,
+    printer: PrinterWithBuffer
+  ) => void;
+
+  public constructor(
+    printer: Printer,
+    getMoreTickets: () => Ticket[],
+    onTicketPrinted: (uuid: string) => void,
+    onTicketFailed: (
+      ticket: Ticket,
+      error: string,
+      printer: PrinterWithBuffer
+    ) => void,
+    startBuffer: Ticket[] = []
+  ) {
+    this.printer = printer;
+    this.buffer = startBuffer;
+    this.getMoreTickets = getMoreTickets;
+    if (this.printer.device)
+      this.printer.device.setHandlePrintResponse(
+        this.handlePrintResponse.bind(this)
+      );
+    this.onTicketPrinted = onTicketPrinted;
+    this.onTicketFailed = onTicketFailed;
+  }
+
+  private fillBuffer() {
+    const tickets = this.getMoreTickets();
+    this.buffer = this.buffer.concat(tickets);
+  }
+
+  public printTickets() {
+    for (const ticket of this.buffer) {
+      if (this.printer.device) this.printer.device.printTicket(ticket);
+    }
+  }
+
+  public continuePrinting() {
+    console.debug(`Continuing printing for ${this.printer.name}`);
+    this.fillBuffer();
+    if (this.buffer.length === 0) {
+      return;
+    }
+    this.printTickets();
+  }
+
+  private handlePrintResponse(
+    printJobId: string,
+    success: boolean,
+    code: string,
+    warning: string
+  ) {
+    try {
+      if (warning) console.warn(`Warning: ${warning}`);
+
+      const ticketIndex = this.buffer.findIndex(
+        (ticket) => ticket.uuid.slice(0, 30) === printJobId
+      );
+      const ticket = this.buffer[ticketIndex];
+
+      this.buffer.splice(ticketIndex, 1); // Remove ticket from buffer
+
+      if (success) {
+        this.onTicketPrinted(ticket.uuid);
+        // Check if we need to fill the buffer again
+        if (this.buffer.length === 0) this.continuePrinting();
+      } else {
+        this.onTicketFailed(ticket, code, this);
+      }
+    } catch (error) {
+      console.error(`Critical error handling print response: ${error}`);
+    }
+  }
+}

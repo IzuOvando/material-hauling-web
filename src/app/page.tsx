@@ -55,7 +55,10 @@ export default async function Home() {
           }
           <Sheet>
             <SheetTrigger asChild>
-              <Button className="bg-secondary hover:bg-secondary-light active:bg-secondary-dark">
+              <Button
+                id="showPrinters"
+                className="bg-secondary hover:bg-secondary-light active:bg-secondary-dark"
+              >
                 Ver Impresoras
               </Button>
             </SheetTrigger>

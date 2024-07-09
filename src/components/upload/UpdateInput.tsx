@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { handleFileUpload } from "@/actions/fileupload";
 import { handleDeleteFiles } from "@/actions/deletefiles";
 import useFrenteStore from "@/store/useFrenteStore";
+import CONFIG from "@/config";
 
 const FileUpdate: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -30,7 +31,7 @@ const FileUpdate: React.FC = () => {
       selectedFrente,
       setIsLoading,
       toast,
-      process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"
+      CONFIG.BASE_URL
     );
 
     if (!success) {
@@ -43,7 +44,7 @@ const FileUpdate: React.FC = () => {
       file,
       setIsLoading,
       toast,
-      process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"
+      CONFIG.BASE_URL
     );
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
