@@ -5,16 +5,29 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { handleFileUpload } from "@/actions/fileupload";
 import { handleDeleteFiles } from "@/actions/deletefiles";
+import useFrenteStore from "@/contexts/useFrenteStore";
 
 const FileUpdate: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const { selectedFrente } = useFrenteStore();
 
   const onFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files ? event.target.files[0] : null;
     if (!file) return;
+
+    if (!selectedFrente) {
+      toast({
+        title: "Error",
+        description: `No se ha seleccionado ningun frente.`,
+        variant: "destructive",
+      });
+      return;
+    }
+
     const { success, errorMessage } = await handleDeleteFiles(
+      selectedFrente,
       setIsLoading,
       toast,
       process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"
@@ -26,6 +39,7 @@ const FileUpdate: React.FC = () => {
     }
 
     await handleFileUpload(
+      selectedFrente,
       file,
       setIsLoading,
       toast,

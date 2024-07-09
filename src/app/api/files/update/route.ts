@@ -12,9 +12,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Method Not Allowed" }, { status: 405 });
   }
 
+  const { nombre } = await req.json();
+
   const rootPath = path.resolve(process.cwd());
   const outputFolder = path.join(rootPath, "db_output", "csv", "csv_output");
-  const specificFilePath = path.join(rootPath, "db_input", "bbd.xlsx");
+  const specificFilePath = path.join(rootPath, "db_input", `${nombre}.xlsx`);
 
   try {
     const files = await readdir(outputFolder);
@@ -37,9 +39,8 @@ export async function POST(req: NextRequest) {
     console.error("Failed to delete files or data:", error);
     return NextResponse.json(
       {
-        message: `Failed to delete files or data: ${
-          error instanceof Error ? error.message : "Unknown error"
-        }`,
+        message: `Failed to delete files or data: ${error instanceof Error ? error.message : "Unknown error"
+          }`,
       },
       { status: 500 }
     );

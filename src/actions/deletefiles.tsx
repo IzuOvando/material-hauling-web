@@ -1,15 +1,19 @@
 import { Dispatch, SetStateAction } from 'react';
 
 export async function handleDeleteFiles(
+    selectedFrente: any,
     setIsLoading: Dispatch<SetStateAction<boolean>>,
     toast: any,
     apiUrl: string
 ) {
     setIsLoading(true);
 
+    const FileName = selectedFrente.nombre
+
     try {
         const response = await fetch(`${apiUrl}/api/files/update`, {
             method: 'POST',
+            body: JSON.stringify({ nombre: FileName }),
         });
 
         if (response.ok) {

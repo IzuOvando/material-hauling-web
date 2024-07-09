@@ -4,17 +4,29 @@ import { useToast } from "@/components/ui/use-toast";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { handleFileUpload } from "@/actions/fileupload";
+import useFrenteStore from "@/contexts/useFrenteStore";
 
 const FileUpload: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const { selectedFrente } = useFrenteStore();
 
   const onFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files ? event.target.files[0] : null;
     if (!file) return;
 
+    if (!selectedFrente) {
+      toast({
+        title: "Error",
+        description: `No se ha seleccionado ningun frente.`,
+        variant: "destructive",
+      });
+      return;
+    }
+
     await handleFileUpload(
+      selectedFrente,
       file,
       setIsLoading,
       toast,

@@ -30,6 +30,7 @@ import { TableTicketColumnToggle } from "./TableTicketColumnToggle";
 import { TableTicketFilters } from "./TableTicketFilters";
 import { Button } from "../ui/button";
 import { PrintTicketDialog } from ".";
+import useFrenteStore from "@/contexts/useFrenteStore";
 
 const columns: ColumnDef<Ticket>[] = [
   {
@@ -166,9 +167,21 @@ const TableTicket = ({ tickets }: { tickets: Ticket[] }) => {
   // Aux states
   const [disablePrintTickets, setDisablePrintTickets] = useState(true);
   const [openPrintTickets, setOpenPrintTickets] = useState(false);
+  // Frentes
+  const { selectedFrente } = useFrenteStore();
+  const [filteredTickets, setFilteredTickets] = useState<Ticket[]>([]);
+
+  useEffect(() => {
+    if (selectedFrente) {
+      const associatedTickets = tickets.filter(ticket => ticket.frenteNombre === selectedFrente.nombre);
+      setFilteredTickets(associatedTickets);
+    } else {
+      setFilteredTickets([]);
+    }
+  }, [selectedFrente, tickets]);
 
   const table = useReactTable({
-    data: tickets,
+    data: filteredTickets,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
@@ -221,9 +234,9 @@ const TableTicket = ({ tickets }: { tickets: Ticket[] }) => {
                       {header.isPlaceholder
                         ? null
                         : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
                     </TableHead>
                   );
                 })}

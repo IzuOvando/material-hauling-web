@@ -2,14 +2,15 @@ import { Dispatch, SetStateAction } from "react";
 import { handleDeleteFiles } from "@/actions/deletefiles";
 
 export async function handleFileUpload(
+  frente: any,
   file: File,
   setIsLoading: Dispatch<SetStateAction<boolean>>,
   toast: any,
   apiUrl: string
 ) {
   setIsLoading(true);
-  const newFile = new File([file], "bbd.xlsx", { type: file.type });
-
+  const newFileName = `bbd_${frente.nombre}.xlsx`;
+  const newFile = new File([file], newFileName, { type: file.type });
   const formData = new FormData();
   formData.append("file", newFile);
 
@@ -34,9 +35,10 @@ export async function handleFileUpload(
           description: "Archivo subido y procesado exitosamente",
           variant: "success",
         });
-        setTimeout(() => window.location.reload(), 3000);
+        setTimeout(() => window.location.reload(), 2500);
       } else {
         const { success, errorMessage } = await handleDeleteFiles(
+          frente,
           setIsLoading,
           toast,
           process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"

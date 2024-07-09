@@ -7,6 +7,11 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
+type Frente = {
+    nombre: string;
+    tickets: DataRecord[];
+};
+
 interface DataRecord {
     empresa: string;
     material: string;
@@ -20,6 +25,8 @@ interface DataRecord {
     banco: string;
     proyecto: string;
     noEmpleado: string;
+    frenteNombre: string;
+    frente?: Frente;
 }
 
 class FileProcessor {
@@ -210,7 +217,7 @@ class FileProcessor {
         return str.replace(/""/g, '"').replace(/^"|"$/g, '');
     };
 
-    public async csvToSQLite(csvFile: string) {
+    public async csvToSQLite(csvFile: string, fileName: string) {
         const records: DataRecord[] = [];
         await new Promise<void>((resolve, reject) => {
             fs.createReadStream(csvFile)
@@ -229,36 +236,66 @@ class FileProcessor {
                         checador: this.cleanQuotes(data.checador),
                         hora: this.cleanQuotes(data.hora),
                         banco: this.cleanQuotes(data.banco),
+                        frenteNombre: fileName,
                     };
                     records.push(filteredData);
                 })
                 .on("error", reject)
                 .on("end", resolve);
         });
+
         try {
             await this.prisma.$transaction(async (prisma) => {
                 await prisma.ticket.deleteMany({});
-                for (const record of records) {
-                    await prisma.ticket.create({ data: record });
+
+                const underscoreIndex = fileName.indexOf('_');
+                const dotIndex = fileName.indexOf('.');
+                const cleanFrenteName = fileName.substring(underscoreIndex + 1, dotIndex);
+
+                if (!cleanFrenteName) {
+                    console.error(`No se pudo extraer un nombre válido del archivo: ${fileName}`);
+                    return;
                 }
+
+                const frente = await prisma.frente.findUnique({
+                    where: { nombre: cleanFrenteName }
+                });
+
+                if (!frente) {
+                    console.error(`No se encontró el frente con el nombre: ${cleanFrenteName}`);
+                    return;
+                }
+
+                for (const record of records) {
+                    await prisma.ticket.create({
+                        data: {
+                            empresa: record.empresa,
+                            material: record.material,
+                            cubicacion: record.cubicacion,
+                            fecha: record.fecha,
+                            placas: record.placas,
+                            idCamion: record.idCamion,
+                            operador: record.operador,
+                            proyecto: record.proyecto,
+                            noEmpleado: record.noEmpleado,
+                            checador: record.checador,
+                            hora: record.hora,
+                            banco: record.banco,
+                            frenteNombre: cleanFrenteName,
+                        },
+                    });
+                }
+
+                console.log("Los datos del CSV han sido cargados en SQLite");
             });
-            console.log("CSV data has been uploaded to SQLite");
         } catch (error) {
-            console.error("Error during database insertion:", error);
+            console.error("Error durante la inserción en la base de datos:", error);
             throw error;
         }
     }
 
-    // public async downloadDatabase(outputFile: string) {
-    //     const users = await this.prisma.ticket.findMany();
-    //     const worksheet = XLSX.utils.json_to_sheet(users);
-    //     const workbook = XLSX.utils.book_new();
-    //     XLSX.utils.book_append_sheet(workbook, worksheet, 'Users');
-    //     XLSX.writeFile(workbook, outputFile);
-    //     console.log('Database has been downloaded as Excel');
-    // }
 
-    public async processFiles() {
+    public async processFiles(fileName: string) {
         const rootPath = path.resolve(process.cwd(), "./");
         const outputFolder = path.resolve(rootPath, "./db_output/csv/csv_output");
 
@@ -267,19 +304,19 @@ class FileProcessor {
         }
         try {
             const csvFilePaths = await this.excelToCSV(
-                "db_input/bbd.xlsx",
+                `./db_input/${fileName}`,
                 outputFolder
             );
-            await this.processCSVFiles(csvFilePaths);
+            await this.processCSVFiles(csvFilePaths, fileName);
         } catch (error) {
             console.error("Error during file processing:", error);
             throw error;
         }
     }
 
-    private async processCSVFiles(csvFilePaths: string[]) {
+    private async processCSVFiles(csvFilePaths: string[], fileName: string) {
         for (const csvFilePath of csvFilePaths) {
-            await this.csvToSQLite(csvFilePath);
+            await this.csvToSQLite(csvFilePath, fileName);
         }
     }
 }

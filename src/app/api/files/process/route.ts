@@ -12,8 +12,10 @@ export async function POST(req: NextRequest) {
   }
 
   try {
+    const { fileName } = await req.json();
+
     const fileProcessor = new FileProcessor();
-    await fileProcessor.processFiles(); // Asegúrate de que esto está correctamente sincronizado con tus necesidades de archivos
+    await fileProcessor.processFiles(fileName);
 
     return new Response(
       JSON.stringify({ message: "Files processed successfully" }),

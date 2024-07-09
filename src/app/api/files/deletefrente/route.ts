@@ -1,0 +1,40 @@
+import { NextRequest, NextResponse } from "next/server";
+import prisma from "@/lib/db";
+
+export async function POST(req: NextRequest) {
+    try {
+        const { nombre } = await req.json();
+
+        const frente = await prisma.frente.findUnique({
+            where: { nombre },
+            include: { tickets: true },
+        });
+
+        if (!frente) {
+            return NextResponse.json(
+                { error: "Frente no encontrado." },
+                { status: 404 }
+            );
+        }
+
+        await prisma.ticket.deleteMany({
+            where: { frenteNombre: nombre },
+        });
+
+        await prisma.frente.delete({
+            where: { nombre },
+        });
+
+        return NextResponse.json(
+            { message: `Frente ${nombre} y todos los tickets relacionados han sido eliminados.` },
+            { status: 200 }
+        );
+    } catch (error) {
+        console.error("Error al eliminar el frente:", error);
+        return NextResponse.json(
+            { error: "No se pudo eliminar el frente." },
+            { status: 500 }
+        );
+    }
+}
+
