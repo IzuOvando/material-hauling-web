@@ -1,3 +1,5 @@
+import CONFIG from "@/config";
+
 type connectionCallbackType = (
   status: "online" | "offline" | "connecting" | "paperEnd"
 ) => void;
@@ -10,6 +12,7 @@ type onReceiveCallbackType = (
 ) => void;
 
 export default class EpsonPrinter {
+  private static SECURE_CONNECTION = !CONFIG.BASE_URL.includes("localhost");
   private ipAddress: string;
   private device: any;
   private status: "online" | "offline" | "connecting" | "paperEnd";
@@ -30,7 +33,9 @@ export default class EpsonPrinter {
     this.connectionCallback = callback;
     // Setting Device
     this.device = new window.epson.ePOSPrint(
-      `https://${this.ipAddress}/cgi-bin/epos/service.cgi?devid=local_printer&timeout=5000`
+      `${EpsonPrinter.SECURE_CONNECTION ? "https" : "http"}://${
+        this.ipAddress
+      }/cgi-bin/epos/service.cgi?devid=local_printer&timeout=5000`
     );
     // Setting Device Handlers
     this.device.ononline = this.onOnline;
