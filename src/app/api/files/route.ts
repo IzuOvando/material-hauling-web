@@ -10,6 +10,12 @@ if (!fs.existsSync(uploadDir)) {
 
 export async function POST(req: NextRequest) {
   try {
+
+    if (req.method === 'POST') {
+      const sizeLimit = 50 * 1024 * 1024;
+      let body = Buffer.alloc(0);
+    }
+
     if (req.method !== "POST") {
       return NextResponse.json(
         { error: "Method Not Allowed" },
