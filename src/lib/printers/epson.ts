@@ -30,7 +30,7 @@ export default class EpsonPrinter {
     this.connectionCallback = callback;
     // Setting Device
     this.device = new window.epson.ePOSPrint(
-      `http://${this.ipAddress}/cgi-bin/epos/service.cgi?devid=local_printer&timeout=5000`
+      `https://${this.ipAddress}/cgi-bin/epos/service.cgi?devid=local_printer&timeout=5000`
     );
     // Setting Device Handlers
     this.device.ononline = this.onOnline;
