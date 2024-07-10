@@ -3,7 +3,6 @@ import { Sheet, SheetTrigger } from "@/components/ui/sheet";
 import { PrintersAside } from "@/components";
 import { TableTicket } from "@/components/tickets";
 import { FrenteTools } from "@/components/frentes";
-import FrenteActionButton from "@/components/upload/FrenteActionButton";
 import prisma from "@/lib/db";
 
 async function checkTicketsExist() {
