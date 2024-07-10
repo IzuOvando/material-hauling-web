@@ -16,5 +16,6 @@ export const tickets: Ticket[] = [
     noEmpleado: "1004",
     proyecto: "Proyecto 1",
     createdAt: new Date(),
+    frenteNombre: "AXBE",
   },
 ];
