@@ -255,7 +255,7 @@ class FileProcessor {
                     data: {
                         empresa: record.empresa,
                         material: record.material,
-                        cubicacion: record.cubicacion,
+                        cubicacion: `${record.cubicacion} m3`,
                         fecha: record.fecha,
                         placas: record.placas,
                         idCamion: record.idCamion,
