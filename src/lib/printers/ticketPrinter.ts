@@ -107,7 +107,7 @@ export default class TicketPrinter extends EpsonPrinter {
 
   private addQR = (writter: any, data: string) => {
     writter.addFeedLine(1);
-    writter.addSymbol(data, writter.SYMBOL_QRCODE_MODEL_2, writter.LEVEL_Q, 6);
+    writter.addSymbol(data, writter.SYMBOL_QRCODE_MODEL_2, writter.LEVEL_Q, 5);
   };
 
   private finishTicket = (writter: any) => {
