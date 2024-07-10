@@ -225,7 +225,6 @@ class FileProcessor {
         });
 
         try {
-            await prisma.ticket.deleteMany({});
 
             const underscoreIndex = fileName.indexOf('_');
             const dotIndex = fileName.indexOf('.');
@@ -235,6 +234,12 @@ class FileProcessor {
                 console.error(`No se pudo extraer un nombre válido del archivo: ${fileName}`);
                 return;
             }
+
+            await prisma.ticket.deleteMany({
+                where: {
+                    frenteNombre: cleanFrenteName,
+                }
+            });
 
             const frente = await prisma.frente.findUnique({
                 where: { nombre: cleanFrenteName }
