@@ -19,6 +19,14 @@ async function main() {
     },
   });
 
+  await prisma.user.create({
+    data: {
+      username: "MiguelPorras",
+      password:
+        "2518b30d074866418e68f8ac3110ebec7226af2cdcaab6da94495a6776c1f539",
+    },
+  });
+
   console.log("Succesfully inserted users into the database!");
 }
 
