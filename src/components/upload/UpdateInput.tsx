@@ -5,14 +5,14 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { handleFileUpload } from "@/actions/fileupload";
 import { handleDeleteFiles } from "@/actions/deletefiles";
-import useFrenteStore from "@/store/useFrenteStore";
 import CONFIG from "@/config";
+import { Upload } from "lucide-react";
+import { Frente } from "@prisma/client";
 
-const FileUpdate: React.FC = () => {
+const FileUpdate = ({ selectedFrente }: { selectedFrente: Frente }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
-  const { selectedFrente } = useFrenteStore();
 
   const onFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files ? event.target.files[0] : null;
@@ -54,8 +54,7 @@ const FileUpdate: React.FC = () => {
   };
 
   return (
-    // TODO Input AlertDialog (¿Estas seguro que quieres actualizar la base de datos, la base de datos anterior se borrara?)
-    <div>
+    <>
       <Input
         ref={fileInputRef}
         type="file"
@@ -65,12 +64,13 @@ const FileUpdate: React.FC = () => {
       />
       <Button
         onClick={triggerFileInput}
-        className="bg-secondary hover:bg-secondary-light active:bg-secondary-dark"
+        className="bg-secondary hover:bg-secondary-light active:bg-secondary-dark w-full flex items-center gap-2"
         disabled={isLoading}
       >
+        <Upload size={18} color="white" />
         {isLoading ? "Subiendo..." : "Actualizar Archivo"}
       </Button>
-    </div>
+    </>
   );
 };
 

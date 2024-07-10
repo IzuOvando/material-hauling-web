@@ -102,7 +102,7 @@ export default class TicketPrinter extends EpsonPrinter {
       .addTextStyle(false, false, true, writter.COLOR_1)
       .addFeedLine(1)
       .addText("PROYECTO\n")
-      .addText(`"${proyect}"\n`);
+      .addText(`"${proyect}`);
   };
 
   private addQR = (writter: any, data: string) => {
@@ -111,6 +111,6 @@ export default class TicketPrinter extends EpsonPrinter {
   };
 
   private finishTicket = (writter: any) => {
-    writter.addFeedLine(3).addCut(writter.CUT_FEED);
+    writter.addFeedLine(2).addCut(writter.CUT_FEED);
   };
 }

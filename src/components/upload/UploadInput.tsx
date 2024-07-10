@@ -4,14 +4,14 @@ import { useToast } from "@/components/ui/use-toast";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { handleFileUpload } from "@/actions/fileupload";
-import useFrenteStore from "@/store/useFrenteStore";
 import CONFIG from "@/config";
+import { Upload } from "lucide-react";
+import { Frente } from "@prisma/client";
 
-const FileUpload: React.FC = () => {
+const FileUpload = ({ selectedFrente }: { selectedFrente: Frente }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
-  const { selectedFrente } = useFrenteStore();
 
   const onFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files ? event.target.files[0] : null;
@@ -51,9 +51,10 @@ const FileUpload: React.FC = () => {
       />
       <Button
         onClick={triggerFileInput}
-        className="bg-secondary hover:bg-secondary-light active:bg-secondary-dark"
+        className="bg-secondary hover:bg-secondary-light active:bg-secondary-dark w-full flex items-center gap-2"
         disabled={isLoading}
       >
+        <Upload size={18} color="white" />
         {isLoading ? "Subiendo..." : "Subir Archivo"}
       </Button>
     </div>
