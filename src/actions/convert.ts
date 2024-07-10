@@ -172,10 +172,12 @@ class FileProcessor {
                             });
                             csvOutput += row.join(",") + "\n";
                         }
-
+                        const fileNameWithoutExtension = path.basename(inputFile, path.extname(inputFile));
+                        const match = fileNameWithoutExtension.match(/_(.*)/);
+                        const extractedPart = match ? match[1] : '';
                         const outputFilePath = path.join(
                             outputFolder,
-                            `${sheetName.replace(/[\s\/]+/g, "_")}.csv`
+                            `${extractedPart}_${sheetName.replace(/[\s\/]+/g, "_")}.csv`
                         );
                         fs.writeFileSync(outputFilePath, csvOutput);
                         csvFilePaths.push(outputFilePath);
@@ -223,54 +225,57 @@ class FileProcessor {
         });
 
         try {
-            await this.prisma.$transaction(async (prisma) => {
-                await prisma.ticket.deleteMany({});
 
-                const underscoreIndex = fileName.indexOf('_');
-                const dotIndex = fileName.indexOf('.');
-                const cleanFrenteName = fileName.substring(underscoreIndex + 1, dotIndex);
+            const underscoreIndex = fileName.indexOf('_');
+            const dotIndex = fileName.indexOf('.');
+            const cleanFrenteName = fileName.substring(underscoreIndex + 1, dotIndex);
 
-                if (!cleanFrenteName) {
-                    console.error(`No se pudo extraer un nombre válido del archivo: ${fileName}`);
-                    return;
+            if (!cleanFrenteName) {
+                console.error(`No se pudo extraer un nombre válido del archivo: ${fileName}`);
+                return;
+            }
+
+            await prisma.ticket.deleteMany({
+                where: {
+                    frenteNombre: cleanFrenteName,
                 }
-
-                const frente = await prisma.frente.findUnique({
-                    where: { nombre: cleanFrenteName }
-                });
-
-                if (!frente) {
-                    console.error(`No se encontró el frente con el nombre: ${cleanFrenteName}`);
-                    return;
-                }
-
-
-                for (const record of records) {
-                    await prisma.ticket.create({
-                        data: {
-                            empresa: record.empresa,
-                            material: record.material,
-                            cubicacion: record.cubicacion,
-                            fecha: record.fecha,
-                            placas: record.placas,
-                            idCamion: record.idCamion,
-                            operador: record.operador,
-                            proyecto: record.proyecto,
-                            noEmpleado: record.noEmpleado,
-                            checador: record.checador,
-                            hora: record.hora,
-                            banco: record.banco,
-                            frenteNombre: cleanFrenteName,
-                        },
-                    });
-                }
-
-                console.log("Los datos del CSV han sido cargados en SQLite");
             });
+
+            const frente = await prisma.frente.findUnique({
+                where: { nombre: cleanFrenteName }
+            });
+
+            if (!frente) {
+                console.error(`No se encontró el frente con el nombre: ${cleanFrenteName}`);
+                return;
+            }
+
+            for (const record of records) {
+                await prisma.ticket.create({
+                    data: {
+                        empresa: record.empresa,
+                        material: record.material,
+                        cubicacion: `${record.cubicacion} m³`,
+                        fecha: record.fecha,
+                        placas: record.placas,
+                        idCamion: record.idCamion,
+                        operador: record.operador,
+                        proyecto: record.proyecto,
+                        noEmpleado: record.noEmpleado,
+                        checador: record.checador,
+                        hora: record.hora,
+                        banco: record.banco,
+                        frenteNombre: cleanFrenteName,
+                    },
+                });
+            }
+
+            console.log("Los datos del CSV han sido cargados en SQLite");
         } catch (error) {
             console.error("Error durante la inserción en la base de datos:", error);
             throw error;
         }
+
     }
 
 
