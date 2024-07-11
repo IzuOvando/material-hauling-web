@@ -1,7 +1,6 @@
 "use client";
 import { Ticket } from "@prisma/client";
 import EpsonPrinter from "./epson";
-import CONFIG from "@/config";
 import { findClosestMatch } from "@/helpers/strings";
 
 const setPrintableMetanames = (metanames: string[], maxLenght: number) => {
@@ -30,22 +29,31 @@ export default class TicketPrinter extends EpsonPrinter {
     11
   );
 
-  public printTicket = (ticket: Ticket) => {
+  public printTicket = (
+    ticket: Ticket,
+    original: boolean = true,
+    id: string
+  ) => {
     let { writter, sender } = this.createPrint();
 
     console.debug(`Printing ticket ${ticket.uuid}...`);
 
     this.configTicket(writter);
-    this.generateTicket(writter, ticket);
+    this.generateTicket(writter, ticket, original);
     this.finishTicket(writter);
 
-    sender(writter.toString(), ticket.uuid.slice(0, 30));
+    sender(writter.toString(), id);
   };
 
-  private generateTicket = (writter: any, ticket: Ticket) => {
+  private generateTicket = (
+    writter: any,
+    ticket: Ticket,
+    original: boolean
+  ) => {
     this.addEnterpriseLogo(writter, ticket.empresa);
     this.addId(writter, ticket.uuid);
     this.addTicketData(writter, ticket);
+    this.addTypeTicket(writter, original);
     this.addProyect(writter, ticket.proyecto);
     this.addQR(writter, `${ticket.uuid}`);
   };
@@ -96,12 +104,16 @@ export default class TicketPrinter extends EpsonPrinter {
     }
   };
 
-  private addProyect = (writter: any, proyect: string) => {
+  private addTypeTicket = (writter: any, original: boolean) => {
     writter
       .addTextAlign(writter.ALIGN_CENTER)
       .addTextStyle(false, false, true, writter.COLOR_1)
       .addFeedLine(1)
-      .addText(`"${proyect}`);
+      .addText(original ? "O-R-I-G-I-N-A-L\n" : "C-O-P-I-A\n");
+  };
+
+  private addProyect = (writter: any, proyect: string) => {
+    writter.addText(`${proyect}`);
   };
 
   private addQR = (writter: any, data: string) => {

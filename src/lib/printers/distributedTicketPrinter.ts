@@ -1,12 +1,19 @@
 import { Ticket } from "@prisma/client";
 import { Printer } from "@/types";
 import { divideArray } from "@/helpers/arrays";
+import { generateUniqueId } from "@/helpers/strings";
+
+type TicketWithId = {
+  ticket: Ticket;
+  id: string;
+  original: boolean;
+};
 
 export default class DistributedPrinter {
   private static MAX_BUFFER_SIZE = 5;
   private printers: PrinterWithBuffer[];
   private failedPrinters: PrinterWithBuffer[];
-  private ticketsToPrint: Ticket[]; // UUIDs of tickets to be printed
+  private ticketsToPrint: TicketWithId[]; // UUIDs of tickets to be printed
   private onPrinterFailed: (printer: string) => void;
   private onTicketPrinted: () => void;
 
@@ -16,9 +23,22 @@ export default class DistributedPrinter {
     onPrinterFailed: (printer: string) => void,
     onTicketPrinted: () => void
   ) {
-    this.ticketsToPrint = [...ticketsToPrint];
+    this.ticketsToPrint = [];
     this.printers = [];
     this.failedPrinters = [];
+
+    ticketsToPrint.forEach((ticket) => {
+      this.ticketsToPrint.push({
+        ticket,
+        id: generateUniqueId(30),
+        original: true,
+      });
+      this.ticketsToPrint.push({
+        ticket,
+        id: generateUniqueId(30),
+        original: false,
+      });
+    });
 
     const initialTickets = this.ticketsToPrint.splice(
       0,
@@ -59,12 +79,14 @@ export default class DistributedPrinter {
   }
 
   private handleOnTicketFailed(
-    ticket: Ticket,
+    ticket: TicketWithId,
     error: string,
     printer: PrinterWithBuffer
   ) {
     console.error(
-      `Error printing ticket ${ticket.uuid} on ${printer.printer.name}: ${error}`
+      `Error printing ticket ${ticket.ticket.uuid} ${
+        ticket.original ? "original" : "copy"
+      } on ${printer.printer.name}: ${error}`
     );
     this.ticketsToPrint.push(ticket);
 
@@ -97,25 +119,25 @@ export default class DistributedPrinter {
 
 class PrinterWithBuffer {
   public printer: Printer;
-  private buffer: Ticket[];
-  private getMoreTickets: () => Ticket[];
+  private buffer: TicketWithId[];
+  private getMoreTickets: () => TicketWithId[];
   private onTicketPrinted: (uuid: string) => void;
   private onTicketFailed: (
-    ticket: Ticket,
+    ticket: TicketWithId,
     error: string,
     printer: PrinterWithBuffer
   ) => void;
 
   public constructor(
     printer: Printer,
-    getMoreTickets: () => Ticket[],
+    getMoreTickets: () => TicketWithId[],
     onTicketPrinted: (uuid: string) => void,
     onTicketFailed: (
-      ticket: Ticket,
+      ticket: TicketWithId,
       error: string,
       printer: PrinterWithBuffer
     ) => void,
-    startBuffer: Ticket[] = []
+    startBuffer: TicketWithId[] = []
   ) {
     this.printer = printer;
     this.buffer = startBuffer;
@@ -135,7 +157,12 @@ class PrinterWithBuffer {
 
   public printTickets() {
     for (const ticket of this.buffer) {
-      if (this.printer.device) this.printer.device.printTicket(ticket);
+      if (this.printer.device)
+        this.printer.device.printTicket(
+          ticket.ticket,
+          ticket.original,
+          ticket.id
+        );
     }
   }
 
@@ -158,14 +185,14 @@ class PrinterWithBuffer {
       if (warning) console.warn(`Warning: ${warning}`);
 
       const ticketIndex = this.buffer.findIndex(
-        (ticket) => ticket.uuid.slice(0, 30) === printJobId
+        (ticket) => ticket.id === printJobId
       );
       const ticket = this.buffer[ticketIndex];
 
       this.buffer.splice(ticketIndex, 1); // Remove ticket from buffer
 
       if (success) {
-        this.onTicketPrinted(ticket.uuid);
+        this.onTicketPrinted(ticket.ticket.uuid);
         // Check if we need to fill the buffer again
         if (this.buffer.length === 0) this.continuePrinting();
       } else {

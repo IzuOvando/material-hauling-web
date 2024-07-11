@@ -12,3 +12,9 @@ export function findClosestMatch(
 
   return null;
 }
+
+export function generateUniqueId(length: number) {
+  return Array.from({ length }, () =>
+    Math.floor(Math.random() * 36).toString(36)
+  ).join("");
+}

@@ -89,7 +89,10 @@ const PrintDialog = ({
       setActualView("finished");
     };
 
-    if (actualView === "printing" && ticketsPrinted === selectedTickets.length)
+    if (
+      actualView === "printing" &&
+      ticketsPrinted === selectedTickets.length * 2 // Cause is original and copy
+    )
       handleFinishPrinting();
   }, [ticketsPrinted]);
 
@@ -172,8 +175,8 @@ const StartView = ({
   return (
     <>
       <div className="w-full text-justify text-base text-gray-700">
-        Se imprimirán <b>{numberOfTickets} tickets</b> en las siguientes
-        impresoras disponibles:
+        Se imprimirán <b>{numberOfTickets * 2} tickets</b> (original y copia) en
+        las siguientes impresoras disponibles:
       </div>
       <div className="flex flex-wrap gap-3 justify-center">
         {availablePrinters.map((printer) => (
@@ -239,7 +242,7 @@ const PrintingView = ({
   return (
     <div className="flex flex-1 justify-center items-center flex-col gap-8 mt-[-1rem] py-4">
       <div className="font-semibold">
-        Se han impreso {ticketsPrinted} de {totalTickets} tickets...
+        Se han impreso {ticketsPrinted} de {totalTickets * 2} tickets...
       </div>
       <span className="loader"></span>
       {printersWithErrorNames.length > 0 && (
@@ -285,7 +288,7 @@ const FinishedView = ({
   return (
     <div className="flex flex-1 justify-center items-center flex-col mt-[-1rem] py-4">
       <div className="font-semibold text-xl text-center">
-        Se han impreso los {totalTickets} tickets correctamente
+        Se han impreso los {totalTickets * 2} tickets correctamente
       </div>
       <ReceiptText
         size={150}
