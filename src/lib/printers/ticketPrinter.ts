@@ -47,7 +47,7 @@ export default class TicketPrinter extends EpsonPrinter {
     this.addId(writter, ticket.uuid);
     this.addTicketData(writter, ticket);
     this.addProyect(writter, ticket.proyecto);
-    this.addQR(writter, `${CONFIG.BASE_URL}`);
+    this.addQR(writter, `${ticket.uuid}`);
   };
 
   private configTicket = (writter: any) => {
@@ -101,7 +101,6 @@ export default class TicketPrinter extends EpsonPrinter {
       .addTextAlign(writter.ALIGN_CENTER)
       .addTextStyle(false, false, true, writter.COLOR_1)
       .addFeedLine(1)
-      .addText("PROYECTO\n")
       .addText(`"${proyect}`);
   };
 
