@@ -23,6 +23,7 @@ export function TableTicketFilters<TData>({
   const operators = [...new Set(tickets.map((ticket) => ticket.operador))];
   const checkers = [...new Set(tickets.map((ticket) => ticket.checador))];
   const banks = [...new Set(tickets.map((ticket) => ticket.banco))];
+  const idCamion = [...new Set(tickets.map((ticket) => ticket.idCamion))];
   const projects = [...new Set(tickets.map((ticket) => ticket.proyecto))];
 
   return (
@@ -68,6 +69,13 @@ export function TableTicketFilters<TData>({
             column={table.getColumn("checador")}
             title="Checador"
             options={checkers}
+          />
+        )}
+        {table.getColumn("idCamion") && (
+          <TableTicketFacetedFilter
+            column={table.getColumn("idCamion")}
+            title="IdCamion"
+            options={idCamion}
           />
         )}
         {table.getColumn("proyecto") && (
