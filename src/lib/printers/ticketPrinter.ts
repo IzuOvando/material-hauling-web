@@ -12,11 +12,11 @@ const setPrintableMetanames = (metanames: string[], maxLenght: number) => {
 
 export default class TicketPrinter extends EpsonPrinter {
   private static METANAMES = [
+    "empresa",
     "fecha",
     "hora",
     "material",
     "cubicacion",
-    "empresa",
     "banco",
     "idCamion",
     "placas",
