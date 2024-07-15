@@ -122,6 +122,9 @@ const columns: ColumnDef<Ticket>[] = [
     header: ({ column }) => (
       <TableTicketColumnHeader column={column} title="IdCamion" />
     ),
+    filterFn: (row, id, value) => {
+      return value.includes(row.getValue(id));
+    },
   },
   {
     accessorKey: "operador",
@@ -173,7 +176,9 @@ const TableTicket = ({ tickets }: { tickets: Ticket[] }) => {
 
   useEffect(() => {
     if (selectedFrente) {
-      const associatedTickets = tickets.filter(ticket => ticket.frenteNombre === selectedFrente.nombre);
+      const associatedTickets = tickets.filter(
+        (ticket) => ticket.frenteNombre === selectedFrente.nombre
+      );
       setFilteredTickets(associatedTickets);
     } else {
       setFilteredTickets([]);
@@ -239,9 +244,9 @@ const TableTicket = ({ tickets }: { tickets: Ticket[] }) => {
                       {header.isPlaceholder
                         ? null
                         : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
                     </TableHead>
                   );
                 })}

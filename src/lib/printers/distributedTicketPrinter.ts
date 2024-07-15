@@ -10,7 +10,7 @@ type TicketWithId = {
 };
 
 export default class DistributedPrinter {
-  private static MAX_BUFFER_SIZE = 5;
+  private static MAX_BUFFER_SIZE = 2;
   private printers: PrinterWithBuffer[];
   private failedPrinters: PrinterWithBuffer[];
   private ticketsToPrint: TicketWithId[]; // UUIDs of tickets to be printed
