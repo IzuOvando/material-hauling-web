@@ -21,7 +21,8 @@ export default class DistributedPrinter {
     printers: Printer[],
     ticketsToPrint: Ticket[],
     onPrinterFailed: (printer: string) => void,
-    onTicketPrinted: () => void
+    onTicketPrinted: () => void,
+    frente: string
   ) {
     this.ticketsToPrint = [];
     this.printers = [];
@@ -52,7 +53,8 @@ export default class DistributedPrinter {
           this.distributeTickets.bind(this),
           this.handleOnTicketPrinted.bind(this),
           this.handleOnTicketFailed.bind(this),
-          initialBuffers[i]
+          initialBuffers[i],
+          frente
         )
       );
     }
@@ -127,6 +129,7 @@ class PrinterWithBuffer {
     error: string,
     printer: PrinterWithBuffer
   ) => void;
+  private frente: string;
 
   public constructor(
     printer: Printer,
@@ -137,11 +140,13 @@ class PrinterWithBuffer {
       error: string,
       printer: PrinterWithBuffer
     ) => void,
-    startBuffer: TicketWithId[] = []
+    startBuffer: TicketWithId[] = [],
+    frente: string
   ) {
     this.printer = printer;
     this.buffer = startBuffer;
     this.getMoreTickets = getMoreTickets;
+    this.frente = frente;
     if (this.printer.device)
       this.printer.device.setHandlePrintResponse(
         this.handlePrintResponse.bind(this)
@@ -161,7 +166,8 @@ class PrinterWithBuffer {
         this.printer.device.printTicket(
           ticket.ticket,
           ticket.original,
-          ticket.id
+          ticket.id,
+          this.frente
         );
     }
   }

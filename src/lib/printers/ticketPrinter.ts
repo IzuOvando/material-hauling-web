@@ -12,7 +12,6 @@ const setPrintableMetanames = (metanames: string[], maxLenght: number) => {
 
 export default class TicketPrinter extends EpsonPrinter {
   private static METANAMES = [
-    "empresa",
     "fecha",
     "hora",
     "material",
@@ -24,22 +23,28 @@ export default class TicketPrinter extends EpsonPrinter {
     "noEmpleado",
     "checador",
   ];
+  private static MAX_LENGTH_METANAME = 11;
   private static PRINT_METANAMES = setPrintableMetanames(
     TicketPrinter.METANAMES,
-    11
+    TicketPrinter.MAX_LENGTH_METANAME
+  );
+  private static CLIENT_METANAME = `CLIENTE:\t`.padStart(
+    TicketPrinter.MAX_LENGTH_METANAME,
+    " "
   );
 
   public printTicket = (
     ticket: Ticket,
     original: boolean = true,
-    id: string
+    id: string,
+    frente: string
   ) => {
     let { writter, sender } = this.createPrint();
 
     console.debug(`Printing ticket ${ticket.uuid}...`);
 
     this.configTicket(writter);
-    this.generateTicket(writter, ticket, original);
+    this.generateTicket(writter, ticket, original, frente);
     this.finishTicket(writter);
 
     sender(writter.toString(), id);
@@ -48,10 +53,12 @@ export default class TicketPrinter extends EpsonPrinter {
   private generateTicket = (
     writter: any,
     ticket: Ticket,
-    original: boolean
+    original: boolean,
+    frente: string
   ) => {
     this.addEnterpriseLogo(writter, ticket.empresa);
     this.addId(writter, ticket.uuid);
+    this.addFrente(writter, frente);
     this.addTicketData(writter, ticket);
     this.addTypeTicket(writter, original);
     this.addProyect(writter, ticket.proyecto);
@@ -90,9 +97,16 @@ export default class TicketPrinter extends EpsonPrinter {
       .addText(`${id}\n`);
   };
 
-  private addTicketData = (writter: any, ticket: Ticket) => {
-    writter.addTextAlign(writter.ALIGN_LEFT);
+  private addFrente = (writter: any, frente: string) => {
+    writter
+      .addTextAlign(writter.ALIGN_LEFT)
+      .addTextStyle(false, false, true, writter.COLOR_1)
+      .addText(TicketPrinter.CLIENT_METANAME)
+      .addTextStyle(false, false, false, writter.COLOR_1)
+      .addText(`SEDENA ${frente}\n`);
+  };
 
+  private addTicketData = (writter: any, ticket: Ticket) => {
     for (const metaname of TicketPrinter.PRINT_METANAMES) {
       writter
         .addTextStyle(false, false, true, writter.COLOR_1)

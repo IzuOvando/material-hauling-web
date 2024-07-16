@@ -15,6 +15,7 @@ import { DistributedTicketPrinter } from "@/lib/printers";
 import PrinterLittleCard from "../printers/PrinterLittleCard";
 import { Printer } from "@/types";
 import { ReceiptText } from "lucide-react";
+import useFrenteStore from "@/store/useFrenteStore";
 
 interface PrintDialogProps {
   open: boolean;
@@ -30,6 +31,7 @@ const PrintDialog = ({
   tickets,
 }: PrintDialogProps) => {
   const { printers } = usePrinterStore();
+  const { selectedFrente } = useFrenteStore();
   const availablePrinters = printers.filter(
     (printer) => printer.status === "online"
   );
@@ -54,7 +56,8 @@ const PrintDialog = ({
       availablePrinters,
       ticketsToPrint,
       handlePrinterFailed,
-      handleTicketPrint
+      handleTicketPrint,
+      selectedFrente ? selectedFrente.nombre : ""
     );
 
     distributedTicketPrinter.current.startPrinting();
