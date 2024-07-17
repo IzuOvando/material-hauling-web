@@ -170,6 +170,8 @@ const TableTicket = ({ tickets }: { tickets: Ticket[] }) => {
   // Aux states
   const [disablePrintTickets, setDisablePrintTickets] = useState(true);
   const [openPrintTickets, setOpenPrintTickets] = useState(false);
+  // Ticket states
+  const [sortedTickets, setSortedTickets] = useState<Ticket[]>([]);
   // Frentes
   const { selectedFrente } = useFrenteStore();
   const [filteredTickets, setFilteredTickets] = useState<Ticket[]>([]);
@@ -216,6 +218,13 @@ const TableTicket = ({ tickets }: { tickets: Ticket[] }) => {
     table.toggleAllRowsSelected(false);
     setRowSelection({});
   }, [columnFilters, table]);
+
+  useEffect(() => {
+    const sortedData = table
+      .getSortedRowModel()
+      .flatRows.map((row) => row.original);
+    setSortedTickets(sortedData);
+  }, [sorting, columnFilters]);
 
   return (
     <>
@@ -291,7 +300,7 @@ const TableTicket = ({ tickets }: { tickets: Ticket[] }) => {
         open={openPrintTickets}
         setOpen={setOpenPrintTickets}
         ticketsSelection={rowSelection}
-        tickets={tickets}
+        tickets={sortedTickets}
       />
     </>
   );
