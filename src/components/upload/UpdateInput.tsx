@@ -9,7 +9,12 @@ import CONFIG from "@/config";
 import { Upload } from "lucide-react";
 import { Frente } from "@prisma/client";
 
-const FileUpdate = ({ selectedFrente }: { selectedFrente: Frente }) => {
+interface FileUpdateProps {
+  selectedFrente: Frente;
+  selectedArea: any;
+}
+
+const FileUpdate: React.FC<FileUpdateProps> = ({ selectedFrente, selectedArea }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
@@ -40,6 +45,7 @@ const FileUpdate = ({ selectedFrente }: { selectedFrente: Frente }) => {
     }
 
     await handleFileUpload(
+      selectedArea,
       selectedFrente,
       file,
       setIsLoading,

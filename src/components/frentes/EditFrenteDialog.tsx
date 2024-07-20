@@ -22,6 +22,7 @@ interface EditFrenteDialogProps {
 
 const EditFrenteDialog = ({ open, setOpen, frente }: EditFrenteDialogProps) => {
   const [areTickets, setAreTickets] = useState(false);
+  const [area, setArea] = useState("gasolina");
 
   useEffect(() => {
     fetch("/api/frente/areTickets", {
@@ -58,9 +59,9 @@ const EditFrenteDialog = ({ open, setOpen, frente }: EditFrenteDialogProps) => {
           </DialogHeader>
           <div className="flex flex-col gap-4 py-4">
             {areTickets ? (
-              <FileUpdate selectedFrente={frente} />
+              <FileUpdate selectedFrente={frente} selectedArea={area} />
             ) : (
-              <FileUpload selectedFrente={frente} />
+              <FileUpload selectedFrente={frente} selectedArea={area} />
             )}
 
             <span className="text-center text-sm mb-5">

@@ -3,12 +3,12 @@ import * as XLSX from "xlsx";
 import * as path from "path";
 import prisma from "@/lib/db";
 import csvParser from "csv-parser";
-import { Ticket } from '@prisma/client';
+import { Prisma } from "@prisma/client";
+import { schemas, SchemaKeys } from "@/lib/schemas/headers";
+import { CreateTicketDto, filteredDataConfig, isCreateAcarreosDto, isCreateGasolinaDto } from '@/lib/schemas/csv_schemas';
 
-type CreateTicketDto = Omit<Ticket, 'uuid' | 'createdAt'>;
 
 class FileProcessor {
-    private prisma = prisma;
 
     private toCamelCase(str: string): string {
         return str
@@ -66,33 +66,11 @@ class FileProcessor {
 
     public excelToCSV(
         inputFile: string,
-        outputFolder: string
+        outputFolder: string,
+        validHeaders: Set<string>
     ): Promise<string[]> {
         const csvFilePaths: string[] = [];
         const inputFilePath = path.resolve(process.cwd(), inputFile);
-
-        const validHeaders = new Set([
-            "id",
-            "union",
-            "n°",
-            "#vd",
-            "id camion",
-            "num. eco.",
-            "placas",
-            "cubicacion",
-            "fecha",
-            "material",
-            "banco",
-            "hora",
-            "no. empleado",
-            "operador",
-            "turno",
-            "checador",
-            "empresa",
-            "proyecto",
-            "no empleado",
-            "proyecto",
-        ]);
 
         const isValidHeaderRow = (headers: string[]) => {
             const headerSet = new Set(headers.map((header) => header.toLowerCase()));
@@ -143,12 +121,10 @@ class FileProcessor {
                                     dateColumns.add(C);
                                 }
                             }
-
                             if (!headerChecked) {
                                 if (!isValidHeaderRow(row)) {
                                     continue;
                                 }
-
                                 row = row.map((header) => {
                                     const camelCaseHeader = this.toCamelCase(header.toString());
                                     return camelCaseHeader;
@@ -197,28 +173,26 @@ class FileProcessor {
         return str.replace(/""/g, '"').replace(/^"|"$/g, '');
     };
 
-    public async csvToSQLite(csvFile: string, fileName: string) {
+    private getFilteredData(key: string, data: any, fileName: string): CreateTicketDto {
+        const config = filteredDataConfig[key];
+        if (!config) {
+            throw new Error(`Unsupported key: ${key}`);
+        }
+        return config(data, fileName, this.cleanQuotes);
+    }
+
+    public async csvToSQLite(csvFile: string, fileName: string, key: string) {
         const records: CreateTicketDto[] = [];
         await new Promise<void>((resolve, reject) => {
             fs.createReadStream(csvFile)
                 .pipe(csvParser())
                 .on("data", (data: any) => {
-                    const filteredData: CreateTicketDto = {
-                        empresa: this.cleanQuotes(data.empresa),
-                        material: this.cleanQuotes(data.material),
-                        cubicacion: this.cleanQuotes(data.cubicacion),
-                        fecha: this.cleanQuotes(data.fecha),
-                        placas: this.cleanQuotes(data.placas),
-                        idCamion: this.cleanQuotes(data.idCamion),
-                        operador: this.cleanQuotes(data.operador),
-                        proyecto: this.cleanQuotes(data.proyecto),
-                        noEmpleado: this.cleanQuotes(data.noEmpleado),
-                        checador: this.cleanQuotes(data.checador),
-                        hora: this.cleanQuotes(data.hora),
-                        banco: this.cleanQuotes(data.banco),
-                        frenteNombre: fileName.substring(fileName.indexOf('_') + 1, fileName.indexOf('.')),
-                    };
-                    records.push(filteredData);
+                    try {
+                        const filteredData = this.getFilteredData(key, data, fileName);
+                        records.push(filteredData);
+                    } catch (error) {
+                        console.error("Error filtering data:", error);
+                    }
                 })
                 .on("error", reject)
                 .on("end", resolve);
@@ -238,6 +212,7 @@ class FileProcessor {
             await prisma.ticket.deleteMany({
                 where: {
                     frenteNombre: cleanFrenteName,
+                    tipo: key,
                 }
             });
 
@@ -251,23 +226,75 @@ class FileProcessor {
             }
 
             for (const record of records) {
-                await prisma.ticket.create({
-                    data: {
-                        empresa: record.empresa,
-                        material: record.material,
-                        cubicacion: `${record.cubicacion} m³`,
-                        fecha: record.fecha,
-                        placas: record.placas,
-                        idCamion: record.idCamion,
-                        operador: record.operador,
-                        proyecto: record.proyecto,
-                        noEmpleado: record.noEmpleado,
-                        checador: record.checador,
-                        hora: record.hora,
-                        banco: record.banco,
-                        frenteNombre: cleanFrenteName,
-                    },
-                });
+                let idAcarreo = null;
+                let idGasolina = null;
+                if (isCreateAcarreosDto(record)) {
+                    const acarreo = await prisma.acarreos.create({
+                        data: {
+                            empresa: record.empresa,
+                            material: record.material,
+                            cubicacion: `${record.cubicacion} m³`,
+                            fecha: record.fecha,
+                            placas: record.placas,
+                            idCamion: record.idCamion,
+                            operador: record.operador,
+                            proyecto: record.proyecto,
+                            noEmpleado: record.noEmpleado,
+                            checador: record.checador,
+                            hora: record.hora,
+                            banco: record.banco,
+                        },
+                    });
+                    idAcarreo = acarreo.id;
+                } else if (isCreateGasolinaDto(record)) {
+                    const gasolina = await prisma.gasolina.create({
+                        data: {
+                            empresa: record.empresa,
+                            direccion: record.direccion,
+                            litros: `${record.litros} m³`,
+                            fecha: record.fecha,
+                            placas: record.placas,
+                            noEstacion: record.noEstacion,
+                            noNota: record.noNota,
+                            tipo: record.tipo,
+                            precio: record.precio,
+                            total: record.total,
+                            hora: record.hora,
+                            odometro: record.odometro,
+                            bomba: record.bomba,
+                            terminal: record.terminal,
+                        },
+                    });
+                    idGasolina = gasolina.id;
+                } else {
+                    throw new Error(`Unsupported key: ${key}`);
+                }
+                const dataToInsert: Prisma.TicketCreateInput = {
+                    tipo: key,
+                    ...(idAcarreo ? { acarreos: { connect: { id: idAcarreo } } } : {}),
+                    ...(idGasolina ? { gasolina: { connect: { id: idGasolina } } } : {}),
+                    frenteGasolina: key === "gasolina" ? { connect: { nombre: cleanFrenteName } } : undefined,
+                    frenteAcarreos: key === "acarreos" ? { connect: { nombre: cleanFrenteName } } : undefined,
+                };
+
+                if (key === "gasolina") {
+                    (dataToInsert as Prisma.TicketCreateInput).frenteGasolina = {
+                        connect: { nombre: cleanFrenteName },
+                    };
+                } else if (key === "acarreos") {
+                    (dataToInsert as Prisma.TicketCreateInput).frenteAcarreos = {
+                        connect: { nombre: cleanFrenteName },
+                    };
+                }
+
+                try {
+                    const createdTicket = await prisma.ticket.create({
+                        data: dataToInsert,
+                    });
+                } catch (error) {
+                    console.error("Failed to create ticket:", error);
+                    throw error;
+                }
             }
 
             console.log("Los datos del CSV han sido cargados en SQLite");
@@ -275,33 +302,40 @@ class FileProcessor {
             console.error("Error durante la inserción en la base de datos:", error);
             throw error;
         }
-
     }
 
+    public isValidKey(key: string): key is SchemaKeys {
+        return ['gasolina', 'acarreos'].includes(key);
+    }
 
-
-    public async processFiles(fileName: string) {
+    public async processFiles(fileName: string, area: string) {
         const rootPath = path.resolve(process.cwd(), "./");
         const outputFolder = path.resolve(rootPath, "./db_output/csv/csv_output");
-
+        const key = area.toLowerCase()
+        if (!this.isValidKey(key)) {
+            console.error(`Invalid area type: ${key}`);
+            throw new Error(`Invalid area type: ${key}`);
+        }
+        const validHeaders = schemas[key];
         if (!fs.existsSync(outputFolder)) {
             fs.mkdirSync(outputFolder, { recursive: true });
         }
         try {
             const csvFilePaths = await this.excelToCSV(
                 `./db_input/${fileName}`,
-                outputFolder
+                outputFolder,
+                validHeaders
             );
-            await this.processCSVFiles(csvFilePaths, fileName);
+            await this.processCSVFiles(csvFilePaths, fileName, key);
         } catch (error) {
             console.error("Error during file processing:", error);
             throw error;
         }
     }
 
-    private async processCSVFiles(csvFilePaths: string[], fileName: string) {
+    private async processCSVFiles(csvFilePaths: string[], fileName: string, key: string) {
         for (const csvFilePath of csvFilePaths) {
-            await this.csvToSQLite(csvFilePath, fileName);
+            await this.csvToSQLite(csvFilePath, fileName, key);
         }
     }
 }

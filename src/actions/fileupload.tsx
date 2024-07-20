@@ -2,7 +2,10 @@ import { Dispatch, SetStateAction } from "react";
 import { handleDeleteFiles } from "@/actions/deletefiles";
 import CONFIG from "@/config";
 
+//TODO PASAR EL FRENTE DE PRISMA Y AHORA EL AREA
+
 export async function handleFileUpload(
+  area: any,
   frente: any,
   file: File,
   setIsLoading: Dispatch<SetStateAction<boolean>>,
@@ -27,7 +30,7 @@ export async function handleFileUpload(
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ fileName: newFile.name }),
+        body: JSON.stringify({ fileName: newFile.name, area: area }),
       });
 
       if (processResponse.ok) {

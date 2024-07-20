@@ -12,10 +12,11 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { fileName } = await req.json();
+    const data = await req.json();
+    const { fileName, area } = data;
 
     const fileProcessor = new FileProcessor();
-    await fileProcessor.processFiles(fileName);
+    await fileProcessor.processFiles(fileName, area);
 
     return new Response(
       JSON.stringify({ message: "Files processed successfully" }),
