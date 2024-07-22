@@ -3,9 +3,12 @@ import * as XLSX from "xlsx";
 import * as path from "path";
 import prisma from "@/lib/db";
 import csvParser from "csv-parser";
+import { promisify } from 'util';
 import { schemas, SchemaKeys } from "@/lib/schemas/headers";
 import { CreateTicketDto, filteredDataConfig, isCreateAcarreosDto, isCreateGasolinaDto } from '@/lib/schemas/csv_schemas';
 
+const readdir = promisify(fs.readdir);
+const unlink = promisify(fs.unlink);
 
 class FileProcessor {
 
@@ -314,6 +317,7 @@ class FileProcessor {
     public async processFiles(fileName: string, area: string) {
         const rootPath = path.resolve(process.cwd(), "./");
         const outputFolder = path.resolve(rootPath, "./db_output/csv/csv_output");
+        const dbInputPath = path.resolve(rootPath, "./db_input");
         const desiredPart = fileName.split('_')[1].split('.')[0];
         const outputExcel = path.resolve(rootPath, `./db_output/excel/${desiredPart}`);
         if (!fs.existsSync(outputExcel)) {
@@ -337,7 +341,7 @@ class FileProcessor {
             );
             await this.processCSVFiles(csvFilePaths, fileName, key);
             await this.downloadDatabase(path.resolve(outputExcel), key)
-            this.deleteFiles([path.resolve(outputFolder, `./db_input/${fileName}`), ...csvFilePaths]);
+            this.deleteFiles([dbInputPath, outputFolder])
         } catch (error) {
             console.error("Error during file processing:", error);
             throw error;
@@ -413,17 +417,24 @@ class FileProcessor {
     }
 
 
-    private deleteFiles(filePaths: string[]): void {
-        filePaths.forEach((filePath) => {
-            fs.unlink(filePath, (err) => {
-                if (err) {
-                    console.error(`Error deleting file ${filePath}:`, err);
-                    throw new Error(`Failed to delete file ${filePath}: ${err.message}`);
-                } else {
-                    console.log(`File ${filePath} deleted successfully.`);
-                }
-            });
-        });
+    private async deleteFiles(directories: string[]): Promise<void> {
+        for (const directory of directories) {
+            try {
+                const files = await readdir(directory);
+                await Promise.all(files.map(file => {
+                    const filePath = path.join(directory, file);
+                    return unlink(filePath).then(() => {
+                        console.log(`File ${filePath} deleted successfully.`);
+                    }).catch(err => {
+                        console.error(`Error deleting file ${filePath}:`, err);
+                        throw new Error(`Failed to delete file ${filePath}: ${err.message}`);
+                    });
+                }));
+            } catch (err) {
+                console.error(`Error accessing directory ${directory}:`, err);
+                throw err;
+            }
+        }
     }
 }
 
