@@ -33,6 +33,7 @@ const FileUpdate: React.FC<FileUpdateProps> = ({ selectedFrente, selectedArea })
     }
 
     const { success, errorMessage } = await handleDeleteFiles(
+      selectedArea,
       selectedFrente,
       setIsLoading,
       toast,

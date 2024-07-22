@@ -3,7 +3,6 @@ import * as XLSX from "xlsx";
 import * as path from "path";
 import prisma from "@/lib/db";
 import csvParser from "csv-parser";
-import { Prisma } from "@prisma/client";
 import { schemas, SchemaKeys } from "@/lib/schemas/headers";
 import { CreateTicketDto, filteredDataConfig, isCreateAcarreosDto, isCreateGasolinaDto } from '@/lib/schemas/csv_schemas';
 
@@ -209,12 +208,21 @@ class FileProcessor {
                 return;
             }
 
-            await prisma.ticket.deleteMany({
-                where: {
-                    frenteNombre: cleanFrenteName,
-                    tipo: key,
-                }
-            });
+            if (key === 'gasolina') {
+                await prisma.gasolina.deleteMany({
+                    where: {
+                        frenteNombre: cleanFrenteName,
+                    },
+                });
+            } else if (key === 'acarreos') {
+                await prisma.acarreos.deleteMany({
+                    where: {
+                        frenteNombre: cleanFrenteName,
+                    },
+                });
+            } else {
+                throw new Error(`Unsupported key: ${key}`);
+            }
 
             const frente = await prisma.frente.findUnique({
                 where: { nombre: cleanFrenteName }
@@ -226,71 +234,66 @@ class FileProcessor {
             }
 
             for (const record of records) {
-                let idAcarreo = null;
-                let idGasolina = null;
-                if (isCreateAcarreosDto(record)) {
-                    const acarreo = await prisma.acarreos.create({
-                        data: {
-                            empresa: record.empresa,
-                            material: record.material,
-                            cubicacion: `${record.cubicacion} m³`,
-                            fecha: record.fecha,
-                            placas: record.placas,
-                            idCamion: record.idCamion,
-                            operador: record.operador,
-                            proyecto: record.proyecto,
-                            noEmpleado: record.noEmpleado,
-                            checador: record.checador,
-                            hora: record.hora,
-                            banco: record.banco,
-                        },
-                    });
-                    idAcarreo = acarreo.id;
-                } else if (isCreateGasolinaDto(record)) {
-                    const gasolina = await prisma.gasolina.create({
-                        data: {
-                            empresa: record.empresa,
-                            direccion: record.direccion,
-                            litros: `${record.litros} m³`,
-                            fecha: record.fecha,
-                            placas: record.placas,
-                            noEstacion: record.noEstacion,
-                            noNota: record.noNota,
-                            tipo: record.tipo,
-                            precio: record.precio,
-                            total: record.total,
-                            hora: record.hora,
-                            odometro: record.odometro,
-                            bomba: record.bomba,
-                            terminal: record.terminal,
-                        },
-                    });
-                    idGasolina = gasolina.id;
-                } else {
-                    throw new Error(`Unsupported key: ${key}`);
-                }
-                const dataToInsert: Prisma.TicketCreateInput = {
-                    tipo: key,
-                    ...(idAcarreo ? { acarreos: { connect: { id: idAcarreo } } } : {}),
-                    ...(idGasolina ? { gasolina: { connect: { id: idGasolina } } } : {}),
-                    frenteGasolina: key === "gasolina" ? { connect: { nombre: cleanFrenteName } } : undefined,
-                    frenteAcarreos: key === "acarreos" ? { connect: { nombre: cleanFrenteName } } : undefined,
-                };
-
-                if (key === "gasolina") {
-                    (dataToInsert as Prisma.TicketCreateInput).frenteGasolina = {
-                        connect: { nombre: cleanFrenteName },
-                    };
-                } else if (key === "acarreos") {
-                    (dataToInsert as Prisma.TicketCreateInput).frenteAcarreos = {
-                        connect: { nombre: cleanFrenteName },
-                    };
-                }
-
                 try {
-                    const createdTicket = await prisma.ticket.create({
-                        data: dataToInsert,
-                    });
+                    if (isCreateAcarreosDto(record)) {
+                        const acarreo = await prisma.acarreos.create({
+                            data: {
+                                frenteNombre: record.frenteNombre,
+                                empresa: record.empresa,
+                                material: record.material,
+                                cubicacion: `${record.cubicacion} m³`,
+                                fecha: record.fecha,
+                                placas: record.placas,
+                                idCamion: record.idCamion,
+                                operador: record.operador,
+                                proyecto: record.proyecto,
+                                noEmpleado: record.noEmpleado,
+                                checador: record.checador,
+                                hora: record.hora,
+                                banco: record.banco,
+                            },
+                        });
+
+                        await prisma.frente.update({
+                            where: { nombre: record.frenteNombre },
+                            data: {
+                                ticketsAcarreos: {
+                                    connect: { uuid: acarreo.uuid },
+                                },
+                            },
+                        });
+                    } else if (isCreateGasolinaDto(record)) {
+                        const gasolina = await prisma.gasolina.create({
+                            data: {
+                                frenteNombre: record.frenteNombre,
+                                empresa: record.empresa,
+                                direccion: record.direccion,
+                                litros: `${record.litros} m³`,
+                                fecha: record.fecha,
+                                placas: record.placas,
+                                noEstacion: record.noEstacion,
+                                noNota: record.noNota,
+                                tipo: record.tipo,
+                                precio: record.precio,
+                                total: record.total,
+                                hora: record.hora,
+                                odometro: record.odometro,
+                                bomba: record.bomba,
+                                terminal: record.terminal,
+                            },
+                        });
+
+                        await prisma.frente.update({
+                            where: { nombre: record.frenteNombre },
+                            data: {
+                                ticketsGasolina: {
+                                    connect: { uuid: gasolina.uuid },
+                                },
+                            },
+                        });
+                    } else {
+                        throw new Error(`Unsupported record type: ${JSON.stringify(record)}`);
+                    }
                 } catch (error) {
                     console.error("Failed to create ticket:", error);
                     throw error;
@@ -311,6 +314,12 @@ class FileProcessor {
     public async processFiles(fileName: string, area: string) {
         const rootPath = path.resolve(process.cwd(), "./");
         const outputFolder = path.resolve(rootPath, "./db_output/csv/csv_output");
+        const desiredPart = fileName.split('_')[1].split('.')[0];
+        const outputExcel = path.resolve(rootPath, `./db_output/excel/${desiredPart}`);
+        if (!fs.existsSync(outputExcel)) {
+            fs.mkdirSync(outputExcel, { recursive: true });
+        }
+
         const key = area.toLowerCase()
         if (!this.isValidKey(key)) {
             console.error(`Invalid area type: ${key}`);
@@ -327,6 +336,8 @@ class FileProcessor {
                 validHeaders
             );
             await this.processCSVFiles(csvFilePaths, fileName, key);
+            await this.downloadDatabase(path.resolve(outputExcel), key)
+            this.deleteFiles([path.resolve(outputFolder, `./db_input/${fileName}`), ...csvFilePaths]);
         } catch (error) {
             console.error("Error during file processing:", error);
             throw error;
@@ -337,6 +348,82 @@ class FileProcessor {
         for (const csvFilePath of csvFilePaths) {
             await this.csvToSQLite(csvFilePath, fileName, key);
         }
+    }
+
+    private downloadDatabase(outputExcel: string, key: string): Promise<void> {
+        return new Promise((resolve, reject) => {
+            let records: any[];
+
+            if (key === 'gasolina') {
+                prisma.gasolina.findMany().then(res => {
+                    records = res;
+                    processRecords();
+                }).catch(err => {
+                    console.error("Error fetching 'gasolina' records:", err);
+                    reject(err);
+                });
+            } else if (key === 'acarreos') {
+                prisma.acarreos.findMany().then(res => {
+                    records = res;
+                    processRecords();
+                }).catch(err => {
+                    console.error("Error fetching 'acarreos' records:", err);
+                    reject(err);
+                });
+            } else {
+                reject(new Error(`Unsupported key: ${key}`));
+            }
+
+            function processRecords() {
+                const worksheet = XLSX.utils.json_to_sheet(records);
+                const workbook = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(workbook, worksheet, key.charAt(0).toUpperCase() + key.slice(1));
+
+                const filename = `${key}.xlsx`;
+                const outputFilePath = path.resolve(outputExcel, filename);
+                const dirPath = path.dirname(outputFilePath);
+
+                fs.mkdir(dirPath, { recursive: true }, (err) => {
+                    if (err) {
+                        console.error("Failed to create directory:", err);
+                        reject(err);
+                        return;
+                    }
+
+                    fs.stat(dirPath, (err, stats) => {
+                        if (err || !stats.isDirectory()) {
+                            console.error("Directory validation failed:", err);
+                            reject(err);
+                            return;
+                        }
+                        const buffer = XLSX.write(workbook, { type: 'buffer' });
+                        fs.writeFile(outputFilePath, buffer, (err) => {
+                            if (err) {
+                                console.error("Failed to write Excel file:", err);
+                                reject(err);
+                                return;
+                            }
+                            console.log('Database has been downloaded as Excel');
+                            resolve();
+                        });
+                    });
+                });
+            }
+        });
+    }
+
+
+    private deleteFiles(filePaths: string[]): void {
+        filePaths.forEach((filePath) => {
+            fs.unlink(filePath, (err) => {
+                if (err) {
+                    console.error(`Error deleting file ${filePath}:`, err);
+                    throw new Error(`Failed to delete file ${filePath}: ${err.message}`);
+                } else {
+                    console.log(`File ${filePath} deleted successfully.`);
+                }
+            });
+        });
     }
 }
 

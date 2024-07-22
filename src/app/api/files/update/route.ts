@@ -4,7 +4,6 @@ import path from "path";
 import { promisify } from "util";
 import prisma from "@/lib/db";
 
-const readdir = promisify(fs.readdir);
 const unlink = promisify(fs.unlink);
 
 export async function POST(req: NextRequest) {
@@ -12,17 +11,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Method Not Allowed" }, { status: 405 });
   }
 
-  const { nombre } = await req.json();
+  const data = await req.json();
+  const { nombre, area } = data;
 
   const rootPath = path.resolve(process.cwd());
-  const outputFolder = path.join(rootPath, "db_output", "csv", "csv_output");
-  const specificFilePath = path.join(rootPath, "db_input", `${nombre}.xlsx`);
-
+  const desiredPart = nombre.split('_')[1].split('.')[0];
+  const specificFilePath = path.join(rootPath, "db_output", "excel", desiredPart, `${area}.xslx`);
   try {
-    const files = await readdir(outputFolder);
-    await Promise.all(
-      files.map((file) => unlink(path.join(outputFolder, file)))
-    );
 
     await unlink(specificFilePath);
 

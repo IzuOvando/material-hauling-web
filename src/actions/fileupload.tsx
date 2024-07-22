@@ -5,7 +5,7 @@ import CONFIG from "@/config";
 //TODO PASAR EL FRENTE DE PRISMA Y AHORA EL AREA
 
 export async function handleFileUpload(
-  area: any,
+  area: string,
   frente: any,
   file: File,
   setIsLoading: Dispatch<SetStateAction<boolean>>,
@@ -42,6 +42,7 @@ export async function handleFileUpload(
         setTimeout(() => window.location.reload(), 2500);
       } else {
         const { success, errorMessage } = await handleDeleteFiles(
+          area,
           frente,
           setIsLoading,
           toast,

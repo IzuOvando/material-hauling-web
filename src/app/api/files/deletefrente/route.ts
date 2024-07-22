@@ -7,7 +7,7 @@ export async function POST(req: NextRequest) {
 
         const frente = await prisma.frente.findUnique({
             where: { nombre },
-            include: { tickets: true },
+            include: { ticketsAcarreos: true, ticketsGasolina: true },
         });
 
         if (!frente) {
@@ -16,10 +16,6 @@ export async function POST(req: NextRequest) {
                 { status: 404 }
             );
         }
-
-        await prisma.ticket.deleteMany({
-            where: { frenteNombre: nombre },
-        });
 
         await prisma.frente.delete({
             where: { nombre },

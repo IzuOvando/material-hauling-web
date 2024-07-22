@@ -1,6 +1,7 @@
 import { Dispatch, SetStateAction } from 'react';
 
 export async function handleDeleteFiles(
+    area: string,
     selectedFrente: any,
     setIsLoading: Dispatch<SetStateAction<boolean>>,
     toast: any,
@@ -13,7 +14,7 @@ export async function handleDeleteFiles(
     try {
         const response = await fetch(`${apiUrl}/api/files/update`, {
             method: 'POST',
-            body: JSON.stringify({ nombre: FileName }),
+            body: JSON.stringify({ nombre: FileName, area: area }),
         });
 
         if (response.ok) {

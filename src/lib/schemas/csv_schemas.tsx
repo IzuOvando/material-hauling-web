@@ -5,8 +5,8 @@ enum TipoTicket {
     GASOLINA = "GASOLINA"
 }
 
-type CreateGasolinaDto = Omit<Gasolina, 'id'> & { tipoTicket: TipoTicket.GASOLINA };
-type CreateAcarreosDto = Omit<Acarreos, 'id'> & { tipoTicket: TipoTicket.ACARREOS };
+type CreateGasolinaDto = Omit<Gasolina, 'uuid' | 'createdAt'> & { tipoTicket: TipoTicket.GASOLINA };
+type CreateAcarreosDto = Omit<Acarreos, 'uuid' | 'createdAt'> & { tipoTicket: TipoTicket.ACARREOS };
 
 export type CreateTicketDto = CreateGasolinaDto | CreateAcarreosDto;
 

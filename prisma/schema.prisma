@@ -16,58 +16,47 @@ model User {
 }
 
 model Frente {
-  nombre          String   @id @unique
-  ticketsGasolina Ticket[] @relation("TicketsGasolina")
-  ticketsAcarreos Ticket[] @relation("TicketsAcarreos")
-}
-
-model Ticket {
-  uuid           String    @id @default(uuid())
-  createdAt      DateTime  @default(now())
-  frenteNombre   String
-  frenteGasolina Frente?   @relation(name: "TicketsGasolina", fields: [frenteNombre], references: [nombre])
-  frenteAcarreos Frente?   @relation(name: "TicketsAcarreos", fields: [frenteNombre], references: [nombre])
-  tipo           String
-  idAcarreo      Int?      @unique
-  idGasolina     Int?      @unique
-  acarreos       Acarreos? @relation(fields: [idAcarreo], references: [id], onDelete: Cascade)
-  gasolina       Gasolina? @relation(fields: [idGasolina], references: [id], onDelete: Cascade)
-
-  @@unique([tipo, idAcarreo, idGasolina])
+  nombre          String     @id @unique
+  ticketsGasolina Gasolina[] @relation("FrenteGasolina")
+  ticketsAcarreos Acarreos[] @relation("FrenteAcarreos")
 }
 
 model Acarreos {
-  id         Int      @id @default(autoincrement())
-  empresa    String
-  material   String
-  cubicacion String
-  fecha      String
-  placas     String
-  noEmpleado String
-  idCamion   String
-  operador   String
-  checador   String
-  hora       String
-  proyecto   String
-  banco      String
-  ticket     Ticket[]
+  uuid         String   @id @default(uuid())
+  createdAt    DateTime @default(now())
+  frenteNombre String
+  empresa      String
+  material     String
+  cubicacion   String
+  fecha        String
+  placas       String
+  noEmpleado   String
+  idCamion     String
+  operador     String
+  checador     String
+  hora         String
+  proyecto     String
+  banco        String
+  frente       Frente   @relation("FrenteAcarreos", fields: [frenteNombre], references: [nombre], onDelete: Cascade)
 }
 
 model Gasolina {
-  id         Int      @id @default(autoincrement())
-  empresa    String
-  direccion  String
-  litros     String
-  fecha      String
-  placas     String
-  noEstacion String
-  noNota     String
-  tipo       String
-  precio     String
-  hora       String
-  total      String
-  odometro   String
-  bomba      String
-  terminal   String
-  ticket     Ticket[]
+  uuid         String   @id @default(uuid())
+  createdAt    DateTime @default(now())
+  frenteNombre String
+  empresa      String
+  direccion    String
+  litros       String
+  fecha        String
+  placas       String
+  noEstacion   String
+  noNota       String
+  tipo         String
+  precio       String
+  hora         String
+  total        String
+  odometro     String
+  bomba        String
+  terminal     String
+  frente       Frente   @relation("FrenteGasolina", fields: [frenteNombre], references: [nombre], onDelete: Cascade)
 }
