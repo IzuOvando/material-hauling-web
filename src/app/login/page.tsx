@@ -1,3 +1,4 @@
+import { FrenteReset } from "@/store";
 import CardLogin from "./components/CardLogin";
 
 export default function Login() {
@@ -7,6 +8,7 @@ export default function Login() {
       <div className="w-full flex justify-center mt-6">
         <CardLogin />
       </div>
+      <FrenteReset />
     </main>
   );
 }

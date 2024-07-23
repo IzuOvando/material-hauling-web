@@ -1,8 +1,2 @@
-import { TicketPrinter } from "@/lib/printers";
-
-export type Printer = {
-  name: string;
-  ip: string;
-  status: "online" | "offline" | "connecting" | "paperEnd";
-  device?: TicketPrinter;
-};
+export type { Printer, Ticket } from "./types";
+export { TicketArea, TicketAreaList } from "./enum";

@@ -13,7 +13,10 @@ interface FileUpdateProps {
   selectedArea: any;
 }
 
-const FileUpload: React.FC<FileUpdateProps> = ({ selectedFrente, selectedArea }) => {
+const FileUpload: React.FC<FileUpdateProps> = ({
+  selectedFrente,
+  selectedArea,
+}) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
@@ -47,7 +50,7 @@ const FileUpload: React.FC<FileUpdateProps> = ({ selectedFrente, selectedArea })
   };
 
   return (
-    <div>
+    <>
       <Input
         ref={fileInputRef}
         type="file"
@@ -63,7 +66,7 @@ const FileUpload: React.FC<FileUpdateProps> = ({ selectedFrente, selectedArea })
         <Upload size={18} color="white" />
         {isLoading ? "Subiendo..." : "Subir Archivo"}
       </Button>
-    </div>
+    </>
   );
 };
 

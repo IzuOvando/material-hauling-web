@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { TicketArea } from "@/types";
 import prisma from "@/lib/db";
 
 export async function POST(req: NextRequest) {
@@ -7,7 +8,7 @@ export async function POST(req: NextRequest) {
 
     const frente = await prisma.frente.findUnique({
       where: { nombre },
-      include: { tickets: true },
+      include: { ticketsAcarreos: true, ticketsGasolina: true },
     });
 
     if (!frente) {
@@ -17,10 +18,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const areTickets = frente.tickets.length > 0;
-
     return NextResponse.json({
-      areTickets: areTickets,
+      [TicketArea.ACARREOS]: frente.ticketsAcarreos.length > 0,
+      [TicketArea.GASOLINA]: frente.ticketsGasolina.length > 0,
     });
   } catch (error) {
     return NextResponse.json(

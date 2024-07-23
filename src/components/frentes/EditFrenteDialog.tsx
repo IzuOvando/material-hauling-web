@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -6,6 +6,14 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { SelectGroup, SelectLabel } from "@radix-ui/react-select";
 import { AlertDialog, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Frente } from "@prisma/client";
@@ -13,38 +21,24 @@ import { Trash } from "lucide-react";
 import DeleteFrenteAlertDialog from "./DeleteFrenteAlertDialog";
 import FileUpdate from "../upload/UpdateInput";
 import FileUpload from "../upload/UploadInput";
+import { TicketArea, TicketAreaList } from "@/types";
 
 interface EditFrenteDialogProps {
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   frente: Frente;
+  areTickets: {
+    [key in TicketArea]: boolean;
+  };
 }
 
-const EditFrenteDialog = ({ open, setOpen, frente }: EditFrenteDialogProps) => {
-  const [areTickets, setAreTickets] = useState(false);
-  const [area, setArea] = useState("gasolina");
-
-  useEffect(() => {
-    fetch("/api/frente/areTickets", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ nombre: frente.nombre }),
-    })
-      .then((res) => {
-        return res.json();
-      })
-      .then((data) => {
-        setAreTickets(data?.areTickets);
-      })
-      .catch((err) => {
-        console.error(
-          "Error al verificar si hay tickets asociados al frente:",
-          err
-        );
-      });
-  }, [frente]);
+const EditFrenteDialog = ({
+  open,
+  setOpen,
+  frente,
+  areTickets,
+}: EditFrenteDialogProps) => {
+  const [area, setArea] = useState<TicketArea>(TicketArea.ACARREOS);
 
   return (
     <AlertDialog>
@@ -54,19 +48,43 @@ const EditFrenteDialog = ({ open, setOpen, frente }: EditFrenteDialogProps) => {
             <DialogTitle>Editar Frente</DialogTitle>
             <DialogDescription>
               Aquí puedes subir una base de datos para el{" "}
-              <b>Frente {frente.nombre}</b> o eliminarla. <br />
+              <b>Frente {frente.nombre}</b> en un área en específico o
+              eliminarlo. <br />
             </DialogDescription>
           </DialogHeader>
           <div className="flex flex-col gap-4 py-4">
-            {areTickets ? (
-              <FileUpdate selectedFrente={frente} selectedArea={area} />
-            ) : (
-              <FileUpload selectedFrente={frente} selectedArea={area} />
-            )}
-
+            <span className="flex w-full gap-2">
+              <Select
+                onValueChange={(v: TicketArea) => setArea(v)}
+                defaultValue={area}
+              >
+                <SelectTrigger className="w-[130px] border-2 border-accent text-accent font-bold text-lg">
+                  <SelectValue placeholder="Área..." className="mx-0" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectLabel className="ml-3 font-bold">Área</SelectLabel>
+                    {TicketAreaList.map((area) => (
+                      <SelectItem
+                        key={area.label}
+                        value={area.value}
+                        className="cursor-pointer"
+                      >
+                        {area.label}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+              {areTickets[area] ? (
+                <FileUpdate selectedFrente={frente} selectedArea={area} />
+              ) : (
+                <FileUpload selectedFrente={frente} selectedArea={area} />
+              )}
+            </span>
             <span className="text-center text-sm mb-5">
-              Si ya existe una base de datos en el frente esta{" "}
-              <b>sera reeplazada</b> con la nueva.
+              Si ya existe una base de datos en el área del frente, ésta{" "}
+              <b>sera reeplazada</b> con la nueva base de datos.
             </span>
             <AlertDialogTrigger asChild>
               <Button

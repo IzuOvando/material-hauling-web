@@ -5,85 +5,132 @@ import { Table } from "@tanstack/react-table";
 
 import { Button } from "@/components/ui/button";
 import { TableTicketFacetedFilter } from "./TableTicketFacetedFilter";
-import { Ticket } from "@prisma/client";
+import { Ticket, TicketArea } from "@/types";
+import { Acarreos, Gasolina } from "@prisma/client";
+import { useMemo } from "react";
 
 interface TableTicketFiltersProps<TData> {
   table: Table<TData>;
   tickets: Ticket[];
+  area: TicketArea;
 }
+
+const setFilters = (tickets: Ticket[], area: TicketArea) => {
+  let filters: {
+    column: string;
+    label: string;
+    data: any[];
+  }[] = [];
+
+  if (area === TicketArea.ACARREOS) {
+    const acarreos = tickets as Acarreos[];
+    filters = [
+      {
+        column: "material",
+        label: "Material",
+        data: [...new Set(acarreos.map((ticket) => ticket.material))],
+      },
+      {
+        column: "empresa",
+        label: "Empresa",
+        data: [...new Set(acarreos.map((ticket) => ticket.empresa))],
+      },
+      {
+        column: "banco",
+        label: "Banco",
+        data: [...new Set(acarreos.map((ticket) => ticket.banco))],
+      },
+      {
+        column: "fecha",
+        label: "Fecha",
+        data: [...new Set(acarreos.map((ticket) => ticket.fecha))],
+      },
+      {
+        column: "operador",
+        label: "Operador",
+        data: [...new Set(acarreos.map((ticket) => ticket.operador))],
+      },
+      {
+        column: "checador",
+        label: "Checador",
+        data: [...new Set(acarreos.map((ticket) => ticket.checador))],
+      },
+      {
+        column: "idCamion",
+        label: "IdCamion",
+        data: [...new Set(acarreos.map((ticket) => ticket.idCamion))],
+      },
+      {
+        column: "proyecto",
+        label: "Proyecto",
+        data: [...new Set(acarreos.map((ticket) => ticket.proyecto))],
+      },
+    ];
+  } else {
+    const gasolina = tickets as Gasolina[];
+    filters = [
+      {
+        column: "noEstacion",
+        label: "NoEstacion",
+        data: [...new Set(gasolina.map((ticket) => ticket.noEstacion))],
+      },
+      {
+        column: "noNota",
+        label: "NoNota",
+        data: [...new Set(gasolina.map((ticket) => ticket.noNota))],
+      },
+      {
+        column: "fecha",
+        label: "Fecha",
+        data: [...new Set(gasolina.map((ticket) => ticket.fecha))],
+      },
+      {
+        column: "placas",
+        label: "Placas",
+        data: [...new Set(gasolina.map((ticket) => ticket.placas))],
+      },
+      {
+        column: "odometro",
+        label: "Odometro",
+        data: [...new Set(gasolina.map((ticket) => ticket.odometro))],
+      },
+      {
+        column: "bomba",
+        label: "Bomba",
+        data: [...new Set(gasolina.map((ticket) => ticket.bomba))],
+      },
+      {
+        column: "terminal",
+        label: "Terminal",
+        data: [...new Set(gasolina.map((ticket) => ticket.terminal))],
+      },
+    ];
+  }
+
+  return filters;
+};
 
 export function TableTicketFilters<TData>({
   table,
   tickets,
+  area,
 }: TableTicketFiltersProps<TData>) {
   const isFiltered = table.getState().columnFilters.length > 0;
-  const materials = [...new Set(tickets.map((ticket) => ticket.material))];
-  const enterprises = [...new Set(tickets.map((ticket) => ticket.empresa))];
-  const dates = [...new Set(tickets.map((ticket) => ticket.fecha))];
-  const operators = [...new Set(tickets.map((ticket) => ticket.operador))];
-  const checkers = [...new Set(tickets.map((ticket) => ticket.checador))];
-  const banks = [...new Set(tickets.map((ticket) => ticket.banco))];
-  const idCamion = [...new Set(tickets.map((ticket) => ticket.idCamion))];
-  const projects = [...new Set(tickets.map((ticket) => ticket.proyecto))];
+  const filters = useMemo(() => setFilters(tickets, area), [tickets, area]);
 
   return (
     <div className="flex items-center justify-between">
       <div className="flex flex-1 items-center gap-2 flex-wrap justify-center lg:justify-normal">
-        {table.getColumn("material") && (
-          <TableTicketFacetedFilter
-            column={table.getColumn("material")}
-            title="Material"
-            options={materials}
-          />
-        )}
-        {table.getColumn("empresa") && (
-          <TableTicketFacetedFilter
-            column={table.getColumn("empresa")}
-            title="Empresa"
-            options={enterprises}
-          />
-        )}
-        {table.getColumn("banco") && (
-          <TableTicketFacetedFilter
-            column={table.getColumn("banco")}
-            title="Banco"
-            options={banks}
-          />
-        )}
-        {table.getColumn("fecha") && (
-          <TableTicketFacetedFilter
-            column={table.getColumn("fecha")}
-            title="Fecha"
-            options={dates}
-          />
-        )}
-        {table.getColumn("operador") && (
-          <TableTicketFacetedFilter
-            column={table.getColumn("operador")}
-            title="Operador"
-            options={operators}
-          />
-        )}
-        {table.getColumn("checador") && (
-          <TableTicketFacetedFilter
-            column={table.getColumn("checador")}
-            title="Checador"
-            options={checkers}
-          />
-        )}
-        {table.getColumn("idCamion") && (
-          <TableTicketFacetedFilter
-            column={table.getColumn("idCamion")}
-            title="IdCamion"
-            options={idCamion}
-          />
-        )}
-        {table.getColumn("proyecto") && (
-          <TableTicketFacetedFilter
-            column={table.getColumn("proyecto")}
-            title="Proyecto"
-            options={projects}
-          />
+        {filters.map(
+          (filter) =>
+            table.getColumn(filter.column) && (
+              <TableTicketFacetedFilter
+                key={filter.column}
+                column={table.getColumn(filter.column)}
+                title={filter.label}
+                options={filter.data}
+              />
+            )
         )}
         {isFiltered && (
           <Button

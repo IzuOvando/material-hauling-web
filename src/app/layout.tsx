@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import { Toaster } from "@/components/ui/toaster";
 import Navbar from "@/components/Navbar";
 import { PrinterStoreInitializer } from "@/store";
-import EnterprisesImagesInitializer from "@/contexts/EnterprisesImagesInitializer";
+import { EnterprisesImagesInitializer } from "@/contexts";
 
 const montserrat = Montserrat({ subsets: ["latin"], variable: "--montserrat" });
 

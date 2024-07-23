@@ -9,13 +9,12 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { usePrinterStore } from "@/store";
+import { usePrinterStore, useFrenteStore } from "@/store";
 import { Ticket } from "@prisma/client";
 import { DistributedTicketPrinter } from "@/lib/printers";
 import PrinterLittleCard from "../printers/PrinterLittleCard";
 import { Printer } from "@/types";
 import { ReceiptText } from "lucide-react";
-import useFrenteStore from "@/store/useFrenteStore";
 
 interface PrintDialogProps {
   open: boolean;

@@ -14,7 +14,10 @@ interface FileUpdateProps {
   selectedArea: any;
 }
 
-const FileUpdate: React.FC<FileUpdateProps> = ({ selectedFrente, selectedArea }) => {
+const FileUpdate: React.FC<FileUpdateProps> = ({
+  selectedFrente,
+  selectedArea,
+}) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);

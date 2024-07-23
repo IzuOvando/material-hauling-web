@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   Select,
   SelectContent,
@@ -8,7 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import useFrenteStore from "@/store/useFrenteStore";
+import { useFrenteStore } from "@/store";
 import { SelectGroup, SelectLabel } from "@radix-ui/react-select";
 import { Frente } from "@prisma/client";
 import { useEffect } from "react";
@@ -16,30 +17,68 @@ import { Button } from "../ui/button";
 import { CirclePlus, Pencil } from "lucide-react";
 import AddFrenteDialog from "./AddFrenteDialog";
 import EditFrenteDialog from "./EditFrenteDialog";
+import { TicketArea, TicketAreaList } from "@/types";
+import DownloadFrenteButton from "./DownloadFrenteButton";
 
 const FrenteTools = ({ frentes }: { frentes: Frente[] }) => {
-  const { selectedFrente, setSelectedFrente } = useFrenteStore();
+  // Hooks
+  const { selectedFrente, selectedArea, setSelectedFrente, setSelectedArea } =
+    useFrenteStore();
+  const router = useRouter();
+  // States
   const [showAddFrenteDialog, setShowAddFrenteDialog] = useState(false);
   const [showEditFrenteDialog, setShowEditFrenteDialog] = useState(false);
+  const [areTickets, setAreTickets] = useState<{
+    [key in TicketArea]: boolean;
+  }>({
+    [TicketArea.ACARREOS]: false,
+    [TicketArea.GASOLINA]: false,
+  });
 
-  const handleSelectChange = (value: string) => {
+  const handleSelectFrente = (value: string) => {
     const frente = frentes.find((f) => f.nombre === value);
     if (frente) {
       setSelectedFrente(frente);
     }
   };
 
+  const handleSelectArea = (value: TicketArea) => {
+    setSelectedArea(value);
+  };
+
   useEffect(() => {
-    if (frentes.length > 0 && !selectedFrente) {
-      setSelectedFrente(frentes[0]);
-    }
-  }, [frentes, selectedFrente, setSelectedFrente]);
+    if (selectedFrente && selectedArea)
+      router.push(`/tickets/${selectedFrente.nombre}/${selectedArea}`);
+  }, [selectedFrente, selectedArea, router]);
+
+  useEffect(() => {
+    if (selectedFrente)
+      fetch("/api/frente/areTickets", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ nombre: selectedFrente.nombre }),
+      })
+        .then((res) => {
+          return res.json();
+        })
+        .then((data) => {
+          setAreTickets(data);
+        })
+        .catch((err) => {
+          console.error(
+            "Error al verificar si hay tickets asociados al frente:",
+            err
+          );
+        });
+  }, [selectedFrente]);
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-2 flex-wrap justify-center">
       <Select
-        onValueChange={handleSelectChange}
-        defaultValue={frentes.length > 0 ? frentes[0].nombre : undefined}
+        onValueChange={handleSelectFrente}
+        value={selectedFrente ? selectedFrente?.nombre : undefined}
       >
         <SelectTrigger className="w-[120px] border-2 border-accent text-accent font-bold text-lg">
           <SelectValue placeholder="Frente..." className="mx-0" />
@@ -61,6 +100,28 @@ const FrenteTools = ({ frentes }: { frentes: Frente[] }) => {
       </Select>
       {selectedFrente && (
         <>
+          <Select
+            onValueChange={handleSelectArea}
+            defaultValue={selectedArea ? selectedArea : undefined}
+          >
+            <SelectTrigger className="w-[130px] border-2 border-accent text-accent font-bold text-lg">
+              <SelectValue placeholder="Área..." className="mx-0" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectLabel className="ml-3 font-bold">Área</SelectLabel>
+                {TicketAreaList.map((area) => (
+                  <SelectItem
+                    key={area.label}
+                    value={area.value}
+                    className="cursor-pointer"
+                  >
+                    {area.label}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
           <Button
             className="py-2 px-[0.4rem] border-2 border-accent bg-white hover:bg-accent group"
             onClick={() => setShowEditFrenteDialog(true)}
@@ -71,11 +132,19 @@ const FrenteTools = ({ frentes }: { frentes: Frente[] }) => {
             open={showEditFrenteDialog}
             setOpen={setShowEditFrenteDialog}
             frente={selectedFrente}
+            areTickets={areTickets}
           />
+          {selectedArea && (
+            <DownloadFrenteButton
+              frente={selectedFrente.nombre}
+              area={selectedArea}
+              areTickets={areTickets}
+            />
+          )}
         </>
       )}
       <Button
-        className="p-2 bg-transparent hover:bg-[rgba(var(--accent-light-color)/50%)] group ml-[-2.5px]"
+        className="p-2 bg-transparent hover:bg-[rgba(var(--accent-light-color)/50%)] group ml-[-0.5rem]"
         onClick={() => setShowAddFrenteDialog(true)}
       >
         <CirclePlus className="text-accent" />

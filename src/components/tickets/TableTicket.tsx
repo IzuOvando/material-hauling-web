@@ -1,8 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Ticket } from "@prisma/client";
 import {
-  ColumnDef,
   getCoreRowModel,
   useReactTable,
   flexRender,
@@ -14,7 +12,9 @@ import {
   VisibilityState,
   getFacetedRowModel,
   getFacetedUniqueValues,
+  TableOptions,
 } from "@tanstack/react-table";
+import { Acarreos, Gasolina } from "@prisma/client";
 import {
   Table,
   TableHeader,
@@ -23,145 +23,27 @@ import {
   TableRow,
   TableCell,
 } from "@/components/ui/table";
-import { Checkbox } from "@/components/ui/checkbox";
 import { TableTicketPagination } from "./TableTicketPagination";
-import { TableTicketColumnHeader } from "./TableTicketColumnHeader";
 import { TableTicketColumnToggle } from "./TableTicketColumnToggle";
 import { TableTicketFilters } from "./TableTicketFilters";
 import { Button } from "../ui/button";
 import { PrintTicketDialog } from ".";
-import useFrenteStore from "@/store/useFrenteStore";
+import { TicketArea, Ticket } from "@/types";
+import { acarreosColumns, gasolinaColumns } from "./tableTicketsColumns";
 
-const columns: ColumnDef<Ticket>[] = [
-  {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value) => table.toggleAllRowsSelected(!!value)}
-        aria-label="Seleccionar todo"
-        className="border-2 border-accent-dark !text-primary data-[state=checked]:bg-accent-dark w-5 h-5 pt-[1px] pl-[1px] mt-1"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Selecccionar fila"
-        className="border-2 border-primary !text-accent-dark data-[state=checked]:bg-primary w-5 h-5 pt-[1px] pl-[1px] mt-1"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
-  {
-    accessorKey: "uuid",
-    header: ({ column }) => (
-      <TableTicketColumnHeader column={column} title="Id" />
-    ),
-  },
-  {
-    accessorKey: "fecha",
-    header: ({ column }) => (
-      <TableTicketColumnHeader column={column} title="Fecha" />
-    ),
-    filterFn: (row, id, value) => {
-      return value.includes(row.getValue(id));
-    },
-  },
-  {
-    accessorKey: "hora",
-    header: ({ column }) => (
-      <TableTicketColumnHeader column={column} title="Hora" />
-    ),
-  },
-  {
-    accessorKey: "material",
-    header: ({ column }) => (
-      <TableTicketColumnHeader column={column} title="Material" />
-    ),
-    filterFn: (row, id, value) => {
-      return value.includes(row.getValue(id));
-    },
-  },
-  {
-    accessorKey: "cubicacion",
-    header: ({ column }) => (
-      <TableTicketColumnHeader column={column} title="Cubicacion" />
-    ),
-  },
-  {
-    accessorKey: "empresa",
-    header: ({ column }) => (
-      <TableTicketColumnHeader column={column} title="Empresa" />
-    ),
-    filterFn: (row, id, value) => {
-      return value.includes(row.getValue(id));
-    },
-  },
-  {
-    accessorKey: "banco",
-    header: ({ column }) => (
-      <TableTicketColumnHeader column={column} title="Banco" />
-    ),
-    filterFn: (row, id, value) => {
-      return value.includes(row.getValue(id));
-    },
-  },
-  {
-    accessorKey: "placas",
-    header: ({ column }) => (
-      <TableTicketColumnHeader column={column} title="Placas" />
-    ),
-  },
-  {
-    accessorKey: "idCamion",
-    header: ({ column }) => (
-      <TableTicketColumnHeader column={column} title="IdCamion" />
-    ),
-    filterFn: (row, id, value) => {
-      return value.includes(row.getValue(id));
-    },
-  },
-  {
-    accessorKey: "operador",
-    header: ({ column }) => (
-      <TableTicketColumnHeader column={column} title="Operador" />
-    ),
-    filterFn: (row, id, value) => {
-      return value.includes(row.getValue(id));
-    },
-  },
-  {
-    accessorKey: "noEmpleado",
-    header: ({ column }) => (
-      <TableTicketColumnHeader column={column} title="NoEmpleado" />
-    ),
-  },
-  {
-    accessorKey: "checador",
-    header: ({ column }) => (
-      <TableTicketColumnHeader column={column} title="Checador" />
-    ),
-    filterFn: (row, id, value) => {
-      return value.includes(row.getValue(id));
-    },
-  },
-  {
-    accessorKey: "proyecto",
-    header: ({ column }) => (
-      <TableTicketColumnHeader column={column} title="Proyecto" />
-    ),
-    filterFn: (row, id, value) => {
-      return value.includes(row.getValue(id));
-    },
-  },
-];
+interface TableTicketAcarreoProps {
+  area: TicketArea.ACARREOS;
+  tickets: Acarreos[];
+}
 
-const TableTicket = ({ tickets }: { tickets: Ticket[] }) => {
+interface TableTicketGasolinaProps {
+  area: TicketArea.GASOLINA;
+  tickets: Gasolina[];
+}
+
+type TableTicketProps = TableTicketAcarreoProps | TableTicketGasolinaProps;
+
+const TableTicket = (props: TableTicketProps) => {
   // Table states
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -172,23 +54,12 @@ const TableTicket = ({ tickets }: { tickets: Ticket[] }) => {
   const [openPrintTickets, setOpenPrintTickets] = useState(false);
   // Ticket states
   const [sortedTickets, setSortedTickets] = useState<Ticket[]>([]);
-  // Frentes
-  const { selectedFrente } = useFrenteStore();
-  const [filteredTickets, setFilteredTickets] = useState<Ticket[]>([]);
 
-  useEffect(() => {
-    if (selectedFrente) {
-      const associatedTickets = tickets.filter(
-        (ticket) => ticket.frenteNombre === selectedFrente.nombre
-      );
-      setFilteredTickets(associatedTickets);
-    } else {
-      setFilteredTickets([]);
-    }
-  }, [selectedFrente, tickets]);
+  const columns =
+    props.area === TicketArea.ACARREOS ? acarreosColumns : gasolinaColumns;
 
-  const table = useReactTable({
-    data: filteredTickets,
+  const optionsTable: TableOptions<any> = {
+    data: props.tickets,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
@@ -207,7 +78,9 @@ const TableTicket = ({ tickets }: { tickets: Ticket[] }) => {
       columnVisibility,
       rowSelection,
     },
-  });
+  };
+
+  const table = useReactTable(optionsTable);
 
   useEffect(() => {
     if (Object.keys(rowSelection).length === 0) setDisablePrintTickets(true);
@@ -228,15 +101,19 @@ const TableTicket = ({ tickets }: { tickets: Ticket[] }) => {
 
   return (
     <>
-      <div className="flex items-center pb-4">
+      <div className="flex items-center justify-center pb-4 flex-wrap lg:justify-start lg:flex-nowrap">
         <Button
-          className="bg-accent hover:bg-accent-light active:bg-accent-dark mr-3"
+          className="bg-accent hover:bg-accent-light active:bg-accent-dark lg:mr-3 mb-3 lg:mb-0"
           disabled={disablePrintTickets}
           onClick={() => setOpenPrintTickets(true)}
         >
           Imprimir Tickets
         </Button>
-        <TableTicketFilters table={table} tickets={tickets} />
+        <TableTicketFilters
+          table={table}
+          tickets={props.tickets}
+          area={props.area}
+        />
         <TableTicketColumnToggle table={table} />
       </div>
       <div className="rounded-lg border-2 border-primary-light overflow-hidden">
