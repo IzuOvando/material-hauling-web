@@ -53,7 +53,7 @@ const TableTicket = (props: TableTicketProps) => {
   const [disablePrintTickets, setDisablePrintTickets] = useState(true);
   const [openPrintTickets, setOpenPrintTickets] = useState(false);
   // Ticket states
-  const [sortedTickets, setSortedTickets] = useState<Ticket[]>([]);
+  const [sortedTickets, setSortedTickets] = useState<Ticket[]>(props.tickets);
 
   const columns =
     props.area === TicketArea.ACARREOS ? acarreosColumns : gasolinaColumns;
@@ -96,7 +96,7 @@ const TableTicket = (props: TableTicketProps) => {
     const sortedData = table
       .getSortedRowModel()
       .flatRows.map((row) => row.original);
-    setSortedTickets(sortedData);
+    if (sortedData.length > 0) setSortedTickets(sortedData);
   }, [sorting, columnFilters]);
 
   return (
