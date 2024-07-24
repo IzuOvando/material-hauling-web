@@ -38,6 +38,8 @@ model Acarreos {
   proyecto     String
   banco        String
   frente       Frente   @relation("FrenteAcarreos", fields: [frenteNombre], references: [nombre], onDelete: Cascade)
+
+  @@index([frenteNombre])
 }
 
 model Gasolina {
@@ -59,4 +61,6 @@ model Gasolina {
   bomba        String
   terminal     String
   frente       Frente   @relation("FrenteGasolina", fields: [frenteNombre], references: [nombre], onDelete: Cascade)
+
+  @@index([frenteNombre])
 }

@@ -183,34 +183,122 @@ class FileProcessor {
         return config(data, fileName, this.cleanQuotes);
     }
 
-    public async csvToSQLite(csvFile: string, fileName: string, key: string) {
-        const records: CreateTicketDto[] = [];
-        await new Promise<void>((resolve, reject) => {
-            fs.createReadStream(csvFile)
-                .pipe(csvParser())
-                .on("data", (data: any) => {
-                    try {
-                        const filteredData = this.getFilteredData(key, data, fileName);
-                        records.push(filteredData);
-                    } catch (error) {
-                        console.error("Error filtering data:", error);
-                    }
+    private async processBatch(records: CreateTicketDto[], cleanFrenteName: string, key: string) {
+        try {
+            if (key === 'acarreos') {
+                const acarreosData = records.filter(isCreateAcarreosDto).map(record => ({
+                    frenteNombre: record.frenteNombre,
+                    empresa: record.empresa,
+                    material: record.material,
+                    cubicacion: `${record.cubicacion} m³`,
+                    fecha: record.fecha,
+                    placas: record.placas,
+                    idCamion: record.idCamion,
+                    operador: record.operador,
+                    proyecto: record.proyecto,
+                    noEmpleado: record.noEmpleado,
+                    checador: record.checador,
+                    hora: record.hora,
+                    banco: record.banco,
+                }));
+
+                await prisma.acarreos.createMany({
+                    data: acarreosData,
+                });
+
+                const acarreoUuids = await prisma.acarreos.findMany({
+                    where: {
+                        frenteNombre: cleanFrenteName,
+                    },
+                    select: {
+                        uuid: true,
+                    },
+                });
+
+                await this.updateFrenteInBatches(cleanFrenteName, acarreoUuids, 'ticketsAcarreos');
+            } else if (key === 'gasolina') {
+                const gasolinaData = records.filter(isCreateGasolinaDto).map(record => ({
+                    frenteNombre: record.frenteNombre,
+                    empresa: record.empresa,
+                    direccion: record.direccion,
+                    litros: `${record.litros} m³`,
+                    fecha: record.fecha,
+                    placas: record.placas,
+                    noEstacion: record.noEstacion,
+                    noNota: record.noNota,
+                    tipo: record.tipo,
+                    precio: record.precio,
+                    total: record.total,
+                    hora: record.hora,
+                    odometro: record.odometro,
+                    bomba: record.bomba,
+                    terminal: record.terminal,
+                }));
+
+                await prisma.gasolina.createMany({
+                    data: gasolinaData,
+                });
+
+                const gasolinaUuids = await prisma.gasolina.findMany({
+                    where: {
+                        frenteNombre: cleanFrenteName,
+                    },
+                    select: {
+                        uuid: true,
+                    },
+                });
+
+                await this.updateFrenteInBatches(cleanFrenteName, gasolinaUuids, 'ticketsGasolina');
+            }
+        } catch (error) {
+            console.error("Error during batch processing:", error);
+            throw error;
+        }
+    }
+
+    private async updateFrenteInBatches(frenteNombre: string, uuids: { uuid: string }[], relationField: string) {
+        const batchSize = 9000;
+        const updatePromises = [];
+
+        for (let i = 0; i < uuids.length; i += batchSize) {
+            const batch = uuids.slice(i, i + batchSize);
+            updatePromises.push(
+                prisma.frente.update({
+                    where: { nombre: frenteNombre },
+                    data: {
+                        [relationField]: {
+                            connect: batch,
+                        },
+                    },
                 })
-                .on("error", reject)
-                .on("end", resolve);
-        });
+            );
+
+            if (updatePromises.length >= 5) {
+                await Promise.all(updatePromises);
+                updatePromises.length = 0;
+            }
+        }
+
+        if (updatePromises.length > 0) {
+            await Promise.all(updatePromises);
+        }
+    }
+
+    public async csvToSQLite(csvFile: string, fileName: string, key: string) {
+        const batchSize = 15000;
+        let records: CreateTicketDto[] = [];
+        let activeBatches = 0;
+
+        const underscoreIndex = fileName.indexOf('_');
+        const dotIndex = fileName.indexOf('.');
+        const cleanFrenteName = fileName.substring(underscoreIndex + 1, dotIndex);
+
+        if (!cleanFrenteName) {
+            console.error(`No se pudo extraer un nombre válido del archivo: ${fileName}`);
+            return;
+        }
 
         try {
-
-            const underscoreIndex = fileName.indexOf('_');
-            const dotIndex = fileName.indexOf('.');
-            const cleanFrenteName = fileName.substring(underscoreIndex + 1, dotIndex);
-
-            if (!cleanFrenteName) {
-                console.error(`No se pudo extraer un nombre válido del archivo: ${fileName}`);
-                return;
-            }
-
             if (key === 'gasolina') {
                 await prisma.gasolina.deleteMany({
                     where: {
@@ -236,74 +324,62 @@ class FileProcessor {
                 return;
             }
 
-            for (const record of records) {
-                try {
-                    if (isCreateAcarreosDto(record)) {
-                        const acarreo = await prisma.acarreos.create({
-                            data: {
-                                frenteNombre: record.frenteNombre,
-                                empresa: record.empresa,
-                                material: record.material,
-                                cubicacion: `${record.cubicacion} m³`,
-                                fecha: record.fecha,
-                                placas: record.placas,
-                                idCamion: record.idCamion,
-                                operador: record.operador,
-                                proyecto: record.proyecto,
-                                noEmpleado: record.noEmpleado,
-                                checador: record.checador,
-                                hora: record.hora,
-                                banco: record.banco,
-                            },
-                        });
-
-                        await prisma.frente.update({
-                            where: { nombre: record.frenteNombre },
-                            data: {
-                                ticketsAcarreos: {
-                                    connect: { uuid: acarreo.uuid },
-                                },
-                            },
-                        });
-                    } else if (isCreateGasolinaDto(record)) {
-                        const gasolina = await prisma.gasolina.create({
-                            data: {
-                                frenteNombre: record.frenteNombre,
-                                empresa: record.empresa,
-                                direccion: record.direccion,
-                                litros: `${record.litros} m³`,
-                                fecha: record.fecha,
-                                placas: record.placas,
-                                noEstacion: record.noEstacion,
-                                noNota: record.noNota,
-                                tipo: record.tipo,
-                                precio: record.precio,
-                                total: record.total,
-                                hora: record.hora,
-                                odometro: record.odometro,
-                                bomba: record.bomba,
-                                terminal: record.terminal,
-                            },
-                        });
-
-                        await prisma.frente.update({
-                            where: { nombre: record.frenteNombre },
-                            data: {
-                                ticketsGasolina: {
-                                    connect: { uuid: gasolina.uuid },
-                                },
-                            },
-                        });
-                    } else {
-                        throw new Error(`Unsupported record type: ${JSON.stringify(record)}`);
+            await new Promise<void>((resolve, reject) => {
+                const stream = fs.createReadStream(csvFile).pipe(csvParser());
+                stream.on("data", async (data: any) => {
+                    stream.pause();
+                    try {
+                        const filteredData: CreateTicketDto = this.getFilteredData(key, data, fileName);
+                        records.push(filteredData);
+                        if (records.length >= batchSize) {
+                            activeBatches++;
+                            try {
+                                await this.processBatch(records, cleanFrenteName, key);
+                            } catch (error) {
+                                if (error instanceof Error) {
+                                    stream.destroy(error);
+                                } else {
+                                    stream.destroy(new Error(`Non-error thrown: ${error}`));
+                                }
+                                reject(error);
+                                return;
+                            }
+                            records = [];
+                            activeBatches--;
+                        }
+                        stream.resume();
+                    } catch (error) {
+                        console.error("Error processing data:", error);
+                        if (error instanceof Error) {
+                            stream.destroy(error);
+                        } else {
+                            stream.destroy(new Error(`Non-error thrown: ${error}`));
+                        }
                     }
-                } catch (error) {
-                    console.error("Failed to create ticket:", error);
-                    throw error;
-                }
-            }
-
-            console.log("Los datos del CSV han sido cargados en SQLite");
+                })
+                    .on("error", error => {
+                        console.error(`Error al procesar el archivo CSV: ${error}`);
+                        reject(error);
+                    })
+                    .on("end", async () => {
+                        if (records.length > 0) {
+                            activeBatches++;
+                            try {
+                                await this.processBatch(records, cleanFrenteName, key);
+                            } catch (error) {
+                                reject(error);
+                                return;
+                            }
+                            activeBatches--;
+                        }
+                        const checkCompletion = setInterval(() => {
+                            if (activeBatches === 0) {
+                                clearInterval(checkCompletion);
+                                resolve();
+                            }
+                        }, 100);
+                    });
+            });
         } catch (error) {
             console.error("Error durante la inserción en la base de datos:", error);
             throw error;
