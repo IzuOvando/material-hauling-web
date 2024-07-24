@@ -1,5 +1,8 @@
-import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/db";
+import * as path from "path";
+import { NextRequest, NextResponse } from "next/server";
+import { deleteFilesInDirectory } from "@/helpers/deletefilesdirectory";
+
 
 export async function POST(req: NextRequest) {
   try {
@@ -20,6 +23,10 @@ export async function POST(req: NextRequest) {
     await prisma.frente.delete({
       where: { nombre },
     });
+
+    const rootPath = path.resolve(process.cwd());
+    const specificFilePath = path.join(rootPath, "db_output", "excel", nombre);
+    await deleteFilesInDirectory(specificFilePath);
 
     return NextResponse.json(
       {

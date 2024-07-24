@@ -1,10 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import fs from "fs";
+import fs from "fs/promises";
 import path from "path";
-import { promisify } from "util";
 import prisma from "@/lib/db";
-
-const unlink = promisify(fs.unlink);
+import { deleteFilesInDirectory } from "@/helpers/deletefilesdirectory";
 
 export async function POST(req: NextRequest) {
   if (req.method !== "POST") {
@@ -15,22 +13,36 @@ export async function POST(req: NextRequest) {
   const { nombre, area } = data;
 
   const rootPath = path.resolve(process.cwd());
-  const desiredPart = nombre.split('_')[1].split('.')[0];
-  const specificFilePath = path.join(rootPath, "db_output", "excel", desiredPart, `${area}.xslx`);
-  try {
+  const specificFilePath = path.join(rootPath, "db_output", "excel", nombre, `${area}.xslx`);
+  const dbInputPathFilePath = path.join(rootPath, "db_input");
+  const csvFilePath = path.join(rootPath, "db_output", "csv");
 
-    await unlink(specificFilePath);
+  try {
+    const paths = [specificFilePath, dbInputPathFilePath, csvFilePath];
+
+    for (const path of paths) {
+      try {
+        const stat = await fs.stat(path);
+        if (stat.isDirectory()) {
+          await deleteFilesInDirectory(path);
+          await fs.rmdir(path);
+        } else {
+          await fs.unlink(path);
+        }
+      } catch (error: any) {
+        if ((error?.message as string).includes("no such file or directory")) {
+          console.warn(`The path ${path} does not exist.`);
+        } else {
+          throw error;
+        }
+      }
+    }
 
     return NextResponse.json(
       { message: "All files and data deleted successfully." },
       { status: 200 }
     );
   } catch (error: any) {
-    if ((error?.message as string).includes("no such file or directory"))
-      return NextResponse.json(
-        { message: "All files and data deleted successfully." },
-        { status: 200 }
-      );
     console.error("Failed to delete files or data:", error);
     return NextResponse.json(
       {

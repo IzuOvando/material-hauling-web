@@ -2,16 +2,14 @@ export type SchemaKeys = 'gasolina' | 'acarreos';
 
 export const schemas: Record<SchemaKeys, Set<string>> = {
     gasolina: new Set([
-        "id",
-        "empresa",
-        "direccion",
+        "uuid",
+        "saldocompra",
+        "autorizacion",
         "litros",
         "fecha",
-        "no.estacion",
+        "formatopago",
         "placas",
         "hora",
-        "no.nota",
-        "tipo",
         "precio",
         "total",
         "odometro",
@@ -19,7 +17,7 @@ export const schemas: Record<SchemaKeys, Set<string>> = {
         "terminal",
     ]),
     acarreos: new Set([
-        "id",
+        "uuid",
         "union",
         "n°",
         "#vd",

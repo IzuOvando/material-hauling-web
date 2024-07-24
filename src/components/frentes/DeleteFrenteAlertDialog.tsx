@@ -9,6 +9,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Frente } from "@prisma/client";
 import { useToast } from "../ui/use-toast";
+import { useFrenteStore } from "@/store";
+import { useRouter } from "next/navigation";
 
 interface DeleteFrenteAlertDialogProps {
   frente: Frente;
@@ -16,6 +18,8 @@ interface DeleteFrenteAlertDialogProps {
 
 const DeleteFrenteAlertDialog = ({ frente }: DeleteFrenteAlertDialogProps) => {
   const { toast } = useToast();
+  const { reset } = useFrenteStore()
+  const router = useRouter();
 
   const handleDelete = async () => {
     try {
@@ -36,7 +40,8 @@ const DeleteFrenteAlertDialog = ({ frente }: DeleteFrenteAlertDialogProps) => {
         description: `Frente eliminado con éxito.`,
         variant: "success",
       });
-      setTimeout(() => window.location.reload(), 2500);
+      reset();
+      setTimeout(() => router.push('/'), 2500);
     } catch (error) {
       console.error("Error al eliminar el frente:", error);
       toast({

@@ -157,6 +157,9 @@ class FileProcessor {
                             outputFolder,
                             `${extractedPart}_${sheetName.replace(/[\s\/]+/g, "_")}.csv`
                         );
+                        if (!csvOutput || csvOutput.trim() === '') {
+                            throw new Error(`El archivo CSV para ${sheetName} está vacío.`);
+                        }
                         fs.writeFileSync(outputFilePath, csvOutput);
                         csvFilePaths.push(outputFilePath);
                     });
@@ -219,14 +222,12 @@ class FileProcessor {
             } else if (key === 'gasolina') {
                 const gasolinaData = records.filter(isCreateGasolinaDto).map(record => ({
                     frenteNombre: record.frenteNombre,
-                    empresa: record.empresa,
-                    direccion: record.direccion,
+                    saldoCompra: record.saldoCompra,
+                    formatoPago: record.formatoPago,
                     litros: `${record.litros} m³`,
                     fecha: record.fecha,
                     placas: record.placas,
-                    noEstacion: record.noEstacion,
-                    noNota: record.noNota,
-                    tipo: record.tipo,
+                    autorizacion: record.autorizacion,
                     precio: record.precio,
                     total: record.total,
                     hora: record.hora,
@@ -297,7 +298,6 @@ class FileProcessor {
             console.error(`No se pudo extraer un nombre válido del archivo: ${fileName}`);
             return;
         }
-
         try {
             if (key === 'gasolina') {
                 await prisma.gasolina.deleteMany({

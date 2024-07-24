@@ -46,14 +46,12 @@ model Gasolina {
   uuid         String   @id @default(uuid())
   createdAt    DateTime @default(now())
   frenteNombre String
-  empresa      String
-  direccion    String
+  saldoCompra  String
+  formatoPago  String
+  autorizacion String
   litros       String
   fecha        String
   placas       String
-  noEstacion   String
-  noNota       String
-  tipo         String
   precio       String
   hora         String
   total        String
