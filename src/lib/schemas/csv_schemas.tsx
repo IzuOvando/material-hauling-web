@@ -56,10 +56,11 @@ export const filteredDataConfig: Record<
     fecha: cleanQuotes(data.fecha),
     placas: cleanQuotes(data.placas),
     autorizacion: cleanQuotes(data.autorizacion),
-    precio: cleanQuotes(data.precioUnitario),
     total: cleanQuotes(data.total),
     hora: cleanQuotes(data.hora),
     odometro: cleanQuotes(data.odometro),
+    precioUnitario: cleanQuotes(data.precioUnitario),
+    kilometros: cleanQuotes(data.kilometros),
     bomba: cleanQuotes(data.bomba),
     terminal: cleanQuotes(data.terminal),
     frenteNombre: fileName.substring(

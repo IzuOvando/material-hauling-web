@@ -43,22 +43,22 @@ model Acarreos {
 }
 
 model Gasolina {
-  uuid         String   @id @default(uuid())
-  createdAt    DateTime @default(now())
-  frenteNombre String
-  saldoCompra  String
-  formatoPago  String
-  autorizacion String
-  litros       String
-  fecha        String
-  placas       String
-  precio       String
-  hora         String
-  total        String
-  odometro     String
-  bomba        String
-  terminal     String
-  frente       Frente   @relation("FrenteGasolina", fields: [frenteNombre], references: [nombre], onDelete: Cascade)
-
+  uuid           String   @id @default(uuid())
+  createdAt      DateTime @default(now())
+  frenteNombre   String
+  saldoCompra    String
+  formatoPago    String
+  autorizacion   String
+  litros         String
+  fecha          String
+  placas         String
+  hora           String
+  total          String
+  odometro       String
+  bomba          String
+  terminal       String
+  precioUnitario String
+  kilometros     String
+  frente         Frente   @relation("FrenteGasolina", fields: [frenteNombre], references: [nombre], onDelete: Cascade)
   @@index([frenteNombre])
 }

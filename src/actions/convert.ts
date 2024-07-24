@@ -74,12 +74,12 @@ class FileProcessor {
         const csvFilePaths: string[] = [];
         const inputFilePath = path.resolve(process.cwd(), inputFile);
 
-        const isValidHeaderRow = (headers: string[]) => {
-            const headerSet = new Set(headers.map((header) => header.toLowerCase()));
-            return (
-                Array.from(validHeaders).filter((header) => headerSet.has(header)).length >=
-                validHeaders.size * 0.8
-            );
+        const isValidHeaderRow = (headers: string[], validHeaders: Set<string>) => {
+            const cleanedHeaders = headers.map(header => header.trim().toLowerCase());
+            const headerSet = new Set(cleanedHeaders);
+            const filteredHeaders = Array.from(validHeaders).filter(header => headerSet.has(header.toLowerCase()));
+            const result = filteredHeaders.length >= validHeaders.size * 0.8;
+            return result;
         };
 
         return new Promise((resolve, reject) => {
@@ -124,7 +124,7 @@ class FileProcessor {
                                 }
                             }
                             if (!headerChecked) {
-                                if (!isValidHeaderRow(row)) {
+                                if (!isValidHeaderRow(row, validHeaders)) {
                                     continue;
                                 }
                                 row = row.map((header) => {
@@ -175,8 +175,12 @@ class FileProcessor {
 
 
     public cleanQuotes = (str: string): string => {
+        if (typeof str !== 'string') {
+            return '';
+        }
         return str.replace(/""/g, '"').replace(/^"|"$/g, '');
     };
+
 
     private getFilteredData(key: string, data: any, fileName: string): CreateTicketDto {
         const config = filteredDataConfig[key];
@@ -228,12 +232,13 @@ class FileProcessor {
                     fecha: record.fecha,
                     placas: record.placas,
                     autorizacion: record.autorizacion,
-                    precio: record.precio,
                     total: record.total,
                     hora: record.hora,
                     odometro: record.odometro,
                     bomba: record.bomba,
                     terminal: record.terminal,
+                    precioUnitario: record.precioUnitario,
+                    kilometros: record.kilometros,
                 }));
 
                 await prisma.gasolina.createMany({
