@@ -6,6 +6,7 @@ import csvParser from "csv-parser";
 import { promisify } from 'util';
 import { schemas, SchemaKeys } from "@/lib/schemas/headers";
 import { CreateTicketDto, filteredDataConfig, isCreateAcarreosDto, isCreateGasolinaDto } from '@/lib/schemas/csv_schemas';
+import CONFIG from "@/config";
 
 const readdir = promisify(fs.readdir);
 const unlink = promisify(fs.unlink);
@@ -262,7 +263,7 @@ class FileProcessor {
     }
 
     private async updateFrenteInBatches(frenteNombre: string, uuids: { uuid: string }[], relationField: string) {
-        const batchSize = 9000;
+        const batchSize = CONFIG.BATCHES_RECORDS;
         const updatePromises = [];
 
         for (let i = 0; i < uuids.length; i += batchSize) {
@@ -290,7 +291,7 @@ class FileProcessor {
     }
 
     public async csvToSQLite(csvFile: string, fileName: string, key: string) {
-        const batchSize = 15000;
+        const batchSize = CONFIG.BATCHES_CSV_LINES;
         let records: CreateTicketDto[] = [];
         let activeBatches = 0;
 
