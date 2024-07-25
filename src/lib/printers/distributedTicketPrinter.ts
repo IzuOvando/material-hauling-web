@@ -1,5 +1,4 @@
-import { Ticket } from "@prisma/client";
-import { Printer } from "@/types";
+import { Printer, Ticket, TicketArea } from "@/types";
 import { divideArray } from "@/helpers/arrays";
 import { generateUniqueId } from "@/helpers/strings";
 
@@ -22,7 +21,8 @@ export default class DistributedPrinter {
     ticketsToPrint: Ticket[],
     onPrinterFailed: (printer: string) => void,
     onTicketPrinted: () => void,
-    frente: string
+    frente: string,
+    area: TicketArea
   ) {
     this.ticketsToPrint = [];
     this.printers = [];
@@ -47,6 +47,7 @@ export default class DistributedPrinter {
     );
     const initialBuffers = divideArray(initialTickets, printers.length);
     for (let i = 0; i < printers.length; i++) {
+      printers[i].device?.setArea(area);
       this.printers.push(
         new PrinterWithBuffer(
           printers[i],

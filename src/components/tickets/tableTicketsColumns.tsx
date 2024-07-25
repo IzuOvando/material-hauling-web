@@ -179,22 +179,10 @@ export const gasolinaColumns: ColumnDef<Gasolina>[] = [
     ),
   },
   {
-    accessorKey: "noEstacion",
+    accessorKey: "kilometros",
     header: ({ column }) => (
-      <TableTicketColumnHeader column={column} title="NoEstacion" />
+      <TableTicketColumnHeader column={column} title="Kilometros" />
     ),
-    filterFn: (row, id, value) => {
-      return value.includes(row.getValue(id));
-    },
-  },
-  {
-    accessorKey: "noNota",
-    header: ({ column }) => (
-      <TableTicketColumnHeader column={column} title="NoNota" />
-    ),
-    filterFn: (row, id, value) => {
-      return value.includes(row.getValue(id));
-    },
   },
   {
     accessorKey: "litros",
@@ -203,15 +191,9 @@ export const gasolinaColumns: ColumnDef<Gasolina>[] = [
     ),
   },
   {
-    accessorKey: "tipo",
+    accessorKey: "precioUnitario",
     header: ({ column }) => (
-      <TableTicketColumnHeader column={column} title="Tipo" />
-    ),
-  },
-  {
-    accessorKey: "precio",
-    header: ({ column }) => (
-      <TableTicketColumnHeader column={column} title="Precio" />
+      <TableTicketColumnHeader column={column} title="Precio Unitario" />
     ),
   },
   {
@@ -248,24 +230,21 @@ export const gasolinaColumns: ColumnDef<Gasolina>[] = [
     },
   },
   {
-    accessorKey: "terminal",
+    accessorKey: "formatoPago",
     header: ({ column }) => (
-      <TableTicketColumnHeader column={column} title="Terminal" />
-    ),
-    filterFn: (row, id, value) => {
-      return value.includes(row.getValue(id));
-    },
-  },
-  {
-    accessorKey: "empresa",
-    header: ({ column }) => (
-      <TableTicketColumnHeader column={column} title="Empresa" />
+      <TableTicketColumnHeader column={column} title="FormatoPago" />
     ),
   },
   {
-    accessorKey: "direccion",
+    accessorKey: "autorizacion",
     header: ({ column }) => (
-      <TableTicketColumnHeader column={column} title="Direccion" />
+      <TableTicketColumnHeader column={column} title="Autorización" />
+    ),
+  },
+  {
+    accessorKey: "saldoCompra",
+    header: ({ column }) => (
+      <TableTicketColumnHeader column={column} title="SaldoCompra" />
     ),
   },
 ];

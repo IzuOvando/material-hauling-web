@@ -62,7 +62,6 @@ export const filteredDataConfig: Record<
     precioUnitario: cleanQuotes(data.precioUnitario),
     kilometros: cleanQuotes(data.kilometros),
     bomba: cleanQuotes(data.bomba),
-    terminal: cleanQuotes(data.terminal),
     frenteNombre: fileName.substring(
       fileName.indexOf("_") + 1,
       fileName.indexOf(".")

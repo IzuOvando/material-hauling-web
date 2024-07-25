@@ -56,9 +56,9 @@ model Gasolina {
   total          String
   odometro       String
   bomba          String
-  terminal       String
   precioUnitario String
   kilometros     String
   frente         Frente   @relation("FrenteGasolina", fields: [frenteNombre], references: [nombre], onDelete: Cascade)
+
   @@index([frenteNombre])
 }

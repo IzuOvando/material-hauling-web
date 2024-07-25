@@ -228,7 +228,7 @@ class FileProcessor {
                     frenteNombre: record.frenteNombre,
                     saldoCompra: record.saldoCompra,
                     formatoPago: record.formatoPago,
-                    litros: `${record.litros} m³`,
+                    litros: `${record.litros} L`,
                     fecha: record.fecha,
                     placas: record.placas,
                     autorizacion: record.autorizacion,
@@ -236,7 +236,6 @@ class FileProcessor {
                     hora: record.hora,
                     odometro: record.odometro,
                     bomba: record.bomba,
-                    terminal: record.terminal,
                     precioUnitario: record.precioUnitario,
                     kilometros: record.kilometros,
                 }));

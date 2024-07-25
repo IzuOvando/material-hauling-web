@@ -70,16 +70,6 @@ const setFilters = (tickets: Ticket[], area: TicketArea) => {
     const gasolina = tickets as Gasolina[];
     filters = [
       {
-        column: "noEstacion",
-        label: "NoEstacion",
-        data: [...new Set(gasolina.map((ticket) => ticket.noEstacion))],
-      },
-      {
-        column: "noNota",
-        label: "NoNota",
-        data: [...new Set(gasolina.map((ticket) => ticket.noNota))],
-      },
-      {
         column: "fecha",
         label: "Fecha",
         data: [...new Set(gasolina.map((ticket) => ticket.fecha))],
@@ -98,11 +88,6 @@ const setFilters = (tickets: Ticket[], area: TicketArea) => {
         column: "bomba",
         label: "Bomba",
         data: [...new Set(gasolina.map((ticket) => ticket.bomba))],
-      },
-      {
-        column: "terminal",
-        label: "Terminal",
-        data: [...new Set(gasolina.map((ticket) => ticket.terminal))],
       },
     ];
   }

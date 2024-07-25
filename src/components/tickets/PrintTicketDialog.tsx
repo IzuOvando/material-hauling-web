@@ -10,10 +10,9 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { usePrinterStore, useFrenteStore } from "@/store";
-import { Ticket } from "@prisma/client";
 import { DistributedTicketPrinter } from "@/lib/printers";
 import PrinterLittleCard from "../printers/PrinterLittleCard";
-import { Printer } from "@/types";
+import { Printer, Ticket, TicketArea } from "@/types";
 import { ReceiptText } from "lucide-react";
 
 interface PrintDialogProps {
@@ -30,7 +29,7 @@ const PrintDialog = ({
   tickets,
 }: PrintDialogProps) => {
   const { printers } = usePrinterStore();
-  const { selectedFrente } = useFrenteStore();
+  const { selectedFrente, selectedArea } = useFrenteStore();
   const availablePrinters = printers.filter(
     (printer) => printer.status === "online"
   );
@@ -56,7 +55,8 @@ const PrintDialog = ({
       ticketsToPrint,
       handlePrinterFailed,
       handleTicketPrint,
-      selectedFrente ? selectedFrente.nombre : ""
+      selectedFrente ? selectedFrente.nombre : "",
+      selectedArea ? selectedArea : TicketArea.ACARREOS
     );
 
     distributedTicketPrinter.current.startPrinting();

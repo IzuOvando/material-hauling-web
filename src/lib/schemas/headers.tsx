@@ -13,7 +13,6 @@ export const schemas: Record<SchemaKeys, Set<string>> = {
         "total",
         "odometro",
         "bomba",
-        "terminal",
         "precio unitario",
         "kilometros",
     ]),
