@@ -80,11 +80,6 @@ const setFilters = (tickets: Ticket[], area: TicketArea) => {
         data: [...new Set(gasolina.map((ticket) => ticket.placas))],
       },
       {
-        column: "odometro",
-        label: "Odometro",
-        data: [...new Set(gasolina.map((ticket) => ticket.odometro))],
-      },
-      {
         column: "bomba",
         label: "Bomba",
         data: [...new Set(gasolina.map((ticket) => ticket.bomba))],

@@ -158,9 +158,9 @@ export const gasolinaColumns: ColumnDef<Gasolina>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "uuid",
+    accessorKey: "folio",
     header: ({ column }) => (
-      <TableTicketColumnHeader column={column} title="Id" />
+      <TableTicketColumnHeader column={column} title="Folio" />
     ),
   },
   {
@@ -176,12 +176,6 @@ export const gasolinaColumns: ColumnDef<Gasolina>[] = [
     accessorKey: "hora",
     header: ({ column }) => (
       <TableTicketColumnHeader column={column} title="Hora" />
-    ),
-  },
-  {
-    accessorKey: "kilometros",
-    header: ({ column }) => (
-      <TableTicketColumnHeader column={column} title="Kilometros" />
     ),
   },
   {
@@ -206,15 +200,6 @@ export const gasolinaColumns: ColumnDef<Gasolina>[] = [
     accessorKey: "placas",
     header: ({ column }) => (
       <TableTicketColumnHeader column={column} title="Placas" />
-    ),
-    filterFn: (row, id, value) => {
-      return value.includes(row.getValue(id));
-    },
-  },
-  {
-    accessorKey: "odometro",
-    header: ({ column }) => (
-      <TableTicketColumnHeader column={column} title="Odometro" />
     ),
     filterFn: (row, id, value) => {
       return value.includes(row.getValue(id));

@@ -52,9 +52,11 @@ export default class TicketAcarreoSchema implements TicketSchema {
 
   private addTypeTicket = (writter: any, original: boolean) => {
     writter
+      .addFeedLine(1)
       .addTextSize(2, 2)
       .addTextStyle(false, false, true, writter.COLOR_1)
       .addText(original ? "ORIGINAL VENTA\n" : "COPIA VENTA\n")
+      .addFeedLine(1)
       .addTextSize(1, 1);
   };
 
@@ -81,11 +83,10 @@ export default class TicketAcarreoSchema implements TicketSchema {
     writter
       .addTextAlign(writter.ALIGN_LEFT)
       .addTextStyle(false, false, false, writter.COLOR_1)
-      .addText(`Folio:\t${ticket.uuid}\n`)
+      .addText(`Folio:\t${ticket.folio}\n`)
       .addText(`Autorización:\t*****${ticket.autorizacion}*****\n`)
       .addText(`Nombre:\tSEDENA ${frente}\n`)
       .addText("Cuenta:\t5892274\n")
-      .addText(`Odómetro:\t${ticket.odometro}\n`)
       .addText(`Bomba:\t${ticket.bomba}\n`)
       .addText(`Placas:\t${ticket.placas}\n`)
       .addText(`Saldo próxima compra:\t${ticket.saldoCompra}\n`)
@@ -94,6 +95,7 @@ export default class TicketAcarreoSchema implements TicketSchema {
 
   private addThanks(writter: any) {
     writter
+      .addFeedLine(1)
       .addTextAlign(writter.ALIGN_CENTER)
       .addTextSize(2, 2)
       .addTextStyle(false, false, true, writter.COLOR_1)

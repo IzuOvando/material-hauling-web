@@ -50,6 +50,7 @@ export const filteredDataConfig: Record<
     tipoTicket: TicketArea.ACARREOS,
   }),
   gasolina: (data, fileName, cleanQuotes) => ({
+    folio: cleanQuotes(data.folio),
     saldoCompra: cleanQuotes(data.saldoCompra),
     formatoPago: cleanQuotes(data.formatoPago),
     litros: cleanQuotes(data.litros),
@@ -58,9 +59,7 @@ export const filteredDataConfig: Record<
     autorizacion: cleanQuotes(data.autorizacion),
     total: cleanQuotes(data.total),
     hora: cleanQuotes(data.hora),
-    odometro: cleanQuotes(data.odometro),
     precioUnitario: cleanQuotes(data.precioUnitario),
-    kilometros: cleanQuotes(data.kilometros),
     bomba: cleanQuotes(data.bomba),
     frenteNombre: fileName.substring(
       fileName.indexOf("_") + 1,

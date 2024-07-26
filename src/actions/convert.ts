@@ -29,6 +29,29 @@ class FileProcessor {
     }
 
     private formatDate(value: number | string): string {
+        const spanishDatePattern = /^(lunes|martes|miércoles|jueves|viernes|sábado|domingo), \d{1,2} de (enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre) de \d{4}$/;
+        const englishDatePattern = /^(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday), (\w+) (\d{1,2}), (\d{4})$/;
+        const months: { [key: string]: string } = {
+            January: 'enero', February: 'febrero', March: 'marzo', April: 'abril',
+            May: 'mayo', June: 'junio', July: 'julio', August: 'agosto',
+            September: 'septiembre', October: 'octubre', November: 'noviembre', December: 'diciembre'
+        };
+        const days: { [key: string]: string } = {
+            Monday: 'lunes', Tuesday: 'martes', Wednesday: 'miércoles',
+            Thursday: 'jueves', Friday: 'viernes', Saturday: 'sábado', Sunday: 'domingo'
+        };
+
+        if (typeof value === "string") {
+            const cleanedValue = value.replace(/^"|"$/g, '');
+
+            const match = englishDatePattern.exec(cleanedValue);
+            if (match) {
+                const [, engDay, engMonth, day, year] = match;
+                return `${days[engDay as keyof typeof days]}, ${day} de ${months[engMonth as keyof typeof months]} de ${year}`;
+            } else if (spanishDatePattern.test(cleanedValue)) {
+                return cleanedValue;
+            }
+        }
 
         if (typeof value === "number") {
             const date = new Date(Date.UTC(0, 0, value - 1));
@@ -38,33 +61,39 @@ class FileProcessor {
             return `${day}-${month}-${year}`;
         }
 
-        if (typeof value === "string" && /^\d{1,2}\/\d{1,2}\/\d{2}$/.test(value)) {
-            const [month, day, year] = value.split("/");
-            const fullYear = (parseInt(year) < 50 ? "20" : "19") + year.padStart(2, "0");
-            return `${day.padStart(2, "0")}-${month.padStart(2, "0")}-${fullYear}`;
-        }
+        if (typeof value === "string") {
+            if (/^\d{1,2}\/\d{1,2}\/\d{2}$/.test(value)) {
+                const [month, day, year] = value.split("/");
+                const fullYear = (parseInt(year) < 50 ? "20" : "19") + year.padStart(2, "0");
+                return `${day.padStart(2, "0")}-${month.padStart(2, "0")}-${fullYear}`;
+            }
 
-        if (typeof value === "string" && /^\d{2}\/\d{2}\/\d{4}$/.test(value)) {
-            const [day, month, year] = value.split("/");
-            return `${day.padStart(2, "0")}-${month.padStart(2, "0")}-${year}`;
-        }
+            if (/^\d{2}\/\d{2}\/\d{4}$/.test(value)) {
+                const [day, month, year] = value.split("/");
+                return `${day.padStart(2, "0")}-${month.padStart(2, "0")}-${year}`;
+            }
 
-        if (typeof value === "string" && /^\d{2}-\d{2}-\d{4}$/.test(value)) {
-            const [day, month, year] = value.split("-");
-            return `${day.padStart(2, "0")}-${month.padStart(2, "0")}-${year}`;
+            if (/^\d{2}-\d{2}-\d{4}$/.test(value)) {
+                const [day, month, year] = value.split("-");
+                return `${day.padStart(2, "0")}-${month.padStart(2, "0")}-${year}`;
+            }
         }
 
         return String(value);
     }
 
     private isDateColumn(value: string): boolean {
+
+        const normalizedValue = value.trim().replace(/^"|"$/g, '').replace(/\s*,\s*/g, ',').replace(/\s{2,}/g, ' ');
+        const englishDatePattern = /^(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday),(January|February|March|April|May|June|July|August|September|October|November|December) \d{1,2},\d{4}$/
+
         return (
-            /^\d{2}\/\d{2}\/\d{4}$/.test(value) ||
-            /^\d{1,2}\/\d{1,2}\/\d{2}$/.test(value) ||
-            /^\d{2}-\d{2}-\d{4}$/.test(value)
+            /^\d{2}\/\d{2}\/\d{4}$/.test(normalizedValue) ||
+            /^\d{1,2}\/\d{1,2}\/\d{2}$/.test(normalizedValue) ||
+            /^\d{2}-\d{2}-\d{4}$/.test(normalizedValue) ||
+            englishDatePattern.test(normalizedValue)
         );
     }
-
 
 
     public excelToCSV(
@@ -107,6 +136,8 @@ class FileProcessor {
 
                         for (let R = range.s.r; R <= range.e.r; ++R) {
                             let row: string[] = [];
+                            let empty = true;
+
                             for (let C = range.s.c; C <= range.e.c; ++C) {
                                 const cellAddress = { c: C, r: R };
                                 const cellRef = XLSX.utils.encode_cell(cellAddress);
@@ -123,7 +154,14 @@ class FileProcessor {
                                 if (this.isDateColumn(cellValue)) {
                                     dateColumns.add(C);
                                 }
+
+                                if (cellValue.trim() !== '') empty = false;
                             }
+
+                            if (empty) {
+                                continue;
+                            }
+
                             if (!headerChecked) {
                                 if (!isValidHeaderRow(row, validHeaders)) {
                                     continue;
@@ -151,6 +189,7 @@ class FileProcessor {
                             });
                             csvOutput += row.join(",") + "\n";
                         }
+
                         const fileNameWithoutExtension = path.basename(inputFile, path.extname(inputFile));
                         const match = fileNameWithoutExtension.match(/_(.*)/);
                         const extractedPart = match ? match[1] : '';
@@ -227,6 +266,7 @@ class FileProcessor {
             } else if (key === 'gasolina') {
                 const gasolinaData = records.filter(isCreateGasolinaDto).map(record => ({
                     frenteNombre: record.frenteNombre,
+                    folio: record.folio,
                     saldoCompra: record.saldoCompra,
                     formatoPago: record.formatoPago,
                     litros: `${record.litros} L`,
@@ -235,10 +275,8 @@ class FileProcessor {
                     autorizacion: record.autorizacion,
                     total: record.total,
                     hora: record.hora,
-                    odometro: record.odometro,
                     bomba: record.bomba,
                     precioUnitario: record.precioUnitario,
-                    kilometros: record.kilometros,
                 }));
 
                 await prisma.gasolina.createMany({
