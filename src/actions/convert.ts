@@ -498,7 +498,21 @@ class FileProcessor {
             }
 
             function processRecords() {
-                const worksheet = XLSX.utils.json_to_sheet(records);
+                const worksheet = XLSX.utils.json_to_sheet(records, {
+                    cellDates: false,
+                    cellStyles: false
+                });
+
+                worksheet['!cols'] = [{ wch: 36 }];
+
+                records.forEach((record, index) => {
+                    const cellRef = XLSX.utils.encode_cell({ c: 0, r: index + 1 });
+                    if (worksheet[cellRef]) {
+                        worksheet[cellRef].t = 's';
+                        worksheet[cellRef].z = '@';
+                    }
+                });
+
                 const workbook = XLSX.utils.book_new();
                 XLSX.utils.book_append_sheet(workbook, worksheet, key.charAt(0).toUpperCase() + key.slice(1));
 
