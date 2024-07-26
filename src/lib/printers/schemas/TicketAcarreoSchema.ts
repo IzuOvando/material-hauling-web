@@ -35,7 +35,7 @@ export default class TicketAcarreoSchema implements TicketSchema {
   ) => {
     const ticketAcarreo = ticket as Acarreos;
     this.addEnterpriseLogo(writter, ticketAcarreo.empresa);
-    this.addId(writter, ticketAcarreo.uuid);
+    this.addId(writter, ticketAcarreo.folio);
     this.addFrente(writter, frente);
     this.addTicketData(writter, ticketAcarreo);
     this.addTypeTicket(writter, original);

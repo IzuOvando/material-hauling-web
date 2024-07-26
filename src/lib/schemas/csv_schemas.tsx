@@ -31,6 +31,7 @@ export const filteredDataConfig: Record<
   ) => CreateTicketDto
 > = {
   acarreos: (data, fileName, cleanQuotes) => ({
+    folio: cleanQuotes(data.folio),
     empresa: cleanQuotes(data.empresa),
     material: cleanQuotes(data.material),
     cubicacion: cleanQuotes(data.cubicacion),

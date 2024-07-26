@@ -24,6 +24,7 @@ model Frente {
 model Acarreos {
   uuid         String   @id @default(uuid())
   createdAt    DateTime @default(now())
+  folio        String
   frenteNombre String
   empresa      String
   material     String

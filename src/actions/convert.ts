@@ -253,6 +253,7 @@ class FileProcessor {
             if (key === 'acarreos') {
                 const acarreosData = records.filter(isCreateAcarreosDto).map(record => ({
                     frenteNombre: record.frenteNombre,
+                    folio: record.folio,
                     empresa: record.empresa,
                     material: record.material,
                     cubicacion: `${record.cubicacion} m³`,

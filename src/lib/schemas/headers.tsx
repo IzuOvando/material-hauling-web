@@ -15,7 +15,7 @@ export const schemas: Record<SchemaKeys, Set<string>> = {
         "precio unitario",
     ]),
     acarreos: new Set([
-        "uuid",
+        "folio",
         "union",
         "n°",
         "#vd",
