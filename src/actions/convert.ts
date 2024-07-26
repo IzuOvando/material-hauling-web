@@ -28,7 +28,8 @@ class FileProcessor {
             .join("");
     }
 
-    private formatDate(value: number | string): string {
+
+    private formatDateGas(value: number | string): string {
         const spanishDatePattern = /^(lunes|martes|miércoles|jueves|viernes|sábado|domingo), \d{1,2} de (enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre) de \d{4}$/;
         const englishDatePattern = /^(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday), (\w+) (\d{1,2}), (\d{4})$/;
         const months: { [key: string]: string } = {
@@ -52,6 +53,10 @@ class FileProcessor {
                 return cleanedValue;
             }
         }
+        return String(value);
+    }
+
+    private formatDateAca(value: number | string): string {
 
         if (typeof value === "number") {
             const date = new Date(Date.UTC(0, 0, value - 1));
@@ -99,7 +104,8 @@ class FileProcessor {
     public excelToCSV(
         inputFile: string,
         outputFolder: string,
-        validHeaders: Set<string>
+        validHeaders: Set<string>,
+        key: string
     ): Promise<string[]> {
         const csvFilePaths: string[] = [];
         const inputFilePath = path.resolve(process.cwd(), inputFile);
@@ -110,6 +116,14 @@ class FileProcessor {
             const filteredHeaders = Array.from(validHeaders).filter(header => headerSet.has(header.toLowerCase()));
             const result = filteredHeaders.length >= validHeaders.size * 0.8;
             return result;
+        };
+
+        const formatTime = (timeStr: string): string => {
+            const match = timeStr.match(/^(\d{2}:\d{2}):\d{2} (a\. m\.|p\. m\.)$/);
+            if (match) {
+                return `${match[1]} ${match[2]}`;
+            }
+            return timeStr;
         };
 
         return new Promise((resolve, reject) => {
@@ -177,7 +191,11 @@ class FileProcessor {
 
                             row = row.map((cellValue, index) => {
                                 if (dateColumns.has(index) && cellValue) {
-                                    cellValue = this.formatDate(cellValue.toString());
+                                    if (key === "gasolina") {
+                                        cellValue = this.formatDateGas(cellValue.toString());
+                                    } else {
+                                        cellValue = this.formatDateAca(cellValue.toString());
+                                    }
                                     cellValue = cellValue.replace(/"/g, '""');
                                     return `"${cellValue}"`;
                                 }
@@ -185,7 +203,7 @@ class FileProcessor {
                                     cellValue = cellValue.replace(/"/g, '""');
                                     return `"${cellValue}"`;
                                 }
-                                return cellValue;
+                                return formatTime(cellValue);
                             });
                             csvOutput += row.join(",") + "\n";
                         }
@@ -456,7 +474,8 @@ class FileProcessor {
             const csvFilePaths = await this.excelToCSV(
                 `./db_input/${fileName}`,
                 outputFolder,
-                validHeaders
+                validHeaders,
+                key
             );
             await this.processCSVFiles(csvFilePaths, fileName, key);
             await this.downloadDatabase(path.resolve(outputExcel), key)
