@@ -29,6 +29,12 @@ export const acarreosColumns: ColumnDef<Acarreos>[] = [
     enableHiding: false,
   },
   {
+    accessorKey: "uuid",
+    header: ({ column }) => (
+      <TableTicketColumnHeader column={column} title="UUID" />
+    ),
+  },
+  {
     accessorKey: "folio",
     header: ({ column }) => (
       <TableTicketColumnHeader column={column} title="Folio" />
