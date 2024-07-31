@@ -13,6 +13,15 @@ export const schemas: Record<SchemaKeys, Set<string>> = {
         "total",
         "bomba",
         "precio unitario",
+        "empresa",
+        "economico",
+        "union",
+        "uuid",
+        "createdat",
+        "frentenombre",
+        "saldocompra",
+        "formatopago",
+        "preciounitario"
     ]),
     acarreos: new Set([
         "folio",
@@ -35,5 +44,10 @@ export const schemas: Record<SchemaKeys, Set<string>> = {
         "proyecto",
         "no empleado",
         "proyecto",
+        "uuid",
+        "createdat",
+        "frenteNombre",
+        "noempleado",
+        "idcamion"
     ]),
 };

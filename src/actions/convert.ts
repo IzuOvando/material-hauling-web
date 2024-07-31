@@ -111,12 +111,20 @@ class FileProcessor {
         const inputFilePath = path.resolve(process.cwd(), inputFile);
 
         const isValidHeaderRow = (headers: string[], validHeaders: Set<string>) => {
-            const cleanedHeaders = headers.map(header => header.trim().toLowerCase());
-            const headerSet = new Set(cleanedHeaders);
-            const filteredHeaders = Array.from(validHeaders).filter(header => headerSet.has(header.toLowerCase()));
-            const result = filteredHeaders.length >= validHeaders.size * 0.8;
-            return result;
+            const normalize = (header: string) => header.replace(/\s+/g, '').toLowerCase();
+
+            const cleanedHeaders = new Set(headers.map(normalize).filter(header => header.length > 0));
+            const normalizedValidHeaders = new Set(Array.from(validHeaders).map(normalize));
+
+            for (const header of cleanedHeaders) {
+                if (!normalizedValidHeaders.has(header)) {
+                    return false;
+                }
+            }
+            return true;
         };
+
+
 
         const formatTime = (timeStr: string): string => {
             const match = timeStr.match(/^(\d{2}:\d{2}):\d{2} (a\. m\.|p\. m\.)$/);
@@ -249,24 +257,48 @@ class FileProcessor {
     }
 
     private async processBatch(records: CreateTicketDto[], cleanFrenteName: string, key: string) {
+
         try {
             if (key === 'acarreos') {
-                const acarreosData = records.filter(isCreateAcarreosDto).map(record => ({
-                    frenteNombre: record.frenteNombre,
-                    folio: record.folio,
-                    empresa: record.empresa,
-                    material: record.material,
-                    cubicacion: `${record.cubicacion} m³`,
-                    fecha: record.fecha,
-                    placas: record.placas,
-                    idCamion: record.idCamion,
-                    operador: record.operador,
-                    proyecto: record.proyecto,
-                    noEmpleado: record.noEmpleado,
-                    checador: record.checador,
-                    hora: record.hora,
-                    banco: record.banco,
-                }));
+                const acarreosData = records.filter(isCreateAcarreosDto).map(record => {
+                    const acarreoEntry: {
+                        uuid?: string;
+                        frenteNombre: string;
+                        folio: string;
+                        empresa: string;
+                        material: string;
+                        cubicacion: string;
+                        fecha: string;
+                        placas: string;
+                        idCamion: string;
+                        operador: string;
+                        proyecto: string;
+                        noEmpleado: string;
+                        checador: string;
+                        hora: string;
+                        banco: string;
+                    } = {
+                        frenteNombre: record.frenteNombre,
+                        folio: record.folio,
+                        empresa: record.empresa,
+                        material: record.material,
+                        cubicacion: `${record.cubicacion} m³`,
+                        fecha: record.fecha,
+                        placas: record.placas,
+                        idCamion: record.idCamion,
+                        operador: record.operador,
+                        proyecto: record.proyecto,
+                        noEmpleado: record.noEmpleado,
+                        checador: record.checador,
+                        hora: record.hora,
+                        banco: record.banco,
+                    };
+                    if (record.uuid) {
+                        acarreoEntry.uuid = record.uuid;
+                    }
+
+                    return acarreoEntry;
+                });
 
                 await prisma.acarreos.createMany({
                     data: acarreosData,
@@ -283,20 +315,42 @@ class FileProcessor {
 
                 await this.updateFrenteInBatches(cleanFrenteName, acarreoUuids, 'ticketsAcarreos');
             } else if (key === 'gasolina') {
-                const gasolinaData = records.filter(isCreateGasolinaDto).map(record => ({
-                    frenteNombre: record.frenteNombre,
-                    folio: record.folio,
-                    saldoCompra: record.saldoCompra,
-                    formatoPago: record.formatoPago,
-                    litros: `${record.litros} L`,
-                    fecha: record.fecha,
-                    placas: record.placas,
-                    autorizacion: record.autorizacion,
-                    total: record.total,
-                    hora: record.hora,
-                    bomba: record.bomba,
-                    precioUnitario: record.precioUnitario,
-                }));
+                const gasolinaData = records.filter(isCreateGasolinaDto).map(record => {
+                    const gasolinaEntry: {
+                        uuid?: string;
+                        frenteNombre: string;
+                        folio: string;
+                        saldoCompra: string;
+                        formatoPago: string;
+                        litros: string;
+                        fecha: string;
+                        placas: string;
+                        autorizacion: string;
+                        total: string;
+                        hora: string;
+                        bomba: string;
+                        precioUnitario: string;
+                    } = {
+                        frenteNombre: record.frenteNombre,
+                        folio: record.folio,
+                        saldoCompra: record.saldoCompra,
+                        formatoPago: record.formatoPago,
+                        litros: `${record.litros} L`,
+                        fecha: record.fecha,
+                        placas: record.placas,
+                        autorizacion: record.autorizacion,
+                        total: record.total,
+                        hora: record.hora,
+                        bomba: record.bomba,
+                        precioUnitario: record.precioUnitario,
+                    };
+
+                    if (record.uuid && record.uuid.trim() !== '') {
+                        gasolinaEntry.uuid = record.uuid;
+                    }
+
+                    return gasolinaEntry;
+                });
 
                 await prisma.gasolina.createMany({
                     data: gasolinaData,
@@ -479,7 +533,7 @@ class FileProcessor {
                 key
             );
             await this.processCSVFiles(csvFilePaths, fileName, key);
-            await this.downloadDatabase(path.resolve(outputExcel), key)
+            await this.downloadDatabase(path.resolve(outputExcel), key, fileName)
             this.deleteFiles([dbInputPath, outputFolder])
         } catch (error) {
             console.error("Error during file processing:", error);
@@ -493,12 +547,25 @@ class FileProcessor {
         }
     }
 
-    private downloadDatabase(outputExcel: string, key: string): Promise<void> {
+    private convertCamelCaseToSpaces(key: string): string {
+        return key.replace(/([a-z])([A-Z])/g, '$1 $2')
+            .replace(/([A-Z])([A-Z][a-z])/g, '$1 $2')
+            .replace(/^./, str => str.toUpperCase());
+    }
+
+
+    private downloadDatabase(outputExcel: string, key: string, fileName: string): Promise<void> {
         return new Promise((resolve, reject) => {
             let records: any[];
-
+            const underscoreIndex = fileName.indexOf('_');
+            const dotIndex = fileName.indexOf('.');
+            const cleanFrenteName = fileName.substring(underscoreIndex + 1, dotIndex);
             if (key === 'gasolina') {
-                prisma.gasolina.findMany().then(res => {
+                prisma.gasolina.findMany({
+                    where: {
+                        frenteNombre: cleanFrenteName
+                    }
+                }).then(res => {
                     records = res;
                     processRecords();
                 }).catch(err => {
@@ -506,7 +573,11 @@ class FileProcessor {
                     reject(err);
                 });
             } else if (key === 'acarreos') {
-                prisma.acarreos.findMany().then(res => {
+                prisma.acarreos.findMany({
+                    where: {
+                        frenteNombre: cleanFrenteName
+                    }
+                }).then(res => {
                     records = res;
                     processRecords();
                 }).catch(err => {
@@ -516,22 +587,30 @@ class FileProcessor {
             } else {
                 reject(new Error(`Unsupported key: ${key}`));
             }
+            const processRecords = () => {
+                const processedRecords = records.map(record => {
+                    const updatedRecord: any = {};
+                    Object.keys(record).forEach(data => {
+                        const newKey = this.convertCamelCaseToSpaces(data);
+                        updatedRecord[newKey] = record[data];
 
-            function processRecords() {
-                const worksheet = XLSX.utils.json_to_sheet(records, {
+                        if (key === 'acarreos' && newKey.toLowerCase() === 'cubicacion' && updatedRecord[newKey]) {
+                            updatedRecord[newKey] = updatedRecord[newKey].replace(/m³/g, '').trim();
+                        }
+
+                        if (key === 'gasolina' && newKey.toLowerCase() === 'litros' && updatedRecord[newKey]) {
+                            updatedRecord[newKey] = updatedRecord[newKey].replace(/L/g, '').trim();
+                        }
+                    });
+                    return updatedRecord;
+                });
+
+                const worksheet = XLSX.utils.json_to_sheet(processedRecords, {
                     cellDates: false,
                     cellStyles: false
                 });
 
                 worksheet['!cols'] = [{ wch: 36 }];
-
-                records.forEach((record, index) => {
-                    const cellRef = XLSX.utils.encode_cell({ c: 0, r: index + 1 });
-                    if (worksheet[cellRef]) {
-                        worksheet[cellRef].t = 's';
-                        worksheet[cellRef].z = '@';
-                    }
-                });
 
                 const workbook = XLSX.utils.book_new();
                 XLSX.utils.book_append_sheet(workbook, worksheet, key.charAt(0).toUpperCase() + key.slice(1));
@@ -553,6 +632,7 @@ class FileProcessor {
                             reject(err);
                             return;
                         }
+
                         const buffer = XLSX.write(workbook, { type: 'buffer' });
                         fs.writeFile(outputFilePath, buffer, (err) => {
                             if (err) {
@@ -568,6 +648,7 @@ class FileProcessor {
             }
         });
     }
+
 
 
     private async deleteFiles(directories: string[]): Promise<void> {
