@@ -30,6 +30,8 @@ interface EditFrenteDialogProps {
   areTickets: {
     [key in TicketArea]: boolean;
   };
+  onFrenteUpdated: () => void;
+  onDeleteFrente: (name: string) => void;
 }
 
 const EditFrenteDialog = ({
@@ -37,6 +39,8 @@ const EditFrenteDialog = ({
   setOpen,
   frente,
   areTickets,
+  onFrenteUpdated,
+  onDeleteFrente,
 }: EditFrenteDialogProps) => {
   const [area, setArea] = useState<TicketArea>(TicketArea.ACARREOS);
 
@@ -77,9 +81,17 @@ const EditFrenteDialog = ({
                 </SelectContent>
               </Select>
               {areTickets[area] ? (
-                <FileUpdate selectedFrente={frente} selectedArea={area} />
+                <FileUpdate
+                  selectedFrente={frente}
+                  selectedArea={area}
+                  onUpdate={onFrenteUpdated}
+                />
               ) : (
-                <FileUpload selectedFrente={frente} selectedArea={area} />
+                <FileUpload
+                  selectedFrente={frente}
+                  selectedArea={area}
+                  onUpload={onFrenteUpdated}
+                />
               )}
             </span>
             <span className="text-center text-sm mb-5">
@@ -101,7 +113,7 @@ const EditFrenteDialog = ({
           </div>
         </DialogContent>
       </Dialog>
-      <DeleteFrenteAlertDialog frente={frente} />
+      <DeleteFrenteAlertDialog frente={frente} onDelete={onDeleteFrente} />
     </AlertDialog>
   );
 };

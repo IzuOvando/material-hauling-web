@@ -9,7 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useFrenteStore } from "@/store";
+import { useFrenteStore, useTicketsSelectionStore } from "@/store";
 import { SelectGroup, SelectLabel } from "@radix-ui/react-select";
 import { Frente } from "@prisma/client";
 import { useEffect } from "react";
@@ -22,8 +22,14 @@ import DownloadFrenteButton from "./DownloadFrenteButton";
 
 const FrenteTools = ({ frentes }: { frentes: Frente[] }) => {
   // Hooks
-  const { selectedFrente, selectedArea, setSelectedFrente, setSelectedArea } =
-    useFrenteStore();
+  const {
+    selectedFrente,
+    selectedArea,
+    setSelectedFrente,
+    setSelectedArea,
+    reset: resetFrente,
+  } = useFrenteStore();
+  const { resetSelection } = useTicketsSelectionStore();
   const router = useRouter();
   // States
   const [showAddFrenteDialog, setShowAddFrenteDialog] = useState(false);
@@ -34,9 +40,10 @@ const FrenteTools = ({ frentes }: { frentes: Frente[] }) => {
     [TicketArea.ACARREOS]: false,
     [TicketArea.GASOLINA]: false,
   });
+  const [frentesDisplay, setFrentesDisplay] = useState<Frente[]>(frentes);
 
   const handleSelectFrente = (value: string) => {
-    const frente = frentes.find((f) => f.nombre === value);
+    const frente = frentesDisplay.find((f) => f.nombre === value);
     if (frente) {
       setSelectedFrente(frente);
     }
@@ -46,32 +53,63 @@ const FrenteTools = ({ frentes }: { frentes: Frente[] }) => {
     setSelectedArea(value);
   };
 
-  useEffect(() => {
-    if (selectedFrente && selectedArea)
-      router.push(`/tickets/${selectedFrente.nombre}/${selectedArea}`);
-  }, [selectedFrente, selectedArea, router]);
+  const fetchAreTickets = async (frente: string) => {
+    fetch("/api/frente/areTickets", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ nombre: frente }),
+    })
+      .then((res) => {
+        return res.json();
+      })
+      .then((data) => {
+        setAreTickets(data);
+      })
+      .catch((err) => {
+        console.error(
+          "Error al verificar si hay tickets asociados al frente:",
+          err
+        );
+      });
+  };
+
+  const handleOnFrenteUpdated = () => {
+    setShowEditFrenteDialog(false);
+    resetSelection();
+    if (selectedFrente) fetchAreTickets(selectedFrente.nombre);
+    router.refresh();
+  };
+
+  const handleOnAddFrente = (frente: string) => {
+    setFrentesDisplay([...frentesDisplay, { nombre: frente }]);
+    setSelectedFrente({
+      nombre: frente,
+    });
+    setSelectedArea(TicketArea.ACARREOS);
+  };
+
+  const handleOnDeleteFrente = (name: string) => {
+    resetSelection();
+    resetFrente();
+    setAreTickets({
+      [TicketArea.ACARREOS]: false,
+      [TicketArea.GASOLINA]: false,
+    });
+    setFrentesDisplay([...frentesDisplay.filter((f) => f.nombre !== name)]);
+    router.push("/");
+  };
 
   useEffect(() => {
-    if (selectedFrente)
-      fetch("/api/frente/areTickets", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ nombre: selectedFrente.nombre }),
-      })
-        .then((res) => {
-          return res.json();
-        })
-        .then((data) => {
-          setAreTickets(data);
-        })
-        .catch((err) => {
-          console.error(
-            "Error al verificar si hay tickets asociados al frente:",
-            err
-          );
-        });
+    if (selectedFrente && selectedArea) {
+      resetSelection();
+      router.push(`/tickets/${selectedFrente.nombre}/${selectedArea}`);
+    }
+  }, [selectedFrente, selectedArea, router, resetSelection]);
+
+  useEffect(() => {
+    if (selectedFrente) fetchAreTickets(selectedFrente.nombre);
   }, [selectedFrente]);
 
   return (
@@ -86,7 +124,7 @@ const FrenteTools = ({ frentes }: { frentes: Frente[] }) => {
         <SelectContent>
           <SelectGroup>
             <SelectLabel className="ml-3 font-bold">Frentes</SelectLabel>
-            {frentes.map((frente) => (
+            {frentesDisplay.map((frente) => (
               <SelectItem
                 key={frente.nombre}
                 value={frente.nombre}
@@ -133,6 +171,8 @@ const FrenteTools = ({ frentes }: { frentes: Frente[] }) => {
             setOpen={setShowEditFrenteDialog}
             frente={selectedFrente}
             areTickets={areTickets}
+            onFrenteUpdated={handleOnFrenteUpdated}
+            onDeleteFrente={handleOnDeleteFrente}
           />
           {selectedArea && (
             <DownloadFrenteButton
@@ -152,6 +192,7 @@ const FrenteTools = ({ frentes }: { frentes: Frente[] }) => {
       <AddFrenteDialog
         open={showAddFrenteDialog}
         setOpen={setShowAddFrenteDialog}
+        onAddFrente={handleOnAddFrente}
       />
     </div>
   );

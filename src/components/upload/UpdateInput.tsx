@@ -12,11 +12,13 @@ import { Frente } from "@prisma/client";
 interface FileUpdateProps {
   selectedFrente: Frente;
   selectedArea: any;
+  onUpdate: () => void;
 }
 
 const FileUpdate: React.FC<FileUpdateProps> = ({
   selectedFrente,
   selectedArea,
+  onUpdate,
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
@@ -54,7 +56,8 @@ const FileUpdate: React.FC<FileUpdateProps> = ({
       file,
       setIsLoading,
       toast,
-      CONFIG.BASE_URL
+      CONFIG.BASE_URL,
+      onUpdate
     );
     if (fileInputRef.current) fileInputRef.current.value = "";
   };

@@ -1,30 +1,16 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { TableTicketColumnHeader } from "./TableTicketColumnHeader";
-import { Checkbox } from "@/components/ui/checkbox";
+import {
+  TableTicketAllSelector,
+  TableTicketRowSelector,
+} from "./TableTicketSelectors";
 import { Acarreos, Gasolina } from "@prisma/client";
 
 export const acarreosColumns: ColumnDef<Acarreos>[] = [
   {
     id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value) => table.toggleAllRowsSelected(!!value)}
-        aria-label="Seleccionar todo"
-        className="border-2 border-accent-dark !text-primary data-[state=checked]:bg-accent-dark w-5 h-5 pt-[1px] pl-[1px] mt-1"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Selecccionar fila"
-        className="border-2 border-primary !text-accent-dark data-[state=checked]:bg-primary w-5 h-5 pt-[1px] pl-[1px] mt-1"
-      />
-    ),
+    header: () => <TableTicketAllSelector />,
+    cell: ({ row }) => <TableTicketRowSelector row={row} />,
     enableSorting: false,
     enableHiding: false,
   },
@@ -141,25 +127,8 @@ export const acarreosColumns: ColumnDef<Acarreos>[] = [
 export const gasolinaColumns: ColumnDef<Gasolina>[] = [
   {
     id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value) => table.toggleAllRowsSelected(!!value)}
-        aria-label="Seleccionar todo"
-        className="border-2 border-accent-dark !text-primary data-[state=checked]:bg-accent-dark w-5 h-5 pt-[1px] pl-[1px] mt-1"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Selecccionar fila"
-        className="border-2 border-primary !text-accent-dark data-[state=checked]:bg-primary w-5 h-5 pt-[1px] pl-[1px] mt-1"
-      />
-    ),
+    header: () => <TableTicketAllSelector />,
+    cell: ({ row }) => <TableTicketRowSelector row={row} />,
     enableSorting: false,
     enableHiding: false,
   },

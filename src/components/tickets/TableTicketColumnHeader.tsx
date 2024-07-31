@@ -14,6 +14,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useTableTickets } from "@/hooks";
 
 interface TableTicketColumnHeaderProps<TData, TValue>
   extends React.HTMLAttributes<HTMLDivElement> {
@@ -26,9 +27,16 @@ export function TableTicketColumnHeader<TData, TValue>({
   title,
   className,
 }: TableTicketColumnHeaderProps<TData, TValue>) {
+  const { setSort } = useTableTickets();
+
   if (!column.getCanSort()) {
     return <div className={cn(className)}>{title}</div>;
   }
+
+  const handleSort = (desc: boolean) => {
+    column.toggleSorting(desc);
+    setSort(column.id, desc);
+  };
 
   return (
     <div className={cn("flex items-center space-x-2", className)}>
@@ -52,14 +60,14 @@ export function TableTicketColumnHeader<TData, TValue>({
         <DropdownMenuContent align="start">
           <DropdownMenuItem
             className="cursor-pointer"
-            onClick={() => column.toggleSorting(false)}
+            onClick={() => handleSort(false)}
           >
             <ArrowUpIcon className="mr-2 h-3.5 w-3.5 text-muted-foreground/70" />
             Asc
           </DropdownMenuItem>
           <DropdownMenuItem
             className="cursor-pointer"
-            onClick={() => column.toggleSorting(true)}
+            onClick={() => handleSort(true)}
           >
             <ArrowDownIcon className="mr-2 h-3.5 w-3.5 text-muted-foreground/70" />
             Desc
