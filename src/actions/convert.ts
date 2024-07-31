@@ -592,7 +592,14 @@ class FileProcessor {
                     const updatedRecord: any = {};
                     Object.keys(record).forEach(data => {
                         const newKey = this.convertCamelCaseToSpaces(data);
-                        updatedRecord[newKey] = record[data];
+                      
+                        let value = record[data];
+
+                        if (newKey.toLowerCase().includes('uuid')) {
+                            value = value.toString();
+                        }
+
+                        updatedRecord[newKey] = value;
 
                         if (key === 'acarreos' && newKey.toLowerCase() === 'cubicacion' && updatedRecord[newKey]) {
                             updatedRecord[newKey] = updatedRecord[newKey].replace(/m³/g, '').trim();
