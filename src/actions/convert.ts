@@ -126,12 +126,25 @@ class FileProcessor {
 
 
 
-        const formatTime = (timeStr: string): string => {
-            const match = timeStr.match(/^(\d{2}:\d{2}):\d{2} (a\. m\.|p\. m\.)$/);
+        const formatDateTime = (dateTimeStr: string): string => {
+            const dateTimeRegex = /^(\d{1,2}\/\d{1,2}\/\d{2,4}) (\d{1,2}:\d{2})(:\d{2})?( ?[APap][mM])?$/;
+
+            const match = dateTimeStr.match(dateTimeRegex);
             if (match) {
-                return `${match[1]} ${match[2]}`;
+                const datePart = match[1];
+                const timePart = match[2];
+                const ampmPart = match[4] ? match[4].toUpperCase() : '';
+
+                let [hours, minutes] = timePart.split(':').map(Number);
+                if (!ampmPart) {
+                    const ampm = hours >= 12 ? 'PM' : 'AM';
+                    hours = hours % 12 || 12;
+                    return `${datePart} ${hours}:${minutes < 10 ? '0' + minutes : minutes} ${ampm}`;
+                }
+
+                return `${datePart} ${timePart} ${ampmPart}`;
             }
-            return timeStr;
+            return dateTimeStr;
         };
 
         return new Promise((resolve, reject) => {
@@ -211,7 +224,7 @@ class FileProcessor {
                                     cellValue = cellValue.replace(/"/g, '""');
                                     return `"${cellValue}"`;
                                 }
-                                return formatTime(cellValue);
+                                return formatDateTime(cellValue);
                             });
                             csvOutput += row.join(",") + "\n";
                         }
@@ -592,7 +605,7 @@ class FileProcessor {
                     const updatedRecord: any = {};
                     Object.keys(record).forEach(data => {
                         const newKey = this.convertCamelCaseToSpaces(data);
-                      
+
                         let value = record[data];
 
                         if (newKey.toLowerCase().includes('uuid')) {
