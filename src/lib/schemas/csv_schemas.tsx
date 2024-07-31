@@ -1,10 +1,13 @@
 import { Gasolina, Acarreos } from "@prisma/client";
 import { TicketArea } from "@/types";
 
-type CreateGasolinaDto = Omit<Gasolina, "uuid" | "createdAt"> & {
+type CreateGasolinaDto = Omit<Gasolina, 'uuid' | 'createdAt'> & {
+  uuid?: string;
   tipoTicket: TicketArea.GASOLINA;
 };
-type CreateAcarreosDto = Omit<Acarreos, "uuid" | "createdAt"> & {
+
+type CreateAcarreosDto = Omit<Acarreos, 'uuid' | 'createdAt'> & {
+  uuid?: string;
   tipoTicket: TicketArea.ACARREOS;
 };
 
@@ -31,6 +34,7 @@ export const filteredDataConfig: Record<
   ) => CreateTicketDto
 > = {
   acarreos: (data, fileName, cleanQuotes) => ({
+    uuid: cleanQuotes(data.uuid),
     folio: cleanQuotes(data.folio),
     empresa: cleanQuotes(data.empresa),
     material: cleanQuotes(data.material),
@@ -51,6 +55,7 @@ export const filteredDataConfig: Record<
     tipoTicket: TicketArea.ACARREOS,
   }),
   gasolina: (data, fileName, cleanQuotes) => ({
+    uuid: cleanQuotes(data.uuid),
     folio: cleanQuotes(data.folio),
     saldoCompra: cleanQuotes(data.saldoCompra),
     formatoPago: cleanQuotes(data.formatoPago),

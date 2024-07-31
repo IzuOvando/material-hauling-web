@@ -1,5 +1,5 @@
 ## Related Ticket 🎫
-[TA-#:#](link)
+[STP-#:#](link)
 
 ## What whats done ❓
 -
