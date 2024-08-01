@@ -7,6 +7,7 @@ import { handleFileUpload } from "@/actions/fileupload";
 import CONFIG from "@/config";
 import { Upload } from "lucide-react";
 import { Frente } from "@prisma/client";
+import { useUser } from '@/contexts/UserContext';
 
 interface FileUpdateProps {
   selectedFrente: Frente;
@@ -19,6 +20,7 @@ const FileUpload: React.FC<FileUpdateProps> = ({
   selectedArea,
   onUpload,
 }) => {
+  const { role } = useUser();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
@@ -54,17 +56,19 @@ const FileUpload: React.FC<FileUpdateProps> = ({
 
   return (
     <>
-      <Input
-        ref={fileInputRef}
-        type="file"
-        onChange={onFileChange}
-        style={{ display: "none" }}
-        accept=".xlsx"
-      />
+      {role === "admin" && (
+        <Input
+          ref={fileInputRef}
+          type="file"
+          onChange={onFileChange}
+          style={{ display: "none" }}
+          accept=".xlsx"
+        />
+      )}
       <Button
         onClick={triggerFileInput}
-        className="bg-secondary hover:bg-secondary-light active:bg-secondary-dark w-full flex items-center gap-2"
-        disabled={isLoading}
+        className={`w-full flex items-center gap-2 ${isLoading ? 'bg-secondary-light' : 'bg-secondary'} ${role !== 'admin' && 'opacity-50 cursor-not-allowed'}`}
+        disabled={isLoading || role !== 'admin'}
       >
         <Upload size={18} color="white" />
         {isLoading ? "Subiendo..." : "Subir Archivo"}

@@ -127,22 +127,41 @@ class FileProcessor {
 
 
         const formatDateTime = (dateTimeStr: string): string => {
-            const dateTimeRegex = /^(\d{1,2}\/\d{1,2}\/\d{2,4}) (\d{1,2}:\d{2})(:\d{2})?( ?[APap][mM])?$/;
+            // Regex to match different formats of dates and times
+            const dateTimeRegex = /^(\d{1,2})\/(\d{1,2})\/(\d{2,4})( \d{1,2}:\d{2}(:\d{2})? ?([APap][mM])?)?$/;
+            // Regex to match time only
+            const timeOnlyRegex = /^(\d{1,2}):(\d{2}):(\d{2}) ?([APap][mM])?$/;
 
-            const match = dateTimeStr.match(dateTimeRegex);
-            if (match) {
-                const datePart = match[1];
-                const timePart = match[2];
-                const ampmPart = match[4] ? match[4].toUpperCase() : '';
+            const dateTimeMatch = dateTimeStr.match(dateTimeRegex);
+            const timeOnlyMatch = dateTimeStr.match(timeOnlyRegex);
 
-                let [hours, minutes] = timePart.split(':').map(Number);
-                if (!ampmPart) {
-                    const ampm = hours >= 12 ? 'PM' : 'AM';
-                    hours = hours % 12 || 12;
-                    return `${datePart} ${hours}:${minutes < 10 ? '0' + minutes : minutes} ${ampm}`;
+            if (dateTimeMatch) {
+                const day = dateTimeMatch[2].padStart(2, '0');
+                const month = dateTimeMatch[1].padStart(2, '0');
+                const year = dateTimeMatch[3].length === 2 ? '20' + dateTimeMatch[3] : dateTimeMatch[3];
+                let formattedDate = `${day}/${month}/${year}`;
+                if (dateTimeMatch[4]) {
+                    const timeStr = dateTimeMatch[4].trim();
+                    const timeRegex = /^(\d{1,2}):(\d{2})(:\d{2})? ?([APap][mM])?$/;
+
+                    const timeMatch = timeStr.match(timeRegex);
+                    if (timeMatch) {
+                        const hours = parseInt(timeMatch[1], 10);
+                        const minutes = timeMatch[2];
+                        const ampm = timeMatch[4] ? timeMatch[4].toUpperCase().replace('.', '') : '';
+                        if (hours === 0 && minutes === '00' && !ampm) {
+                            return formattedDate;
+                        }
+                        const formattedHours = hours.toString().padStart(2, '0');
+                        return `${formattedDate} ${formattedHours}:${minutes} ${ampm}`.trim();
+                    }
                 }
-
-                return `${datePart} ${timePart} ${ampmPart}`;
+                return formattedDate;
+            } else if (timeOnlyMatch) {
+                const hours = timeOnlyMatch[1].padStart(2, '0');
+                const minutes = timeOnlyMatch[2];
+                const ampm = timeOnlyMatch[4] ? timeOnlyMatch[4].toUpperCase().replace('.', '') : '';
+                return `${hours}:${minutes} ${ampm}`.trim();
             }
             return dateTimeStr;
         };

@@ -7,6 +7,9 @@ import { Toaster } from "@/components/ui/toaster";
 import Navbar from "@/components/Navbar";
 import { PrinterStoreInitializer } from "@/store";
 import { EnterprisesImagesInitializer } from "@/contexts";
+import { auth } from "@/auth";
+import { UserProvider } from '@/contexts/UserContext';
+import prisma from "@/lib/db";
 
 const montserrat = Montserrat({ subsets: ["latin"], variable: "--montserrat" });
 
@@ -15,11 +18,22 @@ export const metadata: Metadata = {
   description: "A webapp for managing tickets",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const session = await auth();
+
+  let user = { name: "", role: "" }
+  if (session?.user?.name) {
+    const response = await prisma.user.findUnique({
+      where: { username: session.user.name },
+      select: { username: true, rol: true },
+    });
+    user = response ? { name: response.username, role: response.rol } : { name: "", role: "" };
+  }
+
   return (
     <html lang="es" suppressHydrationWarning>
       <body
@@ -29,12 +43,14 @@ export default function RootLayout({
           montserrat.className
         )}
       >
-        <Navbar />
-        {children}
-        <Toaster />
-        <PrinterStoreInitializer />
-        <EnterprisesImagesInitializer />
-        <Script src="/lib/epos-2.27.0.js" strategy="beforeInteractive" />
+        <UserProvider user={user}>
+          <Navbar userName={user?.name} />
+          {children}
+          <Toaster />
+          <PrinterStoreInitializer />
+          <EnterprisesImagesInitializer />
+          <Script src="/lib/epos-2.27.0.js" strategy="beforeInteractive" />
+        </UserProvider>
       </body>
     </html>
   );
