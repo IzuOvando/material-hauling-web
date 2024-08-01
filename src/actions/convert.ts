@@ -126,12 +126,47 @@ class FileProcessor {
 
 
 
-        const formatTime = (timeStr: string): string => {
-            const match = timeStr.match(/^(\d{2}:\d{2}):\d{2} (a\. m\.|p\. m\.)$/);
-            if (match) {
-                return `${match[1]} ${match[2]}`;
+        const formatDateTime = (dateTimeStr: string): string => {
+            const dateTimeRegex = /^(\d{1,2})\/(\d{1,2})\/(\d{2,4})( \d{1,2}:\d{2}(:\d{2})? ?([APap][mM])?)?$/;
+            const timeOnlyRegex = /^(\d{1,2}):(\d{2}):(\d{2}) ?([APap][mM])?$/;
+
+            const dateTimeMatch = dateTimeStr.match(dateTimeRegex);
+            const timeOnlyMatch = dateTimeStr.match(timeOnlyRegex);
+
+            if (dateTimeMatch) {
+                const day = dateTimeMatch[2].padStart(2, '0');
+                const month = dateTimeMatch[1].padStart(2, '0');
+                const year = dateTimeMatch[3].length === 2 ? '20' + dateTimeMatch[3] : dateTimeMatch[3];
+
+                let formattedDate = `${day}/${month}/${year}`;
+
+                if (dateTimeMatch[4]) {
+                    const timeStr = dateTimeMatch[4].trim();
+                    const timeRegex = /^(\d{1,2}):(\d{2})(:\d{2})? ?([APap][mM])?$/;
+
+                    const timeMatch = timeStr.match(timeRegex);
+                    if (timeMatch) {
+                        const hours = parseInt(timeMatch[1], 10);
+                        const minutes = timeMatch[2];
+                        const ampm = timeMatch[4] ? timeMatch[4].toUpperCase().replace('.', '') : '';
+
+                        if (hours === 0 && minutes === '00' && !ampm) {
+                            return formattedDate;
+                        }
+
+                        const formattedHours = hours.toString().padStart(2, '0');
+                        return `${formattedDate} ${formattedHours}:${minutes} ${ampm}`.trim();
+                    }
+                }
+                return formattedDate;
+            } else if (timeOnlyMatch) {
+                const hours = timeOnlyMatch[1].padStart(2, '0');
+                const minutes = timeOnlyMatch[2];
+                const ampm = timeOnlyMatch[4] ? timeOnlyMatch[4].toUpperCase().replace('.', '') : '';
+                return `${hours}:${minutes} ${ampm}`.trim();
             }
-            return timeStr;
+
+            return dateTimeStr;
         };
 
         return new Promise((resolve, reject) => {
@@ -211,7 +246,7 @@ class FileProcessor {
                                     cellValue = cellValue.replace(/"/g, '""');
                                     return `"${cellValue}"`;
                                 }
-                                return formatTime(cellValue);
+                                return formatDateTime(cellValue);
                             });
                             csvOutput += row.join(",") + "\n";
                         }
@@ -592,7 +627,7 @@ class FileProcessor {
                     const updatedRecord: any = {};
                     Object.keys(record).forEach(data => {
                         const newKey = this.convertCamelCaseToSpaces(data);
-                      
+
                         let value = record[data];
 
                         if (newKey.toLowerCase().includes('uuid')) {
