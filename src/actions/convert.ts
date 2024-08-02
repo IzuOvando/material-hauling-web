@@ -129,7 +129,6 @@ class FileProcessor {
         const formatDateTime = (dateTimeStr: string): string => {
             // Regex to match different formats of dates and times
             const dateTimeRegex = /^(\d{1,2})\/(\d{1,2})\/(\d{2,4})( \d{1,2}:\d{2}(:\d{2})? ?([APap][mM])?)?$/;
-            // Regex to match time only
             const timeOnlyRegex = /^(\d{1,2}):(\d{2}):(\d{2}) ?([APap][mM])?$/;
 
             const dateTimeMatch = dateTimeStr.match(dateTimeRegex);
@@ -140,6 +139,7 @@ class FileProcessor {
                 const month = dateTimeMatch[1].padStart(2, '0');
                 const year = dateTimeMatch[3].length === 2 ? '20' + dateTimeMatch[3] : dateTimeMatch[3];
                 let formattedDate = `${day}/${month}/${year}`;
+
                 if (dateTimeMatch[4]) {
                     const timeStr = dateTimeMatch[4].trim();
                     const timeRegex = /^(\d{1,2}):(\d{2})(:\d{2})? ?([APap][mM])?$/;
@@ -152,6 +152,7 @@ class FileProcessor {
                         if (hours === 0 && minutes === '00' && !ampm) {
                             return formattedDate;
                         }
+
                         const formattedHours = hours.toString().padStart(2, '0');
                         return `${formattedDate} ${formattedHours}:${minutes} ${ampm}`.trim();
                     }
@@ -163,6 +164,7 @@ class FileProcessor {
                 const ampm = timeOnlyMatch[4] ? timeOnlyMatch[4].toUpperCase().replace('.', '') : '';
                 return `${hours}:${minutes} ${ampm}`.trim();
             }
+
             return dateTimeStr;
         };
 
