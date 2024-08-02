@@ -8,16 +8,20 @@ import { handleDeleteFiles } from "@/actions/deletefiles";
 import CONFIG from "@/config";
 import { Upload } from "lucide-react";
 import { Frente } from "@prisma/client";
+import { useUser } from '@/contexts/UserContext';
 
 interface FileUpdateProps {
   selectedFrente: Frente;
   selectedArea: any;
+  onUpdate: () => void;
 }
 
 const FileUpdate: React.FC<FileUpdateProps> = ({
   selectedFrente,
   selectedArea,
+  onUpdate,
 }) => {
+  const { role } = useUser();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
@@ -54,7 +58,8 @@ const FileUpdate: React.FC<FileUpdateProps> = ({
       file,
       setIsLoading,
       toast,
-      CONFIG.BASE_URL
+      CONFIG.BASE_URL,
+      onUpdate
     );
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
@@ -65,17 +70,19 @@ const FileUpdate: React.FC<FileUpdateProps> = ({
 
   return (
     <>
-      <Input
-        ref={fileInputRef}
-        type="file"
-        onChange={onFileChange}
-        style={{ display: "none" }}
-        accept=".xlsx"
-      />
+      {role === "admin" && (
+        <Input
+          ref={fileInputRef}
+          type="file"
+          onChange={onFileChange}
+          style={{ display: "none" }}
+          accept=".xlsx"
+        />
+      )}
       <Button
         onClick={triggerFileInput}
-        className="bg-secondary hover:bg-secondary-light active:bg-secondary-dark w-full flex items-center gap-2"
-        disabled={isLoading}
+        className={`w-full flex items-center gap-2 ${isLoading ? 'bg-secondary-light' : 'bg-secondary'} ${role !== 'admin' && 'opacity-50 cursor-not-allowed'}`}
+        disabled={isLoading || role !== 'admin'}
       >
         <Upload size={18} color="white" />
         {isLoading ? "Subiendo..." : "Actualizar Archivo"}

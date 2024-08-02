@@ -4,14 +4,9 @@ import {
   getCoreRowModel,
   useReactTable,
   flexRender,
-  getPaginationRowModel,
   SortingState,
   getSortedRowModel,
-  ColumnFiltersState,
-  getFilteredRowModel,
   VisibilityState,
-  getFacetedRowModel,
-  getFacetedUniqueValues,
   TableOptions,
 } from "@tanstack/react-table";
 import { Acarreos, Gasolina } from "@prisma/client";
@@ -28,8 +23,10 @@ import { TableTicketColumnToggle } from "./TableTicketColumnToggle";
 import { TableTicketFilters } from "./TableTicketFilters";
 import { Button } from "../ui/button";
 import { PrintTicketDialog } from ".";
-import { TicketArea, Ticket } from "@/types";
+import { TicketArea } from "@/types";
 import { acarreosColumns, gasolinaColumns } from "./tableTicketsColumns";
+import { useTicketsSelectionStore } from "@/store";
+import { TableTicketsProvider } from "@/contexts";
 
 interface TableTicketAcarreoProps {
   area: TicketArea.ACARREOS;
@@ -41,19 +38,25 @@ interface TableTicketGasolinaProps {
   tickets: Gasolina[];
 }
 
-type TableTicketProps = TableTicketAcarreoProps | TableTicketGasolinaProps;
+interface TableTicketGeneralProps {
+  frente?: string;
+  total: number;
+  page: number;
+  limit: number;
+}
+
+type TableTicketProps = (TableTicketAcarreoProps | TableTicketGasolinaProps) &
+  TableTicketGeneralProps;
 
 const TableTicket = (props: TableTicketProps) => {
   // Table states
   const [sorting, setSorting] = useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
-  const [rowSelection, setRowSelection] = useState({});
   // Aux states
   const [disablePrintTickets, setDisablePrintTickets] = useState(true);
   const [openPrintTickets, setOpenPrintTickets] = useState(false);
-  // Ticket states
-  const [sortedTickets, setSortedTickets] = useState<Ticket[]>(props.tickets);
+  // Stores
+  const { selectedTickets, selectedAll } = useTicketsSelectionStore();
 
   const columns =
     props.area === TicketArea.ACARREOS ? acarreosColumns : gasolinaColumns;
@@ -62,45 +65,27 @@ const TableTicket = (props: TableTicketProps) => {
     data: props.tickets,
     columns,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
     onSortingChange: setSorting,
     getSortedRowModel: getSortedRowModel(),
-    onColumnFiltersChange: setColumnFilters,
-    getFilteredRowModel: getFilteredRowModel(),
+    manualSorting: true,
     onColumnVisibilityChange: setColumnVisibility,
-    getFacetedRowModel: getFacetedRowModel(),
-    getFacetedUniqueValues: getFacetedUniqueValues(),
-    onRowSelectionChange: setRowSelection,
     getRowId: (row) => row.uuid,
     state: {
       sorting,
-      columnFilters,
       columnVisibility,
-      rowSelection,
     },
   };
 
   const table = useReactTable(optionsTable);
 
   useEffect(() => {
-    if (Object.keys(rowSelection).length === 0) setDisablePrintTickets(true);
-    else setDisablePrintTickets(false);
-  }, [rowSelection]);
-
-  useEffect(() => {
-    table.toggleAllRowsSelected(false);
-    setRowSelection({});
-  }, [columnFilters, table]);
-
-  useEffect(() => {
-    const sortedData = table
-      .getSortedRowModel()
-      .flatRows.map((row) => row.original);
-    if (sortedData.length > 0) setSortedTickets(sortedData);
-  }, [sorting, columnFilters]);
+    setDisablePrintTickets(
+      !selectedAll && Object.keys(selectedTickets).length === 0
+    );
+  }, [selectedAll, selectedTickets]);
 
   return (
-    <>
+    <TableTicketsProvider>
       <div className="flex items-center justify-center pb-4 flex-wrap lg:justify-start lg:flex-nowrap">
         <Button
           className="bg-accent hover:bg-accent-light active:bg-accent-dark lg:mr-3 mb-3 lg:mb-0"
@@ -109,11 +94,9 @@ const TableTicket = (props: TableTicketProps) => {
         >
           Imprimir Tickets
         </Button>
-        <TableTicketFilters
-          table={table}
-          tickets={props.tickets}
-          area={props.area}
-        />
+        {props.frente !== undefined && (
+          <TableTicketFilters frente={props.frente} area={props.area} />
+        )}
         <TableTicketColumnToggle table={table} />
       </div>
       <div className="rounded-lg border-2 border-primary-light overflow-hidden">
@@ -144,8 +127,10 @@ const TableTicket = (props: TableTicketProps) => {
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                  className="border-primary-light border-b-2 hover:bg-green-50"
+                  data-state={
+                    (selectedAll || selectedTickets[row.id]) && "selected"
+                  }
+                  className="border-primary-light border-b-2 hover:bg-green-50 data-[state=selected]:bg-green-50"
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
@@ -171,15 +156,27 @@ const TableTicket = (props: TableTicketProps) => {
         </Table>
       </div>
       <div className="mt-3">
-        <TableTicketPagination table={table} />
+        <TableTicketPagination
+          selectedRows={
+            selectedAll ? props.total : Object.keys(selectedTickets).length
+          }
+          total={props.total}
+          page={props.page}
+          limit={props.limit}
+        />
       </div>
-      <PrintTicketDialog
-        open={openPrintTickets}
-        setOpen={setOpenPrintTickets}
-        ticketsSelection={rowSelection}
-        tickets={sortedTickets}
-      />
-    </>
+      {props.frente !== undefined && (
+        <PrintTicketDialog
+          open={openPrintTickets}
+          setOpen={setOpenPrintTickets}
+          ticketsSelection={selectedTickets}
+          allSelected={selectedAll}
+          area={props.area}
+          frente={props.frente}
+          total={props.total}
+        />
+      )}
+    </TableTicketsProvider>
   );
 };
 

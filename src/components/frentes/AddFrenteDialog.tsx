@@ -15,9 +15,14 @@ import { useToast } from "../ui/use-toast";
 interface AddFrenteDialogProps {
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  onAddFrente: (frente: string) => void;
 }
 
-const AddFrenteDialog = ({ open, setOpen }: AddFrenteDialogProps) => {
+const AddFrenteDialog = ({
+  open,
+  setOpen,
+  onAddFrente,
+}: AddFrenteDialogProps) => {
   const [error, setError] = useState("");
   const refName = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
@@ -56,7 +61,7 @@ const AddFrenteDialog = ({ open, setOpen }: AddFrenteDialogProps) => {
         description: `Frente ${name} creado con éxito.`,
         variant: "success",
       });
-      setTimeout(() => window.location.reload(), 2500);
+      onAddFrente(name);
     } catch (error) {
       console.error("Error al crear nuevo frente:", error);
       toast({

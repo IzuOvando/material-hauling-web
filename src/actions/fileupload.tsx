@@ -10,7 +10,8 @@ export async function handleFileUpload(
   file: File,
   setIsLoading: Dispatch<SetStateAction<boolean>>,
   toast: any,
-  apiUrl: string
+  apiUrl: string,
+  onUpload: () => void
 ) {
   setIsLoading(true);
   const newFileName = `bbd_${frente.nombre}.xlsx`;
@@ -39,7 +40,7 @@ export async function handleFileUpload(
           description: "Archivo subido y procesado exitosamente",
           variant: "success",
         });
-        setTimeout(() => window.location.reload(), 2500);
+        onUpload();
       } else {
         const { success, errorMessage } = await handleDeleteFiles(
           area,

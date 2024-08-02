@@ -1,41 +1,49 @@
 import { TableTicket } from "@/components/tickets";
 import { notFound } from "next/navigation";
 import { TicketArea } from "@/types";
-import prisma from "@/lib/db";
-
-async function getTickets(frenteName: string, area: string) {
-  if (![TicketArea.ACARREOS, TicketArea.GASOLINA].includes(area as TicketArea))
-    return null;
-
-  const frente = await prisma.frente.findUnique({
-    where: { nombre: frenteName },
-    include: { ticketsGasolina: true, ticketsAcarreos: true },
-  });
-
-  if (!frente) return null;
-
-  const tickets =
-    area === TicketArea.ACARREOS
-      ? frente.ticketsAcarreos
-      : frente.ticketsGasolina;
-
-  return tickets;
-}
+import { getTickets } from "@/actions/tickets";
+import CONFIG from "@/config";
 
 export default async function PageTickets({
   params,
+  searchParams,
 }: {
   params: { frente: string; area: string };
+  searchParams: {
+    page?: string;
+    limit?: string;
+    sort?: string;
+    filters?: string;
+  };
 }) {
-  const tickets: any = await getTickets(params.frente, params.area);
+  const page = Number(searchParams.page) || CONFIG.PAGINATION.DEFAULT_PAGE;
+  const limit = Number(searchParams.limit) || CONFIG.PAGINATION.DEFAULT_LIMIT;
 
-  if (!tickets) {
+  const response = await getTickets(
+    params.frente,
+    params.area as TicketArea,
+    {
+      page,
+      limit,
+    },
+    searchParams.sort,
+    searchParams.filters
+  );
+
+  if (!response) {
     return notFound();
   }
 
   return (
     <>
-      <TableTicket tickets={tickets} area={params.area as TicketArea} />
+      <TableTicket
+        tickets={response.tickets as any}
+        frente={params.frente}
+        area={params.area as TicketArea}
+        total={response.total}
+        page={page}
+        limit={limit}
+      />
     </>
   );
 }

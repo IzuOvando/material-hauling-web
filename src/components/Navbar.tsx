@@ -1,11 +1,9 @@
 "use server";
 import Image from "next/image";
 import { Button } from "./ui/button";
-import { signOut, auth } from "@/auth";
+import { signOut } from "@/auth";
 
-const Navbar = async () => {
-  const session = await auth();
-
+const Navbar = ({ userName }: { userName: string | undefined }) => {
   return (
     <nav className="h-14 bg-primary-dark flex justify-between items-center p-8">
       <Image
@@ -24,11 +22,9 @@ const Navbar = async () => {
           });
         }}
       >
-        {session?.user ? (
+        {userName ? (
           <>
-            <span className="hidden md:block">
-              Bienvenido, {session.user.name}
-            </span>
+            <span className="hidden md:block">Bienvenido, {userName}</span>
             <Button className="bg-accent hover:bg-accent-light active:bg-accent-dark">
               Cerrar Sesión
             </Button>
@@ -40,3 +36,4 @@ const Navbar = async () => {
 };
 
 export default Navbar;
+
