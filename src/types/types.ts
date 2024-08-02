@@ -8,4 +8,9 @@ export type Printer = {
   device?: TicketPrinter;
 };
 
+export type FacetedFilter = {
+  field: keyof Acarreos | keyof Gasolina;
+  options: string[];
+};
+
 export type Ticket = Acarreos | Gasolina;

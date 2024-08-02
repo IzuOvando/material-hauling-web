@@ -1,38 +1,7 @@
 import prisma from "@/lib/db";
 import { TicketArea } from "@/types";
 import { Acarreos, Gasolina } from "@prisma/client";
-
-const SORT_FIELDS = {
-  [TicketArea.ACARREOS]: [
-    "uuid",
-    "folio",
-    "fecha",
-    "hora",
-    "material",
-    "cubicacion",
-    "empresa",
-    "banco",
-    "placas",
-    "idCamion",
-    "operador",
-    "noEmpleado",
-    "checador",
-    "proyecto",
-  ],
-  [TicketArea.GASOLINA]: [
-    "folio",
-    "fecha",
-    "hora",
-    "litros",
-    "precioUnitario",
-    "total",
-    "placas",
-    "bomba",
-    "formatoPago",
-    "autorizacion",
-    "saldoCompra",
-  ],
-};
+import { getFilters, getOrderBy } from "./helpers";
 
 type PaginationConfig = {
   page: number;
@@ -48,11 +17,15 @@ export default async function getTickets(
   frente: string,
   area: TicketArea,
   pagination: PaginationConfig,
-  sort?: string
+  sort?: string,
+  filters?: string
 ): Promise<getTicketReturn | null> {
   // Query variables
   const { page, limit } = pagination;
   let orderBy: any = undefined;
+  let where: any = {
+    frenteNombre: frente,
+  };
   // Return variables
   let tickets: Acarreos[] | Gasolina[] = [];
   let count = 0;
@@ -68,21 +41,23 @@ export default async function getTickets(
   // Add order/sorting
   if (sort) orderBy = getOrderBy(sort, area);
 
+  // Add filters on where
+  if (filters) {
+    const filtersOnWhere = getFilters(filters, area);
+    if (filtersOnWhere) where = { ...where, AND: filtersOnWhere };
+  }
+
   // Query
   if (area === TicketArea.ACARREOS)
     [tickets, count] = await prisma.$transaction([
       prisma.acarreos.findMany({
         skip: (page - 1) * limit,
         take: limit,
-        where: {
-          frenteNombre: frente,
-        },
+        where,
         orderBy,
       }),
       prisma.acarreos.count({
-        where: {
-          frenteNombre: frente,
-        },
+        where,
       }),
     ]);
   else
@@ -90,15 +65,11 @@ export default async function getTickets(
       prisma.gasolina.findMany({
         skip: (page - 1) * limit,
         take: limit,
-        where: {
-          frenteNombre: frente,
-        },
+        where,
         orderBy,
       }),
       prisma.gasolina.count({
-        where: {
-          frenteNombre: frente,
-        },
+        where,
       }),
     ]);
 
@@ -108,18 +79,77 @@ export default async function getTickets(
   };
 }
 
-function getOrderBy(sort: string, area: TicketArea): any {
-  const regex = /^([+-])(\w+)$/;
-  const sortMatch = sort.match(regex);
+// Validation should be done before calling this function
+export async function getSomeTickets(
+  uuids: string[],
+  area: TicketArea,
+  sort?: string
+): Promise<Acarreos[] | Gasolina[]> {
+  // Query variables
+  let orderBy: any = undefined;
 
-  if (!sortMatch) return undefined;
+  // Return variables
+  let tickets: Acarreos[] | Gasolina[] = [];
 
-  const sign = sortMatch[1];
-  const field = sortMatch[2];
+  // Add order/sorting
+  if (sort) orderBy = getOrderBy(sort, area);
 
-  if (!SORT_FIELDS[area].includes(field)) return undefined;
+  if (area === TicketArea.ACARREOS)
+    tickets = await prisma.acarreos.findMany({
+      where: {
+        uuid: {
+          in: uuids,
+        },
+      },
+      orderBy,
+    });
+  else
+    tickets = await prisma.gasolina.findMany({
+      where: {
+        uuid: {
+          in: uuids,
+        },
+      },
+      orderBy,
+    });
 
-  return {
-    [field]: sign === "-" ? "asc" : "desc",
+  return tickets;
+}
+
+export async function getAllTickets(
+  frente: string,
+  area: TicketArea,
+  filters?: string,
+  sort?: string
+): Promise<Acarreos[] | Gasolina[]> {
+  // Query variables
+  let where: any = {
+    frenteNombre: frente,
   };
+  let orderBy: any = undefined;
+
+  // Add filters on where
+  if (filters) {
+    const filtersOnWhere = getFilters(filters, area);
+    if (filtersOnWhere) where = { ...where, AND: filtersOnWhere };
+  }
+
+  // Add order/sorting
+  if (sort) orderBy = getOrderBy(sort, area);
+
+  // Return variables
+  let tickets: Acarreos[] | Gasolina[] = [];
+
+  if (area === TicketArea.ACARREOS)
+    tickets = await prisma.acarreos.findMany({
+      where,
+      orderBy,
+    });
+  else
+    tickets = await prisma.gasolina.findMany({
+      where,
+      orderBy,
+    });
+
+  return tickets;
 }

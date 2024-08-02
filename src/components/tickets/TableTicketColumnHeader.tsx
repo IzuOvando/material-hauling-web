@@ -14,7 +14,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useTableTickets } from "@/hooks";
+import { useTableTicketsGlobal } from "@/contexts";
 
 interface TableTicketColumnHeaderProps<TData, TValue>
   extends React.HTMLAttributes<HTMLDivElement> {
@@ -27,7 +27,7 @@ export function TableTicketColumnHeader<TData, TValue>({
   title,
   className,
 }: TableTicketColumnHeaderProps<TData, TValue>) {
-  const { setSort } = useTableTickets();
+  const { setSort } = useTableTicketsGlobal();
 
   if (!column.getCanSort()) {
     return <div className={cn(className)}>{title}</div>;

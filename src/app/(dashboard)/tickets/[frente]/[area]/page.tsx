@@ -9,7 +9,12 @@ export default async function PageTickets({
   searchParams,
 }: {
   params: { frente: string; area: string };
-  searchParams: { page?: string; limit?: string; sort?: string };
+  searchParams: {
+    page?: string;
+    limit?: string;
+    sort?: string;
+    filters?: string;
+  };
 }) {
   const page = Number(searchParams.page) || CONFIG.PAGINATION.DEFAULT_PAGE;
   const limit = Number(searchParams.limit) || CONFIG.PAGINATION.DEFAULT_LIMIT;
@@ -21,7 +26,8 @@ export default async function PageTickets({
       page,
       limit,
     },
-    searchParams.sort
+    searchParams.sort,
+    searchParams.filters
   );
 
   if (!response) {
@@ -32,6 +38,7 @@ export default async function PageTickets({
     <>
       <TableTicket
         tickets={response.tickets as any}
+        frente={params.frente}
         area={params.area as TicketArea}
         total={response.total}
         page={page}

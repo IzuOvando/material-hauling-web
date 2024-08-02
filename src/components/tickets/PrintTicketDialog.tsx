@@ -12,24 +12,34 @@ import { Button } from "@/components/ui/button";
 import { usePrinterStore, useFrenteStore } from "@/store";
 import { DistributedTicketPrinter } from "@/lib/printers";
 import PrinterLittleCard from "../printers/PrinterLittleCard";
-import { Printer, Ticket, TicketArea } from "@/types";
+import { Printer, TicketArea } from "@/types";
 import { ReceiptText } from "lucide-react";
+import { useSearchParams } from "next/navigation";
+import { useToast } from "../ui/use-toast";
 
 interface PrintDialogProps {
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  allSelected: boolean;
   ticketsSelection: { [key: string]: boolean };
-  tickets: Ticket[];
+  frente: string;
+  area: TicketArea;
+  total: number;
 }
 
 const PrintDialog = ({
   open,
   setOpen,
+  allSelected,
   ticketsSelection,
-  tickets,
+  area,
+  frente,
+  total,
 }: PrintDialogProps) => {
   const { printers } = usePrinterStore();
   const { selectedFrente, selectedArea } = useFrenteStore();
+  const searchParams = useSearchParams();
+  const { toast } = useToast();
   const availablePrinters = printers.filter(
     (printer) => printer.status === "online"
   );
@@ -45,10 +55,55 @@ const PrintDialog = ({
     null
   );
 
-  const handleStartPrinting = () => {
-    const ticketsToPrint = tickets.filter((ticket) =>
-      selectedTickets.includes(ticket.uuid)
-    );
+  const retrieveTickets = async () => {
+    const body: {
+      frente: string;
+      area: TicketArea;
+      allSelected: boolean;
+      selection?: string[];
+    } = { frente, area, allSelected };
+    if (!allSelected) body.selection = Object.keys(ticketsSelection);
+
+    const filters = searchParams.get("filters");
+    const sort = searchParams.get("sort");
+    const params = new URLSearchParams();
+
+    if (filters) params.set("filters", filters);
+    if (sort) params.set("sort", sort);
+
+    const addFilter = params.size > 0 ? `?${params.toString()}` : "";
+
+    try {
+      const response = await fetch(`/api/frente/tickets${addFilter}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+      });
+
+      if (!response.ok) {
+        throw new Error("Error fetching tickets");
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error("Error fetching tickets", error);
+      return null;
+    }
+  };
+
+  const handleStartPrinting = async () => {
+    const ticketsToPrint = await retrieveTickets();
+
+    if (ticketsToPrint === null) {
+      toast({
+        title: "Error",
+        description: `Hubo un problema al obtener los tickets para imprimir, por favor intente nuevamente más tarde.`,
+        variant: "destructive",
+      });
+      return;
+    }
 
     distributedTicketPrinter.current = new DistributedTicketPrinter(
       availablePrinters,
@@ -110,21 +165,21 @@ const PrintDialog = ({
         {actualView === "start" ? (
           <StartView
             availablePrinters={availablePrinters}
-            numberOfTickets={selectedTickets.length}
+            numberOfTickets={allSelected ? total : selectedTickets.length}
             onStartPrinting={handleStartPrinting}
             setOpen={setOpen}
           />
         ) : actualView === "printing" ? (
           <PrintingView
             ticketsPrinted={ticketsPrinted}
-            totalTickets={selectedTickets.length}
+            totalTickets={allSelected ? total : selectedTickets.length}
             printers={printers}
             printersWithErrorNames={failedPrinters}
             handleReconnectPrinters={handleReconnectPrinters}
           />
         ) : (
           <FinishedView
-            totalTickets={selectedTickets.length}
+            totalTickets={allSelected ? total : selectedTickets.length}
             onClose={handleOnClose}
           />
         )}

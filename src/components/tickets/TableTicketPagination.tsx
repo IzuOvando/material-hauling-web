@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useTableTickets } from "@/hooks";
+import { useTableTicketsGlobal } from "@/contexts";
 
 interface TableTicketPaginationProps {
   total: number;
@@ -31,7 +31,7 @@ export function TableTicketPagination({
   const cantGoBack = page == 1;
   const cantGoForward = page == totalPages;
   const { firstPage, lastPage, nextPage, prevPage, setLimit } =
-    useTableTickets();
+    useTableTicketsGlobal();
 
   return (
     <div className="flex items-center justify-between px-2 flex-wrap gap-2">
