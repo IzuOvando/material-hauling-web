@@ -24,6 +24,7 @@ export async function POST(req: NextRequest) {
       data: {
         username: username,
         password: sha256(password).toString(),
+        rol: "user",
       },
     });
 
