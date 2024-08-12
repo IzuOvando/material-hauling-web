@@ -58,7 +58,6 @@ const FileUpdate: React.FC<FileUpdateProps> = ({
       file,
       setIsLoading,
       toast,
-      CONFIG.BASE_URL,
       onUpdate
     );
     if (fileInputRef.current) fileInputRef.current.value = "";

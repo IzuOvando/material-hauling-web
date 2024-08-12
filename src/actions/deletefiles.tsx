@@ -9,12 +9,10 @@ export async function handleDeleteFiles(
 ) {
     setIsLoading(true);
 
-    const FileName = selectedFrente.nombre
-
     try {
         const response = await fetch(`${apiUrl}/api/files/update`, {
             method: 'POST',
-            body: JSON.stringify({ nombre: FileName, area: area }),
+            body: JSON.stringify({ frente: selectedFrente, area: area }),
         });
 
         if (response.ok) {

@@ -2,15 +2,12 @@ import { Dispatch, SetStateAction } from "react";
 import { handleDeleteFiles } from "@/actions/deletefiles";
 import CONFIG from "@/config";
 
-//TODO PASAR EL FRENTE DE PRISMA Y AHORA EL AREA
-
 export async function handleFileUpload(
   area: string,
   frente: any,
   file: File,
   setIsLoading: Dispatch<SetStateAction<boolean>>,
   toast: any,
-  apiUrl: string,
   onUpload: () => void
 ) {
   setIsLoading(true);
@@ -20,18 +17,20 @@ export async function handleFileUpload(
   formData.append("file", newFile);
 
   try {
-    const uploadResponse = await fetch(`${apiUrl}/api/files`, {
+    const uploadResponse = await fetch(`/api/files`, {
       method: "POST",
       body: formData,
     });
 
     if (uploadResponse.ok) {
-      const processResponse = await fetch(`${apiUrl}/api/files/process`, {
+      const responseData = await uploadResponse.json();
+      const { blobUrl } = responseData;
+      const processResponse = await fetch(`/api/files/process`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ fileName: newFile.name, area: area }),
+        body: JSON.stringify({ fileName: newFile.name, area: area, excelBlobUrl: blobUrl }),
       });
 
       if (processResponse.ok) {
@@ -54,14 +53,11 @@ export async function handleFileUpload(
           console.error("Error deleting files:", errorMessage);
           return;
         }
-
-        const processErrorText = await processResponse.text();
         toast({
           title: "Error",
           description: `Error al procesar archivo: Campos incorrectos o formato no válido.`,
           variant: "destructive",
         });
-        console.log(processErrorText);
       }
     } else {
       const uploadErrorText = await uploadResponse.text();

@@ -83,9 +83,14 @@ const FrenteTools = ({ frentes }: { frentes: Frente[] }) => {
   };
 
   const handleOnAddFrente = (frente: string) => {
-    setFrentesDisplay([...frentesDisplay, { nombre: frente }]);
+    setFrentesDisplay([
+      ...frentesDisplay,
+      { nombre: frente, excelUrlGasolinaBlob: null, excelUrlAcarreosBlob: null }
+    ]);
     setSelectedFrente({
       nombre: frente,
+      excelUrlGasolinaBlob: null,
+      excelUrlAcarreosBlob: null
     });
     setSelectedArea(TicketArea.ACARREOS);
   };

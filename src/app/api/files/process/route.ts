@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import FileProcessor from "@/actions/convert";
 
 export async function POST(req: NextRequest) {
@@ -13,10 +13,10 @@ export async function POST(req: NextRequest) {
 
   try {
     const data = await req.json();
-    const { fileName, area } = data;
+    const { fileName, area, excelBlobUrl } = data;
 
     const fileProcessor = new FileProcessor();
-    await fileProcessor.processFiles(fileName, area);
+    await fileProcessor.processFiles(fileName, area, excelBlobUrl);
 
     return new Response(
       JSON.stringify({ message: "Files processed successfully" }),

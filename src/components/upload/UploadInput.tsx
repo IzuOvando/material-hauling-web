@@ -4,7 +4,6 @@ import { useToast } from "@/components/ui/use-toast";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { handleFileUpload } from "@/actions/fileupload";
-import CONFIG from "@/config";
 import { Upload } from "lucide-react";
 import { Frente } from "@prisma/client";
 import { useUser } from '@/contexts/UserContext';
@@ -44,7 +43,6 @@ const FileUpload: React.FC<FileUpdateProps> = ({
       file,
       setIsLoading,
       toast,
-      CONFIG.BASE_URL,
       onUpload
     );
     if (fileInputRef.current) fileInputRef.current.value = "";

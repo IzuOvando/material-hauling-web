@@ -1,21 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import fs from "fs";
-import path from "path";
-
-const uploadDir = path.join(process.cwd(), "db_input");
-
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
-}
+import blobClient from "@/lib/blobClient";
+import { Buffer } from "buffer";
 
 export async function POST(req: NextRequest) {
   try {
-
-    if (req.method === 'POST') {
-      const sizeLimit = 50 * 1024 * 1024;
-      let body = Buffer.alloc(0);
-    }
-
     if (req.method !== "POST") {
       return NextResponse.json(
         { error: "Method Not Allowed" },
@@ -34,28 +22,21 @@ export async function POST(req: NextRequest) {
     }
 
     const fileName = (file as File).name;
-    const filePath = path.join(uploadDir, fileName);
-    const fileStream = fs.createWriteStream(filePath);
 
-    const stream = (file as Blob).stream();
-    const reader = stream.getReader();
+    const nameRoute = `db_input/${fileName}`
 
-    const pump = (): Promise<void> => {
-      return reader.read().then(({ done, value }) => {
-        if (done) {
-          fileStream.end();
-          return;
-        }
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(new Uint8Array(arrayBuffer));
 
-        fileStream.write(Buffer.from(value));
-        return pump();
-      });
-    };
-
-    await pump();
+    const response = await blobClient.putBlob(
+      nameRoute,
+      buffer,
+      { access: 'public' }
+    );
 
     return NextResponse.json({
       message: "File uploaded and processed successfully.",
+      blobUrl: response.url,
     });
   } catch (error) {
     if (error instanceof Error) {

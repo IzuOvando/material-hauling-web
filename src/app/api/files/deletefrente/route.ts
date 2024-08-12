@@ -1,7 +1,6 @@
 import prisma from "@/lib/db";
-import * as path from "path";
 import { NextRequest, NextResponse } from "next/server";
-import { deleteFilesInDirectory } from "@/helpers/deletefilesdirectory";
+import blobClient from "@/lib/blobClient";
 
 
 export async function POST(req: NextRequest) {
@@ -10,8 +9,12 @@ export async function POST(req: NextRequest) {
 
     const frente = await prisma.frente.findUnique({
       where: { nombre },
-      include: { ticketsAcarreos: true, ticketsGasolina: true },
+      select: {
+        excelUrlGasolinaBlob: true,
+        excelUrlAcarreosBlob: true,
+      },
     });
+
 
     if (!frente) {
       return NextResponse.json(
@@ -20,13 +23,16 @@ export async function POST(req: NextRequest) {
       );
     }
 
+
+    if (frente.excelUrlAcarreosBlob) {
+      await blobClient.deleteBlob(frente.excelUrlAcarreosBlob);
+    }
+    if (frente.excelUrlGasolinaBlob) {
+      await blobClient.deleteBlob(frente.excelUrlGasolinaBlob);
+    }
     await prisma.frente.delete({
       where: { nombre },
     });
-
-    const rootPath = path.resolve(process.cwd());
-    const specificFilePath = path.join(rootPath, "db_output", "excel", nombre);
-    await deleteFilesInDirectory(specificFilePath);
 
     return NextResponse.json(
       {
