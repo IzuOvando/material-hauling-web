@@ -1,36 +1,43 @@
 import { Dispatch, SetStateAction } from "react";
 import { handleDeleteFiles } from "@/actions/deletefiles";
 import CONFIG from "@/config";
+import { upload } from '@vercel/blob/client';
+import { Frente } from "@prisma/client";
+
 
 export async function handleFileUpload(
   area: string,
-  frente: any,
+  frente: Frente,
   file: File,
   setIsLoading: Dispatch<SetStateAction<boolean>>,
   toast: any,
-  onUpload: () => void
+  onUpload: () => void,
 ) {
   setIsLoading(true);
   const newFileName = `bbd_${frente.nombre}.xlsx`;
   const newFile = new File([file], newFileName, { type: file.type });
-  const formData = new FormData();
-  formData.append("file", newFile);
+  const nameRoute = `db_input/${newFileName}`
+
+  const clientPayload = JSON.stringify({
+    frenteId: frente.nombre,
+    area: area,
+  });
+
 
   try {
-    const uploadResponse = await fetch(`/api/files`, {
-      method: "POST",
-      body: formData,
+    const uploadResponse = await upload(nameRoute, file, {
+      access: 'public',
+      handleUploadUrl: 'api/files/',
+      clientPayload: clientPayload,
     });
 
-    if (uploadResponse.ok) {
-      const responseData = await uploadResponse.json();
-      const { blobUrl } = responseData;
+    if (uploadResponse && uploadResponse.url) {
       const processResponse = await fetch(`/api/files/process`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ fileName: newFile.name, area: area, excelBlobUrl: blobUrl }),
+        body: JSON.stringify({ fileName: newFile.name, area: area, excelBlobUrl: uploadResponse.url }),
       });
 
       if (processResponse.ok) {
@@ -60,10 +67,9 @@ export async function handleFileUpload(
         });
       }
     } else {
-      const uploadErrorText = await uploadResponse.text();
       toast({
         title: "Error",
-        description: `Error al subir archivo: ${uploadErrorText}`,
+        description: `Error al subir archivo: No se pudo obtener la URL del blob.`,
         variant: "destructive",
       });
     }

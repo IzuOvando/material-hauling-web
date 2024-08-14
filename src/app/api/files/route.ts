@@ -1,43 +1,54 @@
-import { NextRequest, NextResponse } from "next/server";
-import blobClient from "@/lib/blobClient";
-import { Buffer } from "buffer";
+import { handleUpload, type HandleUploadBody } from '@vercel/blob/client';
+import { NextRequest, NextResponse } from 'next/server';
 
-export async function POST(req: NextRequest) {
-  try {
-    if (req.method !== "POST") {
-      return NextResponse.json(
-        { error: "Method Not Allowed" },
-        { status: 405 }
-      );
-    }
+type CustomHandleUploadBody = HandleUploadBody & {
+  frente: string;
+};
 
-    const formData = await req.formData();
-    const file = formData.get("file");
+export async function POST(request: NextRequest): Promise<NextResponse> {
 
-    if (!file || !(file instanceof Blob)) {
-      return NextResponse.json(
-        { error: "No file uploaded or incorrect file type" },
-        { status: 400 }
-      );
-    }
+  const body = (await request.json()) as CustomHandleUploadBody;
 
-    const fileName = (file as File).name;
-
-    const nameRoute = `db_input/${fileName}`
-
-    const arrayBuffer = await file.arrayBuffer();
-    const buffer = Buffer.from(new Uint8Array(arrayBuffer));
-
-    const response = await blobClient.putBlob(
-      nameRoute,
-      buffer,
-      { access: 'public' }
+  let blobUrl: string | null = null;
+  if (request.method !== "POST") {
+    return NextResponse.json(
+      { error: "Method Not Allowed" },
+      { status: 405 }
     );
+  }
 
-    return NextResponse.json({
-      message: "File uploaded and processed successfully.",
-      blobUrl: response.url,
+  try {
+    await handleUpload({
+      body,
+      request,
+      onBeforeGenerateToken: async (clientPayload) => {
+
+        const payload = JSON.parse(clientPayload);
+
+        return {
+          allowedContentTypes: ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'],
+          tokenPayload: JSON.stringify({
+            frente: payload.frenteId,
+            area: payload.area
+          }),
+        };
+      },
+      onUploadCompleted: async ({ blob }) => {
+        blobUrl = blob.url;
+      },
     });
+
+    if (blobUrl) {
+      return NextResponse.json({
+        message: "File uploaded and processed successfully.",
+        blobUrl: blobUrl,
+      });
+    } else {
+      return NextResponse.json(
+        { error: "Failed to retrieve blob URL after upload" },
+        { status: 500 }
+      );
+    }
   } catch (error) {
     if (error instanceof Error) {
       return NextResponse.json(
