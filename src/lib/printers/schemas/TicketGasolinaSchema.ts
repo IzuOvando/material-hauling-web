@@ -1,7 +1,11 @@
 import TicketSchema from "./TicketSchema";
 import { Gasolina } from "@prisma/client";
 import { Ticket } from "@/types";
-
+import { formatPrice, formatVolume } from "@/helpers/formatters/numbers";
+import {
+  formatIsoDateFromString,
+  formatTime12HourFromString,
+} from "@/helpers/formatters/datetime";
 export default class TicketAcarreoSchema implements TicketSchema {
   public generateTicket = (
     writter: any,
@@ -67,9 +71,9 @@ export default class TicketAcarreoSchema implements TicketSchema {
       .addTextAlign(writter.ALIGN_LEFT)
       .addText(`FORMA DE PAGO:\t${ticket.formatoPago}\n`)
       .addText(`COMBUSTIBLE:\t 32011 PEMEX MAGNA\n`)
-      .addText(`PRECIO UNITARIO:\t${ticket.precioUnitario}\n`)
-      .addText(`LITROS:\t ${ticket.litros}\n`)
-      .addText(`TOTAL:\t${ticket.total}\n`)
+      .addText(`PRECIO UNITARIO:\t${formatPrice(ticket.precioUnitario)}\n`)
+      .addText(`LITROS:\t ${formatVolume(ticket.litros, false, true)}\n`)
+      .addText(`TOTAL:\t${formatPrice(ticket.total)}\n`)
       .addTextAlign(writter.ALIGN_CENTER)
       .addTextStyle(false, false, true, writter.COLOR_1)
       .addText("------------------------------------------\n");
@@ -89,8 +93,12 @@ export default class TicketAcarreoSchema implements TicketSchema {
       .addText("Cuenta:\t5892274\n")
       .addText(`Bomba:\t${ticket.bomba}\n`)
       .addText(`Placas:\t${ticket.placas}\n`)
-      .addText(`Saldo próxima compra:\t${ticket.saldoCompra}\n`)
-      .addText(`Fecha y Hora:\t${ticket.fecha} ${ticket.hora}\n`);
+      .addText(`Saldo próxima compra:\t${formatPrice(ticket.saldoCompra)}\n`)
+      .addText(
+        `Fecha y Hora:\t${formatIsoDateFromString(
+          ticket.fecha as any
+        )} ${formatTime12HourFromString(ticket.hora as any)}\n`
+      );
   };
 
   private addThanks(writter: any) {

@@ -88,7 +88,7 @@ export default class TicketAcarreoSchema implements TicketSchema {
         .addTextStyle(false, false, false, writter.COLOR_1);
 
       const key = metaname.normal as keyof typeof ticket;
-      writter.addText(`${ticket[key]}\n`);
+      writter.addText(`${metaname.formatter(ticket[key] as any)}\n`);
     }
   };
 
