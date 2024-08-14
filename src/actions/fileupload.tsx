@@ -4,7 +4,6 @@ import CONFIG from "@/config";
 import { upload } from '@vercel/blob/client';
 import { Frente } from "@prisma/client";
 
-
 export async function handleFileUpload(
   area: string,
   frente: Frente,
@@ -16,28 +15,58 @@ export async function handleFileUpload(
   setIsLoading(true);
   const newFileName = `bbd_${frente.nombre}.xlsx`;
   const newFile = new File([file], newFileName, { type: file.type });
-  const nameRoute = `db_input/${newFileName}`
+  const nameRoute = `db_input/${newFileName}`;
+  const formData = new FormData();
+  formData.append("file", newFile);
 
   const clientPayload = JSON.stringify({
     frenteId: frente.nombre,
     area: area,
   });
 
-
-  try {
-    const uploadResponse = await upload(nameRoute, file, {
+  const handleProductionUpload = async () => {
+    const response = await upload(nameRoute, newFile, {
       access: 'public',
-      handleUploadUrl: 'api/files/',
+      handleUploadUrl: 'api/files/vercel',
       clientPayload: clientPayload,
     });
 
-    if (uploadResponse && uploadResponse.url) {
+    return {
+      blobUrl: response.url,
+    };
+  };
+
+  const handleDevelopmentUpload = async () => {
+    const response = await fetch(`/api/files/local`, {
+      method: "POST",
+      body: formData,
+    });
+
+    const result = await response.json();
+    return {
+      blobUrl: result.blobUrl,
+    };
+  };
+
+  try {
+    let uploadFunction;
+
+    if (process.env.NODE_ENV === 'production') {
+      uploadFunction = handleProductionUpload;
+    } else {
+      uploadFunction = handleDevelopmentUpload;
+    }
+
+    const uploadResponse = await uploadFunction();
+    const blobUrl = uploadResponse.blobUrl;
+
+    if (blobUrl) {
       const processResponse = await fetch(`/api/files/process`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ fileName: newFile.name, area: area, excelBlobUrl: uploadResponse.url }),
+        body: JSON.stringify({ fileName: newFile.name, area: area, excelBlobUrl: blobUrl, }),
       });
 
       if (processResponse.ok) {

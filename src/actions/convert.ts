@@ -425,8 +425,6 @@ class FileProcessor {
 
     public async csvToSQLite(csvFile: string, fileName: string, key: string) {
         const batchSize = CONFIG.BATCHES_CSV_LINES;
-        let records: CreateTicketDto[] = [];
-        let activeBatches = 0;
 
         const underscoreIndex = fileName.indexOf('_');
         const dotIndex = fileName.indexOf('.');
