@@ -24,10 +24,12 @@ export async function handleFileUpload(
     area: area,
   });
 
+  const apiUrl = CONFIG.BASE_URL;
+
   const handleProductionUpload = async () => {
     const response = await upload(nameRoute, newFile, {
       access: 'public',
-      handleUploadUrl: '/api/files/vercel',
+      handleUploadUrl: `${apiUrl}/api/files/vercel`,
       clientPayload: clientPayload,
     });
 
