@@ -6,6 +6,7 @@ const CONFIG = {
     DEFAULT_PAGE: 1,
     DEFAULT_LIMIT: 10,
   },
+  PRINTERS_TIMEOUT: Number(process.env.PRINTERS_TIMEOUT) || 10000,
 };
 
 export default CONFIG;

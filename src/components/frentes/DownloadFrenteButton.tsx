@@ -36,7 +36,7 @@ const DownloadFrenteButton = ({
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ nombre: frente, area: area }),
+        body: JSON.stringify({ frente: frente, area: area }),
       });
 
       if (!response.ok) {

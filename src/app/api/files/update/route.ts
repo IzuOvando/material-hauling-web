@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import fs from "fs/promises";
-import path from "path";
 import prisma from "@/lib/db";
-import { deleteFilesInDirectory } from "@/helpers/deletefilesdirectory";
+import blobClient from "@/lib/blobClient";
 
 export async function POST(req: NextRequest) {
   if (req.method !== "POST") {
@@ -10,66 +8,49 @@ export async function POST(req: NextRequest) {
   }
 
   const data = await req.json();
-  const { nombre, area } = data;
+  const { frente, area } = data;
 
-  const rootPath = path.resolve(process.cwd());
-  const specificFilePath = path.join(rootPath, "db_output", "excel", nombre, `${area}.xslx`);
-  const dbInputPath = path.join(rootPath, "db_input");
-  const csvPath = path.join(rootPath, "db_output", "csv");
+  const foundFrente = await prisma.frente.findUnique({
+    where: { nombre: frente.nombre },
+  });
+
+  if (!foundFrente) {
+    return new NextResponse(
+      JSON.stringify({ error: "Frente not found" }),
+      { status: 404, headers: { "Content-Type": "application/json" } }
+    );
+  }
 
   try {
-    const paths = [specificFilePath];
+    let blobUrl: string | null;
+    const areaLower = area.toLowerCase();
 
-    // Delete specific file
-    for (const filePath of paths) {
-      try {
-        const stat = await fs.stat(filePath);
-        if (!stat.isDirectory()) {
-          await fs.unlink(filePath);
-        }
-      } catch (error: any) {
-        if ((error?.message as string).includes("no such file or directory")) {
-          console.warn(`The path ${filePath} does not exist.`);
-        } else {
-          throw error;
-        }
-      }
+    if (areaLower === "acarreos") {
+      blobUrl = foundFrente.excelUrlAcarreosBlob;
+    } else {
+      blobUrl = foundFrente.excelUrlGasolinaBlob;
     }
 
-    // Delete contents of directories but not the directories themselves
-    const directories = [dbInputPath, csvPath];
 
-    for (const dirPath of directories) {
-      try {
-        const files = await fs.readdir(dirPath);
-        for (const file of files) {
-          const filePath = path.join(dirPath, file);
-          const stat = await fs.stat(filePath);
-          if (stat.isDirectory()) {
-            await deleteFilesInDirectory(filePath);
-            await fs.rmdir(filePath);
-          } else {
-            await fs.unlink(filePath);
-          }
-        }
-      } catch (error: any) {
-        if ((error?.message as string).includes("no such file or directory")) {
-          console.warn(`The path ${dirPath} does not exist.`);
-        } else {
-          throw error;
-        }
+    try {
+      if (blobUrl) {
+        await blobClient.deleteBlob(blobUrl);
+      } else {
+        console.error("Blob URL is null or undefined.");
       }
+    } catch (error: any) {
+      console.error(`Failed to delete blob ${blobUrl}:`, error);
     }
 
     return NextResponse.json(
-      { message: "All files and data deleted successfully." },
+      { message: "All blobs deleted successfully." },
       { status: 200 }
     );
   } catch (error: any) {
-    console.error("Failed to delete files or data:", error);
+    console.error("Failed to delete blobs:", error);
     return NextResponse.json(
       {
-        message: `Failed to delete files or data: ${error instanceof Error ? error.message : "Unknown error"}`,
+        message: `Failed to delete blobs: ${error instanceof Error ? error.message : "Unknown error"}`,
       },
       { status: 500 }
     );

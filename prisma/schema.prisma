@@ -6,8 +6,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("POSTGRES_URL_NON_POOLING")
 }
 
 model User {
@@ -17,49 +18,55 @@ model User {
 }
 
 model Frente {
-  nombre          String     @id @unique
-  ticketsGasolina Gasolina[] @relation("FrenteGasolina")
-  ticketsAcarreos Acarreos[] @relation("FrenteAcarreos")
+  nombre               String     @id @unique
+  excelUrlGasolinaBlob String?
+  excelUrlAcarreosBlob String?
+  ticketsGasolina      Gasolina[] @relation("FrenteGasolina")
+  ticketsAcarreos      Acarreos[] @relation("FrenteAcarreos")
 }
 
 model Acarreos {
   uuid         String   @id @default(uuid())
   createdAt    DateTime @default(now())
-  folio        String
+  folio        Int
   frenteNombre String
   empresa      String
   material     String
-  cubicacion   String
-  fecha        String
+  cubicacion   Float
+  fecha        DateTime
   placas       String
   noEmpleado   String
   idCamion     String
   operador     String
   checador     String
-  hora         String
+  hora         DateTime
   proyecto     String
   banco        String
   frente       Frente   @relation("FrenteAcarreos", fields: [frenteNombre], references: [nombre], onDelete: Cascade)
 
-  @@index([frenteNombre])
+  @@index([frenteNombre, fecha])
+  @@index([frenteNombre, idCamion])
+  @@index([frenteNombre, empresa])
+  @@index([frenteNombre, material])
 }
 
 model Gasolina {
   uuid           String   @id @default(uuid())
   createdAt      DateTime @default(now())
-  folio          String
+  folio          Int
   frenteNombre   String
-  saldoCompra    String
+  saldoCompra    Float
   formatoPago    String
   autorizacion   String
-  litros         String
-  fecha          String
+  litros         Float
+  fecha          DateTime
   placas         String
-  hora           String
-  total          String
-  bomba          String
-  precioUnitario String
+  hora           DateTime
+  total          Float
+  bomba          Int
+  precioUnitario Float
   frente         Frente   @relation("FrenteGasolina", fields: [frenteNombre], references: [nombre], onDelete: Cascade)
 
-  @@index([frenteNombre])
+  @@index([frenteNombre, fecha])
+  @@index([frenteNombre, folio])
 }

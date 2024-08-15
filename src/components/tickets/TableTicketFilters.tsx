@@ -81,6 +81,8 @@ export function TableTicketFilters({ frente, area }: TableTicketFiltersProps) {
             options={facet.options}
             onUpdateFilter={handleFilters}
             ref={(element: any) => (facetsRefs.current[index] = element)}
+            area={area}
+            formatDate={facet.field === "fecha"}
           />
         ))}
         {isFiltered && (

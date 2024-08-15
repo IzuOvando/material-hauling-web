@@ -10,7 +10,10 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { usePrinterStore, useFrenteStore } from "@/store";
-import { DistributedTicketPrinter } from "@/lib/printers";
+import {
+  DistributedTicketPrinter,
+  DistributedPrinterStatus,
+} from "@/lib/printers";
 import PrinterLittleCard from "../printers/PrinterLittleCard";
 import { Printer, TicketArea } from "@/types";
 import { ReceiptText } from "lucide-react";
@@ -46,9 +49,10 @@ const PrintDialog = ({
   const selectedTickets = Object.keys(ticketsSelection);
 
   const [ticketsPrinted, setTicketsPrinted] = useState(0);
+  const [failedTickets, setFailedTickets] = useState(0);
   const [failedPrinters, setFailedPrinters] = useState<string[]>([]);
   const [actualView, setActualView] = useState<
-    "start" | "finished" | "printing"
+    "start" | "finished" | "printing" | "printFailed"
   >("start");
 
   const distributedTicketPrinter = useRef<DistributedTicketPrinter | null>(
@@ -108,22 +112,37 @@ const PrintDialog = ({
     distributedTicketPrinter.current = new DistributedTicketPrinter(
       availablePrinters,
       ticketsToPrint,
-      handlePrinterFailed,
-      handleTicketPrint,
-      selectedFrente ? selectedFrente.nombre : "",
-      selectedArea ? selectedArea : TicketArea.ACARREOS
+      handlePrintEvent,
+      {
+        frente: selectedFrente ? selectedFrente.nombre : "",
+        area: selectedArea ? selectedArea : TicketArea.ACARREOS,
+      }
     );
 
     distributedTicketPrinter.current.startPrinting();
     setActualView("printing");
   };
 
-  const handlePrinterFailed = (printer: string) => {
-    setFailedPrinters((prev) => [...prev, printer]);
-  };
+  const handlePrintEvent = (
+    ticketsPrinted: number,
+    failedPrintersNames: Set<string>,
+    status: DistributedPrinterStatus,
+    ticketsFailed: number
+  ) => {
+    setTicketsPrinted(ticketsPrinted);
+    setFailedPrinters(Array.from(failedPrintersNames));
 
-  const handleTicketPrint = () => {
-    setTicketsPrinted((prev) => prev + 1);
+    switch (status) {
+      case DistributedPrinterStatus.FINISHED:
+        setActualView("finished");
+        break;
+      case DistributedPrinterStatus.WAITING_START_PRINTING_ERRORED:
+        setFailedTickets(ticketsFailed);
+        setActualView("printFailed");
+        break;
+      default:
+        setActualView("printing");
+    }
   };
 
   const handleOnClose = () => {
@@ -135,10 +154,15 @@ const PrintDialog = ({
     }, 1000);
   };
 
-  const handleReconnectPrinters = () => {
+  const handleContinuePrinting = (name: string) => {
     if (distributedTicketPrinter.current)
-      distributedTicketPrinter.current?.retryFailedPrinters();
-    setFailedPrinters([]);
+      distributedTicketPrinter.current.reincludeFailedPrinter(name);
+  };
+
+  const handlePrintFailed = () => {
+    if (distributedTicketPrinter.current)
+      distributedTicketPrinter.current.startPrinting(true);
+    setActualView("printing");
   };
 
   useEffect(() => {
@@ -158,7 +182,7 @@ const PrintDialog = ({
       open={open}
       onOpenChange={actualView === "start" ? setOpen : undefined}
     >
-      <DialogContent className="sm:max-w-[460px] sm:min-h-[332px] flex flex-col">
+      <DialogContent className="sm:max-w-[460px] sm:min-h-[332px] flex flex-col overflow-auto max-h-[90vh]">
         <DialogHeader>
           <DialogTitle>Imprimir Tickets</DialogTitle>
         </DialogHeader>
@@ -175,7 +199,17 @@ const PrintDialog = ({
             totalTickets={allSelected ? total : selectedTickets.length}
             printers={printers}
             printersWithErrorNames={failedPrinters}
-            handleReconnectPrinters={handleReconnectPrinters}
+            continuePrinting={handleContinuePrinting}
+          />
+        ) : actualView === "printFailed" ? (
+          <PrintingFailedView
+            ticketsPrinted={ticketsPrinted}
+            totalTickets={allSelected ? total : selectedTickets.length}
+            printers={printers}
+            printersWithErrorNames={failedPrinters}
+            continuePrinting={handleContinuePrinting}
+            ticketsFailed={failedTickets}
+            onPrintFailed={handlePrintFailed}
           />
         ) : (
           <FinishedView
@@ -199,10 +233,16 @@ const StartView = ({
   numberOfTickets: number;
   onStartPrinting: () => void;
 }) => {
+  const [loading, setLoading] = useState(false);
   const handleShowPrinters = () => {
     const btn = document.getElementById("showPrinters");
     if (btn) btn.click();
     setOpen(false);
+  };
+
+  const handleOnStart = () => {
+    setLoading(true);
+    onStartPrinting();
   };
 
   if (availablePrinters.length === 0)
@@ -237,36 +277,38 @@ const StartView = ({
       </div>
       <div className="flex flex-wrap gap-3 justify-center">
         {availablePrinters.map((printer) => (
-          <PrinterLittleCard key={printer.name} printer={printer} />
+          <PrinterLittleCard key={printer.name} printer={printer} disabled />
         ))}
       </div>
       <DialogFooter>
         <Button
           className="bg-secondary hover:bg-secondary-light active:bg-secondary-dark w-full"
-          onClick={onStartPrinting}
+          onClick={handleOnStart}
+          disabled={loading}
         >
-          Empezar Impresión
+          {loading ? "Preparando impresión..." : "Empezar Impresión"}
         </Button>
       </DialogFooter>
     </>
   );
 };
 
-const PrintingView = ({
+const PrintingFailedView = ({
   ticketsPrinted,
+  ticketsFailed,
   totalTickets,
   printers,
   printersWithErrorNames,
-  handleReconnectPrinters,
+  onPrintFailed,
 }: {
   ticketsPrinted: number;
+  ticketsFailed: number;
   totalTickets: number;
   printers: Printer[];
   printersWithErrorNames: string[];
-  handleReconnectPrinters: () => void;
+  continuePrinting: (name: string) => void;
+  onPrintFailed: () => void;
 }) => {
-  const [disabledButton, setDisabledButton] = useState(true);
-
   const printersWithError = useMemo(
     () =>
       printers.filter((printers) =>
@@ -277,31 +319,37 @@ const PrintingView = ({
 
   useEffect(() => {
     if (printersWithErrorNames.length > 0) {
-      setDisabledButton(true);
-
       const timerReconnect = setTimeout(() => {
         for (const printer of printersWithError) {
           printer.device?.reconnect();
         }
       }, 2000);
 
-      const timerDisable = setTimeout(() => {
-        setDisabledButton(false);
-      }, 5000);
-
       return () => {
         clearTimeout(timerReconnect);
-        clearTimeout(timerDisable);
       };
     }
   }, [printersWithErrorNames]);
 
   return (
     <div className="flex flex-1 justify-center items-center flex-col gap-8 mt-[-1rem] py-4">
-      <div className="font-semibold">
-        Se han impreso {ticketsPrinted} de {totalTickets * 2} tickets...
+      <div className="font-semibold text-center flex flex-col gap-2 items-center">
+        Se han impreso exitosamente {ticketsPrinted * 2} de {totalTickets * 2}{" "}
+        tickets.
+        <ReceiptText
+          size={130}
+          strokeWidth={6}
+          absoluteStrokeWidth
+          color="rgb(var(--secondary-dark-color))"
+        />
+        Sin embargo, {ticketsFailed * 2} tickets fallaron en el proceso.
       </div>
-      <span className="loader"></span>
+      <Button
+        className="bg-secondary hover:bg-secondary-light active:bg-secondary-dark w-full"
+        onClick={onPrintFailed}
+      >
+        Imprimir tickets faltantes
+      </Button>
       {printersWithErrorNames.length > 0 && (
         <>
           <hr className="bg-secondary h-1 w-full" />
@@ -319,15 +367,81 @@ const PrintingView = ({
               conectadas.
             </div>
             <div className="justify-center text-center mb-4 px-3">
-              Luego da click aquí para seguir imprimiendo con ellas.
+              Luego, da click con botón secundario para volver a conectarlas y,
+              una vez <b>online</b>, continuar imprimiendo.
             </div>
-            <Button
-              className="bg-secondary hover:bg-secondary-light active:bg-secondary-dark w-full"
-              onClick={handleReconnectPrinters}
-              disabled={disabledButton}
-            >
-              Reconectar Impresoras
-            </Button>
+          </div>
+        </>
+      )}
+    </div>
+  );
+};
+
+const PrintingView = ({
+  ticketsPrinted,
+  totalTickets,
+  printers,
+  printersWithErrorNames,
+  continuePrinting,
+}: {
+  ticketsPrinted: number;
+  totalTickets: number;
+  printers: Printer[];
+  printersWithErrorNames: string[];
+  continuePrinting: (name: string) => void;
+}) => {
+  const printersWithError = useMemo(
+    () =>
+      printers.filter((printers) =>
+        printersWithErrorNames.includes(printers.name)
+      ),
+    [printersWithErrorNames, printers]
+  );
+
+  useEffect(() => {
+    if (printersWithErrorNames.length > 0) {
+      const timerReconnect = setTimeout(() => {
+        for (const printer of printersWithError) {
+          printer.device?.reconnect();
+        }
+      }, 2000);
+
+      return () => {
+        clearTimeout(timerReconnect);
+      };
+    }
+  }, [printersWithErrorNames]);
+
+  return (
+    <div className="flex flex-1 justify-center items-center flex-col gap-8 mt-[-1rem] py-4">
+      <div className="font-semibold">
+        Se han impreso {ticketsPrinted * 2} de {totalTickets * 2} tickets...
+      </div>
+      <span className="loader"></span>
+      {printersWithErrorNames.length > 0 && (
+        <>
+          <hr className="bg-secondary h-1 w-full" />
+          <div>
+            <div className="justify-center text-center mb-4 px-2">
+              Las siguientes impresoras no pueden seguir imprimiendo:
+            </div>
+            <div className="flex flex-wrap gap-3 justify-center mb-4">
+              {printersWithError.map((printer) => (
+                <PrinterLittleCard
+                  key={printer.name}
+                  printer={printer}
+                  continuePrinting={continuePrinting}
+                />
+              ))}
+            </div>
+            <div className="justify-center text-center mb-4 px-3">
+              Verifica si tienen papel, que no tengan obstrucciones y estén
+              conectadas.
+            </div>
+            <div className="justify-center text-center mb-4 px-3">
+              Luego, da click con botón secundario para volver a conectarlas y,
+              una vez <b>online</b>, continuar imprimiendo.
+            </div>
           </div>
         </>
       )}

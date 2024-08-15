@@ -21,23 +21,41 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
-import { FacetedFilter } from "@/types";
+import { FacetedFilter, TicketArea } from "@/types";
+import {
+  formatIsoDateFromString,
+  formatLongSpanishDateFromString,
+} from "@/helpers/formatters/datetime";
 
 interface TableTicketFacetedFilterProps {
   title: string;
   options: FacetedFilter["options"];
   onUpdateFilter: (field: string, activeFacets: string[]) => void;
+  area: TicketArea;
+  formatDate?: boolean;
 }
 
 export const TableTicketFacetedFilter = forwardRef(
   function TableTicketFacetedFilter(
-    { title, options, onUpdateFilter }: TableTicketFacetedFilterProps,
+    {
+      title,
+      options,
+      onUpdateFilter,
+      area,
+      formatDate,
+    }: TableTicketFacetedFilterProps,
     ref
   ) {
     const [selectedValues, setSelectedValues] = useState<Set<string>>(
       new Set()
     );
     const [isCleaned, setIsCleaned] = useState(false);
+
+    const formatter = !formatDate
+      ? (value: any) => value
+      : area === TicketArea.ACARREOS
+      ? formatIsoDateFromString
+      : formatLongSpanishDateFromString;
 
     const handleOnSelect = (optionValue: string, isSelected: boolean) => {
       if (isSelected) {
@@ -106,7 +124,7 @@ export const TableTicketFacetedFilter = forwardRef(
                           key={option}
                           className="rounded-sm px-1 font-medium bg-green-50 group-hover:bg-primary-light group-hover:text-accent max-w-28 text-ellipsis overflow-hidden whitespace-nowrap inline-block"
                         >
-                          {option}
+                          {formatter(option)}
                         </Badge>
                       ))
                   )}
@@ -142,7 +160,7 @@ export const TableTicketFacetedFilter = forwardRef(
                           className="h-4 w-4 text-accent"
                         />
                       </div>
-                      <span className="font-normal">{option}</span>
+                      <span className="font-normal">{formatter(option)}</span>
                     </CommandItem>
                   );
                 })}

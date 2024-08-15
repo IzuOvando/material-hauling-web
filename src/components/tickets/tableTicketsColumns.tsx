@@ -4,6 +4,12 @@ import {
   TableTicketAllSelector,
   TableTicketRowSelector,
 } from "./TableTicketSelectors";
+import {
+  formatIsoDate,
+  formatLongSpanishDate,
+  formatTime12Hour,
+} from "@/helpers/formatters/datetime";
+import { formatPrice, formatVolume } from "@/helpers/formatters/numbers";
 import { Acarreos, Gasolina } from "@prisma/client";
 
 export const acarreosColumns: ColumnDef<Acarreos>[] = [
@@ -31,6 +37,7 @@ export const acarreosColumns: ColumnDef<Acarreos>[] = [
     header: ({ column }) => (
       <TableTicketColumnHeader column={column} title="Fecha" />
     ),
+    cell: ({ row }) => <>{formatIsoDate(row.getValue("fecha") as Date)}</>,
     filterFn: (row, id, value) => {
       return value.includes(row.getValue(id));
     },
@@ -40,6 +47,7 @@ export const acarreosColumns: ColumnDef<Acarreos>[] = [
     header: ({ column }) => (
       <TableTicketColumnHeader column={column} title="Hora" />
     ),
+    cell: ({ row }) => <>{formatTime12Hour(row.getValue("hora") as Date)}</>,
   },
   {
     accessorKey: "material",
@@ -55,6 +63,7 @@ export const acarreosColumns: ColumnDef<Acarreos>[] = [
     header: ({ column }) => (
       <TableTicketColumnHeader column={column} title="Cubicacion" />
     ),
+    cell: ({ row }) => <>{formatVolume(row.getValue("cubicacion"), true)}</>,
   },
   {
     accessorKey: "empresa",
@@ -143,6 +152,9 @@ export const gasolinaColumns: ColumnDef<Gasolina>[] = [
     header: ({ column }) => (
       <TableTicketColumnHeader column={column} title="Fecha" />
     ),
+    cell: ({ row }) => (
+      <>{formatLongSpanishDate(row.getValue("fecha") as Date)}</>
+    ),
     filterFn: (row, id, value) => {
       return value.includes(row.getValue(id));
     },
@@ -152,11 +164,17 @@ export const gasolinaColumns: ColumnDef<Gasolina>[] = [
     header: ({ column }) => (
       <TableTicketColumnHeader column={column} title="Hora" />
     ),
+    cell: ({ row }) => (
+      <>{formatTime12Hour(row.getValue("hora") as Date, true)}</>
+    ),
   },
   {
     accessorKey: "litros",
     header: ({ column }) => (
       <TableTicketColumnHeader column={column} title="Litros" />
+    ),
+    cell: ({ row }) => (
+      <>{formatVolume(row.getValue("litros") as number, false, true)}</>
     ),
   },
   {
@@ -164,12 +182,16 @@ export const gasolinaColumns: ColumnDef<Gasolina>[] = [
     header: ({ column }) => (
       <TableTicketColumnHeader column={column} title="Precio Unitario" />
     ),
+    cell: ({ row }) => (
+      <>{formatPrice(row.getValue("precioUnitario") as number)}</>
+    ),
   },
   {
     accessorKey: "total",
     header: ({ column }) => (
       <TableTicketColumnHeader column={column} title="Total" />
     ),
+    cell: ({ row }) => <>{formatPrice(row.getValue("total") as number)}</>,
   },
   {
     accessorKey: "placas",
@@ -205,6 +227,9 @@ export const gasolinaColumns: ColumnDef<Gasolina>[] = [
     accessorKey: "saldoCompra",
     header: ({ column }) => (
       <TableTicketColumnHeader column={column} title="SaldoCompra" />
+    ),
+    cell: ({ row }) => (
+      <>{formatPrice(row.getValue("saldoCompra") as number)}</>
     ),
   },
 ];

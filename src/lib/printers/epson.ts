@@ -19,6 +19,7 @@ export default class EpsonPrinter {
 
   private connectionCallback: connectionCallbackType | null = null;
   private onReceiveCallback: onReceiveCallbackType | null = null;
+  private onDisconnectCallback: (() => void) | null = null;
 
   constructor(ipAddress: string, connectionCallback: connectionCallbackType) {
     this.ipAddress = ipAddress;
@@ -35,8 +36,11 @@ export default class EpsonPrinter {
     this.device = new window.epson.ePOSPrint(
       `${EpsonPrinter.SECURE_CONNECTION ? "https" : "http"}://${
         this.ipAddress
-      }/cgi-bin/epos/service.cgi?devid=local_printer&timeout=5000`
+      }/cgi-bin/epos/service.cgi?devid=local_printer&timeout=${
+        CONFIG.PRINTERS_TIMEOUT
+      }`
     );
+    this.device.timeout = CONFIG.PRINTERS_TIMEOUT;
     // Setting Device Handlers
     this.device.ononline = this.onOnline;
     this.device.onoffline = this.onOffline;
@@ -44,6 +48,7 @@ export default class EpsonPrinter {
     this.device.onreceive = this.onReceive;
     this.device.onpapernearend = this.onPaperNearEnd;
     this.device.onpaperend = this.onPaperEnd;
+    this.device.onerror = this.onError;
     this.device.send();
   }
 
@@ -73,6 +78,12 @@ export default class EpsonPrinter {
 
   private onPaperEnd = () => {
     if (this.connectionCallback) this.connectionCallback("paperEnd");
+  };
+
+  private onError = (error: any) => {
+    console.debug(`Printer (${this.ipAddress}) disconnected`);
+    if (this.connectionCallback) this.connectionCallback("offline");
+    if (this.onDisconnectCallback) this.onDisconnectCallback();
   };
 
   public printTest = () => {
@@ -107,6 +118,10 @@ export default class EpsonPrinter {
 
   public setHandlePrintResponse = (callback: onReceiveCallbackType) => {
     this.onReceiveCallback = callback;
+  };
+
+  public setHandleDisconnect = (callback: () => void | null) => {
+    this.onDisconnectCallback = callback;
   };
 
   private onReceive = (res: any) => {

@@ -1,15 +1,15 @@
-import * as fs from "fs";
 import * as XLSX from "xlsx";
 import * as path from "path";
 import prisma from "@/lib/db";
 import csvParser from "csv-parser";
-import { promisify } from 'util';
+import blobClient from "@/lib/blobClient";
+import axios from 'axios';
+import { Readable } from 'stream';
 import { schemas, SchemaKeys } from "@/lib/schemas/headers";
 import { CreateTicketDto, filteredDataConfig, isCreateAcarreosDto, isCreateGasolinaDto } from '@/lib/schemas/csv_schemas';
 import CONFIG from "@/config";
 
-const readdir = promisify(fs.readdir);
-const unlink = promisify(fs.unlink);
+
 
 class FileProcessor {
 
@@ -100,15 +100,31 @@ class FileProcessor {
         );
     }
 
+    public async streamToBuffer(stream: Readable): Promise<Buffer> {
+        const chunks: Buffer[] = [];
 
-    public excelToCSV(
-        inputFile: string,
+        return new Promise<Buffer>((resolve, reject) => {
+            stream.on('data', (chunk) => {
+                chunks.push(chunk);
+            });
+
+            stream.on('end', () => {
+                resolve(Buffer.concat(chunks));
+            });
+
+            stream.on('error', (err) => {
+                reject(err);
+            });
+        });
+    }
+
+    public async excelToCSV(
+        buffer: Buffer,
         outputFolder: string,
         validHeaders: Set<string>,
         key: string
     ): Promise<string[]> {
         const csvFilePaths: string[] = [];
-        const inputFilePath = path.resolve(process.cwd(), inputFile);
 
         const isValidHeaderRow = (headers: string[], validHeaders: Set<string>) => {
             const normalize = (header: string) => header.replace(/\s+/g, '').toLowerCase();
@@ -124,155 +140,126 @@ class FileProcessor {
             return true;
         };
 
-
-
-        const formatDateTime = (dateTimeStr: string): string => {
-            // Regex to match different formats of dates and times
-            const dateTimeRegex = /^(\d{1,2})\/(\d{1,2})\/(\d{2,4})( \d{1,2}:\d{2}(:\d{2})? ?([APap][mM])?)?$/;
-            const timeOnlyRegex = /^(\d{1,2}):(\d{2}):(\d{2}) ?([APap][mM])?$/;
-
-            const dateTimeMatch = dateTimeStr.match(dateTimeRegex);
-            const timeOnlyMatch = dateTimeStr.match(timeOnlyRegex);
-
-            if (dateTimeMatch) {
-                const day = dateTimeMatch[2].padStart(2, '0');
-                const month = dateTimeMatch[1].padStart(2, '0');
-                const year = dateTimeMatch[3].length === 2 ? '20' + dateTimeMatch[3] : dateTimeMatch[3];
-                let formattedDate = `${day}/${month}/${year}`;
-
-                if (dateTimeMatch[4]) {
-                    const timeStr = dateTimeMatch[4].trim();
-                    const timeRegex = /^(\d{1,2}):(\d{2})(:\d{2})? ?([APap][mM])?$/;
-
-                    const timeMatch = timeStr.match(timeRegex);
-                    if (timeMatch) {
-                        const hours = parseInt(timeMatch[1], 10);
-                        const minutes = timeMatch[2];
-                        const ampm = timeMatch[4] ? timeMatch[4].toUpperCase().replace('.', '') : '';
-                        if (hours === 0 && minutes === '00' && !ampm) {
-                            return formattedDate;
-                        }
-
-                        const formattedHours = hours.toString().padStart(2, '0');
-                        return `${formattedDate} ${formattedHours}:${minutes} ${ampm}`.trim();
-                    }
-                }
-                return formattedDate;
-            } else if (timeOnlyMatch) {
-                const hours = timeOnlyMatch[1].padStart(2, '0');
-                const minutes = timeOnlyMatch[2];
-                const ampm = timeOnlyMatch[4] ? timeOnlyMatch[4].toUpperCase().replace('.', '') : '';
-                return `${hours}:${minutes} ${ampm}`.trim();
+        const validateCellType = (value: string, expectedType: string): boolean => {
+            switch (expectedType) {
+                case 'date':
+                    return !isNaN(Date.parse(value));
+                case 'number':
+                    return !isNaN(Number(value));
+                case 'string':
+                    return typeof value === 'string';
+                default:
+                    return true;
             }
-
-            return dateTimeStr;
         };
 
-        return new Promise((resolve, reject) => {
-            fs.readFile(inputFilePath, (err, data) => {
-                if (err) {
-                    console.error("Error reading the file:", err);
-                    reject(err);
+        try {
+            const workbook = XLSX.read(buffer, { type: 'buffer' });
+
+            const promises = workbook.SheetNames.map(async (sheetName) => {
+                const worksheet = workbook.Sheets[sheetName];
+                if (!worksheet["!ref"]) {
+                    console.error(`Sheet ${sheetName} is empty or malformed.`);
                     return;
                 }
 
-                try {
-                    const workbook = XLSX.read(data, { type: "buffer" });
-                    workbook.SheetNames.forEach((sheetName) => {
-                        const worksheet = workbook.Sheets[sheetName];
-                        if (!worksheet["!ref"]) {
-                            console.error(`Sheet ${sheetName} is empty or malformed.`);
-                            return;
+                const range = XLSX.utils.decode_range(worksheet["!ref"]);
+                let csvOutput = "";
+                let dateColumns = new Set<number>();
+                let headerChecked = false;
+
+                for (let R = range.s.r; R <= range.e.r; ++R) {
+                    let row: string[] = [];
+                    let empty = true;
+
+                    for (let C = range.s.c; C <= range.e.c; ++C) {
+                        const cellAddress = { c: C, r: R };
+                        const cellRef = XLSX.utils.encode_cell(cellAddress);
+                        const cell = worksheet[cellRef];
+                        let cellValue = cell ? cell.w || cell.v : "";
+                        if (typeof cellValue === 'string') {
+                            cellValue = cellValue.replace(/"/g, '""');
+                            if (cellValue.includes(',') || cellValue.includes('"')) {
+                                cellValue = `"${cellValue}"`;
+                            }
+                        }
+                        row.push(cellValue);
+
+                        if (this.isDateColumn(cellValue)) {
+                            dateColumns.add(C);
                         }
 
-                        const range = XLSX.utils.decode_range(worksheet["!ref"]);
-                        let csvOutput = "";
-                        let dateColumns = new Set<number>();
-                        let headerChecked = false;
+                        if (cellValue.trim() !== '') empty = false;
+                    }
 
-                        for (let R = range.s.r; R <= range.e.r; ++R) {
-                            let row: string[] = [];
-                            let empty = true;
+                    if (empty) {
+                        continue;
+                    }
 
-                            for (let C = range.s.c; C <= range.e.c; ++C) {
-                                const cellAddress = { c: C, r: R };
-                                const cellRef = XLSX.utils.encode_cell(cellAddress);
-                                const cell = worksheet[cellRef];
-                                let cellValue = cell ? cell.w || cell.v : "";
-                                if (typeof cellValue === 'string') {
-                                    cellValue = cellValue.replace(/"/g, '""');
-                                    if (cellValue.includes(',') || cellValue.includes('"')) {
-                                        cellValue = `"${cellValue}"`;
-                                    }
-                                }
-                                row.push(cellValue);
+                    if (!headerChecked) {
+                        if (!isValidHeaderRow(row, validHeaders)) {
+                            continue;
+                        }
+                        row = row.map((header) => {
+                            const camelCaseHeader = this.toCamelCase(header.toString());
+                            return camelCaseHeader;
+                        });
+                        csvOutput += row.join(",") + "\n";
+                        headerChecked = true;
+                        continue;
+                    }
 
-                                if (this.isDateColumn(cellValue)) {
-                                    dateColumns.add(C);
-                                }
-
-                                if (cellValue.trim() !== '') empty = false;
+                    row = row.map((cellValue, index) => {
+                        if (dateColumns.has(index) && cellValue) {
+                            if (key === "gasolina") {
+                                cellValue = this.formatDateGas(cellValue.toString());
+                            } else {
+                                cellValue = this.formatDateAca(cellValue.toString());
                             }
-
-                            if (empty) {
-                                continue;
-                            }
-
-                            if (!headerChecked) {
-                                if (!isValidHeaderRow(row, validHeaders)) {
-                                    continue;
-                                }
-                                row = row.map((header) => {
-                                    const camelCaseHeader = this.toCamelCase(header.toString());
-                                    return camelCaseHeader;
-                                });
-                                csvOutput += row.join(",") + "\n";
-                                headerChecked = true;
-                                continue;
-                            }
-
-                            row = row.map((cellValue, index) => {
-                                if (dateColumns.has(index) && cellValue) {
-                                    if (key === "gasolina") {
-                                        cellValue = this.formatDateGas(cellValue.toString());
-                                    } else {
-                                        cellValue = this.formatDateAca(cellValue.toString());
-                                    }
-                                    cellValue = cellValue.replace(/"/g, '""');
-                                    return `"${cellValue}"`;
-                                }
-                                if (typeof cellValue === 'string' && (cellValue.includes(',') || cellValue.includes('"'))) {
-                                    cellValue = cellValue.replace(/"/g, '""');
-                                    return `"${cellValue}"`;
-                                }
-                                return formatDateTime(cellValue);
-                            });
-                            csvOutput += row.join(",") + "\n";
+                            cellValue = cellValue.replace(/"/g, '""');
+                            return `"${cellValue}"`;
                         }
 
-                        const fileNameWithoutExtension = path.basename(inputFile, path.extname(inputFile));
-                        const match = fileNameWithoutExtension.match(/_(.*)/);
-                        const extractedPart = match ? match[1] : '';
-                        const outputFilePath = path.join(
-                            outputFolder,
-                            `${extractedPart}_${sheetName.replace(/[\s\/]+/g, "_")}.csv`
-                        );
-                        if (!csvOutput || csvOutput.trim() === '') {
-                            throw new Error(`El archivo CSV para ${sheetName} está vacío.`);
+                        if (typeof cellValue === 'string' && (cellValue.includes(',') || cellValue.includes('"'))) {
+                            cellValue = cellValue.replace(/"/g, '""');
+                            return `"${cellValue}"`;
                         }
-                        fs.writeFileSync(outputFilePath, csvOutput);
-                        csvFilePaths.push(outputFilePath);
+                        const expectedType = 'string';
+                        if (!validateCellType(cellValue, expectedType)) {
+                            console.error(`Invalid cell type for value: ${cellValue}`);
+                            return '';
+                        }
+                        return (cellValue);
                     });
-
-                    resolve(csvFilePaths);
-                } catch (error) {
-                    console.error("Error al procesar el archivo Excel:", error);
-                    reject(error);
+                    csvOutput += row.join(",") + "\n";
                 }
-            });
-        });
-    }
 
+                const fileNameWithoutExtension = path.basename(buffer.toString(), path.extname(buffer.toString()));
+                const match = fileNameWithoutExtension.match(/_(.*)/);
+                const extractedPart = match ? match[1] : '';
+                const outputFilePath = path.join(
+                    outputFolder,
+                    `${extractedPart}_${sheetName.replace(/[\s\/]+/g, "_")}.csv`
+                );
+
+                if (!csvOutput || csvOutput.trim() === '') {
+                    throw new Error(`El archivo CSV para ${sheetName} está vacío.`);
+                }
+
+                const blob = await blobClient.putBlob(outputFilePath, Buffer.from(csvOutput), { access: 'public' });
+                const blobUrl = blob.url;
+                csvFilePaths.push(blobUrl);
+            });
+
+            await Promise.all(promises);
+
+            return csvFilePaths;
+
+        } catch (error) {
+            console.error("Error al procesar el archivo Excel:", error);
+            throw error;
+        }
+    }
 
     public cleanQuotes = (str: string): string => {
         if (typeof str !== 'string') {
@@ -290,6 +277,7 @@ class FileProcessor {
         return config(data, fileName, this.cleanQuotes);
     }
 
+
     private async processBatch(records: CreateTicketDto[], cleanFrenteName: string, key: string) {
 
         try {
@@ -298,25 +286,25 @@ class FileProcessor {
                     const acarreoEntry: {
                         uuid?: string;
                         frenteNombre: string;
-                        folio: string;
+                        folio: number;
                         empresa: string;
                         material: string;
-                        cubicacion: string;
-                        fecha: string;
+                        cubicacion: number;
+                        fecha: Date;
                         placas: string;
                         idCamion: string;
                         operador: string;
                         proyecto: string;
                         noEmpleado: string;
                         checador: string;
-                        hora: string;
+                        hora: Date;
                         banco: string;
                     } = {
                         frenteNombre: record.frenteNombre,
                         folio: record.folio,
                         empresa: record.empresa,
                         material: record.material,
-                        cubicacion: `${record.cubicacion} m³`,
+                        cubicacion: record.cubicacion,
                         fecha: record.fecha,
                         placas: record.placas,
                         idCamion: record.idCamion,
@@ -336,6 +324,7 @@ class FileProcessor {
 
                 await prisma.acarreos.createMany({
                     data: acarreosData,
+                    skipDuplicates: true,
                 });
 
                 const acarreoUuids = await prisma.acarreos.findMany({
@@ -353,23 +342,23 @@ class FileProcessor {
                     const gasolinaEntry: {
                         uuid?: string;
                         frenteNombre: string;
-                        folio: string;
-                        saldoCompra: string;
+                        folio: number;
+                        saldoCompra: number;
                         formatoPago: string;
-                        litros: string;
-                        fecha: string;
+                        litros: number;
+                        fecha: Date;
                         placas: string;
                         autorizacion: string;
-                        total: string;
-                        hora: string;
-                        bomba: string;
-                        precioUnitario: string;
+                        total: number;
+                        hora: Date;
+                        bomba: number;
+                        precioUnitario: number;
                     } = {
                         frenteNombre: record.frenteNombre,
                         folio: record.folio,
                         saldoCompra: record.saldoCompra,
                         formatoPago: record.formatoPago,
-                        litros: `${record.litros} L`,
+                        litros: record.litros,
                         fecha: record.fecha,
                         placas: record.placas,
                         autorizacion: record.autorizacion,
@@ -388,6 +377,7 @@ class FileProcessor {
 
                 await prisma.gasolina.createMany({
                     data: gasolinaData,
+                    skipDuplicates: true,
                 });
 
                 const gasolinaUuids = await prisma.gasolina.findMany({
@@ -437,30 +427,26 @@ class FileProcessor {
 
     public async csvToSQLite(csvFile: string, fileName: string, key: string) {
         const batchSize = CONFIG.BATCHES_CSV_LINES;
-        let records: CreateTicketDto[] = [];
-        let activeBatches = 0;
 
         const underscoreIndex = fileName.indexOf('_');
         const dotIndex = fileName.indexOf('.');
         const cleanFrenteName = fileName.substring(underscoreIndex + 1, dotIndex);
 
-        if (!cleanFrenteName) {
-            console.error(`No se pudo extraer un nombre válido del archivo: ${fileName}`);
-            return;
-        }
         try {
+            if (!cleanFrenteName || !key) {
+                throw new Error('Missing required parameters: cleanFrenteName or key');
+            }
+
             if (key === 'gasolina') {
                 await prisma.gasolina.deleteMany({
-                    where: {
-                        frenteNombre: cleanFrenteName,
-                    },
+                    where: { frenteNombre: cleanFrenteName },
                 });
+                console.log(`Deleted old gasolina records with frenteNombre: ${cleanFrenteName}`);
             } else if (key === 'acarreos') {
                 await prisma.acarreos.deleteMany({
-                    where: {
-                        frenteNombre: cleanFrenteName,
-                    },
+                    where: { frenteNombre: cleanFrenteName },
                 });
+                console.log(`Deleted old acarreos records with frenteNombre: ${cleanFrenteName}`);
             } else {
                 throw new Error(`Unsupported key: ${key}`);
             }
@@ -474,44 +460,54 @@ class FileProcessor {
                 return;
             }
 
+
+            const response = await axios.get(csvFile, { responseType: 'stream' });
+            const csvStream = response.data.pipe(csvParser());
+
             await new Promise<void>((resolve, reject) => {
-                const stream = fs.createReadStream(csvFile).pipe(csvParser());
-                stream.on("data", async (data: any) => {
-                    stream.pause();
-                    try {
-                        const filteredData: CreateTicketDto = this.getFilteredData(key, data, fileName);
-                        records.push(filteredData);
-                        if (records.length >= batchSize) {
-                            activeBatches++;
-                            try {
-                                await this.processBatch(records, cleanFrenteName, key);
-                            } catch (error) {
-                                if (error instanceof Error) {
-                                    stream.destroy(error);
-                                } else {
-                                    stream.destroy(new Error(`Non-error thrown: ${error}`));
+                const records: CreateTicketDto[] = [];
+                let activeBatches = 0;
+
+                csvStream
+                    .on('data', async (data: any) => {
+                        csvStream.pause();
+                        try {
+                            const filteredData: CreateTicketDto = this.getFilteredData(key, data, fileName);
+                            records.push(filteredData);
+
+                            if (records.length >= batchSize) {
+                                activeBatches++;
+                                try {
+                                    await this.processBatch(records, cleanFrenteName, key);
+                                    records.length = 0;
+                                } catch (error) {
+                                    if (error instanceof Error) {
+                                        csvStream.destroy(error);
+                                    } else {
+                                        csvStream.destroy(new Error(`Non-error thrown: ${error}`));
+                                    }
+                                    reject(error);
+                                    return;
                                 }
-                                reject(error);
-                                return;
+                                activeBatches--;
                             }
-                            records = [];
-                            activeBatches--;
+
+                            csvStream.resume();
+                        } catch (error) {
+                            console.error("Error processing data:", error);
+                            if (error instanceof Error) {
+                                csvStream.destroy(error);
+                            } else {
+                                csvStream.destroy(new Error(`Non-error thrown: ${error}`));
+                            }
+                            reject(error);
                         }
-                        stream.resume();
-                    } catch (error) {
-                        console.error("Error processing data:", error);
-                        if (error instanceof Error) {
-                            stream.destroy(error);
-                        } else {
-                            stream.destroy(new Error(`Non-error thrown: ${error}`));
-                        }
-                    }
-                })
-                    .on("error", error => {
-                        console.error(`Error al procesar el archivo CSV: ${error}`);
+                    })
+                    .on('error', (error: Error) => {
+                        console.error(`Error processing CSV file: ${error}`);
                         reject(error);
                     })
-                    .on("end", async () => {
+                    .on('end', async () => {
                         if (records.length > 0) {
                             activeBatches++;
                             try {
@@ -530,6 +526,7 @@ class FileProcessor {
                         }, 100);
                     });
             });
+
         } catch (error) {
             console.error("Error durante la inserción en la base de datos:", error);
             throw error;
@@ -540,35 +537,55 @@ class FileProcessor {
         return ['gasolina', 'acarreos'].includes(key);
     }
 
-    public async processFiles(fileName: string, area: string) {
-        const rootPath = path.resolve(process.cwd(), "./");
-        const outputFolder = path.resolve(rootPath, "./db_output/csv/csv_output");
-        const dbInputPath = path.resolve(rootPath, "./db_input");
-        const desiredPart = fileName.split('_')[1].split('.')[0];
-        const outputExcel = path.resolve(rootPath, `./db_output/excel/${desiredPart}`);
-        if (!fs.existsSync(outputExcel)) {
-            fs.mkdirSync(outputExcel, { recursive: true });
-        }
+    public async streamToNodeReadable(stream: ReadableStream<Uint8Array>): Promise<Readable> {
+        const reader = stream.getReader();
+        const nodeStream = new Readable({
+            read() {
+                reader.read().then(({ value, done }) => {
+                    if (done) {
+                        this.push(null);
+                    } else {
+                        this.push(value);
+                    }
+                }).catch(err => this.emit('error', err));
+            }
+        });
+        return nodeStream;
+    }
 
-        const key = area.toLowerCase()
+    public async processFiles(fileName: string, area: string, excelBlobUrl: string) {
+        const key = area.toLowerCase();
         if (!this.isValidKey(key)) {
             console.error(`Invalid area type: ${key}`);
             throw new Error(`Invalid area type: ${key}`);
         }
         const validHeaders = schemas[key];
-        if (!fs.existsSync(outputFolder)) {
-            fs.mkdirSync(outputFolder, { recursive: true });
-        }
+        const desiredPart = fileName.split('_')[1].split('.')[0];
+        const outputExcelFolder = `db_output/excel/${desiredPart}`;
+        const outputCSVFolder = `db_output/csv/${desiredPart}`;
+
         try {
-            const csvFilePaths = await this.excelToCSV(
-                `./db_input/${fileName}`,
-                outputFolder,
-                validHeaders,
-                key
-            );
+
+            const response = await fetch(excelBlobUrl);
+            if (!response.ok) {
+                throw new Error(`Failed to fetch the blob from URL: ${excelBlobUrl}`);
+            }
+
+            const arrayBuffer = await response.arrayBuffer();
+            const buffer = Buffer.from(arrayBuffer);
+
+            const csvFilePaths = await this.excelToCSV(buffer, outputCSVFolder, validHeaders, key);
+
             await this.processCSVFiles(csvFilePaths, fileName, key);
-            await this.downloadDatabase(path.resolve(outputExcel), key, fileName)
-            this.deleteFiles([dbInputPath, outputFolder])
+
+            await this.downloadDatabase(outputExcelFolder, key, fileName)
+
+            fetch(`${CONFIG.BASE_URL}/api/files/delete-blobs`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ blobUrls: [excelBlobUrl, ...csvFilePaths] }),
+            }).catch(error => console.error('Error al llamar al endpoint de eliminación de blobs:', error));
+
         } catch (error) {
             console.error("Error during file processing:", error);
             throw error;
@@ -588,129 +605,84 @@ class FileProcessor {
     }
 
 
-    private downloadDatabase(outputExcel: string, key: string, fileName: string): Promise<void> {
-        return new Promise((resolve, reject) => {
-            let records: any[];
+    private async downloadDatabase(outputExcel: string, key: string, fileName: string): Promise<void> {
+
+        try {
             const underscoreIndex = fileName.indexOf('_');
             const dotIndex = fileName.indexOf('.');
-            const cleanFrenteName = fileName.substring(underscoreIndex + 1, dotIndex);
+            const cleanFrenteName = fileName.substring(underscoreIndex + 1, dotIndex).replace(/\s+/g, '');
+
+            let records: any[] = [];
             if (key === 'gasolina') {
-                prisma.gasolina.findMany({
+                records = await prisma.gasolina.findMany({
                     where: {
-                        frenteNombre: cleanFrenteName
-                    }
-                }).then(res => {
-                    records = res;
-                    processRecords();
-                }).catch(err => {
-                    console.error("Error fetching 'gasolina' records:", err);
-                    reject(err);
+                        frenteNombre: cleanFrenteName,
+                    },
                 });
             } else if (key === 'acarreos') {
-                prisma.acarreos.findMany({
+                records = await prisma.acarreos.findMany({
                     where: {
-                        frenteNombre: cleanFrenteName
-                    }
-                }).then(res => {
-                    records = res;
-                    processRecords();
-                }).catch(err => {
-                    console.error("Error fetching 'acarreos' records:", err);
-                    reject(err);
+                        frenteNombre: cleanFrenteName,
+                    },
                 });
             } else {
-                reject(new Error(`Unsupported key: ${key}`));
+                throw new Error(`Unsupported key: ${key}`);
             }
-            const processRecords = () => {
-                const processedRecords = records.map(record => {
-                    const updatedRecord: any = {};
-                    Object.keys(record).forEach(data => {
-                        const newKey = this.convertCamelCaseToSpaces(data);
 
-                        let value = record[data];
+            const processedRecords = records.map(record => {
+                const updatedRecord: any = {};
+                Object.keys(record).forEach(data => {
+                    const newKey = this.convertCamelCaseToSpaces(data);
+                    let value = record[data];
 
-                        if (newKey.toLowerCase().includes('uuid')) {
-                            value = value.toString();
-                        }
-
-                        updatedRecord[newKey] = value;
-
-                        if (key === 'acarreos' && newKey.toLowerCase() === 'cubicacion' && updatedRecord[newKey]) {
-                            updatedRecord[newKey] = updatedRecord[newKey].replace(/m³/g, '').trim();
-                        }
-
-                        if (key === 'gasolina' && newKey.toLowerCase() === 'litros' && updatedRecord[newKey]) {
-                            updatedRecord[newKey] = updatedRecord[newKey].replace(/L/g, '').trim();
-                        }
-                    });
-                    return updatedRecord;
-                });
-
-                const worksheet = XLSX.utils.json_to_sheet(processedRecords, {
-                    cellDates: false,
-                    cellStyles: false
-                });
-
-                worksheet['!cols'] = [{ wch: 36 }];
-
-                const workbook = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(workbook, worksheet, key.charAt(0).toUpperCase() + key.slice(1));
-
-                const filename = `${key}.xlsx`;
-                const outputFilePath = path.resolve(outputExcel, filename);
-                const dirPath = path.dirname(outputFilePath);
-
-                fs.mkdir(dirPath, { recursive: true }, (err) => {
-                    if (err) {
-                        console.error("Failed to create directory:", err);
-                        reject(err);
-                        return;
+                    if (newKey.toLowerCase().includes('uuid')) {
+                        value = value.toString();
                     }
 
-                    fs.stat(dirPath, (err, stats) => {
-                        if (err || !stats.isDirectory()) {
-                            console.error("Directory validation failed:", err);
-                            reject(err);
-                            return;
-                        }
-
-                        const buffer = XLSX.write(workbook, { type: 'buffer' });
-                        fs.writeFile(outputFilePath, buffer, (err) => {
-                            if (err) {
-                                console.error("Failed to write Excel file:", err);
-                                reject(err);
-                                return;
-                            }
-                            console.log('Database has been downloaded as Excel');
-                            resolve();
-                        });
-                    });
+                    updatedRecord[newKey] = value;
                 });
-            }
-        });
-    }
+                return updatedRecord;
+            });
+
+            const worksheet = XLSX.utils.json_to_sheet(processedRecords, {
+                cellDates: false,
+                cellStyles: false
+            });
+
+            worksheet['!cols'] = [{ wch: 36 }];
+
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, key.charAt(0).toUpperCase() + key.slice(1));
+
+            const filename = `${key}.xlsx`;
+
+            const buffer = XLSX.write(workbook, { type: 'buffer' });
 
 
+            const blobUrlResult = await blobClient.putBlob(`${outputExcel}${filename}`, buffer, { access: 'public' });
 
-    private async deleteFiles(directories: string[]): Promise<void> {
-        for (const directory of directories) {
-            try {
-                const files = await readdir(directory);
-                await Promise.all(files.map(file => {
-                    const filePath = path.join(directory, file);
-                    return unlink(filePath).then(() => {
-                        console.log(`File ${filePath} deleted successfully.`);
-                    }).catch(err => {
-                        console.error(`Error deleting file ${filePath}:`, err);
-                        throw new Error(`Failed to delete file ${filePath}: ${err.message}`);
-                    });
-                }));
-            } catch (err) {
-                console.error(`Error accessing directory ${directory}:`, err);
-                throw err;
-            }
+            const blobUrl = blobUrlResult.url;
+
+            console.log('Excel file uploaded to Vercel Blob successfully.');
+
+            const updateField = key === 'acarreos' ? 'excelUrlAcarreosBlob' : 'excelUrlGasolinaBlob';
+
+            await prisma.frente.update({
+                where: {
+                    nombre: cleanFrenteName
+                },
+                data: {
+                    [updateField]: blobUrl
+                }
+            });
+
+
+        } catch (error) {
+            console.error('Error during database download and upload:', error);
+            throw error;
         }
     }
+
 }
 
 export default FileProcessor;

@@ -24,7 +24,7 @@ interface DialogPrinterAddProps {
 }
 
 interface DialogPrinterEditProps {
-  mode: "edit";
+  mode: "edit" | "editip";
   name: string;
   ip: string;
 }
@@ -81,7 +81,8 @@ const DialogPrinter = (props: DialogPrinterProps) => {
 
     if (props.mode === "add") addPrinter(name, ip);
 
-    if (props.mode === "edit") editPrinter(props.name, name, ip);
+    if (props.mode === "edit" || props.mode === "editip")
+      editPrinter(props.name, name, ip);
 
     setError("");
     props.setOpen(false);
@@ -105,6 +106,7 @@ const DialogPrinter = (props: DialogPrinterProps) => {
             </Label>
             <Input
               id="name"
+              disabled={props.mode === "editip"}
               ref={refName}
               defaultValue={
                 props.mode === "add"

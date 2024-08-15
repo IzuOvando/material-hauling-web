@@ -4,10 +4,10 @@ import { useToast } from "@/components/ui/use-toast";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { handleFileUpload } from "@/actions/fileupload";
-import CONFIG from "@/config";
 import { Upload } from "lucide-react";
 import { Frente } from "@prisma/client";
 import { useUser } from '@/contexts/UserContext';
+import { PutBlobResult } from '@vercel/blob';
 
 interface FileUpdateProps {
   selectedFrente: Frente;
@@ -24,6 +24,7 @@ const FileUpload: React.FC<FileUpdateProps> = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const [blob, setBlob] = useState<PutBlobResult | null>(null);
 
   const onFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files ? event.target.files[0] : null;
@@ -44,8 +45,7 @@ const FileUpload: React.FC<FileUpdateProps> = ({
       file,
       setIsLoading,
       toast,
-      CONFIG.BASE_URL,
-      onUpload
+      onUpload,
     );
     if (fileInputRef.current) fileInputRef.current.value = "";
   };

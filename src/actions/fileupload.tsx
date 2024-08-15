@@ -1,37 +1,74 @@
 import { Dispatch, SetStateAction } from "react";
 import { handleDeleteFiles } from "@/actions/deletefiles";
 import CONFIG from "@/config";
-
-//TODO PASAR EL FRENTE DE PRISMA Y AHORA EL AREA
+import { upload } from '@vercel/blob/client';
+import { Frente } from "@prisma/client";
 
 export async function handleFileUpload(
   area: string,
-  frente: any,
+  frente: Frente,
   file: File,
   setIsLoading: Dispatch<SetStateAction<boolean>>,
   toast: any,
-  apiUrl: string,
-  onUpload: () => void
+  onUpload: () => void,
 ) {
   setIsLoading(true);
   const newFileName = `bbd_${frente.nombre}.xlsx`;
   const newFile = new File([file], newFileName, { type: file.type });
+  const nameRoute = `db_input/${newFileName}`;
   const formData = new FormData();
   formData.append("file", newFile);
 
-  try {
-    const uploadResponse = await fetch(`${apiUrl}/api/files`, {
+  const clientPayload = JSON.stringify({
+    frenteId: frente.nombre,
+    area: area,
+  });
+
+  const apiUrl = CONFIG.BASE_URL;
+
+  const handleProductionUpload = async () => {
+    const response = await upload(nameRoute, newFile, {
+      access: 'public',
+      handleUploadUrl: `${apiUrl}/api/files/vercel`,
+      clientPayload: clientPayload,
+    });
+
+    return {
+      blobUrl: response.url,
+    };
+  };
+
+  const handleDevelopmentUpload = async () => {
+    const response = await fetch(`/api/files/local`, {
       method: "POST",
       body: formData,
     });
 
-    if (uploadResponse.ok) {
-      const processResponse = await fetch(`${apiUrl}/api/files/process`, {
+    const result = await response.json();
+    return {
+      blobUrl: result.blobUrl,
+    };
+  };
+
+  try {
+    let uploadFunction;
+
+    if (process.env.NODE_ENV === 'production') {
+      uploadFunction = handleProductionUpload;
+    } else {
+      uploadFunction = handleDevelopmentUpload;
+    }
+
+    const uploadResponse = await uploadFunction();
+    const blobUrl = uploadResponse.blobUrl;
+
+    if (blobUrl) {
+      const processResponse = await fetch(`/api/files/process`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ fileName: newFile.name, area: area }),
+        body: JSON.stringify({ fileName: newFile.name, area: area, excelBlobUrl: blobUrl, }),
       });
 
       if (processResponse.ok) {
@@ -54,20 +91,16 @@ export async function handleFileUpload(
           console.error("Error deleting files:", errorMessage);
           return;
         }
-
-        const processErrorText = await processResponse.text();
         toast({
           title: "Error",
           description: `Error al procesar archivo: Campos incorrectos o formato no válido.`,
           variant: "destructive",
         });
-        console.log(processErrorText);
       }
     } else {
-      const uploadErrorText = await uploadResponse.text();
       toast({
         title: "Error",
-        description: `Error al subir archivo: ${uploadErrorText}`,
+        description: `Error al subir archivo: No se pudo obtener la URL del blob.`,
         variant: "destructive",
       });
     }

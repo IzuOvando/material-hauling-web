@@ -9,6 +9,7 @@ import CONFIG from "@/config";
 import { Upload } from "lucide-react";
 import { Frente } from "@prisma/client";
 import { useUser } from '@/contexts/UserContext';
+import { PutBlobResult } from '@vercel/blob';
 
 interface FileUpdateProps {
   selectedFrente: Frente;
@@ -58,8 +59,7 @@ const FileUpdate: React.FC<FileUpdateProps> = ({
       file,
       setIsLoading,
       toast,
-      CONFIG.BASE_URL,
-      onUpdate
+      onUpdate,
     );
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
