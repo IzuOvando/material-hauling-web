@@ -324,6 +324,7 @@ class FileProcessor {
 
                 await prisma.acarreos.createMany({
                     data: acarreosData,
+                    skipDuplicates: true,
                 });
 
                 const acarreoUuids = await prisma.acarreos.findMany({
@@ -376,6 +377,7 @@ class FileProcessor {
 
                 await prisma.gasolina.createMany({
                     data: gasolinaData,
+                    skipDuplicates: true,
                 });
 
                 const gasolinaUuids = await prisma.gasolina.findMany({
@@ -430,20 +432,21 @@ class FileProcessor {
         const dotIndex = fileName.indexOf('.');
         const cleanFrenteName = fileName.substring(underscoreIndex + 1, dotIndex);
 
-        if (!cleanFrenteName) {
-            console.error(`No se pudo extraer un nombre válido del archivo: ${fileName}`);
-            return;
-        }
-
         try {
+            if (!cleanFrenteName || !key) {
+                throw new Error('Missing required parameters: cleanFrenteName or key');
+            }
+
             if (key === 'gasolina') {
                 await prisma.gasolina.deleteMany({
                     where: { frenteNombre: cleanFrenteName },
                 });
+                console.log(`Deleted old gasolina records with frenteNombre: ${cleanFrenteName}`);
             } else if (key === 'acarreos') {
                 await prisma.acarreos.deleteMany({
                     where: { frenteNombre: cleanFrenteName },
                 });
+                console.log(`Deleted old acarreos records with frenteNombre: ${cleanFrenteName}`);
             } else {
                 throw new Error(`Unsupported key: ${key}`);
             }
