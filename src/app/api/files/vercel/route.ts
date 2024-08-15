@@ -1,11 +1,22 @@
 import { handleUpload, type HandleUploadBody } from '@vercel/blob/client';
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
-type CustomHandleUploadBody = HandleUploadBody & {
-  frente: string;
+type ClientPayload = {
+  frenteId: string;
+  area: string;
 };
 
-export async function POST(request: NextRequest): Promise<NextResponse> {
+type CustomPayload = {
+  pathname: string;
+  callbackUrl: string;
+  clientPayload: string;
+  multipart: boolean;
+};
+type CustomHandleUploadBody = HandleUploadBody & {
+  payload: CustomPayload;
+};
+
+export async function POST(request: Request): Promise<NextResponse> {
 
   const body = (await request.json()) as CustomHandleUploadBody;
 
@@ -21,25 +32,26 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     await handleUpload({
       body,
       request,
-      onBeforeGenerateToken: async (clientPayload) => {
+      onBeforeGenerateToken: async () => {
 
-        const payload = JSON.parse(clientPayload);
+        try {
+          const clientPayload = body.payload.clientPayload;
+          const payload: ClientPayload = JSON.parse(clientPayload);
 
-        console.log(payload)
-
-        if (!payload.frenteId || !payload.area) {
-          throw new Error("Invalid client payload");
+          return {
+            allowedContentTypes: ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'],
+            tokenPayload: JSON.stringify({
+              frente: payload.frenteId,
+              area: payload.area,
+            }),
+          };
+        } catch (error) {
+          console.error("Error parsing clientPayload:", error);
+          throw new Error("Failed to parse clientPayload.");
         }
-
-        return {
-          allowedContentTypes: ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'],
-          tokenPayload: JSON.stringify({
-            frente: payload.frenteId,
-            area: payload.area
-          }),
-        };
       },
-      onUploadCompleted: async ({ blob }) => {
+      onUploadCompleted: async ({ blob, tokenPayload }) => {
+        console.log('blob upload completed', blob, tokenPayload);
         blobUrl = blob.url;
       },
     });
