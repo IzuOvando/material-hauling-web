@@ -25,6 +25,12 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
         const payload = JSON.parse(clientPayload);
 
+        console.log(payload)
+
+        if (!payload.frenteId || !payload.area) {
+          throw new Error("Invalid client payload");
+        }
+
         return {
           allowedContentTypes: ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'],
           tokenPayload: JSON.stringify({
