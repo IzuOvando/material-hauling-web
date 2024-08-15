@@ -29,7 +29,7 @@ export async function POST(request: Request): Promise<NextResponse> {
   }
 
   try {
-    await handleUpload({
+    const jsonResponse = await handleUpload({
       body,
       request,
       onBeforeGenerateToken: async () => {
@@ -50,23 +50,11 @@ export async function POST(request: Request): Promise<NextResponse> {
           throw new Error("Failed to parse clientPayload.");
         }
       },
-      onUploadCompleted: async ({ blob, tokenPayload }) => {
-        console.log('blob upload completed', blob, tokenPayload);
-        blobUrl = blob.url;
+      onUploadCompleted: async () => {
       },
     });
 
-    if (blobUrl) {
-      return NextResponse.json({
-        message: "File uploaded and processed successfully.",
-        blobUrl: blobUrl,
-      });
-    } else {
-      return NextResponse.json(
-        { error: "Failed to retrieve blob URL after upload" },
-        { status: 500 }
-      );
-    }
+    return NextResponse.json(jsonResponse);
   } catch (error) {
     if (error instanceof Error) {
       return NextResponse.json(
