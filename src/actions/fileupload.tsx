@@ -27,7 +27,7 @@ export async function handleFileUpload(
   const handleProductionUpload = async () => {
     const response = await upload(nameRoute, newFile, {
       access: 'public',
-      handleUploadUrl: 'api/files/vercel',
+      handleUploadUrl: '/api/files/vercel',
       clientPayload: clientPayload,
     });
 
