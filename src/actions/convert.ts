@@ -287,7 +287,7 @@ class FileProcessor {
                     const acarreoEntry: {
                         uuid?: string;
                         frenteNombre: string;
-                        folio: number;
+                        folio: string;
                         empresa: string;
                         material: string;
                         cubicacion: number;
@@ -343,7 +343,7 @@ class FileProcessor {
                     const gasolinaEntry: {
                         uuid?: string;
                         frenteNombre: string;
-                        folio: number;
+                        folio: string;
                         saldoCompra: number;
                         formatoPago: string;
                         litros: number;

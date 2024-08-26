@@ -80,7 +80,7 @@ export const filteredDataConfig: Record<
 
     return {
       uuid: cleanQuotes(data.uuid),
-      folio: parseInt(cleanQuotes(data.folio)),
+      folio: cleanQuotes(data.folio),
       empresa: cleanQuotes(data.empresa),
       material: cleanQuotes(data.material),
       cubicacion: parseFloat(cleanQuotes(data.cubicacion)),
@@ -111,7 +111,7 @@ export const filteredDataConfig: Record<
     };
     return {
       uuid: cleanQuotes(data.uuid),
-      folio: parseInt(cleanQuotes(data.folio), 10),
+      folio: cleanQuotes(data.folio),
       saldoCompra: parseCurrency(cleanQuotes(data.saldoCompra)),
       formatoPago: cleanQuotes(data.formatoPago),
       litros: parseFloat(cleanQuotes(data.litros)),
