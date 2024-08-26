@@ -3,7 +3,7 @@ import { Gasolina } from "@prisma/client";
 import { Ticket } from "@/types";
 import { formatPrice, formatVolume } from "@/helpers/formatters/numbers";
 import {
-  formatIsoDateFromString,
+  formatLongSpanishDateFromString,
   formatTime12HourFromString,
 } from "@/helpers/formatters/datetime";
 export default class TicketAcarreoSchema implements TicketSchema {
@@ -95,7 +95,7 @@ export default class TicketAcarreoSchema implements TicketSchema {
       .addText(`Placas:\t${ticket.placas}\n`)
       .addText(`Saldo próxima compra:\t${formatPrice(ticket.saldoCompra)}\n`)
       .addText(
-        `Fecha y Hora:\t${formatIsoDateFromString(
+        `Fecha y Hora:\t${formatLongSpanishDateFromString(
           ticket.fecha as any
         )} ${formatTime12HourFromString(ticket.hora as any)}\n`
       );
