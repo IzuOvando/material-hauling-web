@@ -133,8 +133,8 @@ class FileProcessor {
             const cleanedHeaders = new Set(headers.map(normalize).filter(header => header.length > 0));
             const normalizedValidHeaders = new Set(Array.from(validHeaders).map(normalize));
 
-            for (const header of cleanedHeaders) {
-                if (!normalizedValidHeaders.has(header)) {
+            for (const validHeader of normalizedValidHeaders) {
+                if (!cleanedHeaders.has(validHeader)) {
                     return false;
                 }
             }
@@ -199,7 +199,7 @@ class FileProcessor {
 
                     if (!headerChecked) {
                         if (!isValidHeaderRow(row, validHeaders)) {
-                            continue;
+                            throw new Error("El encabezado del CSV no es válido.");
                         }
                         row = row.map((header) => {
                             const camelCaseHeader = this.toCamelCase(header.toString());
