@@ -61,12 +61,13 @@ export function getFilters(filters: string, area: TicketArea): any {
     const splittedData = fieldData.split("=");
     if (splittedData.length === 2) {
       const field = splittedData[0].trim();
-      const values = splittedData[1]
+      let values: string[] | number[] = splittedData[1]
         .split("^")
         .map((value) => value.trim())
         .filter((value) => value !== "");
       if (FILTER_FIELDS[area].includes(field) && values.length !== 0)
-        filtersOnWhere[field] = { in: values };
+        if (field === "bomba") values = values.map((value) => Number(value));
+      filtersOnWhere[field] = { in: values };
     }
   });
 
