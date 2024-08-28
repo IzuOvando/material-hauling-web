@@ -75,7 +75,8 @@ export const filteredDataConfig: Record<
   acarreos: (data, fileName, cleanQuotes) => {
     const hora = parseHoraTime(cleanQuotes(data.hora))
 
-    const [day, month, year] = cleanQuotes(data.fecha).split('-').map(part => parseInt(part, 10));
+    const fechaStr = cleanQuotes(data.fecha);
+    const [month, day, year] = fechaStr.split('-').map(part => parseInt(part, 10));
     const fecha = new Date(year, month - 1, day);
 
     return {
