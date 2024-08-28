@@ -28,7 +28,7 @@ model Frente {
 model Acarreos {
   uuid         String   @id @default(uuid())
   createdAt    DateTime @default(now())
-  folio        Int
+  folio        String
   frenteNombre String
   empresa      String
   material     String
@@ -53,7 +53,7 @@ model Acarreos {
 model Gasolina {
   uuid           String   @id @default(uuid())
   createdAt      DateTime @default(now())
-  folio          Int
+  folio          String
   frenteNombre   String
   saldoCompra    Float
   formatoPago    String
