@@ -1,4 +1,4 @@
-export type SchemaKeys = 'gasolina' | 'acarreos';
+export type SchemaKeys = 'gasolina' | 'acarreos' | 'camionesQR';
 
 export const schemas: Record<SchemaKeys, Set<string>> = {
     gasolina: new Set([
@@ -32,4 +32,11 @@ export const schemas: Record<SchemaKeys, Set<string>> = {
         "proyecto",
         "idcamion",
     ]),
+    camionesQR: new Set([
+        "placas",
+        "idcamion",
+        "operador",
+        "turno",
+        "frente"
+    ])
 };
