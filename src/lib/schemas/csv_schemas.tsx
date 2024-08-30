@@ -80,7 +80,7 @@ export const filteredDataConfig: Record<
 
     return {
       uuid: cleanQuotes(data.uuid),
-      folio: cleanQuotes(data.folio),
+      folio: parseInt(cleanQuotes(data.folio)),
       empresa: cleanQuotes(data.empresa),
       material: cleanQuotes(data.material),
       cubicacion: parseFloat(cleanQuotes(data.cubicacion)),

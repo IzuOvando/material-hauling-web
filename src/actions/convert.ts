@@ -287,7 +287,7 @@ class FileProcessor {
                     const acarreoEntry: {
                         uuid?: string;
                         frenteNombre: string;
-                        folio: string;
+                        folio: number;
                         empresa: string;
                         material: string;
                         cubicacion: number;
