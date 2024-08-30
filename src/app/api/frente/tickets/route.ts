@@ -7,7 +7,7 @@ export async function POST(req: NextRequest) {
   const body = await req.json();
   const filters = req.nextUrl.searchParams.get("filters") || undefined;
   const sort = req.nextUrl.searchParams.get("sort") || undefined;
-  const { frente, area, allSelected } = body;
+  const { frente, area, allSelected, ticketsIds } = body;
 
   try {
     // Validation Area
@@ -18,8 +18,7 @@ export async function POST(req: NextRequest) {
 
     if (!allSelected) {
       // Retrieve tickets by uuid
-      const { selection } = body;
-      const tickets = await getSomeTickets(selection, area, sort);
+      const tickets = await getSomeTickets(ticketsIds, area, sort);
       return NextResponse.json(tickets);
     }
 
@@ -30,7 +29,10 @@ export async function POST(req: NextRequest) {
     if (!frenteOnDB)
       return NextResponse.json({ error: "Frente not found" }, { status: 404 });
 
-    const tickets = await getAllTickets(frente, area, filters, sort);
+    const tickets = (await getAllTickets(frente, area, filters, sort)).filter(
+      (ticket) => !ticketsIds.includes(ticket.uuid)
+    );
+
     return NextResponse.json(tickets);
   } catch (error) {
     console.error("Failed to get tickets", error);

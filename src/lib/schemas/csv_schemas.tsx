@@ -75,13 +75,12 @@ export const filteredDataConfig: Record<
   acarreos: (data, fileName, cleanQuotes) => {
     const hora = parseHoraTime(cleanQuotes(data.hora))
 
-    const fechaStr = cleanQuotes(data.fecha);
-    const [month, day, year] = fechaStr.split('-').map(part => parseInt(part, 10));
+    const [day, month, year] = cleanQuotes(data.fecha).split('-').map(part => parseInt(part, 10));
     const fecha = new Date(year, month - 1, day);
 
     return {
       uuid: cleanQuotes(data.uuid),
-      folio: cleanQuotes(data.folio),
+      folio: parseInt(cleanQuotes(data.folio)),
       empresa: cleanQuotes(data.empresa),
       material: cleanQuotes(data.material),
       cubicacion: parseFloat(cleanQuotes(data.cubicacion)),

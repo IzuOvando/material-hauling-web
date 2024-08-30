@@ -24,7 +24,7 @@ interface PrintDialogProps {
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   allSelected: boolean;
-  ticketsSelection: { [key: string]: boolean };
+  ticketsIds: { [key: string]: boolean };
   frente: string;
   area: TicketArea;
   total: number;
@@ -34,7 +34,7 @@ const PrintDialog = ({
   open,
   setOpen,
   allSelected,
-  ticketsSelection,
+  ticketsIds,
   area,
   frente,
   total,
@@ -46,7 +46,10 @@ const PrintDialog = ({
   const availablePrinters = printers.filter(
     (printer) => printer.status === "online"
   );
-  const selectedTickets = Object.keys(ticketsSelection);
+  const ticketsIdsList = Object.keys(ticketsIds);
+  const ticketsToPrint = allSelected
+    ? total - ticketsIdsList.length
+    : ticketsIdsList.length;
 
   const [ticketsPrinted, setTicketsPrinted] = useState(0);
   const [failedTickets, setFailedTickets] = useState(0);
@@ -64,9 +67,8 @@ const PrintDialog = ({
       frente: string;
       area: TicketArea;
       allSelected: boolean;
-      selection?: string[];
-    } = { frente, area, allSelected };
-    if (!allSelected) body.selection = Object.keys(ticketsSelection);
+      ticketsIds: string[];
+    } = { frente, area, allSelected, ticketsIds: ticketsIdsList };
 
     const filters = searchParams.get("filters");
     const sort = searchParams.get("sort");
@@ -172,7 +174,7 @@ const PrintDialog = ({
 
     if (
       actualView === "printing" &&
-      ticketsPrinted === selectedTickets.length * 2 // Cause is original and copy
+      ticketsPrinted === ticketsToPrint * 2 // Cause is original and copy
     )
       handleFinishPrinting();
   }, [ticketsPrinted]);
@@ -189,14 +191,14 @@ const PrintDialog = ({
         {actualView === "start" ? (
           <StartView
             availablePrinters={availablePrinters}
-            numberOfTickets={allSelected ? total : selectedTickets.length}
+            numberOfTickets={ticketsToPrint}
             onStartPrinting={handleStartPrinting}
             setOpen={setOpen}
           />
         ) : actualView === "printing" ? (
           <PrintingView
             ticketsPrinted={ticketsPrinted}
-            totalTickets={allSelected ? total : selectedTickets.length}
+            totalTickets={ticketsToPrint}
             printers={printers}
             printersWithErrorNames={failedPrinters}
             continuePrinting={handleContinuePrinting}
@@ -204,7 +206,7 @@ const PrintDialog = ({
         ) : actualView === "printFailed" ? (
           <PrintingFailedView
             ticketsPrinted={ticketsPrinted}
-            totalTickets={allSelected ? total : selectedTickets.length}
+            totalTickets={ticketsToPrint}
             printers={printers}
             printersWithErrorNames={failedPrinters}
             continuePrinting={handleContinuePrinting}
@@ -212,10 +214,7 @@ const PrintDialog = ({
             onPrintFailed={handlePrintFailed}
           />
         ) : (
-          <FinishedView
-            totalTickets={allSelected ? total : selectedTickets.length}
-            onClose={handleOnClose}
-          />
+          <FinishedView totalTickets={ticketsToPrint} onClose={handleOnClose} />
         )}
       </DialogContent>
     </Dialog>
