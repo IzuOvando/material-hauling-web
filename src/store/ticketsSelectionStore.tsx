@@ -1,7 +1,7 @@
 import { create } from "zustand";
 
 type TicketsSelectionState = {
-  selectedTickets: {
+  ticketsIds: {
     [uuid: string]: boolean;
   };
   selectedAll: boolean;
@@ -13,32 +13,56 @@ type TicketsSelectionState = {
 
 export const useTicketsSelectionStore = create<TicketsSelectionState>(
   (set) => ({
-    selectedTickets: {},
+    ticketsIds: {},
     selectedAll: false,
     setSelectAll: (value) =>
       set((state) => ({
         selectedAll: value,
-        selectedTickets: value ? {} : state.selectedTickets,
+        ticketsIds: {},
       })),
     selectTicket: (uuid) =>
-      set((state) => ({
-        selectedTickets: {
-          ...state.selectedTickets,
-          [uuid]: true,
-        },
-      })),
+      set((state) => {
+        if (state.selectedAll)
+          return {
+            ticketsIds: dropTicket(uuid, state.ticketsIds),
+          };
+        else
+          return {
+            ticketsIds: pushTicket(uuid, state.ticketsIds),
+          };
+      }),
     unselectTicket: (uuid) =>
       set((state) => {
-        const updatedSelection = { ...state.selectedTickets };
-        delete updatedSelection[uuid];
-        return {
-          selectedTickets: updatedSelection,
-        };
+        if (state.selectedAll)
+          return {
+            ticketsIds: pushTicket(uuid, state.ticketsIds),
+          };
+        else
+          return {
+            ticketsIds: dropTicket(uuid, state.ticketsIds),
+          };
       }),
     resetSelection: () =>
       set((state) => ({
-        selectedTickets: {},
+        ticketsIds: {},
         selectedAll: false,
       })),
   })
 );
+
+const dropTicket = (
+  uuid: string,
+  ticketsIds: TicketsSelectionState["ticketsIds"]
+) => {
+  const updatedSelection = { ...ticketsIds };
+  delete updatedSelection[uuid];
+  return updatedSelection;
+};
+
+const pushTicket = (
+  uuid: string,
+  ticketsIds: TicketsSelectionState["ticketsIds"]
+) => ({
+  ...ticketsIds,
+  [uuid]: true,
+});
