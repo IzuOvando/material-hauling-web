@@ -34,9 +34,10 @@ export const schemas: Record<SchemaKeys, Set<string>> = {
     ]),
     camionesQR: new Set([
         "placas",
-        "idcamion",
         "operador",
         "turno",
-        "frente"
+        "frente",
+        "noeconomico",
+        "volumen"
     ])
 };

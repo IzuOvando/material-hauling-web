@@ -1,8 +1,18 @@
 import XLSX from 'xlsx';
 import { schemas } from "@/lib/schemas/headers";
+import QRBuilder from '@/utils/qr/QRBuilder';
 
 export function validateExcelFileQRs(file: File): Promise<void> {
     const validHeaders = schemas['camionesQR'];
+
+    const headerToFieldMap: { [key: string]: string } = {
+        "placas": "setPlacas",
+        "noeconomico": "setNoeconomico",
+        "operador": "setOperador",
+        "turno": "setTurno",
+        "frente": "setFrente",
+        "volumen": "setVolumen"
+    };
 
     const isValidHeaderRow = (headers: string[], validHeaders: Set<string>): boolean => {
         const normalize = (header: string) => header.replace(/\s+/g, '').toLowerCase();
@@ -39,10 +49,11 @@ export function validateExcelFileQRs(file: File): Promise<void> {
 
                     const range = XLSX.utils.decode_range(worksheet["!ref"]);
                     let headerChecked = false;
-                    let row: string[] = [];
+                    let headers: string[] = [];
+                    let qrBuilder: QRBuilder;
 
                     for (let R = range.s.r; R <= range.e.r; ++R) {
-                        row = [];
+                        let row: string[] = [];
                         let empty = true;
 
                         for (let C = range.s.c; C <= range.e.c; ++C) {
@@ -66,15 +77,37 @@ export function validateExcelFileQRs(file: File): Promise<void> {
                         if (empty) continue;
 
                         if (!headerChecked) {
-                            if (!isValidHeaderRow(row, validHeaders)) {
+                            headers = row;
+                            if (!isValidHeaderRow(headers, validHeaders)) {
                                 throw new Error("El encabezado del archivo no es válido.");
                             }
                             headerChecked = true;
                             continue;
                         }
 
-                        // Process rows after header validation if needed
-                        // For example, you might want to process the rows further
+                        qrBuilder = new QRBuilder();
+
+                        headers.forEach((header, index) => {
+                            const normalizedHeader = header.trim().toLowerCase();
+                            const field = Object.keys(headerToFieldMap).find(key => normalizedHeader.includes(key));
+                            if (field) {
+                                const methodName = headerToFieldMap[field];
+                                const method = (qrBuilder as any)[methodName];
+                                if (typeof method === 'function') {
+                                    try {
+                                        method.call(qrBuilder, row[index]);
+                                    } catch (error) {
+                                        console.error(`Error processing field "${field}" for row ${R + 1}:`, error);
+                                    }
+                                }
+                            }
+                        });
+
+                        try {
+                            qrBuilder.generateQR();
+                        } catch (error) {
+                            console.error(`Error generating QR for row ${R + 1}:`, error);
+                        }
                     }
                 });
 
@@ -87,7 +120,7 @@ export function validateExcelFileQRs(file: File): Promise<void> {
         };
 
         reader.onerror = () => {
-            reject(new Error('Error al leer el archivo.'));
+            reject(new Error('Failed to read file.'));
         };
 
         reader.readAsArrayBuffer(file);

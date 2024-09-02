@@ -56,7 +56,7 @@ const TableTicket = (props: TableTicketProps) => {
   const [disablePrintTickets, setDisablePrintTickets] = useState(true);
   const [openPrintTickets, setOpenPrintTickets] = useState(false);
   // Stores
-  const { selectedTickets, selectedAll } = useTicketsSelectionStore();
+  const { ticketsIds, selectedAll } = useTicketsSelectionStore();
 
   const columns =
     props.area === TicketArea.ACARREOS ? acarreosColumns : gasolinaColumns;
@@ -80,9 +80,11 @@ const TableTicket = (props: TableTicketProps) => {
 
   useEffect(() => {
     setDisablePrintTickets(
-      !selectedAll && Object.keys(selectedTickets).length === 0
+      selectedAll
+        ? Object.keys(ticketsIds).length === props.total
+        : Object.keys(ticketsIds).length === 0
     );
-  }, [selectedAll, selectedTickets]);
+  }, [ticketsIds, selectedAll]);
 
   return (
     <TableTicketsProvider>
@@ -128,7 +130,9 @@ const TableTicket = (props: TableTicketProps) => {
                 <TableRow
                   key={row.id}
                   data-state={
-                    (selectedAll || selectedTickets[row.id]) && "selected"
+                    (selectedAll
+                      ? !Boolean(ticketsIds[row.id])
+                      : Boolean(ticketsIds[row.id])) && "selected"
                   }
                   className="border-primary-light border-b-2 hover:bg-green-50 data-[state=selected]:bg-green-50"
                 >
@@ -158,7 +162,9 @@ const TableTicket = (props: TableTicketProps) => {
       <div className="mt-3">
         <TableTicketPagination
           selectedRows={
-            selectedAll ? props.total : Object.keys(selectedTickets).length
+            selectedAll
+              ? props.total - Object.keys(ticketsIds).length
+              : Object.keys(ticketsIds).length
           }
           total={props.total}
           page={props.page}
@@ -169,7 +175,7 @@ const TableTicket = (props: TableTicketProps) => {
         <PrintTicketDialog
           open={openPrintTickets}
           setOpen={setOpenPrintTickets}
-          ticketsSelection={selectedTickets}
+          ticketsIds={ticketsIds}
           allSelected={selectedAll}
           area={props.area}
           frente={props.frente}
