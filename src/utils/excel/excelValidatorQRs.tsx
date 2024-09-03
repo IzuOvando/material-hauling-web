@@ -1,8 +1,8 @@
 import XLSX from 'xlsx';
 import { schemas } from "@/lib/schemas/headers";
-import QRBuilder from '@/utils/qr/QRBuilder';
+import MetaDataCamiones from '@/utils/qr/MetaDataCamiones';
 
-export function validateExcelFileQRs(file: File): Promise<void> {
+export function getMetadataCamionFromFile(file: File): Promise<MetaDataCamiones[]> {
     const validHeaders = schemas['camionesQR'];
 
     const headerToFieldMap: { [key: string]: string } = {
@@ -40,6 +40,8 @@ export function validateExcelFileQRs(file: File): Promise<void> {
                 const data = new Uint8Array(arrayBuffer);
                 const workbook = XLSX.read(data, { type: 'array' });
 
+                const qrBuilders: MetaDataCamiones[] = [];
+
                 const sheetPromises = workbook.SheetNames.map(async (sheetName) => {
                     const worksheet = workbook.Sheets[sheetName];
                     if (!worksheet["!ref"]) {
@@ -50,7 +52,6 @@ export function validateExcelFileQRs(file: File): Promise<void> {
                     const range = XLSX.utils.decode_range(worksheet["!ref"]);
                     let headerChecked = false;
                     let headers: string[] = [];
-                    let qrBuilder: QRBuilder;
 
                     for (let R = range.s.r; R <= range.e.r; ++R) {
                         let row: string[] = [];
@@ -85,7 +86,7 @@ export function validateExcelFileQRs(file: File): Promise<void> {
                             continue;
                         }
 
-                        qrBuilder = new QRBuilder();
+                        const qrBuilder = new MetaDataCamiones();
 
                         headers.forEach((header, index) => {
                             const normalizedHeader = header.trim().toLowerCase();
@@ -103,16 +104,12 @@ export function validateExcelFileQRs(file: File): Promise<void> {
                             }
                         });
 
-                        try {
-                            qrBuilder.generateQR();
-                        } catch (error) {
-                            console.error(`Error generating QR for row ${R + 1}:`, error);
-                        }
+                        qrBuilders.push(qrBuilder);
                     }
                 });
 
                 Promise.all(sheetPromises)
-                    .then(() => resolve())
+                    .then(() => resolve(qrBuilders))
                     .catch((error) => reject(error));
             } catch (error) {
                 reject(error);
