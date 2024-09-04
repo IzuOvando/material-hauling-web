@@ -11,9 +11,6 @@ export const schemas: Record<SchemaKeys, Set<string>> = {
         "hora",
         "total",
         "bomba",
-        "empresa",
-        "economico",
-        "union",
         "saldocompra",
         "formatopago",
         "preciounitario"
