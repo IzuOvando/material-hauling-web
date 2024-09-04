@@ -2,26 +2,23 @@ import XLSX from 'xlsx';
 import { getMetadataCamionFromFile } from '@/utils/excel/excelValidatorQRs'
 import MetaDataCamiones from '@/utils/qr/MetaDataCamiones';
 
-jest.mock('@/utils/qr/MetaDataCamiones');
-
 const createMockFile = (name: string, type: string, contents: string | ArrayBuffer): File => {
     const blob = new Blob([contents], { type });
     return new File([blob], name, { type });
 };
 
-
-
 describe('getMetadataCamionFromFile', () => {
+    console.log("1")
     const validHeaders = ["placas", "noeconomico", "operador", "turno", "frente", "volumen"];
     const validData = [
         ["ABC123", "001", "Juan Pérez", "Mañana", "Frente A", "100"],
         ["XYZ789", "002", "María López", "Tarde", "Frente B", "200"]
     ];
-
+    console.log("2")
     beforeEach(() => {
         jest.clearAllMocks();
     });
-
+    console.log("2")
     test('Debe resolver correctamente cuando el archivo contiene encabezados válidos y datos correctos', async () => {
         const workbook = XLSX.utils.book_new();
         const worksheet = XLSX.utils.aoa_to_sheet([validHeaders, ...validData]);
@@ -30,7 +27,11 @@ describe('getMetadataCamionFromFile', () => {
 
         const mockFile = createMockFile('test.xlsx', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', excelData);
 
+        console.log("4")
+
         const result = await getMetadataCamionFromFile(mockFile);
+
+        console.log("5")
 
         expect(result).toHaveLength(2);
         expect(result[0]).toBeInstanceOf(MetaDataCamiones);

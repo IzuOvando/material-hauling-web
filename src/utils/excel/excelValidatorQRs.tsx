@@ -86,6 +86,8 @@ export function getMetadataCamionFromFile(file: File): Promise<MetaDataCamiones[
                             continue;
                         }
 
+                        console.log("dentro de metadata")
+
                         const qrBuilder = new MetaDataCamiones();
 
                         headers.forEach((header, index) => {

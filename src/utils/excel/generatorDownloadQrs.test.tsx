@@ -1,10 +1,8 @@
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
 import MetaDataCamiones from '@/utils/qr/MetaDataCamiones';
-import { generateQRString } from '@/utils/qr/QRGenerate';
+import { getCamionesQRSVG } from './generatorDownloadQrs';
 
-// Mocks
-jest.mock('@/utils/qr/MetaDataCamiones');
 jest.mock('jszip');
 jest.mock('file-saver');
 
@@ -14,14 +12,8 @@ describe('getCamionesQRSVG', () => {
 
     beforeEach(() => {
         jest.clearAllMocks();
-
-        // Mock de la instancia de MetaDataCamiones
         MetaDataCamiones.prototype.generateQRCodes = mockGenerateQRCodes;
-
-        // Mock de JSZip
         JSZip.prototype.generateAsync = jest.fn().mockResolvedValue(new Blob());
-
-        // Mock de file-saver
         (saveAs as unknown as jest.Mock).mockImplementation(mockSaveAs);
     });
 
@@ -50,15 +42,10 @@ describe('getCamionesQRSVG', () => {
         const mockQRCodes = ['<svg>QR1</svg>', '<svg>QR2</svg>'];
         mockGenerateQRCodes.mockResolvedValue(mockQRCodes);
 
-        await generateQRString(mockDataCamiones);
+        await getCamionesQRSVG(mockDataCamiones);
 
-        // Verifica que se haya llamado a generateQRCodes con los datos correctos
         expect(mockGenerateQRCodes).toHaveBeenCalledWith(mockDataCamiones);
-
-        // Verifica que JSZip.generateAsync se haya llamado con el tipo 'blob'
         expect(JSZip.prototype.generateAsync).toHaveBeenCalledWith({ type: 'blob' });
-
-        // Verifica que saveAs se haya llamado con el contenido correcto
         expect(mockSaveAs).toHaveBeenCalledWith(expect.any(Blob), 'qrcodes.zip');
     });
 
@@ -75,9 +62,8 @@ describe('getCamionesQRSVG', () => {
             }
         ];
 
-        // Configura el mock para que genere un error
         mockGenerateQRCodes.mockRejectedValue(new Error('Error generating QR codes'));
 
-        await expect(generateQRString(mockDataCamiones)).rejects.toThrow('Error generating QR codes');
+        await expect(getCamionesQRSVG(mockDataCamiones)).rejects.toThrow('Error generating QR codes');
     });
 });

@@ -15,6 +15,8 @@ interface QRData {
 export function generateQRString(qrData: QRData): string {
   const qrString = JSON.stringify(qrData);
 
+  console.log("QR", qrString)
+
   const svgQRCode = ReactDOMServer.renderToStaticMarkup(
     <QRCodeSVG
       value={qrString}
@@ -24,6 +26,8 @@ export function generateQRString(qrData: QRData): string {
       level="Q"
     />
   );
+
+  console.log("QR trono")
 
   return svgQRCode;
 }

@@ -112,6 +112,8 @@ class MetaDataCamiones {
                     idcamion: metaData.idcamion!
                 };
 
+                console.log("qrData", qrData)
+
                 const svgQRCode = generateQRString(qrData);
                 qrObjects.push(svgQRCode);
             } catch (error: any) {

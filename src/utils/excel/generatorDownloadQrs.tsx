@@ -21,7 +21,8 @@ export async function getCamionesQRSVG(dataCamiones: MetaDataCamion[]): Promise<
         const zip = new JSZip();
 
         qrCodes.forEach((svgQRCode, index) => {
-            zip.file(`QR_${index + 1}.svg`, svgQRCode);
+            const idcamion = dataCamiones[index].idcamion;
+            zip.file(`QR_${idcamion}.svg`, svgQRCode);
         });
 
         const content = await zip.generateAsync({ type: 'blob' });
