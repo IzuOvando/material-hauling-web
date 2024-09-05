@@ -29,7 +29,6 @@ describe('getMetadataCamionFromFile', () => {
     test('Debe resolver correctamente cuando el archivo contiene encabezados válidos y datos correctos', async () => {
         const workbook = XLSX.utils.book_new();
         const worksheet = XLSX.utils.aoa_to_sheet(validData);
-        console.log(validData)
         XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
         const excelData = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
 
