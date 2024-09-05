@@ -86,8 +86,6 @@ export function getMetadataCamionFromFile(file: File): Promise<MetaDataCamiones[
                             continue;
                         }
 
-                        console.log("dentro de metadata")
-
                         const qrBuilder = new MetaDataCamiones();
 
                         headers.forEach((header, index) => {
@@ -97,11 +95,7 @@ export function getMetadataCamionFromFile(file: File): Promise<MetaDataCamiones[
                                 const methodName = headerToFieldMap[field];
                                 const method = (qrBuilder as any)[methodName];
                                 if (typeof method === 'function') {
-                                    try {
-                                        method.call(qrBuilder, row[index]);
-                                    } catch (error) {
-                                        console.error(`Error processing field "${field}" for row ${R + 1}:`, error);
-                                    }
+                                    method.call(qrBuilder, row[index]);
                                 }
                             }
                         });

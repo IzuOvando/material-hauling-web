@@ -13,25 +13,16 @@ interface MetaDataCamion {
 }
 
 export async function getCamionesQRSVG(dataCamiones: MetaDataCamion[]): Promise<void> {
-    const metaDataInstance = new MetaDataCamiones();
+    const qrCodes = MetaDataCamiones.generateQRCodes(dataCamiones);
+    const zip = new JSZip()
+    qrCodes.forEach((svgQRCode, index) => {
+        const idcamion = dataCamiones[index]?.idcamion;
+        zip.file(`QR_${idcamion}.svg`, svgQRCode);
+    });
 
-    try {
-        const qrCodes = await metaDataInstance.generateQRCodes(dataCamiones);
+    const content = await zip.generateAsync({ type: 'blob' });
 
-        const zip = new JSZip();
-
-        qrCodes.forEach((svgQRCode, index) => {
-            const idcamion = dataCamiones[index].idcamion;
-            zip.file(`QR_${idcamion}.svg`, svgQRCode);
-        });
-
-        const content = await zip.generateAsync({ type: 'blob' });
-
-        saveAs(content, 'qrcodes.zip');
-    } catch (error) {
-        console.error('Error generating QR codes or ZIP:', error);
-        throw error;
-    }
+    saveAs(content, 'qrcodes.zip');
 }
 
 
