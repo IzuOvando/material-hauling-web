@@ -1,7 +1,12 @@
-import { getFacetedFilters } from "@/actions/tickets";
+import {
+  getFacetedFilters,
+  getFacetedFiltersFromCache,
+  setFacetedFiltersInCache,
+} from "@/actions/tickets";
 import prisma from "@/lib/db";
 import { TicketArea } from "@/types";
 import { NextRequest, NextResponse } from "next/server";
+import { MD5 as md5 } from "crypto-js";
 
 export async function GET(req: NextRequest) {
   const params = req.nextUrl.searchParams;
@@ -23,8 +28,17 @@ export async function GET(req: NextRequest) {
   if (!frenteOnDB)
     return NextResponse.json({ error: "Frente not found" }, { status: 404 });
 
+  // Preparing cache key
+  const cacheKey = `facets_${frente}_${area}${getPartialKeyFilters(filters)}`;
+
+  // Requesting facets from cache
+  const cachedFacets = await getFacetedFiltersFromCache(cacheKey);
+  if (cachedFacets) return NextResponse.json({ facets: cachedFacets });
+
+  // Requesting facets from database and caching them
   try {
-    const facets = await getFacetedFilters(frente, area as TicketArea);
+    const facets = await getFacetedFilters(frente, area as TicketArea, filters);
+    await setFacetedFiltersInCache(cacheKey, facets);
     return NextResponse.json({ facets });
   } catch (error) {
     console.error("Failed to get facets", error);
@@ -34,3 +48,8 @@ export async function GET(req: NextRequest) {
     );
   }
 }
+
+const getPartialKeyFilters = (filters?: string) => {
+  if (!filters) return "";
+  return `_${md5(filters).toString()}`;
+};

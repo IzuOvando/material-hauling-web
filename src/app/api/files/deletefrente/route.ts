@@ -1,7 +1,8 @@
 import prisma from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 import blobClient from "@/lib/blobClient";
-
+import { invalidateFacetsCache } from "@/actions/tickets";
+import { TicketArea } from "@/types";
 
 export async function POST(req: NextRequest) {
   try {
@@ -15,14 +16,12 @@ export async function POST(req: NextRequest) {
       },
     });
 
-
     if (!frente) {
       return NextResponse.json(
         { error: "Frente no encontrado." },
         { status: 404 }
       );
     }
-
 
     if (frente.excelUrlAcarreosBlob) {
       await blobClient.deleteBlob(frente.excelUrlAcarreosBlob);
@@ -33,6 +32,9 @@ export async function POST(req: NextRequest) {
     await prisma.frente.delete({
       where: { nombre },
     });
+
+    await invalidateFacetsCache(nombre, TicketArea.ACARREOS);
+    await invalidateFacetsCache(nombre, TicketArea.GASOLINA);
 
     return NextResponse.json(
       {
