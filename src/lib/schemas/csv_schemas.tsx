@@ -86,7 +86,7 @@ export const filteredDataConfig: Record<
     const hora = parseHoraTime(cleanQuotes(data.hora))
 
     const fechaStr = cleanQuotes(data.fecha);
-    const [month, day, year] = fechaStr.split('-').map(part => parseInt(part, 10));
+    const [day, month, year] = fechaStr.split('-').map(part => parseInt(part, 10));
     const fecha = new Date(year, month - 1, day);
 
     return {
