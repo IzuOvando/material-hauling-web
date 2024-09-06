@@ -605,6 +605,27 @@ class FileProcessor {
             .replace(/^./, str => str.toUpperCase());
     }
 
+    private formatHour(hour: string): string {
+        const date = new Date(hour);
+        let hours = date.getUTCHours();
+        const minutes = date.getUTCMinutes();
+        const suffix = hours >= 12 ? 'p.m.' : 'a.m.';
+
+        hours = hours % 12;
+        hours = hours ? hours : 12;
+
+        const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
+
+        return `${hours}:${formattedMinutes} ${suffix}`;
+    }
+
+    private formatDateToDDMMYYYY(date: Date): string {
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0'); // getMonth() devuelve el mes basado en 0
+        const year = date.getFullYear();
+
+        return `${day}/${month}/${year}`;
+    }
 
     private async downloadDatabase(outputExcel: string, key: string, fileName: string): Promise<void> {
 
@@ -636,8 +657,16 @@ class FileProcessor {
                     const newKey = this.convertCamelCaseToSpaces(data);
                     let value = record[data];
 
+                    if (newKey.toLowerCase() === 'hora' && value) {
+                        value = this.formatHour(value);
+                    }
+
                     if (newKey.toLowerCase().includes('uuid')) {
                         value = value.toString();
+                    }
+
+                    if (newKey.toLocaleLowerCase() === 'fecha' && value) {
+                        value = this.formatDateToDDMMYYYY(value);
                     }
 
                     updatedRecord[newKey] = value;

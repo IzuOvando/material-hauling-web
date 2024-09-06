@@ -10,7 +10,10 @@ export type Printer = {
 
 export type FacetedFilter = {
   field: keyof Acarreos | keyof Gasolina;
-  options: string[];
+  options: {
+    value: string;
+    count: number;
+  }[];
 };
 
 export type Ticket = Acarreos | Gasolina;

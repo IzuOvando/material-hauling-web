@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
 import FileProcessor from "@/actions/convert";
+import { invalidateFacetsCache } from "@/actions/tickets";
 
 export async function POST(req: NextRequest) {
   if (req.method !== "POST") {
@@ -13,10 +14,11 @@ export async function POST(req: NextRequest) {
 
   try {
     const data = await req.json();
-    const { fileName, area, excelBlobUrl } = data;
+    const { fileName, area, excelBlobUrl, frente } = data;
 
     const fileProcessor = new FileProcessor();
     await fileProcessor.processFiles(fileName, area, excelBlobUrl);
+    await invalidateFacetsCache(frente, area);
 
     return new Response(
       JSON.stringify({ message: "Files processed successfully" }),

@@ -1,0 +1,25 @@
+version: "1.0"
+
+services:
+  database:
+    image: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: sedena_tickets
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: N0M3L0S3
+
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"
+
+  serverless-redis-http:
+    ports:
+      - "8079:80"
+    image: hiett/serverless-redis-http:latest
+    environment:
+      SRH_MODE: env
+      SRH_TOKEN: dev_token
+      SRH_CONNECTION_STRING: "redis://redis:6379"

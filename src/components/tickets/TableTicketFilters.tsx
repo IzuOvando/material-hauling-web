@@ -7,6 +7,8 @@ import { TableTicketFacetedFilter } from "./TableTicketFacetedFilter";
 import { FacetedFilter, TicketArea } from "@/types";
 import { FILTER_FIELDS } from "@/actions/tickets/helpers";
 import { useTableTicketsGlobal } from "@/contexts";
+import { useSearchParams } from "next/navigation";
+import axios from "axios";
 
 interface TableTicketFiltersProps {
   frente: string;
@@ -22,8 +24,11 @@ export function TableTicketFilters({ frente, area }: TableTicketFiltersProps) {
   );
   const [activeFields, setActiveFields] = useState<Set<string>>(new Set());
   const [isFiltered, setIsFiltered] = useState(false);
+  const [filterParams, setFilterParams] = useState<string | null>(null);
   const facetsRefs = useRef<any[]>([]);
+  const facetsRequestCancelaToken = useRef(axios.CancelToken.source());
 
+  const activeParams = useSearchParams();
   const { updateFilters, cleanFilters } = useTableTicketsGlobal();
 
   const handleCleanFilters = () => {
@@ -49,28 +54,41 @@ export function TableTicketFilters({ frente, area }: TableTicketFiltersProps) {
   }, []);
 
   useEffect(() => {
+    const newFiltersParams = activeParams.get("filters");
+    if (newFiltersParams !== filterParams) setFilterParams(newFiltersParams);
+  }, [activeParams]);
+
+  useEffect(() => {
     const getFacets = () => {
+      if (facetsRequestCancelaToken.current)
+        facetsRequestCancelaToken.current.cancel();
+
+      facetsRequestCancelaToken.current = axios.CancelToken.source();
+
       const params = new URLSearchParams();
       params.set("frente", frente);
       params.set("area", area);
-      fetch(`/api/frente/tickets/facets?${params.toString()}`)
-        .then((res) => {
-          return res.json();
+      if (filterParams) params.set("filters", filterParams);
+      axios
+        .get(`/api/frente/tickets/facets?${params.toString()}`, {
+          cancelToken: facetsRequestCancelaToken.current.token,
         })
-        .then((data: any) => {
-          setFacets(data.facets);
+        .then((res: any) => {
+          setFacets(res.data.facets);
         })
         .catch((error) => {
+          if (axios.isCancel(error)) return; // Canceled request
           console.error("Error fetching facets:", error);
         });
     };
 
     getFacets();
-  }, [frente, area]);
+  }, [frente, area, filterParams]);
 
   useEffect(() => {
     setIsFiltered(activeFields.size > 0);
   }, [activeFields]);
+
   return (
     <div className="flex items-center justify-between">
       <div className="flex flex-1 items-center gap-2 flex-wrap justify-center lg:justify-normal">

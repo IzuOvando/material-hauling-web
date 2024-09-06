@@ -88,9 +88,9 @@ const TableTicket = (props: TableTicketProps) => {
 
   return (
     <TableTicketsProvider>
-      <div className="flex items-center justify-center pb-4 flex-wrap lg:justify-start lg:flex-nowrap">
+      <div className="flex items-center justify-center pb-4 flex-wrap lg:justify-start lg:flex-nowrap gap-3">
         <Button
-          className="bg-accent hover:bg-accent-light active:bg-accent-dark lg:mr-3 mb-3 lg:mb-0"
+          className="bg-accent hover:bg-accent-light active:bg-accent-dark"
           disabled={disablePrintTickets}
           onClick={() => setOpenPrintTickets(true)}
         >

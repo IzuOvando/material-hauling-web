@@ -51,18 +51,28 @@ const meses = [
 ];
 
 function parseSpanishDate(dateStr: string): Date {
-  const regex = /(\d{1,2}) de (\w+) de (\d{4})/;
-  const match = regex.exec(dateStr);
-  if (!match) {
-    throw new Error(`Fecha no válida: ${dateStr}`);
+
+  const ddmmyyyyRegex = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/;
+  const ddmmyyyyMatch = ddmmyyyyRegex.exec(dateStr);
+  if (ddmmyyyyMatch) {
+    const day = parseInt(ddmmyyyyMatch[1], 10);
+    const month = parseInt(ddmmyyyyMatch[2], 10);
+    const year = parseInt(ddmmyyyyMatch[3], 10);
+    return new Date(year, month - 1, day); // JavaScript months are 0-based
   }
 
-  const day = parseInt(match[1], 10);
-  const month = meses.indexOf(match[2].toLowerCase());
-  const year = parseInt(match[3], 10);
+  const spanishDateRegex = /(\d{1,2}) de (\w+) de (\d{4})/;
+  const spanishMatch = spanishDateRegex.exec(dateStr);
+  if (spanishMatch) {
+    const day = parseInt(spanishMatch[1], 10);
+    const month = meses.indexOf(spanishMatch[2].toLowerCase());
+    const year = parseInt(spanishMatch[3], 10);
+    return new Date(year, month, day);
+  }
 
-  return new Date(year, month, day);
+  throw new Error(`Fecha no válida: ${dateStr}`);
 }
+
 
 export const filteredDataConfig: Record<
   string,
@@ -76,7 +86,9 @@ export const filteredDataConfig: Record<
     const hora = parseHoraTime(cleanQuotes(data.hora))
 
     const fechaStr = cleanQuotes(data.fecha);
-    const [month, day, year] = fechaStr.split('-').map(part => parseInt(part, 10));
+    
+    const [day, month, year] = fechaStr.split('-').map(part => parseInt(part, 10));
+
     const fecha = new Date(year, month - 1, day);
 
     return {
