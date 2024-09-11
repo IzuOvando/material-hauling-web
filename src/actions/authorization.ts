@@ -15,12 +15,6 @@ export async function authenticate(
       error: "Required attributes username & password",
     };
 
-  if ((password as string).length < 6)
-    return {
-      attempts: attempts + 1,
-      error: "Password length should be more than 6 characters",
-    };
-
   try {
     await signIn("credentials", {
       username: username,
