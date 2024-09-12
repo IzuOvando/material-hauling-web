@@ -1,7 +1,7 @@
 import { Dispatch, SetStateAction } from "react";
 import { handleDeleteFiles } from "@/actions/deletefiles";
 import CONFIG from "@/config";
-import { upload } from '@vercel/blob/client';
+import { upload } from "@vercel/blob/client";
 import { Frente } from "@prisma/client";
 
 export async function handleFileUpload(
@@ -10,7 +10,7 @@ export async function handleFileUpload(
   file: File,
   setIsLoading: Dispatch<SetStateAction<boolean>>,
   toast: any,
-  onUpload: () => void,
+  onUpload: () => void
 ) {
   setIsLoading(true);
   const newFileName = `bbd_${frente.nombre}.xlsx`;
@@ -28,7 +28,7 @@ export async function handleFileUpload(
 
   const handleProductionUpload = async () => {
     const response = await upload(nameRoute, newFile, {
-      access: 'public',
+      access: "public",
       handleUploadUrl: `${apiUrl}/api/files/vercel`,
       clientPayload: clientPayload,
     });
@@ -53,7 +53,7 @@ export async function handleFileUpload(
   try {
     let uploadFunction;
 
-    if (process.env.NODE_ENV === 'production') {
+    if (process.env.NODE_ENV === "production") {
       uploadFunction = handleProductionUpload;
     } else {
       uploadFunction = handleDevelopmentUpload;
@@ -68,7 +68,12 @@ export async function handleFileUpload(
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ fileName: newFile.name, area: area, excelBlobUrl: blobUrl, }),
+        body: JSON.stringify({
+          fileName: newFile.name,
+          area: area,
+          excelBlobUrl: blobUrl,
+          frente: frente.nombre,
+        }),
       });
 
       if (processResponse.ok) {

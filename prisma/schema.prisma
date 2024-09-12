@@ -68,5 +68,6 @@ model Gasolina {
   frente         Frente   @relation("FrenteGasolina", fields: [frenteNombre], references: [nombre], onDelete: Cascade)
 
   @@index([frenteNombre, fecha])
-  @@index([frenteNombre, folio])
+  @@index([frenteNombre, placas])
+  @@index([frenteNombre, bomba])
 }

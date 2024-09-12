@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import { authenticate } from "@/actions/authorization";
+import sha256 from 'crypto-js/sha256';
 
 const CardLogin = () => {
   const [state, dispatch] = useFormState(authenticate, {
@@ -22,38 +23,66 @@ const CardLogin = () => {
   });
   const { toast } = useToast();
 
+  const sendErrorToast = (message: string) => {
+    const { dismiss } = toast({
+      title: "Error",
+      description: message,
+      variant: "destructive",
+    });
+
+    setTimeout(() => {
+      dismiss();
+    }, 2000);
+  };
+
   useEffect(() => {
-    const sendErrorToast = (message: string) => {
-      const { dismiss } = toast({
-        title: "Error",
-        description: message,
-        variant: "destructive",
-      });
-
-      setTimeout(() => {
-        dismiss();
-      }, 2000);
-    };
-
-    switch (state.error) {
-      case "Required attributes username & password":
-        sendErrorToast("Debes ingresar un username y password");
-        break;
-      case "Password length should be more than 6 characters":
-        sendErrorToast("La contraseña debe tener más de 6 caracteres");
-        break;
-      case "Invalid Credentials":
-        sendErrorToast("Usuario y/o contraseña son incorrectos");
-        break;
-      case "Something went wrong":
-        sendErrorToast("Tuvimos un problema, intentelo más tarde");
-        break;
+    if (state.error) {
+      switch (state.error) {
+        case "Required attributes username & password":
+          sendErrorToast("Debes ingresar un username y password");
+          break;
+        case "Password length should be more than 6 characters":
+          sendErrorToast("La contraseña debe tener más de 6 caracteres");
+          break;
+        case "Invalid Credentials":
+          sendErrorToast("Usuario y/o contraseña son incorrectos");
+          break;
+        case "Something went wrong":
+          sendErrorToast("Tuvimos un problema, inténtelo más tarde");
+          break;
+        default:
+          sendErrorToast("Ocurrió un error inesperado.");
+      }
     }
-  }, [state, toast]);
+  }, [state.error, toast]);
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const form = event.currentTarget as HTMLFormElement;
+    const formData = new FormData(form);
+    const username = formData.get("username") as string;
+    const password = formData.get("password") as string;
+
+    if (!username || !password) {
+      sendErrorToast("Debes ingresar un username y password");
+      return;
+    }
+
+    if (password.length <= 6) {
+      sendErrorToast("La contraseña debe tener más de 6 caracteres");
+      return;
+    }
+
+    const hashedPassword = sha256(password).toString();
+
+    formData.set("password", hashedPassword);
+
+    dispatch(formData);
+  };
 
   return (
     <Card className="w-[350px]">
-      <form action={dispatch}>
+      <form onSubmit={handleSubmit}>
         <CardHeader>
           <CardTitle>Ingresa Credenciales</CardTitle>
         </CardHeader>

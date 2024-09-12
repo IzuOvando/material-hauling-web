@@ -117,14 +117,14 @@ export const TableTicketFacetedFilter = forwardRef(
                     </Badge>
                   ) : (
                     options
-                      .filter((option) => selectedValues.has(option))
+                      .filter((option) => selectedValues.has(option.value))
                       .map((option) => (
                         <Badge
                           variant="secondary"
-                          key={option}
+                          key={option.value}
                           className="rounded-sm px-1 font-medium bg-green-50 group-hover:bg-primary-light group-hover:text-accent max-w-28 text-ellipsis overflow-hidden whitespace-nowrap inline-block"
                         >
-                          {formatter(option)}
+                          {formatter(option.value)}
                         </Badge>
                       ))
                   )}
@@ -140,12 +140,12 @@ export const TableTicketFacetedFilter = forwardRef(
               <CommandEmpty>Sin resultados</CommandEmpty>
               <CommandGroup>
                 {options.map((option) => {
-                  const isSelected = selectedValues.has(option);
+                  const isSelected = selectedValues.has(option.value);
                   return (
                     <CommandItem
-                      key={option}
+                      key={option.value}
                       className="cursor-pointer"
-                      onSelect={() => handleOnSelect(option, isSelected)}
+                      onSelect={() => handleOnSelect(option.value, isSelected)}
                     >
                       <div
                         className={cn(
@@ -160,7 +160,12 @@ export const TableTicketFacetedFilter = forwardRef(
                           className="h-4 w-4 text-accent"
                         />
                       </div>
-                      <span className="font-normal">{formatter(option)}</span>
+                      <span className="font-normal pr-3">
+                        {formatter(option.value)}
+                      </span>
+                      <span className="ml-auto flex h-4 w-4 items-center justify-center font-mono font-normal text-xs">
+                        {option.count}
+                      </span>
                     </CommandItem>
                   );
                 })}
