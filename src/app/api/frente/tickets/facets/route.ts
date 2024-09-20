@@ -24,9 +24,16 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Invalid area" }, { status: 400 });
   const frenteOnDB = await prisma.frente.findUnique({
     where: { nombre: frente },
+    select: { excelUrlGasolinaBlob: true, excelUrlAcarreosBlob: true },
   });
   if (!frenteOnDB)
     return NextResponse.json({ error: "Frente not found" }, { status: 404 });
+  // If is empty just return empty array
+  if (
+    (area === TicketArea.ACARREOS && !frenteOnDB.excelUrlAcarreosBlob) ||
+    (area === TicketArea.GASOLINA && !frenteOnDB.excelUrlGasolinaBlob)
+  )
+    return NextResponse.json({ facets: [] });
 
   // Preparing cache key
   const cacheKey = `facets_${frente}_${area}${getPartialKeyFilters(filters)}`;
@@ -38,7 +45,7 @@ export async function GET(req: NextRequest) {
   // Requesting facets from database and caching them
   try {
     const facets = await getFacetedFilters(frente, area as TicketArea, filters);
-    await setFacetedFiltersInCache(cacheKey, facets);
+    if (facets.length > 0) await setFacetedFiltersInCache(cacheKey, facets);
     return NextResponse.json({ facets });
   } catch (error) {
     console.error("Failed to get facets", error);
