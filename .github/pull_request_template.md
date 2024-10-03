@@ -10,7 +10,7 @@
 
 - [x] feature
 - [ ] realese
-- [ ] hotfix
+- [ ] bugfix
 - [ ] support
 
 ## How can be tested? 🔍

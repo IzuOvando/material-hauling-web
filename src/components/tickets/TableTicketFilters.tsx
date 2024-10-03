@@ -9,6 +9,7 @@ import { FILTER_FIELDS } from "@/actions/tickets/helpers";
 import { useTableTicketsGlobal } from "@/contexts";
 import { useSearchParams } from "next/navigation";
 import axios from "axios";
+import { useFrenteStore } from "@/store";
 
 interface TableTicketFiltersProps {
   frente: string;
@@ -30,6 +31,7 @@ export function TableTicketFilters({ frente, area }: TableTicketFiltersProps) {
 
   const activeParams = useSearchParams();
   const { updateFilters, cleanFilters } = useTableTicketsGlobal();
+  const { refreshFacetsKey } = useFrenteStore();
 
   const handleCleanFilters = () => {
     setActiveFields(new Set());
@@ -74,7 +76,8 @@ export function TableTicketFilters({ frente, area }: TableTicketFiltersProps) {
           cancelToken: facetsRequestCancelaToken.current.token,
         })
         .then((res: any) => {
-          setFacets(res.data.facets);
+          const { facets } = res.data;
+          if (facets.length > 0) setFacets(facets);
         })
         .catch((error) => {
           if (axios.isCancel(error)) return; // Canceled request
@@ -83,7 +86,7 @@ export function TableTicketFilters({ frente, area }: TableTicketFiltersProps) {
     };
 
     getFacets();
-  }, [frente, area, filterParams]);
+  }, [frente, area, filterParams, refreshFacetsKey]);
 
   useEffect(() => {
     setIsFiltered(activeFields.size > 0);
