@@ -3,7 +3,6 @@ import { FileDroper } from "@/components/common";
 import { useToast } from "@/components/ui/use-toast";
 import { getMetadataCamionFromFile } from "@/utils/excel/excelValidatorQRs";
 import { getCamionesQRSVG } from "@/utils/excel/generatorDownloadQrs";
-import MetaDataCamiones from "@/utils/qr/MetaDataCamiones";
 
 export default function QRPage() {
   const { toast } = useToast();
