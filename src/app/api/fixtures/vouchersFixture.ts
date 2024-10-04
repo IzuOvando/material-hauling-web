@@ -1,0 +1,86 @@
+export const vouchersFixture = [
+    {
+        voucherTime: "2024-10-01T12:00:00Z",
+        tiro: "Tiro 1",
+        origen: "Origen 1",
+        material: "Material 1",
+        placas: "ABC-123",
+        operador: "Operador 1",
+        turno: 2,
+        noEconomico: "12345",
+        empresa: "Empresa 1",
+        cubicacion: 100,
+        frenteNombre: "T6F3",
+        checkerName: "Checker 1",
+        noEmpleado: "001",
+        checkerNo: "C001"
+    },
+    {
+        voucherTime: "2024-10-01T12:00:00Z",
+        tiro: "Tiro 1",
+        origen: "Origen 1",
+        material: "Material 1",
+        placas: "ABC-123",
+        operador: "Operador 1",
+        turno: 2,
+        noEconomico: "12345",
+        empresa: "Empresa 1",
+        cubicacion: 100,
+        frenteNombre: "T6F3",
+        checkerName: "Checker 1",
+        noEmpleado: "001",
+        checkerNo: "C001"
+    },
+    {
+        voucherTime: "2024-10-01T12:00:00Z",
+        tiro: "Tiro 1",
+        origen: "Origen 1",
+        material: "Material 1",
+        placas: "ABC-123",
+        operador: "Operador 1",
+        turno: 2,
+        noEconomico: "12345",
+        empresa: "Empresa 1",
+        cubicacion: 100,
+        frenteNombre: "T6F3",
+        checkerName: "Checker 1",
+        noEmpleado: "001",
+        checkerNo: "C001"
+    },
+    {
+        voucherTime: "2024-10-01T12:00:00Z",
+        tiro: "Tiro 1",
+        origen: "Origen 1",
+        material: "Material 1",
+        placas: "ABC-123",
+        operador: "Operador 1",
+        turno: 2,
+        noEconomico: "12345",
+        empresa: "Empresa 1",
+        cubicacion: 100,
+        frenteNombre: "T6F3",
+        checkerName: "Checker 1",
+        noEmpleado: "001",
+        checkerNo: "C001"
+    },
+];
+
+export const invalidVouchersFixture = [
+    {
+        voucherTime: "2024-10-01T12:00:00Z",
+        tiro: "Tiro 1",
+        origen: "Origen 1",
+        material: "Material 1",
+        placas: "ABC-123",
+        operador: "Operador 1",
+        turno: 5,
+        noEconomico: "12345",
+        empresa: "Empresa 1",
+        cubicacion: 100,
+        frenteNombre: "64TP5",
+        checkerName: "Checker 1",
+        noEmpleado: "001",
+        checkerNo: "C001"
+    },
+];
+

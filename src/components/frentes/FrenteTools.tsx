@@ -27,6 +27,7 @@ const FrenteTools = ({ frentes }: { frentes: Frente[] }) => {
     selectedArea,
     setSelectedFrente,
     setSelectedArea,
+    refreshFacets,
     reset: resetFrente,
   } = useFrenteStore();
   const { resetSelection } = useTicketsSelectionStore();
@@ -79,18 +80,23 @@ const FrenteTools = ({ frentes }: { frentes: Frente[] }) => {
     setShowEditFrenteDialog(false);
     resetSelection();
     if (selectedFrente) fetchAreTickets(selectedFrente.nombre);
+    refreshFacets();
     router.refresh();
   };
 
   const handleOnAddFrente = (frente: string) => {
     setFrentesDisplay([
       ...frentesDisplay,
-      { nombre: frente, excelUrlGasolinaBlob: null, excelUrlAcarreosBlob: null }
+      {
+        nombre: frente,
+        excelUrlGasolinaBlob: null,
+        excelUrlAcarreosBlob: null,
+      },
     ]);
     setSelectedFrente({
       nombre: frente,
       excelUrlGasolinaBlob: null,
-      excelUrlAcarreosBlob: null
+      excelUrlAcarreosBlob: null,
     });
     setSelectedArea(TicketArea.ACARREOS);
   };
