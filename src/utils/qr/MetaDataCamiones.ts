@@ -7,10 +7,12 @@ class MetaDataCamiones {
   private operador: string | null = null;
   private turno: number | null = null;
   private frente: string | null = null;
-  private volumen: number | null = null;
+  private cubicacion: number | null = null;
   private idcamion: string | null = null;
+  private empresa: string | null = null;
+  private noempleado: string | null = null;
 
-  constructor() {}
+  constructor() { }
 
   public setPlacas(placas: string): MetaDataCamiones {
     if (!placas || placas.trim() === "") {
@@ -30,7 +32,7 @@ class MetaDataCamiones {
         "El volumen es requerido y debe ser mayor a 0."
       );
     }
-    this.volumen = volumen;
+    this.cubicacion = volumen;
     return this;
   }
 
@@ -78,6 +80,28 @@ class MetaDataCamiones {
     return this;
   }
 
+  public setEmpresa(empresa: string): MetaDataCamiones {
+    if (!empresa || empresa.trim() === "") {
+      throw new ValidationError(
+        "empresa",
+        "La empresa es requerida y no puede estar vacía."
+      );
+    }
+    this.empresa = empresa;
+    return this;
+  }
+
+  public setNoempleado(noempleado: string): MetaDataCamiones {
+    if (!noempleado || noempleado.trim() === "") {
+      throw new ValidationError(
+        "empresa",
+        "La empresa es requerida y no puede estar vacía."
+      );
+    }
+    this.noempleado = noempleado;
+    return this;
+  }
+
   private setIdcamion(): void {
     if (this.frente && this.noeconomico) {
       this.idcamion = `TM-${this.frente}-${this.noeconomico}`;
@@ -117,7 +141,11 @@ class MetaDataCamiones {
       this.turno !== null &&
       this.frente !== null &&
       this.frente !== "" &&
-      this.volumen !== null
+      this.empresa !== null &&
+      this.empresa !== "" &&
+      this.noempleado !== null &&
+      this.noempleado !== "" &&
+      this.cubicacion !== null
     );
   }
 }

@@ -9,18 +9,18 @@ const createMockFile = (name: string, type: string, contents: ArrayBuffer): File
 };
 
 describe('getMetadataCamionFromFile', () => {
-    const validHeaders = ["placas", "noeconomico", "operador", "turno", "frente", "volumen"];
+    const validHeaders = ["placas", "noeconomico", "operador", "turno", "frente", "cubicacion", "empresa", "noempleado"];
     const validData = [
         validHeaders,
-        ["GHI123", "006", "Ana Silva", 1, "T9F7", 400],
-        ["GHIJKD", "007", "Ana Silva", 2, "T3F5", 100],
+        ["GHI123", "006", "Ana Silva", 1, "T9F7", 400, "Mabina SA de CV", "568TXP"],
+        ["GHIJKD", "007", "Ana Silva", 2, "T3F5", 100, "Mabina SA de CV", "568TXP"],
     ];
     const invalidData = [
         validHeaders,
-        ["ABC123", "001", "Juan Pérez", 1, "Frente A", 100],
-        ["XYZ789", "002", "María López", "2", "Frente B", "200"],
-        ["DEF456", "003", "Carlos Gómez", 2, "Frente C", "300"],
-        ["GHI123", "004", "Ana Silva", "1", "Frente D", 400],
+        ["ABC123", "001", "Juan Pérez", 1, "Frente A", 100, 300, 300],
+        ["XYZ789", "002", "María López", "2", "Frente B", "200", 300, 300],
+        ["DEF456", "003", "Carlos Gómez", 2, "Frente C", "300", "300", "300"],
+        ["GHI123", "004", "Ana Silva", "1", "Frente D", 400, "300", "300"]
     ];
     beforeEach(() => {
         jest.clearAllMocks();
@@ -80,9 +80,9 @@ describe('getMetadataCamionFromFile', () => {
         const dataWithEmptyRows = [
             validHeaders,
             [],
-            ["ABC123", "", "Juan Pérez", "Mañana", "Frente A", "100"],
-            ["", "", "", "", "", ""],
-            ["XYZ789", "002", "María López", "Tarde", "Frente B", "200"]
+            ["ABC123", "", "Juan Pérez", "Mañana", "Frente A", "100", "Mabina SA de CV", "568TXP"],
+            ["", "", "", "", "", "", "", ""],
+            ["XYZ789", "002", "María López", "Tarde", "Frente B", "200", "Mabina SA de CV", "568TXP"]
         ];
 
         const workbook = XLSX.utils.book_new();

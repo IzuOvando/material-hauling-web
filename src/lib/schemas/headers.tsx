@@ -34,9 +34,9 @@ export const schemas: Record<SchemaKeys, Set<string>> = {
         "operador",
         "turno",
         "frente",
-        "noEconomico",
+        "noeconomico",
         "cubicacion",
         "empresa",
-        "noEmpleado",
+        "noempleado",
     ])
 };

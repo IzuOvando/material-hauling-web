@@ -20,30 +20,36 @@ describe("getCamionesQRSVG", () => {
     const camiones = [
       {
         placas: "ABC123",
-        volumen: 100,
+        cubicacion: 100,
         noeconomico: "001",
         operador: "Juan Pérez",
         turno: 1,
         frente: "T6F9",
+        empresa: "Mabina SA de CV",
+        noempleado: "568TXP"
       },
       {
         placas: "XYZ789",
-        volumen: 200,
+        cubicacion: 200,
         noeconomico: "002",
         operador: "María López",
         turno: 2,
         frente: "T9F5",
+        empresa: "Mabina SA de CV",
+        noempleado: "568TXP"
       },
     ];
 
     const metadatas = camiones.map((camion) =>
       new MetaDataCamiones()
         .setPlacas(camion.placas)
-        .setVolumen(camion.volumen)
+        .setVolumen(camion.cubicacion)
         .setNoeconomico(camion.noeconomico)
         .setOperador(camion.operador)
         .setTurno(camion.turno)
         .setFrente(camion.frente)
+        .setEmpresa(camion.empresa)
+        .setNoempleado(camion.noempleado)
         .build()
     );
 
@@ -64,6 +70,8 @@ describe("getCamionesQRSVG", () => {
           .setOperador("Juan Pérez")
           .setTurno(1)
           .setFrente("")
+          .setEmpresa("")
+          .setNoempleado("")
           .build(),
       ];
       getCamionesQRSVG(mockDataCamiones);

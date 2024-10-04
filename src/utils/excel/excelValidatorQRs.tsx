@@ -13,7 +13,9 @@ export function getMetadataCamionFromFile(
     operador: "setOperador",
     turno: "setTurno",
     frente: "setFrente",
-    volumen: "setVolumen",
+    cubicacion: "setVolumen",
+    empresa: "setEmpresa",
+    noempleado: "setNoempleado"
   };
 
   const isValidHeaderRow = (
