@@ -172,31 +172,44 @@ class FileProcessor {
                 for (let R = range.s.r; R <= range.e.r; ++R) {
                     let row: string[] = [];
                     let empty = true;
-
+                    let emptyConsecutiveCount = 0;
+                
                     for (let C = range.s.c; C <= range.e.c; ++C) {
                         const cellAddress = { c: C, r: R };
                         const cellRef = XLSX.utils.encode_cell(cellAddress);
                         const cell = worksheet[cellRef];
                         let cellValue = cell ? cell.w || cell.v : "";
+                
+                        if (!cellValue || cellValue.trim() === '') {
+                            emptyConsecutiveCount++;
+                        } else {
+                            emptyConsecutiveCount = 0;
+                        }
+                
+                        if (emptyConsecutiveCount >= 3) {
+                            return;
+                        }
+                
                         if (typeof cellValue === 'string') {
                             cellValue = cellValue.replace(/"/g, '""');
                             if (cellValue.includes(',') || cellValue.includes('"')) {
                                 cellValue = `"${cellValue}"`;
                             }
                         }
+                
                         row.push(cellValue);
-
+                
                         if (this.isDateColumn(cellValue)) {
                             dateColumns.add(C);
                         }
-
+                
                         if (cellValue.trim() !== '') empty = false;
                     }
-
+                
                     if (empty) {
                         continue;
                     }
-
+                
                     if (!headerChecked) {
                         if (!isValidHeaderRow(row, validHeaders)) {
                             throw new Error("El encabezado del CSV no es válido.");
@@ -209,7 +222,7 @@ class FileProcessor {
                         headerChecked = true;
                         continue;
                     }
-
+                
                     row = row.map((cellValue, index) => {
                         if (dateColumns.has(index) && cellValue) {
                             if (key === "gasolina") {
@@ -220,11 +233,12 @@ class FileProcessor {
                             cellValue = cellValue.replace(/"/g, '""');
                             return `"${cellValue}"`;
                         }
-
+                
                         if (typeof cellValue === 'string' && (cellValue.includes(',') || cellValue.includes('"'))) {
                             cellValue = cellValue.replace(/"/g, '""');
                             return `"${cellValue}"`;
                         }
+                
                         const expectedType = 'string';
                         if (!validateCellType(cellValue, expectedType)) {
                             console.error(`Invalid cell type for value: ${cellValue}`);
@@ -232,8 +246,9 @@ class FileProcessor {
                         }
                         return (cellValue);
                     });
+                
                     csvOutput += row.join(",") + "\n";
-                }
+                }                
 
                 const fileNameWithoutExtension = path.basename(buffer.toString(), path.extname(buffer.toString()));
                 const match = fileNameWithoutExtension.match(/_(.*)/);
