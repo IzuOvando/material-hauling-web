@@ -3,14 +3,14 @@ import generateQRString from "./generateQRString";
 
 class MetaDataCamiones {
   private placas: string | null = null;
-  private noeconomico: string | null = null;
+  private noEconomico: string | null = null;
   private operador: string | null = null;
   private turno: number | null = null;
-  private frente: string | null = null;
+  private frenteNombre: string | null = null;
   private cubicacion: number | null = null;
-  private idcamion: string | null = null;
+  private idCamion: string | null = null;
   private empresa: string | null = null;
-  private noempleado: string | null = null;
+  private noEmpleado: string | null = null;
 
   constructor() { }
 
@@ -43,7 +43,7 @@ class MetaDataCamiones {
         "El No. Economico es requerido y no puede estar vacío."
       );
     }
-    this.noeconomico = noeconomico;
+    this.noEconomico = noeconomico;
     return this;
   }
 
@@ -76,7 +76,7 @@ class MetaDataCamiones {
         "El frente debe ser un valor de 4 caracteres alfanuméricos."
       );
     }
-    this.frente = frente;
+    this.frenteNombre = frente;
     return this;
   }
 
@@ -98,13 +98,13 @@ class MetaDataCamiones {
         "La empresa es requerida y no puede estar vacía."
       );
     }
-    this.noempleado = noempleado;
+    this.noEmpleado = noempleado;
     return this;
   }
 
   private setIdcamion(): void {
-    if (this.frente && this.noeconomico) {
-      this.idcamion = `TM-${this.frente}-${this.noeconomico}`;
+    if (this.frenteNombre && this.noEconomico) {
+      this.idCamion = `TM-${this.frenteNombre}-${this.noEconomico}`;
     } else {
       throw new InvalidDataError(
         "Frente y No Economico deben estar establecidos para generar el ID del camión."
@@ -118,7 +118,7 @@ class MetaDataCamiones {
   }
 
   public getIdCamion() {
-    return this.idcamion;
+    return this.idCamion;
   }
 
   public toQR() {
@@ -132,19 +132,19 @@ class MetaDataCamiones {
     return (
       this.placas !== null &&
       this.placas !== "" &&
-      this.noeconomico !== null &&
-      this.noeconomico !== "" &&
-      this.idcamion !== null &&
-      this.idcamion !== "" &&
+      this.noEconomico !== null &&
+      this.noEconomico !== "" &&
+      this.idCamion !== null &&
+      this.idCamion !== "" &&
       this.operador !== null &&
       this.operador !== "" &&
       this.turno !== null &&
-      this.frente !== null &&
-      this.frente !== "" &&
+      this.frenteNombre !== null &&
+      this.frenteNombre !== "" &&
       this.empresa !== null &&
       this.empresa !== "" &&
-      this.noempleado !== null &&
-      this.noempleado !== "" &&
+      this.noEmpleado !== null &&
+      this.noEmpleado !== "" &&
       this.cubicacion !== null
     );
   }
