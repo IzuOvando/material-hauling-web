@@ -13,7 +13,8 @@ export const vouchersFixture = [
         frenteNombre: "T6F3",
         checkerName: "Checker 1",
         noEmpleado: "001",
-        checkerNo: "C001"
+        checkerNo: "C001",
+        idCamion: "asda312d",
     },
     {
         voucherTime: "2024-10-01T12:00:00Z",
@@ -29,7 +30,8 @@ export const vouchersFixture = [
         frenteNombre: "T6F3",
         checkerName: "Checker 1",
         noEmpleado: "001",
-        checkerNo: "C001"
+        checkerNo: "C001",
+        idCamion: "asda312d",
     },
     {
         voucherTime: "2024-10-01T12:00:00Z",
@@ -45,7 +47,8 @@ export const vouchersFixture = [
         frenteNombre: "T6F3",
         checkerName: "Checker 1",
         noEmpleado: "001",
-        checkerNo: "C001"
+        checkerNo: "C001",
+        idCamion: "asda312d",
     },
     {
         voucherTime: "2024-10-01T12:00:00Z",
@@ -61,7 +64,8 @@ export const vouchersFixture = [
         frenteNombre: "T6F3",
         checkerName: "Checker 1",
         noEmpleado: "001",
-        checkerNo: "C001"
+        checkerNo: "C001",
+        idCamion: "asda312d",
     },
 ];
 
@@ -80,7 +84,8 @@ export const invalidVouchersFixture = [
         frenteNombre: "64TP5",
         checkerName: "Checker 1",
         noEmpleado: "001",
-        checkerNo: "C001"
+        checkerNo: "C001",
+        idCamion: "asda312d",
     },
 ];
 
