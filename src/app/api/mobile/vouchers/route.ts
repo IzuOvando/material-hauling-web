@@ -74,6 +74,7 @@ export async function POST(req: NextRequest) {
                         frenteNombre: voucher.frenteNombre,
                         checkerName: voucher.checkerName,
                         noEmpleado: voucher.noEmpleado,
+                        idCamion: voucher.idCamion,
                         ...(voucher.checkerNo && { checkerNo: voucher.checkerNo }),
                     },
                 })
