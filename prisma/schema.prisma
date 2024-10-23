@@ -18,11 +18,33 @@ model User {
 }
 
 model Frente {
-  nombre               String     @id @unique
+  nombre               String          @id @unique
   excelUrlGasolinaBlob String?
   excelUrlAcarreosBlob String?
-  ticketsGasolina      Gasolina[] @relation("FrenteGasolina")
-  ticketsAcarreos      Acarreos[] @relation("FrenteAcarreos")
+  ticketsGasolina      Gasolina[]      @relation("FrenteGasolina")
+  ticketsAcarreos      Acarreos[]      @relation("FrenteAcarreos")
+  VoucherCamion        VoucherCamion[] @relation("FrenteVoucherCamion")
+}
+
+model VoucherCamion {
+  uuid         String   @id @default(uuid())
+  createdAt    DateTime @default(now())
+  voucherTime  DateTime
+  tiro         String
+  origen       String
+  material     String
+  placas       String
+  operador     String
+  turno        Int
+  noEconomico  String
+  empresa      String
+  cubicacion   Float
+  checkerName  String
+  noEmpleado   String
+  idCamion     String
+  checkerNo    String?
+  frenteNombre String
+  frente       Frente   @relation("FrenteVoucherCamion", fields: [frenteNombre], references: [nombre], onDelete: Cascade)
 }
 
 model Acarreos {

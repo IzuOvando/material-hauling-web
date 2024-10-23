@@ -6,6 +6,7 @@ const createJestConfig = nextJest({
 });
 
 const config: Config = {
+
   // All imported modules in your tests should be mocked automatically
   // automock: false,
 
@@ -35,7 +36,9 @@ const config: Config = {
   // Indicates which provider should be used to instrument code for coverage
   coverageProvider: "v8",
   testEnvironment: "jsdom",
-
+  moduleNameMapper: {
+    "^@/(.*)$": "<rootDir>/src/$1", // Mapea el alias '@' a la carpeta 'src'
+  },
   // A list of reporter names that Jest uses when writing coverage reports
   // coverageReporters: [
   //   "json",
