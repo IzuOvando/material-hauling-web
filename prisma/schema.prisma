@@ -41,9 +41,9 @@ model VoucherCamion {
   cubicacion   Float
   checkerName  String
   noEmpleado   String
-  idCamion     String
   checkerNo    String?
   frenteNombre String
+  idCamion     String
   frente       Frente   @relation("FrenteVoucherCamion", fields: [frenteNombre], references: [nombre], onDelete: Cascade)
 }
 
