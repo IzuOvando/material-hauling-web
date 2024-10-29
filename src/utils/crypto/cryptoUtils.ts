@@ -1,12 +1,15 @@
-import crypto from 'crypto';
+import CryptoJS from 'crypto-js';
 
 export function generateSaltAndHash(data: string) {
-  const salt = crypto.randomBytes(16).toString('hex');
-  const iterations = 300000;
-  const keyLength = 64;
-  const digest = 'sha512';
+  const salt = CryptoJS.lib.WordArray.random(16).toString(CryptoJS.enc.Hex);
+  const iterations = 5000;
+  const keySize = 64 / 4;
 
-  const hash = crypto.pbkdf2Sync(data, salt, iterations, keyLength, digest).toString('hex');
+  const hash = CryptoJS.PBKDF2(data, salt, {
+    keySize: keySize,
+    iterations: iterations,
+    hasher: CryptoJS.algo.SHA512,
+  }).toString(CryptoJS.enc.Hex);
 
   return { salt, hash };
 }
