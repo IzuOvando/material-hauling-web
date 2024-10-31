@@ -69,11 +69,11 @@ class MetaDataCamiones {
   }
 
   public setFrente(frente: string): MetaDataCamiones {
-    const frenteRegex = /^[a-zA-Z0-9]{4}$/;
+    const frenteRegex = /^[a-zA-Z0-9]{1,6}$/;
     if (!frente || !frenteRegex.test(frente)) {
       throw new ValidationError(
         "frente",
-        "El frente debe ser un valor de 4 caracteres alfanuméricos."
+        "El frente debe ser un valor alfanumérico de hasta 6 caracteres."
       );
     }
     this.frenteNombre = frente;
@@ -125,7 +125,20 @@ class MetaDataCamiones {
     if (!this.isComplete()) {
       throw new Error("Faltan campos requeridos para generar el QR.");
     }
-    return generateQRString(JSON.stringify(this));
+
+    const qrText = [
+      `Placas: ${this.placas}`,
+      `No Economico: ${this.noEconomico}`,
+      `Operador: ${this.operador}`,
+      `Turno: ${this.turno}`,
+      `Frente: ${this.frenteNombre}`,
+      `Cubicacion: ${this.cubicacion}`,
+      `Empresa: ${this.empresa}`,
+      `No Empleado: ${this.noEmpleado}`,
+      `Id Camion: ${this.idCamion}`
+    ].join('\n');
+
+    return generateQRString(qrText);
   }
 
   private isComplete(): boolean {

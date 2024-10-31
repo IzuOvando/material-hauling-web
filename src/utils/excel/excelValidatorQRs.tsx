@@ -101,7 +101,7 @@ export function getMetadataCamionFromFile(
             const qrBuilder = new MetaDataCamiones();
 
             headers.forEach((header, index) => {
-              const normalizedHeader = header.trim().toLowerCase();
+              const normalizedHeader = header.trim().toLowerCase().replace(/\s+/g, "");
               const field = Object.keys(headerToFieldMap).find((key) =>
                 normalizedHeader.includes(key)
               );
