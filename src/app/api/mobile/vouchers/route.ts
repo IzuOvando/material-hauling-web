@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/db";
 import { Prisma } from "@prisma/client";
 import { VoucherCamion as PrismaVoucherCamion } from "@prisma/client";
+import { TokenAuthenticator } from "@/auth/TokenAuthenticator";
 import {
     ValidationError,
     validateFrenteNombre,
@@ -10,6 +11,13 @@ import {
 } from '@/utils/validators';
 
 export async function POST(req: NextRequest) {
+
+    const authHeader = req.headers.get("authorization");
+    const accessToken = authHeader && authHeader.split(" ")[1];
+
+    if (!accessToken || !TokenAuthenticator.verify(accessToken)) {
+        return NextResponse.json({ message: "Unauthorized, provide valid credentials to perform this action" }, { status: 401 });
+    }
 
     let requestBody;
 

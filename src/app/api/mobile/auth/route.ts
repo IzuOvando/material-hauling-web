@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { validateUser } from '@/lib/db/validateUser';
 import { generateSaltAndHash } from '@/utils/crypto/cryptoUtils';
+import { TokenAuthenticator } from '@/auth/TokenAuthenticator';
 
 export async function POST(request: Request) {
   try {
@@ -16,8 +17,9 @@ export async function POST(request: Request) {
     }
 
     const concatenated = `${username}:${user.password}`;
-
     const { salt, hash } = generateSaltAndHash(concatenated);
+
+    const tokens = TokenAuthenticator.authenticate(username, user.rol);
 
     return NextResponse.json(
       {
@@ -25,6 +27,7 @@ export async function POST(request: Request) {
           salt,
           hash,
         },
+        tokens,
       },
       { status: 201 }
     );
