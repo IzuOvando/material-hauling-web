@@ -20,53 +20,62 @@ export async function POST(req: NextRequest) {
     }
 
     let requestBody;
+    let vouchersArray
 
     try {
         requestBody = await req.json();
-
-        const { frenteNombre, vouchers } = requestBody;
-        if (!vouchers || !Array.isArray(vouchers) || vouchers.length === 0) {
-            return NextResponse.json({ error: "No vouchers data provided" }, { status: 400 });
+        vouchersArray = Object.values(requestBody) as PrismaVoucherCamion[];
+        const frenteNombres = new Set(vouchersArray.map(voucher => voucher.frenteNombre).filter(Boolean));
+        if (frenteNombres.size !== 1) {
+            return NextResponse.json({ error: "Inconsistent frenteNombre across vouchers" }, { status: 400 });
         }
 
-        validateFrenteNombre(frenteNombre);
+        const frenteNombre = frenteNombres.values().next().value as string;
+        if (!vouchersArray || vouchersArray.length === 0) {
+            return NextResponse.json({ error: "No vouchers data provided" }, { status: 400 });
+        }
+        if (typeof frenteNombre === 'string') {
+            validateFrenteNombre(frenteNombre);
+            await validateFrenteExists(frenteNombre, prisma);
+        } else {
+            return NextResponse.json({ error: "Invalid frenteNombre value" }, { status: 400 });
+        }
 
-        await validateFrenteExists(frenteNombre, prisma);
+        const validationErrors: ValidationError[] = [];
 
+        for (const voucher of vouchersArray) {
+            try {
+                if (voucher.turno !== undefined) {
+                    validateTurno(voucher.turno);
+                } else {
+                    validationErrors.push(new ValidationError("turno", "Turno is required"));
+                }
+            } catch (error) {
+                if (error instanceof ValidationError) {
+                    validationErrors.push(error);
+                } else {
+                    console.error("Unexpected validation error:", error);
+                }
+            }
+        }
+        if (validationErrors.length > 0) {
+            return NextResponse.json(
+                {
+                    errors: validationErrors.map(e => ({ field: e.field, message: e.message }))
+                },
+                { status: 400 }
+            );
+        }
+    
     } catch (error) {
         if (error instanceof ValidationError) {
             return NextResponse.json({ error: error.message, field: error.field }, { status: 400 });
         }
         return NextResponse.json({ error: "Invalid JSON format or validation error" }, { status: 400 });
     }
-
-    const voucherData: PrismaVoucherCamion[] = requestBody.vouchers;
-    const validationErrors: ValidationError[] = [];
-
-    for (const voucher of voucherData) {
-        try {
-            validateTurno(voucher.turno);
-        } catch (error) {
-            if (error instanceof ValidationError) {
-                validationErrors.push(error);
-            } else {
-                console.error("Unexpected validation error:", error);
-            }
-        }
-    }
-
-    if (validationErrors.length > 0) {
-        return NextResponse.json(
-            {
-                errors: validationErrors.map(e => ({ field: e.field, message: e.message }))
-            },
-            { status: 400 }
-        );
-    }
-
     try {
         await prisma.$transaction(
-            voucherData.map((voucher) =>
+            vouchersArray.map((voucher) =>
                 prisma.voucherCamion.create({
                     data: {
                         voucherTime: voucher.voucherTime,
