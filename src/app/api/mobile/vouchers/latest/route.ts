@@ -29,7 +29,7 @@ export async function GET(req: NextRequest) {
     }
 
     const vouchers: PrismaVoucherCamion[] = await prisma.voucherCamion.findMany({
-      orderBy: { createdAt: "desc" },
+      orderBy: { voucherTime: "desc" },
       take: limit,
     });
 
