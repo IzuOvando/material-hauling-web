@@ -23,3 +23,11 @@ services:
       SRH_MODE: env
       SRH_TOKEN: dev_token
       SRH_CONNECTION_STRING: "redis://redis:6379"
+  app:
+    image: node:18.17.0
+    working_dir: /app
+    volumes:
+      - .:/app
+    command: npm run dev 
+    ports:
+      - "3000:3000"

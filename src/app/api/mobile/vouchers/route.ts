@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
     const accessToken = authHeader && authHeader.split(" ")[1];
 
     if (!accessToken || !TokenAuthenticator.verify(accessToken)) {
-        return NextResponse.json({ message: "Unauthorized, provide valid credentials to perform this action" }, { status: 401 });
+        return NextResponse.json({ message: "No autorizado, proporcione credenciales válidas para realizar esta acción" }, { status: 401 });
     }
 
     let requestBody;
@@ -27,18 +27,18 @@ export async function POST(req: NextRequest) {
         vouchersArray = Object.values(requestBody) as PrismaVoucherCamion[];
         const frenteNombres = new Set(vouchersArray.map(voucher => voucher.frenteNombre).filter(Boolean));
         if (frenteNombres.size !== 1) {
-            return NextResponse.json({ error: "Inconsistent frenteNombre across vouchers" }, { status: 400 });
+            return NextResponse.json({ error: "Inconsistencia en el campo 'frente' entre los vouchers" }, { status: 400 });
         }
 
         const frenteNombre = frenteNombres.values().next().value as string;
         if (!vouchersArray || vouchersArray.length === 0) {
-            return NextResponse.json({ error: "No vouchers data provided" }, { status: 400 });
+            return NextResponse.json({ error: "No se proporcionaron datos de vouchers" }, { status: 400 });
         }
         if (typeof frenteNombre === 'string') {
             validateFrenteNombre(frenteNombre);
             await validateFrenteExists(frenteNombre, prisma);
         } else {
-            return NextResponse.json({ error: "Invalid frenteNombre value" }, { status: 400 });
+            return NextResponse.json({ error: "Este frente no existe en la base de datos global" }, { status: 400 });
         }
 
         const validationErrors: ValidationError[] = [];
@@ -48,13 +48,13 @@ export async function POST(req: NextRequest) {
                 if (voucher.turno !== undefined) {
                     validateTurno(voucher.turno);
                 } else {
-                    validationErrors.push(new ValidationError("turno", "Turno is required"));
+                    validationErrors.push(new ValidationError("turno", "El campo 'turno' es requerido"));
                 }
             } catch (error) {
                 if (error instanceof ValidationError) {
                     validationErrors.push(error);
                 } else {
-                    console.error("Unexpected validation error:", error);
+                    console.error("Error de validación inesperado:", error);
                 }
             }
         }
@@ -71,7 +71,7 @@ export async function POST(req: NextRequest) {
         if (error instanceof ValidationError) {
             return NextResponse.json({ error: error.message, field: error.field }, { status: 400 });
         }
-        return NextResponse.json({ error: "Invalid JSON format or validation error" }, { status: 400 });
+        return NextResponse.json({ error: "Formato JSON inválido o error de validación" }, { status: 400 });
     }
     try {
         await prisma.$transaction(
@@ -100,15 +100,15 @@ export async function POST(req: NextRequest) {
     } catch (error) {
         if (error instanceof Prisma.PrismaClientValidationError) {
             return NextResponse.json(
-                { error: "Validation error with the data provided" },
+                { error: "Error de validación con los datos proporcionados" },
                 { status: 400 }
             );
         }
         return NextResponse.json(
-            { error: "Internal Server Error" },
+            { error: "Error interno del servidor" },
             { status: 500 }
         );
     }
 
-    return NextResponse.json({ message: "Vouchers created successfully" }, { status: 201 });
+    return NextResponse.json({ message: "Vouchers creados con éxito" }, { status: 201 });
 }

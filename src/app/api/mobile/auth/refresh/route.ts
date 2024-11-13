@@ -6,7 +6,7 @@ export async function POST(req: NextRequest) {
         const { refreshToken } = await req.json();
 
         if (!refreshToken) {
-            return NextResponse.json({ message: "Refresh token is required" }, { status: 400 });
+            return NextResponse.json({ message: "Se requiere un refresh token" }, { status: 400 });
         }
 
         const tokens = TokenAuthenticator.refresh(refreshToken);
@@ -16,16 +16,16 @@ export async function POST(req: NextRequest) {
         if (error instanceof Error) {
             switch (error.message) {
                 case "Invalid refreshToken: expired":
-                    return NextResponse.json({ message: "Refresh token has expired" }, { status: 401 });
+                    return NextResponse.json({ message: "El refresh token ha expirado" }, { status: 401 });
                 case "Invalid refreshToken: malformed":
-                    return NextResponse.json({ message: "Invalid or malformed refresh token" }, { status: 401 });
+                    return NextResponse.json({ message: "El refresh token es inválido o está mal formado" }, { status: 401 });
                 case "Invalid refreshToken claims":
-                    return NextResponse.json({ message: "Invalid refresh token claims" }, { status: 401 });
+                    return NextResponse.json({ message: "Los claims del refresh token son inválidos" }, { status: 401 });
                 default:
-                    return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
+                    return NextResponse.json({ message: "Error interno del servidor" }, { status: 500 });
             }
         }
 
-        return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
+        return NextResponse.json({ message: "Error interno del servidor" }, { status: 500 });
     }
 }

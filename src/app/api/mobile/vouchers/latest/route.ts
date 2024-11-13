@@ -10,7 +10,7 @@ export async function GET(req: NextRequest) {
     const accessToken = authHeader && authHeader.split(" ")[1];
 
     if (!accessToken || !TokenAuthenticator.verify(accessToken)) {
-      return NextResponse.json({ message: "Unauthorized, provide valid credentials to perform this action" }, { status: 401 });
+      return NextResponse.json({ message: "No autorizado, proporcione credenciales válidas para realizar esta acción" }, { status: 401 });
     }
 
     const { searchParams } = new URL(req.url);
@@ -21,7 +21,7 @@ export async function GET(req: NextRequest) {
       const parsedLimit = parseInt(limitParam, 10);
       if (isNaN(parsedLimit) || parsedLimit < 1 || parsedLimit > 50) {
         return NextResponse.json(
-          { message: "Limit must have a value between 1 and 50" },
+          { message: "El límite debe tener un valor entre 1 y 50" },
           { status: 400 }
         );
       }
@@ -35,10 +35,11 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(vouchers);
   } catch (error) {
-    console.error("Error retrieving vouchers:", error);
+    console.error("Error al recuperar los vouchers:", error);
     return NextResponse.json(
-      { message: "An error occurred while retrieving the vouchers" },
+      { message: "Ocurrió un error al recuperar los vouchers" },
       { status: 500 }
     );
   }
 }
+
