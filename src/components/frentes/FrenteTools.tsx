@@ -40,6 +40,7 @@ const FrenteTools = ({ frentes }: { frentes: Frente[] }) => {
   }>({
     [TicketArea.ACARREOS]: false,
     [TicketArea.GASOLINA]: false,
+    [TicketArea.CONCRETO]: false,
   });
   const [frentesDisplay, setFrentesDisplay] = useState<Frente[]>(frentes);
 
@@ -91,12 +92,14 @@ const FrenteTools = ({ frentes }: { frentes: Frente[] }) => {
         nombre: frente,
         excelUrlGasolinaBlob: null,
         excelUrlAcarreosBlob: null,
+        excelUrlConcretoBlob: null,
       },
     ]);
     setSelectedFrente({
       nombre: frente,
       excelUrlGasolinaBlob: null,
       excelUrlAcarreosBlob: null,
+      excelUrlConcretoBlob: null,
     });
     setSelectedArea(TicketArea.ACARREOS);
   };
@@ -107,6 +110,7 @@ const FrenteTools = ({ frentes }: { frentes: Frente[] }) => {
     setAreTickets({
       [TicketArea.ACARREOS]: false,
       [TicketArea.GASOLINA]: false,
+      [TicketArea.CONCRETO]: false,
     });
     setFrentesDisplay([...frentesDisplay.filter((f) => f.nombre !== name)]);
     router.push("/");

@@ -48,6 +48,7 @@ export const schemas: Record<SchemaKeys, Set<string>> = {
         "fecha",
         "planta",
         "fc",
+        "uso",
         "cubicacion",
         "ubicacion",
         "elemento",

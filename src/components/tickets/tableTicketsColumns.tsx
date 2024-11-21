@@ -326,6 +326,12 @@ const concretoColumns: ColumnDef<Concreto>[] = [
     ),
   },
   {
+    accessorKey: "uso",
+    header: ({ column }) => (
+      <TableTicketColumnHeader column={column} title="Uso" />
+    ),
+  },
+  {
     accessorKey: "cliente",
     header: ({ column }) => (
       <TableTicketColumnHeader column={column} title="Cliente" />

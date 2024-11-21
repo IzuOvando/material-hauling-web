@@ -202,6 +202,7 @@ export const filteredDataConfig: Record<
       planta: cleanQuotes(data.planta),
       operador: cleanQuotes(data.operador),
       fc: cleanQuotes(data.fc),
+      uso: cleanQuotes(data.uso),
       ubicacion: normalizeValue(cleanQuotes(data.ubicacion)),
       rev: parseInt(cleanQuotes(data.rev)),
       tempConcreto: parseFloat(cleanQuotes(data.tempconcreto)),
