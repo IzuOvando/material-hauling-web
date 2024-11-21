@@ -22,9 +22,11 @@ model Frente {
   nombre               String          @id @unique
   excelUrlGasolinaBlob String?
   excelUrlAcarreosBlob String?
+  excelUrlConcretoBlob String?
   ticketsGasolina      Gasolina[]      @relation("FrenteGasolina")
   ticketsAcarreos      Acarreos[]      @relation("FrenteAcarreos")
   VoucherCamion        VoucherCamion[] @relation("FrenteVoucherCamion")
+  ticketsConcreto      Concreto[]      @relation("FrenteConcreto")
 }
 
 model VoucherCamion {
@@ -93,4 +95,35 @@ model Gasolina {
   @@index([frenteNombre, fecha])
   @@index([frenteNombre, placas])
   @@index([frenteNombre, bomba])
+}
+
+model Concreto {
+  uuid         String   @id @default(uuid())
+  createdAt    DateTime @default(now())
+  folio        String
+  frenteNombre String
+  cubicacion   Float
+  cliente      String
+  empresa      String
+  noPlanta     String
+  planta       String
+  operador     String
+  fecha        DateTime
+  fc           String
+  ubicacion    String
+  rev          Int
+  tempConcreto Float
+  tempAmbiente Float
+  noEconomico  String
+  marca        String
+  elemento     String
+  horaSalida   DateTime
+  horaLlegada  DateTime
+  frente       Frente   @relation("FrenteConcreto", fields: [frenteNombre], references: [nombre], onDelete: Cascade)
+
+  @@index([frenteNombre, fecha])
+  @@index([frenteNombre, elemento])
+  @@index([frenteNombre, empresa])
+  @@index([frenteNombre, noEconomico])
+  @@index([frenteNombre, ubicacion])
 }

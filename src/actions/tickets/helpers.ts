@@ -30,11 +30,38 @@ export const SORT_FIELDS = {
     "autorizacion",
     "saldoCompra",
   ],
+  [TicketArea.CONCRETO]: [
+    "uuid",
+    "fecha",
+    "horaSalida",
+    "horaLlegada",
+    "elemento",
+    "fc",
+    "cubicacion",
+    "rev",
+    "tempConcreto",
+    "tempAmbiente",
+    "marca",
+    "cliente",
+    "empresa",
+    "noPlanta",
+    "planta",
+    "ubicacion",
+    "noEconomico",
+    "operador",
+  ],
 };
 
 export const FILTER_FIELDS = {
   [TicketArea.ACARREOS]: ["fecha", "idCamion", "material", "empresa"],
   [TicketArea.GASOLINA]: ["fecha", "placas", "bomba"],
+  [TicketArea.CONCRETO]: [
+    "fecha",
+    "elemento",
+    "empresa",
+    "noEconomico",
+    "ubicacion",
+  ],
 };
 
 export function getOrderBy(sort: string, area: TicketArea): any {

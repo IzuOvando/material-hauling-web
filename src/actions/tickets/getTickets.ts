@@ -1,6 +1,6 @@
 import prisma from "@/lib/db";
 import { TicketArea } from "@/types";
-import { Acarreos, Gasolina } from "@prisma/client";
+import { Acarreos, Gasolina, Concreto } from "@prisma/client";
 import { getFilters, getOrderBy } from "./helpers";
 
 type PaginationConfig = {
@@ -8,8 +8,10 @@ type PaginationConfig = {
   limit: number;
 };
 
+type TicketsType = Acarreos[] | Gasolina[] | Concreto[];
+
 type getTicketReturn = {
-  tickets: Acarreos[] | Gasolina[];
+  tickets: TicketsType;
   total: number;
 };
 
@@ -27,11 +29,15 @@ export default async function getTickets(
     frenteNombre: frente,
   };
   // Return variables
-  let tickets: Acarreos[] | Gasolina[] = [];
+  let tickets: TicketsType = [];
   let count = 0;
 
   // Validations
-  if (![TicketArea.ACARREOS, TicketArea.GASOLINA].includes(area as TicketArea))
+  if (
+    ![TicketArea.ACARREOS, TicketArea.GASOLINA, TicketArea.CONCRETO].includes(
+      area as TicketArea
+    )
+  )
     return null;
   const frenteOnDB = await prisma.frente.findUnique({
     where: { nombre: frente },
@@ -60,7 +66,7 @@ export default async function getTickets(
         where,
       }),
     ]);
-  else
+  else if (area === TicketArea.GASOLINA)
     [tickets, count] = await prisma.$transaction([
       prisma.gasolina.findMany({
         skip: (page - 1) * limit,
@@ -69,6 +75,18 @@ export default async function getTickets(
         orderBy,
       }),
       prisma.gasolina.count({
+        where,
+      }),
+    ]);
+  else
+    [tickets, count] = await prisma.$transaction([
+      prisma.concreto.findMany({
+        skip: (page - 1) * limit,
+        take: limit,
+        where,
+        orderBy,
+      }),
+      prisma.concreto.count({
         where,
       }),
     ]);
@@ -84,12 +102,12 @@ export async function getSomeTickets(
   uuids: string[],
   area: TicketArea,
   sort?: string
-): Promise<Acarreos[] | Gasolina[]> {
+): Promise<TicketsType> {
   // Query variables
   let orderBy: any = undefined;
 
   // Return variables
-  let tickets: Acarreos[] | Gasolina[] = [];
+  let tickets: TicketsType = [];
 
   // Add order/sorting
   if (sort) orderBy = getOrderBy(sort, area);
@@ -103,8 +121,17 @@ export async function getSomeTickets(
       },
       orderBy,
     });
-  else
+  else if (area === TicketArea.GASOLINA)
     tickets = await prisma.gasolina.findMany({
+      where: {
+        uuid: {
+          in: uuids,
+        },
+      },
+      orderBy,
+    });
+  else
+    tickets = await prisma.concreto.findMany({
       where: {
         uuid: {
           in: uuids,
@@ -121,7 +148,7 @@ export async function getAllTickets(
   area: TicketArea,
   filters?: string,
   sort?: string
-): Promise<Acarreos[] | Gasolina[]> {
+): Promise<TicketsType> {
   // Query variables
   let where: any = {
     frenteNombre: frente,
@@ -138,18 +165,22 @@ export async function getAllTickets(
   if (sort) orderBy = getOrderBy(sort, area);
 
   // Return variables
-  let tickets: Acarreos[] | Gasolina[] = [];
+  let tickets: TicketsType = [];
 
   if (area === TicketArea.ACARREOS)
     tickets = await prisma.acarreos.findMany({
       where,
       orderBy,
     });
-  else
+  else if (area === TicketArea.GASOLINA)
     tickets = await prisma.gasolina.findMany({
       where,
       orderBy,
     });
-
+  else
+    tickets = await prisma.concreto.findMany({
+      where,
+      orderBy,
+    });
   return tickets;
 }

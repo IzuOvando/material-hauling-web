@@ -27,10 +27,10 @@ export async function POST(req: NextRequest) {
   });
 
   if (!foundFrente) {
-    return new NextResponse(
-      JSON.stringify({ error: "Frente not found" }),
-      { status: 404, headers: { "Content-Type": "application/json" } }
-    );
+    return new NextResponse(JSON.stringify({ error: "Frente not found" }), {
+      status: 404,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 
   let blobUrl: string | null;
@@ -38,8 +38,10 @@ export async function POST(req: NextRequest) {
 
   if (areaLower === "acarreos") {
     blobUrl = foundFrente.excelUrlAcarreosBlob;
-  } else {
+  } else if (areaLower === "gasolina") {
     blobUrl = foundFrente.excelUrlGasolinaBlob;
+  } else {
+    blobUrl = foundFrente.excelUrlConcretoBlob;
   }
 
   if (!blobUrl) {

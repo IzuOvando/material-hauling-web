@@ -9,7 +9,7 @@ import {
   VisibilityState,
   TableOptions,
 } from "@tanstack/react-table";
-import { Acarreos, Gasolina } from "@prisma/client";
+import { Acarreos, Gasolina, Concreto } from "@prisma/client";
 import {
   Table,
   TableHeader,
@@ -24,7 +24,7 @@ import { TableTicketFilters } from "./TableTicketFilters";
 import { Button } from "../ui/button";
 import { PrintTicketDialog } from ".";
 import { TicketArea } from "@/types";
-import { acarreosColumns, gasolinaColumns } from "./tableTicketsColumns";
+import { ticketsColumns } from "./tableTicketsColumns";
 import { useTicketsSelectionStore } from "@/store";
 import { TableTicketsProvider } from "@/contexts";
 
@@ -38,6 +38,11 @@ interface TableTicketGasolinaProps {
   tickets: Gasolina[];
 }
 
+interface TableTicketConcretoProps {
+  area: TicketArea.CONCRETO;
+  tickets: Concreto[];
+}
+
 interface TableTicketGeneralProps {
   frente?: string;
   total: number;
@@ -45,7 +50,11 @@ interface TableTicketGeneralProps {
   limit: number;
 }
 
-type TableTicketProps = (TableTicketAcarreoProps | TableTicketGasolinaProps) &
+type TableTicketProps = (
+  | TableTicketAcarreoProps
+  | TableTicketGasolinaProps
+  | TableTicketConcretoProps
+) &
   TableTicketGeneralProps;
 
 const TableTicket = (props: TableTicketProps) => {
@@ -57,9 +66,8 @@ const TableTicket = (props: TableTicketProps) => {
   const [openPrintTickets, setOpenPrintTickets] = useState(false);
   // Stores
   const { ticketsIds, selectedAll } = useTicketsSelectionStore();
-
-  const columns =
-    props.area === TicketArea.ACARREOS ? acarreosColumns : gasolinaColumns;
+  // Columns
+  const columns = ticketsColumns[props.area];
 
   const optionsTable: TableOptions<any> = {
     data: props.tickets,

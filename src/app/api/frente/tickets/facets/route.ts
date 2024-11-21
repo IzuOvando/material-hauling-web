@@ -20,18 +20,27 @@ export async function GET(req: NextRequest) {
       { error: "Required params frente and area" },
       { status: 400 }
     );
-  if (![TicketArea.ACARREOS, TicketArea.GASOLINA].includes(area as TicketArea))
+  if (
+    ![TicketArea.ACARREOS, TicketArea.GASOLINA, TicketArea.CONCRETO].includes(
+      area as TicketArea
+    )
+  )
     return NextResponse.json({ error: "Invalid area" }, { status: 400 });
   const frenteOnDB = await prisma.frente.findUnique({
     where: { nombre: frente },
-    select: { excelUrlGasolinaBlob: true, excelUrlAcarreosBlob: true },
+    select: {
+      excelUrlGasolinaBlob: true,
+      excelUrlAcarreosBlob: true,
+      excelUrlConcretoBlob: true,
+    },
   });
   if (!frenteOnDB)
     return NextResponse.json({ error: "Frente not found" }, { status: 404 });
   // If is empty just return empty array
   if (
     (area === TicketArea.ACARREOS && !frenteOnDB.excelUrlAcarreosBlob) ||
-    (area === TicketArea.GASOLINA && !frenteOnDB.excelUrlGasolinaBlob)
+    (area === TicketArea.GASOLINA && !frenteOnDB.excelUrlGasolinaBlob) ||
+    (area === TicketArea.CONCRETO && !frenteOnDB.excelUrlConcretoBlob)
   )
     return NextResponse.json({ facets: [] });
 

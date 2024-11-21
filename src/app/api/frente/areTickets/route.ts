@@ -8,7 +8,11 @@ export async function POST(req: NextRequest) {
 
     const frente = await prisma.frente.findUnique({
       where: { nombre },
-      select: { excelUrlGasolinaBlob: true, excelUrlAcarreosBlob: true, },
+      select: {
+        excelUrlGasolinaBlob: true,
+        excelUrlAcarreosBlob: true,
+        excelUrlConcretoBlob: true,
+      },
     });
 
     if (!frente) {
@@ -19,8 +23,15 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json({
-      [TicketArea.ACARREOS]: frente.excelUrlAcarreosBlob ? frente.excelUrlAcarreosBlob.length > 0 : false,
-      [TicketArea.GASOLINA]: frente.excelUrlGasolinaBlob ? frente.excelUrlGasolinaBlob.length > 0 : false,
+      [TicketArea.ACARREOS]: frente.excelUrlAcarreosBlob
+        ? frente.excelUrlAcarreosBlob.length > 0
+        : false,
+      [TicketArea.GASOLINA]: frente.excelUrlGasolinaBlob
+        ? frente.excelUrlGasolinaBlob.length > 0
+        : false,
+      [TicketArea.CONCRETO]: frente.excelUrlConcretoBlob
+        ? frente.excelUrlConcretoBlob.length > 0
+        : false,
     });
   } catch (error) {
     return NextResponse.json(

@@ -10,9 +10,10 @@ import {
   formatTime12Hour,
 } from "@/helpers/formatters/datetime";
 import { formatPrice, formatVolume } from "@/helpers/formatters/numbers";
-import { Acarreos, Gasolina } from "@prisma/client";
+import { Acarreos, Gasolina, Concreto } from "@prisma/client";
+import { TicketArea } from "@/types";
 
-export const acarreosColumns: ColumnDef<Acarreos>[] = [
+const acarreosColumns: ColumnDef<Acarreos>[] = [
   {
     id: "select",
     header: () => <TableTicketAllSelector />,
@@ -133,7 +134,7 @@ export const acarreosColumns: ColumnDef<Acarreos>[] = [
   },
 ];
 
-export const gasolinaColumns: ColumnDef<Gasolina>[] = [
+const gasolinaColumns: ColumnDef<Gasolina>[] = [
   {
     id: "select",
     header: () => <TableTicketAllSelector />,
@@ -233,3 +234,143 @@ export const gasolinaColumns: ColumnDef<Gasolina>[] = [
     ),
   },
 ];
+
+const concretoColumns: ColumnDef<Concreto>[] = [
+  {
+    id: "select",
+    header: () => <TableTicketAllSelector />,
+    cell: ({ row }) => <TableTicketRowSelector row={row} />,
+    enableSorting: false,
+    enableHiding: false,
+  },
+  {
+    accessorKey: "uuid",
+    header: ({ column }) => (
+      <TableTicketColumnHeader column={column} title="Folio" />
+    ),
+  },
+  {
+    accessorKey: "fecha",
+    header: ({ column }) => (
+      <TableTicketColumnHeader column={column} title="Fecha" />
+    ),
+    cell: ({ row }) => (
+      <>{formatLongSpanishDate(row.getValue("fecha") as Date)}</>
+    ),
+    filterFn: (row, id, value) => {
+      return value.includes(row.getValue(id));
+    },
+  },
+  {
+    accessorKey: "horaSalida",
+    header: ({ column }) => (
+      <TableTicketColumnHeader column={column} title="Hora Salida" />
+    ),
+    cell: ({ row }) => (
+      <>{formatTime12Hour(row.getValue("horaSalida") as Date, true)}</>
+    ),
+  },
+  {
+    accessorKey: "horaLlegada",
+    header: ({ column }) => (
+      <TableTicketColumnHeader column={column} title="Hora Llegada" />
+    ),
+    cell: ({ row }) => (
+      <>{formatTime12Hour(row.getValue("horaLlegada") as Date, true)}</>
+    ),
+  },
+  {
+    accessorKey: "elemento",
+    header: ({ column }) => (
+      <TableTicketColumnHeader column={column} title="Elemento" />
+    ),
+  },
+  {
+    accessorKey: "fc",
+    header: ({ column }) => (
+      <TableTicketColumnHeader column={column} title="F'c" />
+    ),
+  },
+  {
+    accessorKey: "cubicacion",
+    header: ({ column }) => (
+      <TableTicketColumnHeader column={column} title="Cubicación" />
+    ),
+    cell: ({ row }) => <>{formatVolume(row.getValue("cubicacion"), true)}</>,
+  },
+  {
+    accessorKey: "rev",
+    header: ({ column }) => (
+      <TableTicketColumnHeader column={column} title="Rev" />
+    ),
+    cell: ({ row }) => <>{row.getValue("rev")} cm</>,
+  },
+  {
+    accessorKey: "tempConcreto",
+    header: ({ column }) => (
+      <TableTicketColumnHeader column={column} title="T°Concreto" />
+    ),
+    cell: ({ row }) => <>{row.getValue("tempConcreto")} °C</>,
+  },
+  {
+    accessorKey: "tempAmbiente",
+    header: ({ column }) => (
+      <TableTicketColumnHeader column={column} title="T°Ambiente" />
+    ),
+    cell: ({ row }) => <>{row.getValue("tempAmbiente")} °C</>,
+  },
+  {
+    accessorKey: "marca",
+    header: ({ column }) => (
+      <TableTicketColumnHeader column={column} title="Marca" />
+    ),
+  },
+  {
+    accessorKey: "cliente",
+    header: ({ column }) => (
+      <TableTicketColumnHeader column={column} title="Cliente" />
+    ),
+  },
+  {
+    accessorKey: "empresa",
+    header: ({ column }) => (
+      <TableTicketColumnHeader column={column} title="Empresa" />
+    ),
+  },
+  {
+    accessorKey: "noPlanta",
+    header: ({ column }) => (
+      <TableTicketColumnHeader column={column} title="NoPlanta" />
+    ),
+  },
+  {
+    accessorKey: "planta",
+    header: ({ column }) => (
+      <TableTicketColumnHeader column={column} title="Planta" />
+    ),
+  },
+  {
+    accessorKey: "ubicacion",
+    header: ({ column }) => (
+      <TableTicketColumnHeader column={column} title="Ubicación" />
+    ),
+  },
+  {
+    accessorKey: "noEconomico",
+    header: ({ column }) => (
+      <TableTicketColumnHeader column={column} title="NoEconomico" />
+    ),
+  },
+  {
+    accessorKey: "operador",
+    header: ({ column }) => (
+      <TableTicketColumnHeader column={column} title="Operador" />
+    ),
+  },
+];
+
+export const ticketsColumns = {
+  [TicketArea.ACARREOS]: acarreosColumns,
+  [TicketArea.GASOLINA]: gasolinaColumns,
+  [TicketArea.CONCRETO]: concretoColumns,
+};

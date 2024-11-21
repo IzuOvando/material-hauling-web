@@ -6,7 +6,7 @@ import blobClient from "@/lib/blobClient";
 import axios from 'axios';
 import { Readable } from 'stream';
 import { schemas, SchemaKeys } from "@/lib/schemas/headers";
-import { CreateTicketDto, filteredDataConfig, isCreateAcarreosDto, isCreateGasolinaDto } from '@/lib/schemas/csv_schemas';
+import { CreateTicketDto, filteredDataConfig, isCreateAcarreosDto, isCreateGasolinaDto, isCreateConcretoaDto } from '@/lib/schemas/csv_schemas';
 import CONFIG from "@/config";
 
 
@@ -187,7 +187,8 @@ class FileProcessor {
                         }
                 
                         if (emptyConsecutiveCount >= 3) {
-                            return;
+                            console.warn(`Skipping the rest of the row due to 3 consecutive empty cells at row ${R}, column ${C}`);
+                            break;
                         }
                 
                         if (typeof cellValue === 'string') {
@@ -406,6 +407,73 @@ class FileProcessor {
                 });
 
                 await this.updateFrenteInBatches(cleanFrenteName, gasolinaUuids, 'ticketsGasolina');
+            } else if (key === 'concreto') {
+                const concretoData = records.filter(isCreateConcretoaDto).map(record => {
+                    const concretoEntry: {
+                        uuid?: string;
+                        frenteNombre: string;
+                        folio: string;
+                        cubicacion: number;
+                        cliente: string;
+                        empresa: string;
+                        fecha: Date;
+                        noPlanta: string;
+                        planta: string;
+                        operador: string;
+                        fc: string;
+                        ubicacion: string;
+                        rev: number;
+                        tempConcreto: number;
+                        tempAmbiente: number;
+                        noEconomico: string;
+                        marca: string;
+                        elemento: string;
+                        horaSalida: Date;
+                        horaLlegada: Date;
+                    } = {
+                        frenteNombre: record.frenteNombre,
+                        folio: record.folio,
+                        cubicacion: record.cubicacion,
+                        cliente: record.cliente,
+                        empresa: record.empresa,
+                        fecha: record.fecha,
+                        noPlanta: record.noPlanta,
+                        planta: record.planta,
+                        operador: record.operador,
+                        fc: record.fc,
+                        ubicacion: record.ubicacion,
+                        rev: record.rev,
+                        tempConcreto: record.tempConcreto,
+                        tempAmbiente: record.tempAmbiente,
+                        noEconomico: record.noEconomico,
+                        marca: record.marca,
+                        elemento: record.elemento,
+                        horaSalida: record.horaSalida,
+                        horaLlegada: record.horaLlegada,
+                    };
+
+                    if (record.uuid && record.uuid.trim() !== '') {
+                        concretoEntry.uuid = record.uuid;
+                    }
+
+                    return concretoEntry;
+                });
+
+                await prisma.concreto.createMany({
+                    data: concretoData,
+                    skipDuplicates: true,
+                });
+
+                const concretoUuids = await prisma.concreto.findMany({
+                    where: {
+                        frenteNombre: cleanFrenteName,
+                    },
+                    select: {
+                        uuid: true,
+                    },
+                });
+
+                await this.updateFrenteInBatches(cleanFrenteName, concretoUuids, 'ticketsConcreto');
             }
         } catch (error) {
             console.error("Error during batch processing:", error);
@@ -463,6 +531,11 @@ class FileProcessor {
                     where: { frenteNombre: cleanFrenteName },
                 });
                 console.log(`Deleted old acarreos records with frenteNombre: ${cleanFrenteName}`);
+            } else if (key === 'concreto') {
+                await prisma.concreto.deleteMany({
+                    where: { frenteNombre: cleanFrenteName },
+                });
+                console.log(`Deleted old concreto records with frenteNombre: ${cleanFrenteName}`);
             } else {
                 throw new Error(`Unsupported key: ${key}`);
             }
@@ -550,7 +623,7 @@ class FileProcessor {
     }
 
     public isValidKey(key: string): key is SchemaKeys {
-        return ['gasolina', 'acarreos'].includes(key);
+        return ['gasolina', 'acarreos', 'concreto'].includes(key);
     }
 
     public async streamToNodeReadable(stream: ReadableStream<Uint8Array>): Promise<Readable> {
@@ -631,6 +704,8 @@ class FileProcessor {
 
         const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
 
+        console.log(`${hours}:${formattedMinutes} ${suffix}`)
+
         return `${hours}:${formattedMinutes} ${suffix}`;
     }
 
@@ -662,6 +737,12 @@ class FileProcessor {
                         frenteNombre: cleanFrenteName,
                     },
                 });
+            } else if (key === 'concreto') {
+                records = await prisma.concreto.findMany({
+                    where: {
+                        frenteNombre: cleanFrenteName,
+                    },
+                });
             } else {
                 throw new Error(`Unsupported key: ${key}`);
             }
@@ -673,6 +754,14 @@ class FileProcessor {
                     let value = record[data];
 
                     if (newKey.toLowerCase() === 'hora' && value) {
+                        value = this.formatHour(value);
+                    }
+                    
+                    if (newKey.toLowerCase() === 'hora salida' && value) {
+                        value = this.formatHour(value);
+                    }
+
+                    if (newKey.toLowerCase() === 'hora llegada' && value) {
                         value = this.formatHour(value);
                     }
 
@@ -710,7 +799,10 @@ class FileProcessor {
 
             console.log('Excel file uploaded to Vercel Blob successfully.');
 
-            const updateField = key === 'acarreos' ? 'excelUrlAcarreosBlob' : 'excelUrlGasolinaBlob';
+            const updateField = key === 'acarreos' ? 'excelUrlAcarreosBlob' 
+            : key === 'gasolina' 
+            ? 'excelUrlGasolinaBlob'
+            : 'excelUrlConcretoBlob';
 
             await prisma.frente.update({
                 where: {

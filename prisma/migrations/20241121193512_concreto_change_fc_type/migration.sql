@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Concreto" ALTER COLUMN "fc" SET DATA TYPE TEXT;

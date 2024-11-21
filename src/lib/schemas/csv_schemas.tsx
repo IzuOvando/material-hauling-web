@@ -1,4 +1,4 @@
-import { Gasolina, Acarreos } from "@prisma/client";
+import { Gasolina, Acarreos, Concreto } from "@prisma/client";
 import { TicketArea } from "@/types";
 
 type CreateGasolinaDto = Omit<Gasolina, 'uuid' | 'createdAt'> & {
@@ -11,7 +11,11 @@ type CreateAcarreosDto = Omit<Acarreos, 'uuid' | 'createdAt'> & {
   tipoTicket: TicketArea.ACARREOS;
 };
 
-export type CreateTicketDto = CreateGasolinaDto | CreateAcarreosDto;
+type CreateConcretoDto = Omit<Concreto, 'uuid' | 'createdAt'> & {
+  uuid?: string;
+  tipoTicket: TicketArea.CONCRETO;
+};
+export type CreateTicketDto = CreateGasolinaDto | CreateAcarreosDto | CreateConcretoDto;
 
 export function isCreateAcarreosDto(
   dto: CreateTicketDto
@@ -23,6 +27,19 @@ export function isCreateGasolinaDto(
   dto: CreateTicketDto
 ): dto is CreateGasolinaDto {
   return dto.tipoTicket === TicketArea.GASOLINA;
+}
+
+export function isCreateConcretoaDto(
+  dto: CreateTicketDto
+): dto is CreateConcretoDto {
+  return dto.tipoTicket === TicketArea.CONCRETO;
+}
+
+function normalizeValue(value: string): string {
+  return value
+      .trim()
+      .replace(/\s+/g, ' ')
+      .replace(/\s*,\s*/g, ',');
 }
 
 function parseHoraTime(dateStr: string): Date {
@@ -58,7 +75,7 @@ function parseSpanishDate(dateStr: string): Date {
     const day = parseInt(ddmmyyyyMatch[1], 10);
     const month = parseInt(ddmmyyyyMatch[2], 10);
     const year = parseInt(ddmmyyyyMatch[3], 10);
-    return new Date(year, month - 1, day); // JavaScript months are 0-based
+    return new Date(year, month - 1, day);
   }
 
   const spanishDateRegex = /(\d{1,2}) de (\w+) de (\d{4})/;
@@ -73,6 +90,25 @@ function parseSpanishDate(dateStr: string): Date {
   throw new Error(`Fecha no válida: ${dateStr}`);
 }
 
+function normalizeKeysToLowerCase<T>(data: T): T {
+
+  if (typeof data !== "object" || data === null) {
+    return data;
+  }
+
+  if (Array.isArray(data)) {
+    return data.map(item => normalizeKeysToLowerCase(item)) as T;
+  }
+
+  return Object.keys(data).reduce((acc, key) => {
+    const normalizedKey = key.toLowerCase();
+    const value = (data as Record<string, unknown>)[key];
+    (acc as Record<string, unknown>)[normalizedKey] = normalizeKeysToLowerCase(value);
+    return acc;
+  }, {} as T);
+}
+
+
 
 export const filteredDataConfig: Record<
   string,
@@ -82,7 +118,8 @@ export const filteredDataConfig: Record<
     cleanQuotes: (str: string) => string
   ) => CreateTicketDto
 > = {
-  acarreos: (data, fileName, cleanQuotes) => {
+  acarreos: (rawData, fileName, cleanQuotes) => {
+    const data = normalizeKeysToLowerCase(rawData);
     const hora = parseHoraTime(cleanQuotes(data.hora))
 
     const fechaStr = cleanQuotes(data.fecha);
@@ -113,7 +150,8 @@ export const filteredDataConfig: Record<
       tipoTicket: TicketArea.ACARREOS,
     };
   },
-  gasolina: (data, fileName, cleanQuotes) => {
+  gasolina: (rawData, fileName, cleanQuotes) => {
+    const data = normalizeKeysToLowerCase(rawData);
     const hora = parseHoraTime(cleanQuotes(data.hora))
 
     const fecha = parseSpanishDate(cleanQuotes(data.fecha));
@@ -140,6 +178,44 @@ export const filteredDataConfig: Record<
         fileName.indexOf(".")
       ),
       tipoTicket: TicketArea.GASOLINA,
+    };
+  },
+  concreto: (rawData, fileName, cleanQuotes) => {
+    const data = normalizeKeysToLowerCase(rawData);
+    const horaSalida = parseHoraTime(cleanQuotes(data.horasalida))
+    const horaLlegada = parseHoraTime(cleanQuotes(data.horallegada))
+
+    const fechaStr = cleanQuotes(data.fecha);
+
+    const [day, month, year] = fechaStr.split('-').map(part => parseInt(part, 10));
+
+    const fecha = new Date(year, month - 1, day);
+
+    return {
+      uuid: cleanQuotes(data.uuid),
+      folio: cleanQuotes(data.folio),
+      cubicacion: parseFloat(cleanQuotes(data.cubicacion)),
+      cliente: cleanQuotes(data.cliente),
+      empresa: cleanQuotes(data.empresa),
+      fecha: fecha,
+      noPlanta: cleanQuotes(data.noplanta),
+      planta: cleanQuotes(data.planta),
+      operador: cleanQuotes(data.operador),
+      fc: cleanQuotes(data.fc),
+      ubicacion: normalizeValue(cleanQuotes(data.ubicacion)),
+      rev: parseInt(cleanQuotes(data.rev)),
+      tempConcreto: parseFloat(cleanQuotes(data.tempconcreto)),
+      tempAmbiente: parseFloat(cleanQuotes(data.tempambiente)),
+      noEconomico: cleanQuotes(data.noeconomico),
+      marca: cleanQuotes(data.marca),
+      elemento: normalizeValue(cleanQuotes(data.elemento)),
+      horaSalida: horaSalida,
+      horaLlegada: horaLlegada,
+      frenteNombre: fileName.substring(
+        fileName.indexOf("_") + 1,
+        fileName.indexOf(".")
+      ),
+      tipoTicket: TicketArea.CONCRETO,
     };
   },
 };

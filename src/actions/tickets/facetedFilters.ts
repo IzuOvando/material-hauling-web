@@ -1,6 +1,6 @@
 import prisma from "@/lib/db";
 import { FacetedFilter, TicketArea } from "@/types";
-import { Acarreos, Gasolina } from "@prisma/client";
+import { Acarreos, Gasolina, Concreto } from "@prisma/client";
 import { FILTER_FIELDS, getFilters } from "./helpers";
 import { kv } from "@vercel/kv";
 
@@ -25,7 +25,7 @@ export default async function getFacetedFilters(
 
   const facetedFilters: FacetedFilter[] = FILTER_FIELDS[area].map(
     (field, index) => ({
-      field: field as keyof Acarreos | keyof Gasolina,
+      field: field as keyof Acarreos | keyof Gasolina | keyof Concreto,
       options: distinctValues[index].map((distinct: DistinctValuesType) => {
         const value = distinct[field];
         return {
@@ -63,9 +63,22 @@ const getDistinctValues = async (
           [field]: "asc",
         },
       });
-    } else {
+    } else if (area === TicketArea.GASOLINA) {
       return prisma.gasolina.findMany({
         distinct: [field as keyof Gasolina],
+        where: {
+          frenteNombre: frente,
+        },
+        select: {
+          [field]: true,
+        },
+        orderBy: {
+          [field]: "asc",
+        },
+      });
+    } else {
+      return prisma.concreto.findMany({
+        distinct: [field as keyof Concreto],
         where: {
           frenteNombre: frente,
         },
@@ -122,9 +135,17 @@ const getCounts = async (
           [field]: true,
         },
       });
-    } else {
+    } else if (area === TicketArea.GASOLINA) {
       return prisma.gasolina.groupBy({
         by: [field as keyof Gasolina],
+        where: localWhere,
+        _count: {
+          [field]: true,
+        },
+      });
+    } else {
+      return prisma.concreto.groupBy({
+        by: [field as keyof Concreto],
         where: localWhere,
         _count: {
           [field]: true,

@@ -6,7 +6,7 @@ import {
   formatLongSpanishDateFromString,
   formatTime12HourFromString,
 } from "@/helpers/formatters/datetime";
-export default class TicketAcarreoSchema implements TicketSchema {
+export default class TicketGasolinaSchema implements TicketSchema {
   public generateTicket = (
     writter: any,
     ticket: Ticket,
