@@ -12,7 +12,9 @@ export async function POST(req: NextRequest) {
   try {
     // Validation Area
     if (
-      ![TicketArea.ACARREOS, TicketArea.GASOLINA].includes(area as TicketArea)
+      ![TicketArea.ACARREOS, TicketArea.GASOLINA, TicketArea.CONCRETO].includes(
+        area as TicketArea
+      )
     )
       return NextResponse.json({ error: "Invalid area" }, { status: 400 });
 
