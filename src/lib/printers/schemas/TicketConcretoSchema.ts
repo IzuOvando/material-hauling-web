@@ -50,22 +50,24 @@ export default class TicketConcretoSchema implements TicketSchema {
       .addTextStyle(false, false, true, writter.COLOR_1)
       .addText(enterprise)
       .addTextStyle(false, false, false, writter.COLOR_1)
-      .addFeedLine(1);
+      .addFeedLine(2);
   };
 
   private addId = (writter: any, id: string) => {
     writter
-      .addTextAlign(writter.ALIGN_LEFT)
+      .addTextAlign(writter.ALIGN_CENTER)
       .addTextStyle(false, false, true, writter.COLOR_1)
-      .addText("  FOLIO:\t")
+      .addText("FOLIO\n")
       .addTextStyle(false, false, false, writter.COLOR_1)
-      .addText(`${id}\n`);
+      .addText(`${id}\n`)
+      .addFeedLine(1);
   };
 
   private addCliente = (writter: any, cliente: string) => {
     writter
+      .addTextAlign(writter.ALIGN_CENTER)
       .addTextStyle(false, false, true, writter.COLOR_1)
-      .addText("CLIENTE:\t")
+      .addText("CLIENTE\n")
       .addTextStyle(false, false, false, writter.COLOR_1)
       .addText(`${cliente}\n`)
       .addFeedLine(1);
@@ -74,15 +76,15 @@ export default class TicketConcretoSchema implements TicketSchema {
   private addTimeInfo = (writter: any, ticket: Concreto) => {
     writter
       .addTextStyle(false, false, true, writter.COLOR_1)
-      .addText("    FECHA:\t")
+      .addText("       FECHA:\t")
       .addTextStyle(false, false, false, writter.COLOR_1)
       .addText(`${formatIsoDateFromString(ticket.fecha as any)}\n`)
       .addTextStyle(false, false, true, writter.COLOR_1)
-      .addText(" HRSALIDA:\t")
+      .addText("    HRSALIDA:\t")
       .addTextStyle(false, false, false, writter.COLOR_1)
       .addText(`${formatTime12HourFromString(ticket.horaSalida as any)}\n`)
       .addTextStyle(false, false, true, writter.COLOR_1)
-      .addText("HRLLEGADA:\t")
+      .addText("   HRLLEGADA:\t")
       .addTextStyle(false, false, false, writter.COLOR_1)
       .addText(`${formatTime12HourFromString(ticket.horaLlegada as any)}\n`)
       .addFeedLine(1);
