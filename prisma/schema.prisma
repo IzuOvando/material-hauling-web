@@ -120,6 +120,7 @@ model Concreto {
   horaSalida   DateTime
   horaLlegada  DateTime
   uso          String   @default("")
+  placas       String
   frente       Frente   @relation("FrenteConcreto", fields: [frenteNombre], references: [nombre], onDelete: Cascade)
 
   @@index([frenteNombre, fecha])

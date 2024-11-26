@@ -17,10 +17,11 @@ export default class TicketConcretoSchema implements TicketSchema {
     const ticketConcreto = ticket as Concreto;
     this.addEnterpriseLogo(writter, ticketConcreto.empresa);
     this.addEnterpriseName(writter, ticketConcreto.empresa);
-    this.addId(writter, ticketConcreto.uuid);
-    this.addCliente(writter, ticketConcreto.cliente);
+    this.addMetaInfo(writter, ticketConcreto);
+    this.addMetaConcretoInfo(writter, ticketConcreto);
+    this.addConcretoInfo(writter, ticketConcreto);
+    this.addTruckInfo(writter, ticketConcreto);
     this.addTimeInfo(writter, ticketConcreto);
-    this.addTicketInfo(writter, ticketConcreto);
     this.addTypeTicket(writter, original);
     this.addQR(writter, `${ticketConcreto.uuid}`);
   };
@@ -53,93 +54,107 @@ export default class TicketConcretoSchema implements TicketSchema {
       .addFeedLine(2);
   };
 
-  private addId = (writter: any, id: string) => {
+  private addMetaInfo = (writter: any, ticket: Concreto) => {
     writter
-      .addTextAlign(writter.ALIGN_CENTER)
+      .addTextAlign(writter.ALIGN_LEFT)
       .addTextStyle(false, false, true, writter.COLOR_1)
-      .addText("FOLIO\n")
+      .addText("FECHA: ")
       .addTextStyle(false, false, false, writter.COLOR_1)
-      .addText(`${id}\n`)
+      .addText(`${formatIsoDateFromString(ticket.fecha as any)}\n`)
+      .addTextStyle(false, false, true, writter.COLOR_1)
+      .addText("FOLIO: ")
+      .addTextStyle(false, false, false, writter.COLOR_1)
+      .addText(`${ticket.uuid}\n`)
+      .addTextStyle(false, false, true, writter.COLOR_1)
+      .addText("PLANTA: ")
+      .addTextStyle(false, false, false, writter.COLOR_1)
+      .addText(`${ticket.noPlanta} - ${ticket.planta}\n`)
+      .addTextStyle(false, false, true, writter.COLOR_1)
+      .addText("CLIENTE: ")
+      .addTextStyle(false, false, false, writter.COLOR_1)
+      .addText(`${ticket.cliente}\n`)
       .addFeedLine(1);
   };
 
-  private addCliente = (writter: any, cliente: string) => {
+  private addMetaConcretoInfo = (writter: any, ticket: Concreto) => {
+    writter
+      .addTextAlign(writter.ALIGN_LEFT)
+      .addTextStyle(false, false, true, writter.COLOR_1)
+      .addText("UBICACION: ")
+      .addTextStyle(false, false, false, writter.COLOR_1)
+      .addText(`${ticket.ubicacion}\n`)
+      .addTextStyle(false, false, true, writter.COLOR_1)
+      .addText("ELEMENTO: ")
+      .addTextStyle(false, false, false, writter.COLOR_1)
+      .addText(`${ticket.elemento}\n`)
+      .addTextStyle(false, false, true, writter.COLOR_1)
+      .addText("USO: ")
+      .addTextStyle(false, false, false, writter.COLOR_1)
+      .addText(`${ticket.uso}\n`)
+      .addFeedLine(1);
+  };
+
+  private addConcretoInfo = (writter: any, ticket: Concreto) => {
     writter
       .addTextAlign(writter.ALIGN_CENTER)
       .addTextStyle(false, false, true, writter.COLOR_1)
-      .addText("CLIENTE\n")
+      .addText("F'C: ")
       .addTextStyle(false, false, false, writter.COLOR_1)
-      .addText(`${cliente}\n`)
+      .addText(`${ticket.fc}\t`)
+      .addTextStyle(false, false, true, writter.COLOR_1)
+      .addText("VOLUMEN: ")
+      .addTextStyle(false, false, false, writter.COLOR_1)
+      .addText(`${ticket.cubicacion} m³\t`)
+      .addTextStyle(false, false, true, writter.COLOR_1)
+      .addText("REV: ")
+      .addTextStyle(false, false, false, writter.COLOR_1)
+      .addText(`${ticket.rev} cm\n`)
+      .addTextStyle(false, false, true, writter.COLOR_1)
+      .addText("T°CONCRETO: ")
+      .addTextStyle(false, false, false, writter.COLOR_1)
+      .addText(`${ticket.tempConcreto} °C\t`)
+      .addTextStyle(false, false, true, writter.COLOR_1)
+      .addText("T°AMBIENTE: ")
+      .addTextStyle(false, false, false, writter.COLOR_1)
+      .addText(`${ticket.tempAmbiente} °C\n`)
+      .addTextStyle(false, false, true, writter.COLOR_1)
+      .addText("MARCA: ")
+      .addTextStyle(false, false, false, writter.COLOR_1)
+      .addText(`${ticket.marca}\n`)
+      .addFeedLine(1);
+  };
+
+  private addTruckInfo = (writter: any, ticket: Concreto) => {
+    writter
+      .addTextAlign(writter.ALIGN_LEFT)
+      .addTextStyle(false, false, true, writter.COLOR_1)
+      .addText("NO.ECONOMICO: ")
+      .addTextStyle(false, false, false, writter.COLOR_1)
+      .addText(`${ticket.noEconomico}\n`)
+      .addTextStyle(false, false, true, writter.COLOR_1)
+      .addText("PLACA: ")
+      .addTextStyle(false, false, false, writter.COLOR_1)
+      .addText(`${ticket.placas}\n`)
+      .addTextStyle(false, false, true, writter.COLOR_1)
+      .addText("OPERADOR: ")
+      .addTextStyle(false, false, false, writter.COLOR_1)
+      .addText(`${ticket.operador}\n`)
       .addFeedLine(1);
   };
 
   private addTimeInfo = (writter: any, ticket: Concreto) => {
     writter
+      .addTextAlign(writter.ALIGN_LEFT)
       .addTextStyle(false, false, true, writter.COLOR_1)
-      .addText("       FECHA:\t")
+      .addText("HRSALIDA: ")
       .addTextStyle(false, false, false, writter.COLOR_1)
-      .addText(`${formatIsoDateFromString(ticket.fecha as any)}\n`)
+      .addText(`${formatTime12HourFromString(ticket.horaSalida as any)}`)
+      .addTextAlign(writter.ALIGN_RIGHT)
       .addTextStyle(false, false, true, writter.COLOR_1)
-      .addText("    HRSALIDA:\t")
+      .addText("HRLLEGADA: ")
       .addTextStyle(false, false, false, writter.COLOR_1)
-      .addText(`${formatTime12HourFromString(ticket.horaSalida as any)}\n`)
-      .addTextStyle(false, false, true, writter.COLOR_1)
-      .addText("   HRLLEGADA:\t")
-      .addTextStyle(false, false, false, writter.COLOR_1)
-      .addText(`${formatTime12HourFromString(ticket.horaLlegada as any)}\n`)
+      .addText(`${formatTime12HourFromString(ticket.horaLlegada as any)}`)
       .addFeedLine(1);
-  };
-
-  private addTicketInfo = (writter: any, ticket: Concreto) => {
-    writter
-      .addTextStyle(false, false, true, writter.COLOR_1)
-      .addText("      PLANTA:\t")
-      .addTextStyle(false, false, false, writter.COLOR_1)
-      .addText(`${ticket.planta}\n`)
-      .addTextStyle(false, false, true, writter.COLOR_1)
-      .addText("   NO.PLANTA:\t")
-      .addTextStyle(false, false, false, writter.COLOR_1)
-      .addText(`${ticket.noPlanta}\n`)
-      .addTextStyle(false, false, true, writter.COLOR_1)
-      .addText("   UBICACION:\t")
-      .addTextStyle(false, false, false, writter.COLOR_1)
-      .addText(`${ticket.ubicacion}\n`)
-      .addTextStyle(false, false, true, writter.COLOR_1)
-      .addText("NO.ECONOMICO:\t")
-      .addTextStyle(false, false, false, writter.COLOR_1)
-      .addText(`${ticket.noEconomico}\n`)
-      .addTextStyle(false, false, true, writter.COLOR_1)
-      .addText("    OPERADOR:\t")
-      .addTextStyle(false, false, false, writter.COLOR_1)
-      .addText(`${ticket.operador}\n`)
-      .addTextStyle(false, false, true, writter.COLOR_1)
-      .addText("         F'C:\t")
-      .addTextStyle(false, false, false, writter.COLOR_1)
-      .addText(`${ticket.fc}\n`)
-      .addTextStyle(false, false, true, writter.COLOR_1)
-      .addText("         REV:\t")
-      .addTextStyle(false, false, false, writter.COLOR_1)
-      .addText(`${ticket.rev} cm\n`)
-      .addTextStyle(false, false, true, writter.COLOR_1)
-      .addText("         USO:\t")
-      .addTextStyle(false, false, false, writter.COLOR_1)
-      .addText(`${ticket.uso}\n`)
-      .addTextStyle(false, false, true, writter.COLOR_1)
-      .addText("  T°CONCRETO:\t")
-      .addTextStyle(false, false, false, writter.COLOR_1)
-      .addText(`${ticket.tempConcreto} °C\n`)
-      .addTextStyle(false, false, true, writter.COLOR_1)
-      .addText("  T°AMBIENTE:\t")
-      .addTextStyle(false, false, false, writter.COLOR_1)
-      .addText(`${ticket.tempAmbiente} °C\n`)
-      .addTextStyle(false, false, true, writter.COLOR_1)
-      .addText("  CUBICACION:\t")
-      .addTextStyle(false, false, false, writter.COLOR_1)
-      .addText(`${ticket.cubicacion} m³\n`)
-      .addTextStyle(false, false, true, writter.COLOR_1)
-      .addText("    ELEMENTO:\t")
-      .addTextStyle(false, false, false, writter.COLOR_1)
-      .addText(`${ticket.elemento}\n`);
   };
 
   private addTypeTicket = (writter: any, original: boolean) => {

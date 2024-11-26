@@ -58,6 +58,7 @@ export const schemas: Record<SchemaKeys, Set<string>> = {
         "tempconcreto",
         "tempambiente",
         "horasalida",
-        "horallegada"
+        "horallegada",
+        "placas",
     ])
 };

@@ -373,6 +373,12 @@ const concretoColumns: ColumnDef<Concreto>[] = [
       <TableTicketColumnHeader column={column} title="Operador" />
     ),
   },
+  {
+    accessorKey: "placas",
+    header: ({ column }) => (
+      <TableTicketColumnHeader column={column} title="Placas" />
+    ),
+  },
 ];
 
 export const ticketsColumns = {

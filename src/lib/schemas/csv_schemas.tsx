@@ -212,6 +212,7 @@ export const filteredDataConfig: Record<
       elemento: normalizeValue(cleanQuotes(data.elemento)),
       horaSalida: horaSalida,
       horaLlegada: horaLlegada,
+      placas: cleanQuotes(data.placas),
       frenteNombre: fileName.substring(
         fileName.indexOf("_") + 1,
         fileName.indexOf(".")

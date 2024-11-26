@@ -430,6 +430,7 @@ class FileProcessor {
                         elemento: string;
                         horaSalida: Date;
                         horaLlegada: Date;
+                        placas: string;
                     } = {
                         frenteNombre: record.frenteNombre,
                         folio: record.folio,
@@ -451,6 +452,7 @@ class FileProcessor {
                         elemento: record.elemento,
                         horaSalida: record.horaSalida,
                         horaLlegada: record.horaLlegada,
+                        placas: record.placas
                     };
 
                     if (record.uuid && record.uuid.trim() !== '') {
@@ -704,8 +706,6 @@ class FileProcessor {
         hours = hours ? hours : 12;
 
         const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
-
-        console.log(`${hours}:${formattedMinutes} ${suffix}`)
 
         return `${hours}:${formattedMinutes} ${suffix}`;
     }

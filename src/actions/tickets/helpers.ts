@@ -49,6 +49,7 @@ export const SORT_FIELDS = {
     "ubicacion",
     "noEconomico",
     "operador",
+    "placas",
   ],
 };
 
