@@ -100,12 +100,10 @@ model Gasolina {
 model Concreto {
   uuid         String   @id @default(uuid())
   createdAt    DateTime @default(now())
-  folio        String
   frenteNombre String
   cubicacion   Float
   cliente      String
   empresa      String
-  noPlanta     String
   planta       String
   operador     String
   fecha        DateTime
@@ -118,7 +116,6 @@ model Concreto {
   marca        String
   elemento     String
   horaSalida   DateTime
-  horaLlegada  DateTime
   uso          String   @default("")
   placas       String
   frente       Frente   @relation("FrenteConcreto", fields: [frenteNombre], references: [nombre], onDelete: Cascade)

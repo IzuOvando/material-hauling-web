@@ -183,7 +183,6 @@ export const filteredDataConfig: Record<
   concreto: (rawData, fileName, cleanQuotes) => {
     const data = normalizeKeysToLowerCase(rawData);
     const horaSalida = parseHoraTime(cleanQuotes(data.horasalida))
-    const horaLlegada = parseHoraTime(cleanQuotes(data.horallegada))
 
     const fechaStr = cleanQuotes(data.fecha);
 
@@ -193,12 +192,10 @@ export const filteredDataConfig: Record<
 
     return {
       uuid: cleanQuotes(data.uuid),
-      folio: cleanQuotes(data.folio),
       cubicacion: parseFloat(cleanQuotes(data.cubicacion)),
       cliente: cleanQuotes(data.cliente),
       empresa: cleanQuotes(data.empresa),
       fecha: fecha,
-      noPlanta: cleanQuotes(data.noplanta),
       planta: cleanQuotes(data.planta),
       operador: cleanQuotes(data.operador),
       fc: cleanQuotes(data.fc),
@@ -211,7 +208,6 @@ export const filteredDataConfig: Record<
       marca: cleanQuotes(data.marca),
       elemento: normalizeValue(cleanQuotes(data.elemento)),
       horaSalida: horaSalida,
-      horaLlegada: horaLlegada,
       placas: cleanQuotes(data.placas),
       frenteNombre: fileName.substring(
         fileName.indexOf("_") + 1,

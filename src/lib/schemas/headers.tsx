@@ -42,8 +42,6 @@ export const schemas: Record<SchemaKeys, Set<string>> = {
     concreto: new Set([
         "cliente",
         "empresa",
-        "folio",
-        "noplanta",
         "operador",
         "fecha",
         "planta",
@@ -58,7 +56,6 @@ export const schemas: Record<SchemaKeys, Set<string>> = {
         "tempconcreto",
         "tempambiente",
         "horasalida",
-        "horallegada",
         "placas",
     ])
 };

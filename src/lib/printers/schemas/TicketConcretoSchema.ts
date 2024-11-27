@@ -68,7 +68,7 @@ export default class TicketConcretoSchema implements TicketSchema {
       .addTextStyle(false, false, true, writter.COLOR_1)
       .addText("PLANTA: ")
       .addTextStyle(false, false, false, writter.COLOR_1)
-      .addText(`${ticket.noPlanta} - ${ticket.planta}\n`)
+      .addText(`${ticket.planta}\n`)
       .addTextStyle(false, false, true, writter.COLOR_1)
       .addText("CLIENTE: ")
       .addTextStyle(false, false, false, writter.COLOR_1)
@@ -117,10 +117,6 @@ export default class TicketConcretoSchema implements TicketSchema {
       .addText("T°AMBIENTE: ")
       .addTextStyle(false, false, false, writter.COLOR_1)
       .addText(`${ticket.tempAmbiente} °C\n`)
-      .addTextStyle(false, false, true, writter.COLOR_1)
-      .addText("MARCA: ")
-      .addTextStyle(false, false, false, writter.COLOR_1)
-      .addText(`${ticket.marca}\n`)
       .addFeedLine(1);
   };
 
@@ -131,6 +127,10 @@ export default class TicketConcretoSchema implements TicketSchema {
       .addText("NO.ECONOMICO: ")
       .addTextStyle(false, false, false, writter.COLOR_1)
       .addText(`${ticket.noEconomico}\n`)
+      .addTextStyle(false, false, true, writter.COLOR_1)
+      .addText("MARCA: ")
+      .addTextStyle(false, false, false, writter.COLOR_1)
+      .addText(`${ticket.marca}\n`)
       .addTextStyle(false, false, true, writter.COLOR_1)
       .addText("PLACA: ")
       .addTextStyle(false, false, false, writter.COLOR_1)
@@ -148,12 +148,10 @@ export default class TicketConcretoSchema implements TicketSchema {
       .addTextStyle(false, false, true, writter.COLOR_1)
       .addText("HRSALIDA: ")
       .addTextStyle(false, false, false, writter.COLOR_1)
-      .addText(`${formatTime12HourFromString(ticket.horaSalida as any)}`)
-      .addTextAlign(writter.ALIGN_RIGHT)
+      .addText(`${formatTime12HourFromString(ticket.horaSalida as any)}\t\t\t`)
       .addTextStyle(false, false, true, writter.COLOR_1)
-      .addText("HRLLEGADA: ")
+      .addText("HRLLEGADA: \n")
       .addTextStyle(false, false, false, writter.COLOR_1)
-      .addText(`${formatTime12HourFromString(ticket.horaLlegada as any)}`)
       .addFeedLine(1);
   };
 

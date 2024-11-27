@@ -411,12 +411,10 @@ class FileProcessor {
                     const concretoEntry: {
                         uuid?: string;
                         frenteNombre: string;
-                        folio: string;
                         cubicacion: number;
                         cliente: string;
                         empresa: string;
                         fecha: Date;
-                        noPlanta: string;
                         planta: string;
                         operador: string;
                         fc: string;
@@ -429,16 +427,13 @@ class FileProcessor {
                         marca: string;
                         elemento: string;
                         horaSalida: Date;
-                        horaLlegada: Date;
                         placas: string;
                     } = {
                         frenteNombre: record.frenteNombre,
-                        folio: record.folio,
                         cubicacion: record.cubicacion,
                         cliente: record.cliente,
                         empresa: record.empresa,
                         fecha: record.fecha,
-                        noPlanta: record.noPlanta,
                         planta: record.planta,
                         operador: record.operador,
                         fc: record.fc,
@@ -451,7 +446,6 @@ class FileProcessor {
                         marca: record.marca,
                         elemento: record.elemento,
                         horaSalida: record.horaSalida,
-                        horaLlegada: record.horaLlegada,
                         placas: record.placas
                     };
 

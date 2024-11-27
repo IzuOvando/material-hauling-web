@@ -271,15 +271,6 @@ const concretoColumns: ColumnDef<Concreto>[] = [
     ),
   },
   {
-    accessorKey: "horaLlegada",
-    header: ({ column }) => (
-      <TableTicketColumnHeader column={column} title="Hora Llegada" />
-    ),
-    cell: ({ row }) => (
-      <>{formatTime12Hour(row.getValue("horaLlegada") as Date, true)}</>
-    ),
-  },
-  {
     accessorKey: "elemento",
     header: ({ column }) => (
       <TableTicketColumnHeader column={column} title="Elemento" />
@@ -341,12 +332,6 @@ const concretoColumns: ColumnDef<Concreto>[] = [
     accessorKey: "empresa",
     header: ({ column }) => (
       <TableTicketColumnHeader column={column} title="Empresa" />
-    ),
-  },
-  {
-    accessorKey: "noPlanta",
-    header: ({ column }) => (
-      <TableTicketColumnHeader column={column} title="NoPlanta" />
     ),
   },
   {
