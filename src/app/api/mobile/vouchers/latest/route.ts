@@ -17,6 +17,7 @@ export async function GET(req: NextRequest) {
     const limitParam = searchParams.get("limit");
 
     let limit = 5;
+    
     if (limitParam !== null) {
       const parsedLimit = parseInt(limitParam, 10);
       
