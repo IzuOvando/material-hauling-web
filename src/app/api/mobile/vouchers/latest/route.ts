@@ -19,6 +19,7 @@ export async function GET(req: NextRequest) {
     let limit = 5;
     if (limitParam !== null) {
       const parsedLimit = parseInt(limitParam, 10);
+      
       if (isNaN(parsedLimit) || parsedLimit < 1 || parsedLimit > 50) {
         return NextResponse.json(
           { message: "El límite debe tener un valor entre 1 y 50" },
