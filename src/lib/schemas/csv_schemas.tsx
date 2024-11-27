@@ -1,21 +1,24 @@
 import { Gasolina, Acarreos, Concreto } from "@prisma/client";
 import { TicketArea } from "@/types";
 
-type CreateGasolinaDto = Omit<Gasolina, 'uuid' | 'createdAt'> & {
+type CreateGasolinaDto = Omit<Gasolina, "uuid" | "createdAt"> & {
   uuid?: string;
   tipoTicket: TicketArea.GASOLINA;
 };
 
-type CreateAcarreosDto = Omit<Acarreos, 'uuid' | 'createdAt'> & {
+type CreateAcarreosDto = Omit<Acarreos, "uuid" | "createdAt"> & {
   uuid?: string;
   tipoTicket: TicketArea.ACARREOS;
 };
 
-type CreateConcretoDto = Omit<Concreto, 'uuid' | 'createdAt'> & {
+type CreateConcretoDto = Omit<Concreto, "uuid" | "createdAt"> & {
   uuid?: string;
   tipoTicket: TicketArea.CONCRETO;
 };
-export type CreateTicketDto = CreateGasolinaDto | CreateAcarreosDto | CreateConcretoDto;
+export type CreateTicketDto =
+  | CreateGasolinaDto
+  | CreateAcarreosDto
+  | CreateConcretoDto;
 
 export function isCreateAcarreosDto(
   dto: CreateTicketDto
@@ -37,9 +40,9 @@ export function isCreateConcretoaDto(
 
 function normalizeValue(value: string): string {
   return value
-      .trim()
-      .replace(/\s+/g, ' ')
-      .replace(/\s*,\s*/g, ',');
+    .trim()
+    .replace(/\s+/g, " ")
+    .replace(/\s*,\s*/g, ",");
 }
 
 function parseHoraTime(dateStr: string): Date {
@@ -63,12 +66,21 @@ function parseHoraTime(dateStr: string): Date {
   return date;
 }
 const meses = [
-  "enero", "febrero", "marzo", "abril", "mayo", "junio",
-  "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"
+  "enero",
+  "febrero",
+  "marzo",
+  "abril",
+  "mayo",
+  "junio",
+  "julio",
+  "agosto",
+  "septiembre",
+  "octubre",
+  "noviembre",
+  "diciembre",
 ];
 
 function parseSpanishDate(dateStr: string): Date {
-
   const ddmmyyyyRegex = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/;
   const ddmmyyyyMatch = ddmmyyyyRegex.exec(dateStr);
   if (ddmmyyyyMatch) {
@@ -91,24 +103,22 @@ function parseSpanishDate(dateStr: string): Date {
 }
 
 function normalizeKeysToLowerCase<T>(data: T): T {
-
   if (typeof data !== "object" || data === null) {
     return data;
   }
 
   if (Array.isArray(data)) {
-    return data.map(item => normalizeKeysToLowerCase(item)) as T;
+    return data.map((item) => normalizeKeysToLowerCase(item)) as T;
   }
 
   return Object.keys(data).reduce((acc, key) => {
     const normalizedKey = key.toLowerCase();
     const value = (data as Record<string, unknown>)[key];
-    (acc as Record<string, unknown>)[normalizedKey] = normalizeKeysToLowerCase(value);
+    (acc as Record<string, unknown>)[normalizedKey] =
+      normalizeKeysToLowerCase(value);
     return acc;
   }, {} as T);
 }
-
-
 
 export const filteredDataConfig: Record<
   string,
@@ -120,11 +130,13 @@ export const filteredDataConfig: Record<
 > = {
   acarreos: (rawData, fileName, cleanQuotes) => {
     const data = normalizeKeysToLowerCase(rawData);
-    const hora = parseHoraTime(cleanQuotes(data.hora))
+    const hora = parseHoraTime(cleanQuotes(data.hora));
 
     const fechaStr = cleanQuotes(data.fecha);
 
-    const [month, day, year] = fechaStr.split('-').map(part => parseInt(part, 10));
+    const [month, day, year] = fechaStr
+      .split("-")
+      .map((part) => parseInt(part, 10));
 
     const fecha = new Date(year, month - 1, day);
 
@@ -152,12 +164,12 @@ export const filteredDataConfig: Record<
   },
   gasolina: (rawData, fileName, cleanQuotes) => {
     const data = normalizeKeysToLowerCase(rawData);
-    const hora = parseHoraTime(cleanQuotes(data.hora))
+    const hora = parseHoraTime(cleanQuotes(data.hora));
 
     const fecha = parseSpanishDate(cleanQuotes(data.fecha));
 
     const parseCurrency = (value: string): number => {
-      const cleanedValue = value.replace(/[\$,]/g, '');
+      const cleanedValue = value.replace(/[\$,]/g, "");
       return parseFloat(cleanedValue);
     };
     return {
@@ -182,11 +194,13 @@ export const filteredDataConfig: Record<
   },
   concreto: (rawData, fileName, cleanQuotes) => {
     const data = normalizeKeysToLowerCase(rawData);
-    const horaSalida = parseHoraTime(cleanQuotes(data.horasalida))
+    const horaSalida = parseHoraTime(cleanQuotes(data.horasalida));
 
     const fechaStr = cleanQuotes(data.fecha);
 
-    const [day, month, year] = fechaStr.split('-').map(part => parseInt(part, 10));
+    const [day, month, year] = fechaStr
+      .split("-")
+      .map((part) => parseInt(part, 10));
 
     const fecha = new Date(year, month - 1, day);
 
@@ -200,7 +214,7 @@ export const filteredDataConfig: Record<
       operador: cleanQuotes(data.operador),
       fc: cleanQuotes(data.fc),
       uso: cleanQuotes(data.uso),
-      ubicacion: normalizeValue(cleanQuotes(data.ubicacion)),
+      destino: normalizeValue(cleanQuotes(data.destino)),
       rev: parseInt(cleanQuotes(data.rev)),
       tempConcreto: parseFloat(cleanQuotes(data.tempconcreto)),
       tempAmbiente: parseFloat(cleanQuotes(data.tempambiente)),

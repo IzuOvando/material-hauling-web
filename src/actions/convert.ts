@@ -419,7 +419,7 @@ class FileProcessor {
                         operador: string;
                         fc: string;
                         uso: string;
-                        ubicacion: string;
+                        destino: string;
                         rev: number;
                         tempConcreto: number;
                         tempAmbiente: number;
@@ -438,7 +438,7 @@ class FileProcessor {
                         operador: record.operador,
                         fc: record.fc,
                         uso: record.uso,
-                        ubicacion: record.ubicacion,
+                        destino: record.destino,
                         rev: record.rev,
                         tempConcreto: record.tempConcreto,
                         tempAmbiente: record.tempAmbiente,

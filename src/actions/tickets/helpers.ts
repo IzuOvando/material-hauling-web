@@ -44,7 +44,7 @@ export const SORT_FIELDS = {
     "cliente",
     "empresa",
     "planta",
-    "ubicacion",
+    "destino",
     "noEconomico",
     "operador",
     "placas",
@@ -59,7 +59,7 @@ export const FILTER_FIELDS = {
     "elemento",
     "empresa",
     "noEconomico",
-    "ubicacion",
+    "destino",
   ],
 };
 

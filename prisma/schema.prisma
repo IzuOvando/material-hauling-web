@@ -108,7 +108,7 @@ model Concreto {
   operador     String
   fecha        DateTime
   fc           String
-  ubicacion    String
+  destino      String
   rev          Int
   tempConcreto Float
   tempAmbiente Float
@@ -124,5 +124,5 @@ model Concreto {
   @@index([frenteNombre, elemento])
   @@index([frenteNombre, empresa])
   @@index([frenteNombre, noEconomico])
-  @@index([frenteNombre, ubicacion])
+  @@index([frenteNombre, destino])
 }

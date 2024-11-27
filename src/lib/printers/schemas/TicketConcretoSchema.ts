@@ -80,9 +80,9 @@ export default class TicketConcretoSchema implements TicketSchema {
     writter
       .addTextAlign(writter.ALIGN_LEFT)
       .addTextStyle(false, false, true, writter.COLOR_1)
-      .addText("UBICACION: ")
+      .addText("DESTINO: ")
       .addTextStyle(false, false, false, writter.COLOR_1)
-      .addText(`${ticket.ubicacion}\n`)
+      .addText(`${ticket.destino}\n`)
       .addTextStyle(false, false, true, writter.COLOR_1)
       .addText("ELEMENTO: ")
       .addTextStyle(false, false, false, writter.COLOR_1)
@@ -148,9 +148,9 @@ export default class TicketConcretoSchema implements TicketSchema {
       .addTextStyle(false, false, true, writter.COLOR_1)
       .addText("HRSALIDA: ")
       .addTextStyle(false, false, false, writter.COLOR_1)
-      .addText(`${formatTime12HourFromString(ticket.horaSalida as any)}\t\t\t`)
+      .addText(`${formatTime12HourFromString(ticket.horaSalida as any)}\t`)
       .addTextStyle(false, false, true, writter.COLOR_1)
-      .addText("HRLLEGADA: \n")
+      .addText("HRLLEGADA: \t\t\n")
       .addTextStyle(false, false, false, writter.COLOR_1)
       .addFeedLine(1);
   };
