@@ -338,10 +338,40 @@ class FileProcessor {
                     return acarreoEntry;
                 });
 
-                await prisma.acarreos.createMany({
-                    data: acarreosData,
-                    skipDuplicates: true,
+                const uuids = acarreosData
+                .map(record => record.uuid)
+                .filter((uuid): uuid is string => uuid !== undefined);
+            
+                const existingRecords = await prisma.acarreos.findMany({
+                    where: { uuid: { in: uuids } },
+                    select: { uuid: true },
                 });
+
+                const existingUUIDSet = new Set(existingRecords.map(record => record.uuid));
+
+                const recordsToUpdate = acarreosData.filter(
+                    record => record.uuid && existingUUIDSet.has(record.uuid)
+                );
+
+                const recordsToCreate = acarreosData.filter(
+                    record => !record.uuid || !existingUUIDSet.has(record.uuid)
+                );
+            
+                await Promise.all(
+                    recordsToUpdate.map(record =>
+                        prisma.acarreos.update({
+                            where: { uuid: record.uuid },
+                            data: record,
+                        })
+                    )
+                );
+            
+                if (recordsToCreate.length > 0) {
+                    await prisma.acarreos.createMany({
+                        data: recordsToCreate,
+                        skipDuplicates: true,
+                    });
+                }
 
                 const acarreoUuids = await prisma.acarreos.findMany({
                     where: {
@@ -391,10 +421,40 @@ class FileProcessor {
                     return gasolinaEntry;
                 });
 
-                await prisma.gasolina.createMany({
-                    data: gasolinaData,
-                    skipDuplicates: true,
+                const uuids = gasolinaData
+                .map(record => record.uuid)
+                .filter((uuid): uuid is string => uuid !== undefined);
+            
+                const existingRecords = await prisma.gasolina.findMany({
+                    where: { uuid: { in: uuids } },
+                    select: { uuid: true },
                 });
+
+                const existingUUIDSet = new Set(existingRecords.map(record => record.uuid));
+
+                const recordsToUpdate = gasolinaData.filter(
+                    record => record.uuid && existingUUIDSet.has(record.uuid)
+                );
+
+                const recordsToCreate = gasolinaData.filter(
+                    record => !record.uuid || !existingUUIDSet.has(record.uuid)
+                );
+            
+                await Promise.all(
+                    recordsToUpdate.map(record =>
+                        prisma.gasolina.update({
+                            where: { uuid: record.uuid },
+                            data: record,
+                        })
+                    )
+                );
+            
+                if (recordsToCreate.length > 0) {
+                    await prisma.gasolina.createMany({
+                        data: recordsToCreate,
+                        skipDuplicates: true,
+                    });
+                }
 
                 const gasolinaUuids = await prisma.gasolina.findMany({
                     where: {
@@ -456,10 +516,40 @@ class FileProcessor {
                     return concretoEntry;
                 });
 
-                await prisma.concreto.createMany({
-                    data: concretoData,
-                    skipDuplicates: true,
+                const uuids = concretoData
+                .map(record => record.uuid)
+                .filter((uuid): uuid is string => uuid !== undefined);
+            
+                const existingRecords = await prisma.concreto.findMany({
+                    where: { uuid: { in: uuids } },
+                    select: { uuid: true },
                 });
+
+                const existingUUIDSet = new Set(existingRecords.map(record => record.uuid));
+
+                const recordsToUpdate = concretoData.filter(
+                    record => record.uuid && existingUUIDSet.has(record.uuid)
+                );
+
+                const recordsToCreate = concretoData.filter(
+                    record => !record.uuid || !existingUUIDSet.has(record.uuid)
+                );
+            
+                await Promise.all(
+                    recordsToUpdate.map(record =>
+                        prisma.concreto.update({
+                            where: { uuid: record.uuid },
+                            data: record,
+                        })
+                    )
+                );
+            
+                if (recordsToCreate.length > 0) {
+                    await prisma.concreto.createMany({
+                        data: recordsToCreate,
+                        skipDuplicates: true,
+                    });
+                }
 
                 const concretoUuids = await prisma.concreto.findMany({
                     where: {
