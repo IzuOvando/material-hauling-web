@@ -87,10 +87,6 @@ export default class TicketConcretoSchema implements TicketSchema {
       .addText("ELEMENTO: ")
       .addTextStyle(false, false, false, writter.COLOR_1)
       .addText(`${ticket.elemento}\n`)
-      .addTextStyle(false, false, true, writter.COLOR_1)
-      .addText("USO: ")
-      .addTextStyle(false, false, false, writter.COLOR_1)
-      .addText(`${ticket.uso}\n`)
       .addFeedLine(1);
   };
 
