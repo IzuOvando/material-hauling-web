@@ -1,2 +1,2 @@
 export type { Printer, Ticket, FacetedFilter } from "./types";
-export { TicketArea, TicketAreaList } from "./enum";
+export { TicketArea, TicketAreaList, Section } from "./enum";
