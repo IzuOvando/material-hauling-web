@@ -26,65 +26,6 @@ class FileProcessor {
             .join("");
     }
 
-
-    private formatDateGas(value: number | string): string {
-        const spanishDatePattern = /^(lunes|martes|miércoles|jueves|viernes|sábado|domingo), \d{1,2} de (enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre) de \d{4}$/;
-        const englishDatePattern = /^(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday), (\w+) (\d{1,2}), (\d{4})$/;
-        const months: { [key: string]: string } = {
-            January: 'enero', February: 'febrero', March: 'marzo', April: 'abril',
-            May: 'mayo', June: 'junio', July: 'julio', August: 'agosto',
-            September: 'septiembre', October: 'octubre', November: 'noviembre', December: 'diciembre'
-        };
-        const days: { [key: string]: string } = {
-            Monday: 'lunes', Tuesday: 'martes', Wednesday: 'miércoles',
-            Thursday: 'jueves', Friday: 'viernes', Saturday: 'sábado', Sunday: 'domingo'
-        };
-
-        if (typeof value === "string") {
-            const cleanedValue = value.replace(/^"|"$/g, '');
-
-            const match = englishDatePattern.exec(cleanedValue);
-            if (match) {
-                const [, engDay, engMonth, day, year] = match;
-                return `${days[engDay as keyof typeof days]}, ${day} de ${months[engMonth as keyof typeof months]} de ${year}`;
-            } else if (spanishDatePattern.test(cleanedValue)) {
-                return cleanedValue;
-            }
-        }
-        return String(value);
-    }
-
-    private formatDateAca(value: number | string): string {
-
-        if (typeof value === "number") {
-            const date = new Date(Date.UTC(0, 0, value - 1));
-            const day = String(date.getUTCDate()).padStart(2, "0");
-            const month = String(date.getUTCMonth() + 1).padStart(2, "0");
-            const year = date.getUTCFullYear();
-            return `${day}-${month}-${year}`;
-        }
-
-        if (typeof value === "string") {
-            if (/^\d{1,2}\/\d{1,2}\/\d{2}$/.test(value)) {
-                const [month, day, year] = value.split("/");
-                const fullYear = (parseInt(year) < 50 ? "20" : "19") + year.padStart(2, "0");
-                return `${day.padStart(2, "0")}-${month.padStart(2, "0")}-${fullYear}`;
-            }
-
-            if (/^\d{2}\/\d{2}\/\d{4}$/.test(value)) {
-                const [day, month, year] = value.split("/");
-                return `${day.padStart(2, "0")}-${month.padStart(2, "0")}-${year}`;
-            }
-
-            if (/^\d{2}-\d{2}-\d{4}$/.test(value)) {
-                const [day, month, year] = value.split("-");
-                return `${day.padStart(2, "0")}-${month.padStart(2, "0")}-${year}`;
-            }
-        }
-
-        return String(value);
-    }
-
     private isDateColumn(value: string): boolean {
 
         const normalizedValue = value.trim().replace(/^"|"$/g, '').replace(/\s*,\s*/g, ',').replace(/\s{2,}/g, ' ');
@@ -165,8 +106,11 @@ class FileProcessor {
                 let csvOutput = "";
                 let dateColumns = new Set<number>();
                 let headerChecked = false;
+                let shouldStop = false;
 
                 for (let R = range.s.r; R <= range.e.r; ++R) {
+                    if (shouldStop) break;
+
                     let row: string[] = [];
                     let empty = true;
                     let emptyConsecutiveCount = 0;
@@ -185,6 +129,9 @@ class FileProcessor {
                 
                         if (emptyConsecutiveCount >= 3) {
                             console.warn(`Skipping the rest of the row due to 3 consecutive empty cells at row ${R}, column ${C}`);
+                            if (empty) {
+                                shouldStop = true; 
+                            }
                             break;
                         }
                 
@@ -223,11 +170,6 @@ class FileProcessor {
                 
                     row = row.map((cellValue, index) => {
                         if (dateColumns.has(index) && cellValue) {
-                            if (key === "gasolina") {
-                                cellValue = this.formatDateGas(cellValue.toString());
-                            } else {
-                                cellValue = this.formatDateAca(cellValue.toString());
-                            }
                             cellValue = cellValue.replace(/"/g, '""');
                             return `"${cellValue}"`;
                         }
@@ -793,12 +735,15 @@ class FileProcessor {
     }
 
     private formatDateToDDMMYYYY(date: Date): string {
-        const day = String(date.getDate()).padStart(2, '0');
-        const month = String(date.getMonth() + 1).padStart(2, '0'); // getMonth() devuelve el mes basado en 0
-        const year = date.getFullYear();
 
+        const day = date.getUTCDate().toString().padStart(2, '0'); 
+        const month = (date.getUTCMonth() + 1).toString().padStart(2, '0');
+        const year = date.getUTCFullYear().toString();
+    
         return `${day}/${month}/${year}`;
     }
+    
+      
 
     private async downloadDatabase(outputExcel: string, key: string, fileName: string): Promise<void> {
 
@@ -852,7 +797,7 @@ class FileProcessor {
                         value = value.toString();
                     }
 
-                    if (newKey.toLocaleLowerCase() === 'fecha' && value) {
+                    if ((newKey.toLocaleLowerCase() === 'fecha'|| newKey.toLocaleLowerCase() === 'created at') && value) {
                         value = this.formatDateToDDMMYYYY(value);
                     }
 

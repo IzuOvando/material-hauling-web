@@ -1,5 +1,6 @@
 import { Gasolina, Acarreos, Concreto } from "@prisma/client";
 import { TicketArea } from "@/types";
+import { DateTime } from 'luxon';
 
 type CreateGasolinaDto = Omit<Gasolina, "uuid" | "createdAt"> & {
   uuid?: string;
@@ -65,41 +66,22 @@ function parseHoraTime(dateStr: string): Date {
 
   return date;
 }
-const meses = [
-  "enero",
-  "febrero",
-  "marzo",
-  "abril",
-  "mayo",
-  "junio",
-  "julio",
-  "agosto",
-  "septiembre",
-  "octubre",
-  "noviembre",
-  "diciembre",
-];
 
-function parseSpanishDate(dateStr: string): Date {
-  const ddmmyyyyRegex = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/;
-  const ddmmyyyyMatch = ddmmyyyyRegex.exec(dateStr);
-  if (ddmmyyyyMatch) {
-    const day = parseInt(ddmmyyyyMatch[1], 10);
-    const month = parseInt(ddmmyyyyMatch[2], 10);
-    const year = parseInt(ddmmyyyyMatch[3], 10);
-    return new Date(year, month - 1, day);
+function parseUTCDate(dateStr: string): Date {
+
+  const date = DateTime.fromISO(dateStr, { zone: 'utc' });
+
+  if (date.isValid) {
+      return date.toJSDate();
   }
 
-  const spanishDateRegex = /(\d{1,2}) de (\w+) de (\d{4})/;
-  const spanishMatch = spanishDateRegex.exec(dateStr);
-  if (spanishMatch) {
-    const day = parseInt(spanishMatch[1], 10);
-    const month = meses.indexOf(spanishMatch[2].toLowerCase());
-    const year = parseInt(spanishMatch[3], 10);
-    return new Date(year, month, day);
+  const parsedDate = DateTime.fromFormat(dateStr, 'M/d/yy', { zone: 'utc' });
+
+  if (!parsedDate.isValid) {
+      throw new Error(`Invalid date format: ${dateStr}`);
   }
 
-  throw new Error(`Fecha no válida: ${dateStr}`);
+  return parsedDate.toJSDate();
 }
 
 function normalizeKeysToLowerCase<T>(data: T): T {
@@ -134,11 +116,7 @@ export const filteredDataConfig: Record<
 
     const fechaStr = cleanQuotes(data.fecha);
 
-    const [month, day, year] = fechaStr
-      .split("-")
-      .map((part) => parseInt(part, 10));
-
-    const fecha = new Date(year, month - 1, day);
+    const fecha = parseUTCDate(fechaStr);
 
     return {
       uuid: cleanQuotes(data.uuid),
@@ -148,10 +126,10 @@ export const filteredDataConfig: Record<
       cubicacion: parseFloat(cleanQuotes(data.cubicacion)),
       fecha: fecha,
       placas: cleanQuotes(data.placas),
-      idCamion: cleanQuotes(data.idCamion),
+      idCamion: cleanQuotes(data.idcamion),
       operador: cleanQuotes(data.operador),
       proyecto: cleanQuotes(data.proyecto),
-      noEmpleado: cleanQuotes(data.noEmpleado),
+      noEmpleado: cleanQuotes(data.noempleado),
       checador: cleanQuotes(data.checador),
       hora: hora,
       banco: cleanQuotes(data.banco),
@@ -166,7 +144,9 @@ export const filteredDataConfig: Record<
     const data = normalizeKeysToLowerCase(rawData);
     const hora = parseHoraTime(cleanQuotes(data.hora));
 
-    const fecha = parseSpanishDate(cleanQuotes(data.fecha));
+    const fechaStr = cleanQuotes(data.fecha);
+
+    const fecha = parseUTCDate(fechaStr);
 
     const parseCurrency = (value: string): number => {
       const cleanedValue = value.replace(/[\$,]/g, "");
@@ -175,15 +155,15 @@ export const filteredDataConfig: Record<
     return {
       uuid: cleanQuotes(data.uuid),
       folio: cleanQuotes(data.folio),
-      saldoCompra: parseCurrency(cleanQuotes(data.saldoCompra)),
-      formatoPago: cleanQuotes(data.formatoPago),
+      saldoCompra: parseCurrency(cleanQuotes(data.saldocompra)),
+      formatoPago: cleanQuotes(data.formatopago),
       litros: parseFloat(cleanQuotes(data.litros)),
       fecha: fecha,
       placas: cleanQuotes(data.placas),
       autorizacion: cleanQuotes(data.autorizacion),
       total: parseCurrency(cleanQuotes(data.total)),
       hora: hora,
-      precioUnitario: parseCurrency(cleanQuotes(data.precioUnitario)),
+      precioUnitario: parseCurrency(cleanQuotes(data.preciounitario)),
       bomba: parseInt(cleanQuotes(data.bomba), 10),
       frenteNombre: fileName.substring(
         fileName.indexOf("_") + 1,
@@ -198,11 +178,7 @@ export const filteredDataConfig: Record<
 
     const fechaStr = cleanQuotes(data.fecha);
 
-    const [day, month, year] = fechaStr
-      .split("-")
-      .map((part) => parseInt(part, 10));
-
-    const fecha = new Date(year, month - 1, day);
+    const fecha = parseUTCDate(fechaStr);
 
     return {
       uuid: cleanQuotes(data.uuid),
