@@ -1,3 +1,4 @@
+"use client";
 import { useState, useCallback } from "react";
 import { useDropzone, Accept } from "react-dropzone";
 import { Button } from "@/components/ui/button";

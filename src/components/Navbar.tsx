@@ -2,6 +2,7 @@
 import Image from "next/image";
 import { Button } from "./ui/button";
 import { signOut } from "@/auth";
+import { ToggleNavButton } from "./common";
 
 const Navbar = ({ userName }: { userName: string | undefined }) => {
   return (
@@ -24,8 +25,12 @@ const Navbar = ({ userName }: { userName: string | undefined }) => {
       >
         {userName ? (
           <>
+            <ToggleNavButton />
             <span className="hidden md:block">Bienvenido, {userName}</span>
-            <Button className="bg-accent hover:bg-accent-light active:bg-accent-dark">
+            <Button
+              type="submit"
+              className="bg-accent hover:bg-accent-light active:bg-accent-dark"
+            >
               Cerrar Sesión
             </Button>
           </>
@@ -36,4 +41,3 @@ const Navbar = ({ userName }: { userName: string | undefined }) => {
 };
 
 export default Navbar;
-

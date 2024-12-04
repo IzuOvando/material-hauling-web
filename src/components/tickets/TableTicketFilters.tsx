@@ -4,7 +4,7 @@ import { useState, useCallback, useEffect, useRef } from "react";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { TableTicketFacetedFilter } from "./TableTicketFacetedFilter";
-import { FacetedFilter, TicketArea } from "@/types";
+import { FacetedFilter, TicketArea, Section } from "@/types";
 import { FILTER_FIELDS } from "@/actions/tickets/helpers";
 import { useTableTicketsGlobal } from "@/contexts";
 import { useSearchParams } from "next/navigation";
@@ -13,7 +13,7 @@ import { useFrenteStore } from "@/store";
 
 interface TableTicketFiltersProps {
   frente: string;
-  area: TicketArea;
+  area: TicketArea | Section;
 }
 
 export function TableTicketFilters({ frente, area }: TableTicketFiltersProps) {

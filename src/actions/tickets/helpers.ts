@@ -1,4 +1,4 @@
-import { TicketArea } from "@/types";
+import { TicketArea, Section } from "@/types";
 
 export const SORT_FIELDS = {
   [TicketArea.ACARREOS]: [
@@ -49,6 +49,22 @@ export const SORT_FIELDS = {
     "operador",
     "placas",
   ],
+  [Section.VOUCHERCAMION]: [
+    "uuid",
+    "idCamion",
+    "placas",
+    "material",
+    "cubicacion",
+    "origen",
+    "tiro",
+    "voucherTime",
+    "operador",
+    "noEmpleado",
+    "turno",
+    "empresa",
+    "checkerName",
+    "checkerNo",
+  ],
 };
 
 export const FILTER_FIELDS = {
@@ -61,9 +77,10 @@ export const FILTER_FIELDS = {
     "noEconomico",
     "destino",
   ],
+  [Section.VOUCHERCAMION]: ["idCamion", "material", "origen", "tiro"],
 };
 
-export function getOrderBy(sort: string, area: TicketArea): any {
+export function getOrderBy(sort: string, area: TicketArea | Section): any {
   const regex = /^([+-])(\w+)$/;
   const sortMatch = sort.match(regex);
 
@@ -79,7 +96,7 @@ export function getOrderBy(sort: string, area: TicketArea): any {
   };
 }
 
-export function getFilters(filters: string, area: TicketArea): any {
+export function getFilters(filters: string, area: TicketArea | Section): any {
   const filtersOnWhere: any = {};
   const fieldsData = filters.split("|");
 

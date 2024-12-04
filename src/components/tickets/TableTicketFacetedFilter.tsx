@@ -21,7 +21,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
-import { FacetedFilter, TicketArea } from "@/types";
+import { FacetedFilter, TicketArea, Section } from "@/types";
 import {
   formatIsoDateFromString,
   formatLongSpanishDateFromString,
@@ -31,7 +31,7 @@ interface TableTicketFacetedFilterProps {
   title: string;
   options: FacetedFilter["options"];
   onUpdateFilter: (field: string, activeFacets: string[]) => void;
-  area: TicketArea;
+  area: TicketArea | Section;
   formatDate?: boolean;
 }
 

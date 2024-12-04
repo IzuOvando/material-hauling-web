@@ -9,6 +9,8 @@ import {
     validateTurno,
     validateFrenteExists
 } from '@/utils/validators';
+import { invalidateFacetsCache } from "@/actions/tickets";
+import { Section } from "@/types";
 
 export async function POST(req: NextRequest) {
 
@@ -66,7 +68,8 @@ export async function POST(req: NextRequest) {
                 { status: 400 }
             );
         }
-    
+        
+        await invalidateFacetsCache(frenteNombre, Section.VOUCHERCAMION);
     } catch (error) {
         if (error instanceof ValidationError) {
             return NextResponse.json({ error: error.message, field: error.field }, { status: 400 });

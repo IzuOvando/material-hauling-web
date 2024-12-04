@@ -1,6 +1,6 @@
 import prisma from "@/lib/db";
-import { FacetedFilter, TicketArea } from "@/types";
-import { Acarreos, Gasolina, Concreto } from "@prisma/client";
+import { FacetedFilter, TicketArea, Section } from "@/types";
+import { Acarreos, Gasolina, Concreto, VoucherCamion } from "@prisma/client";
 import { FILTER_FIELDS, getFilters } from "./helpers";
 import { kv } from "@vercel/kv";
 
@@ -17,7 +17,7 @@ type DistinctValuesType = {
 // This function is expected to be called from other function that validates the frente and area parameters
 export default async function getFacetedFilters(
   frente: string,
-  area: TicketArea,
+  area: TicketArea | Section,
   filters?: string
 ) {
   const distinctValues = await getDistinctValues(frente, area);
@@ -25,7 +25,11 @@ export default async function getFacetedFilters(
 
   const facetedFilters: FacetedFilter[] = FILTER_FIELDS[area].map(
     (field, index) => ({
-      field: field as keyof Acarreos | keyof Gasolina | keyof Concreto,
+      field: field as
+        | keyof Acarreos
+        | keyof Gasolina
+        | keyof Concreto
+        | keyof VoucherCamion,
       options: distinctValues[index].map((distinct: DistinctValuesType) => {
         const value = distinct[field];
         return {
@@ -41,7 +45,7 @@ export default async function getFacetedFilters(
 
 const getDistinctValues = async (
   frente: string,
-  area: TicketArea
+  area: TicketArea | Section
 ): Promise<DistinctValuesType[]> => {
   // Get values from cache
   const cacheKey = `facets_${frente}_${area}_distinct`;
@@ -76,9 +80,22 @@ const getDistinctValues = async (
           [field]: "asc",
         },
       });
-    } else {
+    } else if (area === TicketArea.CONCRETO) {
       return prisma.concreto.findMany({
         distinct: [field as keyof Concreto],
+        where: {
+          frenteNombre: frente,
+        },
+        select: {
+          [field]: true,
+        },
+        orderBy: {
+          [field]: "asc",
+        },
+      });
+    } else {
+      return prisma.voucherCamion.findMany({
+        distinct: [field as keyof VoucherCamion],
         where: {
           frenteNombre: frente,
         },
@@ -100,6 +117,10 @@ const getDistinctValues = async (
       return group.map((item: any) => ({
         fecha: item.fecha.toISOString(),
       }));
+    else if (Object.hasOwn(group[0], "voucherTime"))
+      return group.map((item: any) => ({
+        fecha: item.voucherTime.toISOString(),
+      }));
     else return group;
   });
 
@@ -110,7 +131,7 @@ const getDistinctValues = async (
 
 const getCounts = async (
   frente: string,
-  area: TicketArea,
+  area: TicketArea | Section,
   filters?: string
 ) => {
   let where: any = {
@@ -143,9 +164,17 @@ const getCounts = async (
           [field]: true,
         },
       });
-    } else {
+    } else if (area === TicketArea.CONCRETO) {
       return prisma.concreto.groupBy({
         by: [field as keyof Concreto],
+        where: localWhere,
+        _count: {
+          [field]: true,
+        },
+      });
+    } else {
+      return prisma.voucherCamion.groupBy({
+        by: [field as keyof VoucherCamion],
         where: localWhere,
         _count: {
           [field]: true,
@@ -162,6 +191,11 @@ const getCounts = async (
       return group.map((item: any) => ({
         ...item,
         fecha: item.fecha.toISOString(),
+      }));
+    else if (Object.hasOwn(group[0], "voucherTime"))
+      return group.map((item: any) => ({
+        ...item,
+        fecha: item.voucherTime.toISOString(),
       }));
     else return group;
   });
@@ -237,7 +271,7 @@ export const setDistinctValuesInCache = async (
 
 export const invalidateFacetsCache = async (
   frente: string,
-  area: TicketArea
+  area: TicketArea | Section
 ) => {
   try {
     const [cursor, keys] = await kv.scan(0, {

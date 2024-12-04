@@ -1,6 +1,6 @@
 import prisma from "@/lib/db";
-import { TicketArea } from "@/types";
-import { Acarreos, Gasolina, Concreto } from "@prisma/client";
+import { Section, TicketArea } from "@/types";
+import { Acarreos, Gasolina, Concreto, VoucherCamion } from "@prisma/client";
 import { getFilters, getOrderBy } from "./helpers";
 
 type PaginationConfig = {
@@ -8,7 +8,7 @@ type PaginationConfig = {
   limit: number;
 };
 
-type TicketsType = Acarreos[] | Gasolina[] | Concreto[];
+type TicketsType = Acarreos[] | Gasolina[] | Concreto[] | VoucherCamion[];
 
 type getTicketReturn = {
   tickets: TicketsType;
@@ -17,7 +17,7 @@ type getTicketReturn = {
 
 export default async function getTickets(
   frente: string,
-  area: TicketArea,
+  area: TicketArea | Section,
   pagination: PaginationConfig,
   sort?: string,
   filters?: string
@@ -34,9 +34,12 @@ export default async function getTickets(
 
   // Validations
   if (
-    ![TicketArea.ACARREOS, TicketArea.GASOLINA, TicketArea.CONCRETO].includes(
-      area as TicketArea
-    )
+    ![
+      TicketArea.ACARREOS,
+      TicketArea.GASOLINA,
+      TicketArea.CONCRETO,
+      Section.VOUCHERCAMION,
+    ].includes(area as TicketArea)
   )
     return null;
   const frenteOnDB = await prisma.frente.findUnique({
@@ -78,7 +81,7 @@ export default async function getTickets(
         where,
       }),
     ]);
-  else
+  else if (area === TicketArea.CONCRETO)
     [tickets, count] = await prisma.$transaction([
       prisma.concreto.findMany({
         skip: (page - 1) * limit,
@@ -87,6 +90,18 @@ export default async function getTickets(
         orderBy,
       }),
       prisma.concreto.count({
+        where,
+      }),
+    ]);
+  else
+    [tickets, count] = await prisma.$transaction([
+      prisma.voucherCamion.findMany({
+        skip: (page - 1) * limit,
+        take: limit,
+        where,
+        orderBy,
+      }),
+      prisma.voucherCamion.count({
         where,
       }),
     ]);
