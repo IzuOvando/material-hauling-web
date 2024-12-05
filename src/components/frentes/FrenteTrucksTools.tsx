@@ -9,43 +9,31 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useFrenteStore, useTicketsSelectionStore } from "@/store";
+import { useFrenteStore } from "@/store";
 import { SelectGroup, SelectLabel } from "@radix-ui/react-select";
 import { Frente } from "@prisma/client";
 import { useEffect } from "react";
+import {
+  DeleteVouchersDialog,
+  DownloadVoucherCamionButton,
+} from "@/components/trucks";
+import { Section } from "@/types";
 import { Button } from "../ui/button";
-import { CirclePlus, Pencil } from "lucide-react";
-import AddFrenteDialog from "./AddFrenteDialog";
-import EditFrenteDialog from "./EditFrenteDialog";
-import { TicketArea, TicketAreaList } from "@/types";
-import DownloadFrenteButton from "./DownloadFrenteButton";
+import { Trash } from "lucide-react";
 
 const FrenteTrucksTools = ({
   frentes,
-  canDownload,
+  areTickets,
 }: {
   frentes: Frente[];
-  canDownload: boolean;
+  areTickets?: boolean;
 }) => {
   // Hooks
-  const {
-    selectedFrente,
-    setSelectedFrente,
-    refreshFacets,
-    reset: resetFrente,
-  } = useFrenteStore();
+  const { selectedFrente, setSelectedFrente } = useFrenteStore();
   const router = useRouter();
   // States
-  const [showAddFrenteDialog, setShowAddFrenteDialog] = useState(false);
-  const [showEditFrenteDialog, setShowEditFrenteDialog] = useState(false);
-  const [areTickets, setAreTickets] = useState<{
-    [key in TicketArea]: boolean;
-  }>({
-    [TicketArea.ACARREOS]: false,
-    [TicketArea.GASOLINA]: false,
-    [TicketArea.CONCRETO]: false,
-  });
   const [frentesDisplay, setFrentesDisplay] = useState<Frente[]>(frentes);
+  const [openDelete, setOpenDelete] = useState(false);
 
   const handleSelectFrente = (value: string) => {
     const frente = frentesDisplay.find((f) => f.nombre === value);
@@ -84,14 +72,25 @@ const FrenteTrucksTools = ({
           </SelectGroup>
         </SelectContent>
       </Select>
-      {/* {canDownload && (
-        <DownloadFrenteButton
-          frente={selectedFrente.nombre}
-          //   area={selectedArea}
-          areTickets={areTickets}
-        />
-        TODO: Add Trucks Download Button
-      )} */}
+      {selectedFrente && areTickets && (
+        <>
+          <DownloadVoucherCamionButton
+            frente={selectedFrente.nombre}
+            section={Section.VOUCHERCAMION}
+          />
+          <Button
+            className="p-2 bg-transparent hover:bg-[rgba(var(--accent-light-color)/50%)] group ml-[-0.5rem]"
+            onClick={() => setOpenDelete(true)}
+          >
+            <Trash className="text-accent" />
+          </Button>
+          <DeleteVouchersDialog
+            open={openDelete}
+            setOpen={setOpenDelete}
+            frente={selectedFrente}
+          />
+        </>
+      )}
     </div>
   );
 };

@@ -117,11 +117,11 @@ const getDistinctValues = async (
       return group.map((item: any) => ({
         fecha: item.fecha.toISOString(),
       }));
-    else if (Object.hasOwn(group[0], "voucherTime"))
+    else if (Object.hasOwn(group[0], "voucherDate")) {
       return group.map((item: any) => ({
-        fecha: item.voucherTime.toISOString(),
+        voucherDate: item.voucherDate.toISOString(),
       }));
-    else return group;
+    } else return group;
   });
 
   await setDistinctValuesInCache(cacheKey, distinctValues);
@@ -192,10 +192,10 @@ const getCounts = async (
         ...item,
         fecha: item.fecha.toISOString(),
       }));
-    else if (Object.hasOwn(group[0], "voucherTime"))
+    else if (Object.hasOwn(group[0], "voucherDate"))
       return group.map((item: any) => ({
         ...item,
-        fecha: item.voucherTime.toISOString(),
+        voucherDate: item.voucherDate.toISOString(),
       }));
     else return group;
   });

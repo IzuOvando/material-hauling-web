@@ -1,9 +1,12 @@
+"use client";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { Trash } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 const DeleteVouchersButton = ({ frente }: { frente: string }) => {
   const { toast } = useToast();
+  const router = useRouter();
 
   const deleteVouchers = async () => {
     let disableToast: () => void;
@@ -27,6 +30,9 @@ const DeleteVouchersButton = ({ frente }: { frente: string }) => {
         variant: "success",
       });
       disableToast = dismiss;
+      setTimeout(() => {
+        router.push("/trucks/db");
+      }, 2000);
     } catch (error) {
       console.error("Error al eliminar los registros:", error);
       const { dismiss } = toast({

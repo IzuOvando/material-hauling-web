@@ -391,6 +391,9 @@ const voucherCamionColumns: ColumnDef<VoucherCamion>[] = [
     header: ({ column }) => (
       <TableTicketColumnHeader column={column} title="IdCamion" />
     ),
+    filterFn: (row, id, value) => {
+      return value.includes(row.getValue(id));
+    },
   },
   {
     accessorKey: "placas",
@@ -403,6 +406,9 @@ const voucherCamionColumns: ColumnDef<VoucherCamion>[] = [
     header: ({ column }) => (
       <TableTicketColumnHeader column={column} title="Material" />
     ),
+    filterFn: (row, id, value) => {
+      return value.includes(row.getValue(id));
+    },
   },
   {
     accessorKey: "cubicacion",
@@ -416,24 +422,39 @@ const voucherCamionColumns: ColumnDef<VoucherCamion>[] = [
     header: ({ column }) => (
       <TableTicketColumnHeader column={column} title="Origen" />
     ),
+    filterFn: (row, id, value) => {
+      return value.includes(row.getValue(id));
+    },
   },
   {
     accessorKey: "tiro",
     header: ({ column }) => (
       <TableTicketColumnHeader column={column} title="Tiro" />
     ),
+    filterFn: (row, id, value) => {
+      return value.includes(row.getValue(id));
+    },
   },
   {
-    accessorKey: "voucherTime",
+    accessorKey: "voucherDate",
     header: ({ column }) => (
       <TableTicketColumnHeader column={column} title="Fecha" />
     ),
     cell: ({ row }) => (
-      <>{formatDateAndTimeToString(row.getValue("voucherTime") as Date)}</>
+      <>{formatIsoDate(row.getValue("voucherDate") as Date)}</>
     ),
     filterFn: (row, id, value) => {
       return value.includes(row.getValue(id));
     },
+  },
+  {
+    accessorKey: "voucherTime",
+    header: ({ column }) => (
+      <TableTicketColumnHeader column={column} title="Hora" />
+    ),
+    cell: ({ row }) => (
+      <>{formatTime12Hour(row.getValue("voucherTime") as Date)}</>
+    ),
   },
   {
     accessorKey: "operador",

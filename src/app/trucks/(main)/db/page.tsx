@@ -15,7 +15,7 @@ export default async function DBEmptyPage() {
         page={CONFIG.PAGINATION.DEFAULT_PAGE}
         limit={CONFIG.PAGINATION.DEFAULT_LIMIT}
         total={0}
-        componentTopLeft={<FrenteTrucksTools frentes={frentes} canDownload />}
+        componentTopLeft={<FrenteTrucksTools frentes={frentes} />}
       />
     </>
   );

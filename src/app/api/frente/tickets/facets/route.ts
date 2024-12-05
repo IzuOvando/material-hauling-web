@@ -41,13 +41,25 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Frente not found" }, { status: 404 });
   // If is empty just return empty array
   if (
-    (area != Section.VOUCHERCAMION &&
-      area === TicketArea.ACARREOS &&
-      !frenteOnDB.excelUrlAcarreosBlob) ||
+    (area === TicketArea.ACARREOS && !frenteOnDB.excelUrlAcarreosBlob) ||
     (area === TicketArea.GASOLINA && !frenteOnDB.excelUrlGasolinaBlob) ||
     (area === TicketArea.CONCRETO && !frenteOnDB.excelUrlConcretoBlob)
   )
     return NextResponse.json({ facets: [] });
+  if (area === Section.VOUCHERCAMION) {
+    const frenteConVoucherCamion = await prisma.frente.findFirst({
+      where: {
+        VoucherCamion: {
+          some: {},
+        },
+      },
+      select: {
+        nombre: true,
+      },
+    });
+
+    if (!frenteConVoucherCamion) return NextResponse.json({ facets: [] });
+  }
 
   // Preparing cache key
   const cacheKey = `facets_${frente}_${area}${getPartialKeyFilters(filters)}`;

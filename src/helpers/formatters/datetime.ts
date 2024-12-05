@@ -38,7 +38,6 @@ export const formatLongSpanishDateFromString = (date: string) => {
 
 export const formatTime12Hour = (time: Date, lowercase?: boolean) => {
   const dt = DateTime.fromJSDate(time, { zone: "utc" });
-
   const format = "h:mm a";
 
   const formattedTime = dt.toFormat(format);

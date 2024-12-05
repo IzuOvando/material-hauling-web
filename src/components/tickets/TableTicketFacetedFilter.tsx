@@ -53,7 +53,7 @@ export const TableTicketFacetedFilter = forwardRef(
 
     const formatter = !formatDate
       ? (value: any) => value
-      : area === TicketArea.ACARREOS
+      : area === TicketArea.ACARREOS || area === Section.VOUCHERCAMION
       ? formatIsoDateFromString
       : formatLongSpanishDateFromString;
 
@@ -94,7 +94,7 @@ export const TableTicketFacetedFilter = forwardRef(
             className="group h-8 border-2 border-primary text-primary hover:bg-primary hover:!text-accent-light capitalize"
           >
             <PlusCircledIcon className="mr-2 h-4 w-4" />
-            {title}
+            {title == "voucherDate" ? "Fecha" : title}
             {selectedValues?.size > 0 && (
               <>
                 <Separator

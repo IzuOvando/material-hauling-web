@@ -77,7 +77,13 @@ export const FILTER_FIELDS = {
     "noEconomico",
     "destino",
   ],
-  [Section.VOUCHERCAMION]: ["idCamion", "material", "origen", "tiro"],
+  [Section.VOUCHERCAMION]: [
+    "idCamion",
+    "material",
+    "origen",
+    "tiro",
+    "voucherDate",
+  ],
 };
 
 export function getOrderBy(sort: string, area: TicketArea | Section): any {

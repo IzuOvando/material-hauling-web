@@ -47,7 +47,12 @@ export default async function DBPage({
         page={page}
         limit={limit}
         total={response.total}
-        componentTopLeft={<FrenteTrucksTools frentes={frentes} canDownload />}
+        componentTopLeft={
+          <FrenteTrucksTools
+            frentes={frentes}
+            areTickets={response.tickets.length > 0}
+          />
+        }
       />
     </>
   );
