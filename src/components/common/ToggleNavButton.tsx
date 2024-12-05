@@ -16,7 +16,7 @@ const ToggleNavButton = () => {
     <Button
       type="button"
       onClick={handleGoTo}
-      className="bg-primary hover:bg-primary-light active:bg-primary-dark"
+      className="bg-primary hover:bg-primary-light active:bg-primary-dark hidden md:block"
     >
       {isTrucks ? "Ir a Tickets" : "Ir a Trucks"}
     </Button>
