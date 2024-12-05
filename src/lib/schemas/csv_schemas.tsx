@@ -52,11 +52,11 @@ function parseHoraTime(dateStr: string): Date {
 
   let adjustedHours = hours;
 
-  if (period.toLowerCase() === "p." || period.toLowerCase() === "pm") {
+  if (period.toLowerCase().includes("p")) {
     if (hours !== 12) {
       adjustedHours += 12;
     }
-  } else if (period.toLowerCase() === "a." || period.toLowerCase() === "am") {
+  } else if (period.toLowerCase().includes("a")) {
     if (hours === 12) {
       adjustedHours = 0;
     }

@@ -40,17 +40,6 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const foundFrente = await prisma.frente.findUnique({
-    where: { nombre: frente },
-  });
-
-  if (!foundFrente) {
-    return new NextResponse(JSON.stringify({ error: "Frente not found" }), {
-      status: 404,
-      headers: { "Content-Type": "application/json" },
-    });
-  }
-
   let blobUrl: string | null;
   const typeLower = type.toLowerCase();
 
@@ -74,12 +63,23 @@ export async function POST(req: NextRequest) {
     }
   }
 
+  const foundFrente = await prisma.frente.findUnique({
+    where: { nombre: frente },
+  });
+
+  if (!foundFrente) {
+    return new NextResponse(JSON.stringify({ error: "Frente not found" }), {
+      status: 404,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
   if (typeLower === "acarreos") {
     blobUrl = foundFrente.excelUrlAcarreosBlob;
   } else if (typeLower === "gasolina") {
     blobUrl = foundFrente.excelUrlGasolinaBlob;
   } else if (typeLower === "vouchercamion") {
-    blobUrl = foundFrente.excelUrlGasolinaBlob;
+    blobUrl = foundFrente.excelUrlVoucherCamionBlob;
   } else {
     blobUrl = foundFrente.excelUrlConcretoBlob;
   }

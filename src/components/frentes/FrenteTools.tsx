@@ -93,6 +93,7 @@ const FrenteTools = ({ frentes }: { frentes: Frente[] }) => {
         excelUrlGasolinaBlob: null,
         excelUrlAcarreosBlob: null,
         excelUrlConcretoBlob: null,
+        excelUrlVoucherCamionBlob: null,
       },
     ]);
     setSelectedFrente({
@@ -100,6 +101,7 @@ const FrenteTools = ({ frentes }: { frentes: Frente[] }) => {
       excelUrlGasolinaBlob: null,
       excelUrlAcarreosBlob: null,
       excelUrlConcretoBlob: null,
+      excelUrlVoucherCamionBlob: null,
     });
     setSelectedArea(TicketArea.ACARREOS);
   };
