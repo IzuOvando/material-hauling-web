@@ -37,7 +37,7 @@ export async function GET(req: NextRequest) {
 
     const formattedVouchers = vouchers.map((voucher) => ({
       ...voucher,
-      fullDateTime: VoucherDateTimeUtil.combineDateTime(voucher.voucherDate, voucher.voucherTime),
+      voucherTime: VoucherDateTimeUtil.combineDateTime(voucher.voucherDate, voucher.voucherTime),
     }));
 
     return NextResponse.json(formattedVouchers);
