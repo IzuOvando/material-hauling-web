@@ -32,6 +32,7 @@ model Frente {
 model VoucherCamion {
   uuid         String   @id @default(uuid())
   createdAt    DateTime @default(now())
+  voucherDate  DateTime
   voucherTime  DateTime
   tiro         String
   origen       String
@@ -50,6 +51,12 @@ model VoucherCamion {
   frente       Frente   @relation("FrenteVoucherCamion", fields: [frenteNombre], references: [nombre], onDelete: Cascade)
 
   @@index(createdAt)
+  @@index([frenteNombre, voucherDate])
+  @@index([frenteNombre, voucherTime])
+  @@index([frenteNombre, idCamion])
+  @@index([frenteNombre, origen])
+  @@index([frenteNombre, tiro])
+  @@index([frenteNombre, material])
 }
 
 model Acarreos {

@@ -11,6 +11,8 @@ import {
 } from '@/utils/validators';
 import { invalidateFacetsCache } from "@/actions/tickets";
 import { Section } from "@/types";
+import { VoucherDateTimeUtil } from "@/helpers/formatters/voucherdatetime";
+import { VoucherDateTimeError } from "@/errors";
 
 export async function POST(req: NextRequest) {
 
@@ -77,10 +79,18 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: "Formato JSON inválido o error de validación" }, { status: 400 });
     }
     try {
+
+        for (const voucher of vouchersArray) {
+            const { voucherDate, voucherTime } = VoucherDateTimeUtil.splitDateTime(new Date(voucher.voucherTime));
+            voucher.voucherDate = voucherDate;
+            voucher.voucherTime = voucherTime;
+        }
+
         await prisma.$transaction(
             vouchersArray.map((voucher) =>
                 prisma.voucherCamion.create({
                     data: {
+                        voucherDate: voucher.voucherDate,
                         voucherTime: voucher.voucherTime,
                         tiro: voucher.tiro,
                         origen: voucher.origen,
@@ -101,6 +111,12 @@ export async function POST(req: NextRequest) {
             )
         );
     } catch (error) {
+        if (error instanceof VoucherDateTimeError) {
+            return NextResponse.json(
+                { error: "Error en el formato de fecha/hora proporcionado" },
+                { status: 400 }
+            );
+        }
         if (error instanceof Prisma.PrismaClientValidationError) {
             return NextResponse.json(
                 { error: "Error de validación con los datos proporcionados" },
