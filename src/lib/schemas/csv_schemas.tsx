@@ -70,11 +70,16 @@ function parseHoraTime(dateStr: string): Date {
 function parseUTCDate(dateStr: string): Date {
 
   const date = DateTime.fromISO(dateStr, { zone: 'utc' });
-
   if (date.isValid) {
-      return date.toJSDate();
+    return date.toJSDate();
   }
 
+  const isDDMMYYYY = /^\d{2}\/\d{2}\/\d{4}$/.test(dateStr);
+
+  if (isDDMMYYYY) {
+    const [dd, mm, yyyy] = dateStr.split('/');
+    dateStr = `${mm}/${parseInt(dd)}/${yyyy.slice(-2)}`;
+  }
   const parsedDate = DateTime.fromFormat(dateStr, 'M/d/yy', { zone: 'utc' });
 
   if (!parsedDate.isValid) {
