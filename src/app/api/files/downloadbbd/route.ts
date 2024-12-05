@@ -29,7 +29,9 @@ export async function POST(req: NextRequest) {
   }
 
   const data = await req.json();
-  const { frente, type }: { frente: string; type: string } = data;
+  
+  const { frente, area, section } = data;
+  const type = area || section;
 
   if (!type || !isValidAreaOrSection(type)) {
     return new NextResponse(
