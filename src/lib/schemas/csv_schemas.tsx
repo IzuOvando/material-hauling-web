@@ -1,6 +1,6 @@
 import { Gasolina, Acarreos, Concreto } from "@prisma/client";
 import { TicketArea } from "@/types";
-import { DateTime } from 'luxon';
+import { DateTime } from "luxon";
 
 type CreateGasolinaDto = Omit<Gasolina, "uuid" | "createdAt"> & {
   uuid?: string;
@@ -47,13 +47,14 @@ function normalizeValue(value: string): string {
 }
 
 function parseHoraTime(dateStr: string): Date {
-
   const normalizedDateStr = dateStr.replace(/\./g, "").toLowerCase();
   const [time, period] = normalizedDateStr.split(" ");
   const [hours, minutes] = time.split(":").map(Number);
   const formattedMinutes = minutes.toString().padStart(2, "0");
   const formattedTime = `${hours}:${formattedMinutes} ${period}`;
-  const dateTime = DateTime.fromFormat(formattedTime, "h:mm a", { zone: "UTC" });
+  const dateTime = DateTime.fromFormat(formattedTime, "h:mm a", {
+    zone: "America/Mexico_City",
+  });
 
   if (!dateTime.isValid) {
     throw new Error("Formato de hora inválido");
@@ -62,8 +63,7 @@ function parseHoraTime(dateStr: string): Date {
 }
 
 function parseUTCDate(dateStr: string): Date {
-
-  const date = DateTime.fromISO(dateStr, { zone: 'utc' });
+  const date = DateTime.fromISO(dateStr, { zone: "America/Mexico_City" });
   if (date.isValid) {
     return date.toJSDate();
   }
@@ -71,13 +71,15 @@ function parseUTCDate(dateStr: string): Date {
   const isDDMMYYYY = /^\d{2}\/\d{2}\/\d{4}$/.test(dateStr);
 
   if (isDDMMYYYY) {
-    const [dd, mm, yyyy] = dateStr.split('/');
+    const [dd, mm, yyyy] = dateStr.split("/");
     dateStr = `${mm}/${parseInt(dd)}/${yyyy.slice(-2)}`;
   }
-  const parsedDate = DateTime.fromFormat(dateStr, 'M/d/yy', { zone: 'utc' });
+  const parsedDate = DateTime.fromFormat(dateStr, "M/d/yy", {
+    zone: "America/Mexico_City",
+  });
 
   if (!parsedDate.isValid) {
-      throw new Error(`Invalid date format: ${dateStr}`);
+    throw new Error(`Invalid date format: ${dateStr}`);
   }
 
   return parsedDate.toJSDate();
