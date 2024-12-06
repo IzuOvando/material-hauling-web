@@ -1,6 +1,7 @@
 import * as XLSX from "xlsx";
 import prisma from "@/lib/db";
 import blobClient from "@/lib/blobClient";
+import { DateTime } from "luxon";
 
 export default class DatabaseDownloader { 
 
@@ -75,7 +76,50 @@ export default class DatabaseDownloader {
     
         throw new Error(`Unsupported key: ${key}`);
     }
-    
+    private processVoucherValue(newKey: string, value: string): string {
+        if (!value) return value;
+
+        const key = newKey.toLowerCase();
+
+        try {
+            if (key === 'voucher time') {
+                let dt = DateTime.fromISO(value, { zone: 'utc' });
+                if (!dt.isValid) {
+                    const jsDate = new Date(value);
+                    if (isNaN(jsDate.getTime())) {
+                        throw new Error(`Invalid DateTime for 'voucher time': Unable to parse "${value}"`);
+                    }
+                    dt = DateTime.fromJSDate(jsDate, { zone: 'utc' });
+                }
+                if (!dt.isValid) {
+                    throw new Error(`Invalid DateTime for 'voucher time': ${dt.invalidExplanation}`);
+                }
+                const formattedTime = dt.toFormat('hh:mm a');
+                return formattedTime;
+            }
+
+            if (key === 'voucher date') {
+                let dt = DateTime.fromISO(value, { zone: 'utc' });
+                if (!dt.isValid) {
+                    const jsDate = new Date(value);
+                    if (isNaN(jsDate.getTime())) {
+                        throw new Error(`Invalid DateTime for 'voucher date': Unable to parse "${value}"`);
+                    }
+                    dt = DateTime.fromJSDate(jsDate, { zone: 'utc' });
+                }
+
+                if (!dt.isValid) {
+                    throw new Error(`Invalid DateTime for 'voucher date': ${dt.invalidExplanation}`);
+                }
+
+                const formattedDate = dt.toFormat('yyyy-MM-dd');
+                return formattedDate;
+            }
+            return value;
+        } catch (error) {
+            throw error;
+        }
+    }
 
     private processRecords(records: any[]): any[] {
         return records.map(record => {
@@ -94,6 +138,10 @@ export default class DatabaseDownloader {
 
                 if (['fecha', 'created at'].includes(newKey.toLowerCase()) && value) {
                     value = this.formatDateToDDMMYYYY(value);
+                }
+
+                if (['voucher time', 'voucher date'].includes(newKey.toLowerCase()) && value) {
+                    value = this.processVoucherValue(newKey, value);
                 }
 
                 updatedRecord[newKey] = value;

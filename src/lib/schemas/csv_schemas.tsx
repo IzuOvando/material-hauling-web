@@ -47,24 +47,18 @@ function normalizeValue(value: string): string {
 }
 
 function parseHoraTime(dateStr: string): Date {
-  const [time, period] = dateStr.split(" ");
+
+  const normalizedDateStr = dateStr.replace(/\./g, "").toLowerCase();
+  const [time, period] = normalizedDateStr.split(" ");
   const [hours, minutes] = time.split(":").map(Number);
+  const formattedMinutes = minutes.toString().padStart(2, "0");
+  const formattedTime = `${hours}:${formattedMinutes} ${period}`;
+  const dateTime = DateTime.fromFormat(formattedTime, "h:mm a", { zone: "UTC" });
 
-  let adjustedHours = hours;
-
-  if (period.toLowerCase().includes("p")) {
-    if (hours !== 12) {
-      adjustedHours += 12;
-    }
-  } else if (period.toLowerCase().includes("a")) {
-    if (hours === 12) {
-      adjustedHours = 0;
-    }
+  if (!dateTime.isValid) {
+    throw new Error("Formato de hora inválido");
   }
-  const date = new Date(0);
-  date.setUTCHours(adjustedHours, minutes, 0, 0);
-
-  return date;
+  return dateTime.toJSDate();
 }
 
 function parseUTCDate(dateStr: string): Date {
