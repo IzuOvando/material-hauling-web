@@ -12,17 +12,28 @@ export default class DatabaseDownloader {
     }
 
     private formatHour(hour: string): string {
-        const date = new Date(hour);
-        let hours = date.getUTCHours();
-        const minutes = date.getUTCMinutes();
-        const suffix = hours >= 12 ? 'p.m.' : 'a.m.';
+        let dt = DateTime.fromISO(hour, { zone: 'utc' });
 
-        hours = hours % 12;
-        hours = hours ? hours : 12;
+        if (!dt.isValid) {
+            const jsDate = new Date(hour);
+    
+            if (isNaN(jsDate.getTime())) {
+                throw new Error(`Invalid DateTime for 'voucher time': Unable to parse "${hour}"`);
+            }
+    
+            dt = DateTime.fromJSDate(jsDate, { zone: 'utc' });
+        }
+    
+        if (!dt.isValid) {
+            throw new Error(`Invalid DateTime for 'voucher time': ${dt.invalidExplanation}`);
+        }
 
-        const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
-
-        return `${hours}:${formattedMinutes} ${suffix}`;
+        dt = dt.setZone('America/Mexico_City');
+        const hours = dt.hour % 12 || 12;
+        const minutes = dt.minute < 10 ? `0${dt.minute}` : dt.minute;
+        const suffix = dt.hour >= 12 ? 'p.m.' : 'a.m.';
+    
+        return `${hours}:${minutes} ${suffix}`;
     }
 
     private formatDateToDDMMYYYY(date: Date): string {
