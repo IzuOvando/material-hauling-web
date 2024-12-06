@@ -26,12 +26,9 @@ export default class DatabaseDownloader {
     }
 
     private formatDateToDDMMYYYY(date: Date): string {
-
-        const day = date.getUTCDate().toString().padStart(2, '0'); 
-        const month = (date.getUTCMonth() + 1).toString().padStart(2, '0');
-        const year = date.getUTCFullYear().toString();
-    
-        return `${day}/${month}/${year}`;
+        return DateTime.fromJSDate(date, { zone: 'utc' })
+            .setZone('America/Mexico_City')
+            .toFormat('dd/MM/yyyy');
     }
 
     private async extractFrenteName(fileName: string): Promise<string> {
@@ -76,6 +73,7 @@ export default class DatabaseDownloader {
     
         throw new Error(`Unsupported key: ${key}`);
     }
+
     private processVoucherValue(newKey: string, value: string): string {
         if (!value) return value;
 
@@ -91,10 +89,12 @@ export default class DatabaseDownloader {
                     }
                     dt = DateTime.fromJSDate(jsDate, { zone: 'utc' });
                 }
+
                 if (!dt.isValid) {
                     throw new Error(`Invalid DateTime for 'voucher time': ${dt.invalidExplanation}`);
                 }
-                const formattedTime = dt.toFormat('hh:mm a');
+
+                const formattedTime = dt.setZone('America/Mexico_City').toFormat('hh:mm a');
                 return formattedTime;
             }
 
@@ -112,14 +112,16 @@ export default class DatabaseDownloader {
                     throw new Error(`Invalid DateTime for 'voucher date': ${dt.invalidExplanation}`);
                 }
 
-                const formattedDate = dt.toFormat('yyyy-MM-dd');
+                const formattedDate = dt.setZone('America/Mexico_City').toFormat('yyyy-MM-dd');
                 return formattedDate;
             }
+
             return value;
         } catch (error) {
             throw error;
         }
     }
+
 
     private processRecords(records: any[]): any[] {
         return records.map(record => {
