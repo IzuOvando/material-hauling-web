@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import {
   getCoreRowModel,
   useReactTable,
@@ -9,7 +9,7 @@ import {
   VisibilityState,
   TableOptions,
 } from "@tanstack/react-table";
-import { Acarreos, Gasolina, Concreto } from "@prisma/client";
+import { Acarreos, Gasolina, Concreto, VoucherCamion } from "@prisma/client";
 import {
   Table,
   TableHeader,
@@ -23,7 +23,7 @@ import { TableTicketColumnToggle } from "./TableTicketColumnToggle";
 import { TableTicketFilters } from "./TableTicketFilters";
 import { Button } from "../ui/button";
 import { PrintTicketDialog } from ".";
-import { TicketArea } from "@/types";
+import { TicketArea, Section } from "@/types";
 import { ticketsColumns } from "./tableTicketsColumns";
 import { useTicketsSelectionStore } from "@/store";
 import { TableTicketsProvider } from "@/contexts";
@@ -43,17 +43,24 @@ interface TableTicketConcretoProps {
   tickets: Concreto[];
 }
 
+interface TableTicketVoucherCamionProps {
+  area: Section.VOUCHERCAMION;
+  tickets: VoucherCamion[];
+}
+
 interface TableTicketGeneralProps {
   frente?: string;
   total: number;
   page: number;
   limit: number;
+  componentTopLeft?: ReactNode;
 }
 
 type TableTicketProps = (
   | TableTicketAcarreoProps
   | TableTicketGasolinaProps
   | TableTicketConcretoProps
+  | TableTicketVoucherCamionProps
 ) &
   TableTicketGeneralProps;
 
@@ -97,13 +104,17 @@ const TableTicket = (props: TableTicketProps) => {
   return (
     <TableTicketsProvider>
       <div className="flex items-center justify-center pb-4 flex-wrap lg:justify-start lg:flex-nowrap gap-3">
-        <Button
-          className="bg-accent hover:bg-accent-light active:bg-accent-dark"
-          disabled={disablePrintTickets}
-          onClick={() => setOpenPrintTickets(true)}
-        >
-          Imprimir Tickets
-        </Button>
+        {props.componentTopLeft ? (
+          props.componentTopLeft
+        ) : (
+          <Button
+            className="bg-accent hover:bg-accent-light active:bg-accent-dark"
+            disabled={disablePrintTickets}
+            onClick={() => setOpenPrintTickets(true)}
+          >
+            Imprimir Tickets
+          </Button>
+        )}
         {props.frente !== undefined && (
           <TableTicketFilters frente={props.frente} area={props.area} />
         )}
@@ -160,7 +171,9 @@ const TableTicket = (props: TableTicketProps) => {
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  No hay tickets que mostrar
+                  No hay{" "}
+                  {props.area == Section.VOUCHERCAMION ? "vouchers" : "tickets"}{" "}
+                  que mostrar
                 </TableCell>
               </TableRow>
             )}
@@ -177,9 +190,10 @@ const TableTicket = (props: TableTicketProps) => {
           total={props.total}
           page={props.page}
           limit={props.limit}
+          notSelectable={props.area == Section.VOUCHERCAMION}
         />
       </div>
-      {props.frente !== undefined && (
+      {props.frente !== undefined && props.area !== Section.VOUCHERCAMION && (
         <PrintTicketDialog
           open={openPrintTickets}
           setOpen={setOpenPrintTickets}

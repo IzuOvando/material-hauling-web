@@ -2,10 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/db";
 import { VoucherCamion as PrismaVoucherCamion } from "@prisma/client";
 import { TokenAuthenticator } from "@/auth/TokenAuthenticator";
+import { VoucherDateTimeUtil } from "@/helpers/formatters/voucherdatetime";
 
 export async function GET(req: NextRequest) {
   try {
-
     const authHeader = req.headers.get("authorization");
     const accessToken = authHeader && authHeader.split(" ")[1];
 
@@ -17,10 +17,10 @@ export async function GET(req: NextRequest) {
     const limitParam = searchParams.get("limit");
 
     let limit = 5;
-    
+
     if (limitParam !== null) {
       const parsedLimit = parseInt(limitParam, 10);
-      
+
       if (isNaN(parsedLimit) || parsedLimit < 1 || parsedLimit > 50) {
         return NextResponse.json(
           { message: "El límite debe tener un valor entre 1 y 50" },
@@ -35,7 +35,12 @@ export async function GET(req: NextRequest) {
       take: limit,
     });
 
-    return NextResponse.json(vouchers);
+    const formattedVouchers = vouchers.map((voucher) => ({
+      ...voucher,
+      voucherTime: VoucherDateTimeUtil.combineDateTime(voucher.voucherDate, voucher.voucherTime),
+    }));
+
+    return NextResponse.json(formattedVouchers);
   } catch (error) {
     console.error("Error al recuperar los vouchers:", error);
     return NextResponse.json(

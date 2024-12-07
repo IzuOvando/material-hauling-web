@@ -1,5 +1,5 @@
 import { TicketPrinter } from "@/lib/printers";
-import { Acarreos, Gasolina, Concreto } from "@prisma/client";
+import { Acarreos, Gasolina, Concreto, VoucherCamion } from "@prisma/client";
 
 export type Printer = {
   name: string;
@@ -9,11 +9,11 @@ export type Printer = {
 };
 
 export type FacetedFilter = {
-  field: keyof Acarreos | keyof Gasolina | keyof Concreto;
+  field: keyof Acarreos | keyof Gasolina | keyof Concreto | keyof VoucherCamion;
   options: {
     value: string;
     count: number;
   }[];
 };
 
-export type Ticket = Acarreos | Gasolina | Concreto;
+export type Ticket = Acarreos | Gasolina | Concreto | VoucherCamion;

@@ -1,7 +1,7 @@
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import CONFIG from "@/config";
 import { getFilters } from "@/actions/tickets/helpers";
-import { TicketArea } from "@/types";
+import { TicketArea, Section } from "@/types";
 import { useRef } from "react";
 
 const useTableTickets = () => {
@@ -60,7 +60,7 @@ const useTableTickets = () => {
   const updateFilters = (
     field: string,
     options: string[],
-    area: TicketArea
+    area: TicketArea | Section
   ) => {
     // Getting actual filters
     const paramFilters = filters.current || "";

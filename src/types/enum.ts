@@ -4,6 +4,10 @@ export enum TicketArea {
   CONCRETO = "CONCRETO",
 }
 
+export enum Section {
+  VOUCHERCAMION = "VOUCHERCAMION",
+}
+
 export const TicketAreaList = [
   {
     label: "Acarreos",

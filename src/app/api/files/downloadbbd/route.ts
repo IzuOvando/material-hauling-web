@@ -1,6 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
 import axios from "axios";
 import prisma from "@/lib/db";
+import { Section, TicketArea } from "@/types";
+import DatabaseDownloader from "@/actions/databasedownloader";
+
+const isValidAreaOrSection = (type: string) => {
+  const upperCaseType = type.toUpperCase();
+
+  if (Object.values(TicketArea).includes(upperCaseType as TicketArea)) {
+    return true;
+  }
+
+  if (Object.values(Section).includes(upperCaseType as Section)) {
+    return true;
+  }
+
+  return false;
+};
 
 export async function POST(req: NextRequest) {
   if (req.method !== "POST") {
@@ -13,13 +29,38 @@ export async function POST(req: NextRequest) {
   }
 
   const data = await req.json();
-  const { frente, area }: { frente: string; area: string } = data;
+  
+  const { frente, area, section } = data;
+  const type = area || section;
 
-  if (!frente) {
+  if (!type || !isValidAreaOrSection(type)) {
     return new NextResponse(
-      JSON.stringify({ error: "Frente nombre is missing" }),
+      JSON.stringify({ error: "Invalid area or section" }),
       { status: 400, headers: { "Content-Type": "application/json" } }
     );
+  }
+
+  let blobUrl: string | null;
+  const typeLower = type.toLowerCase();
+
+  if (typeLower === "vouchercamion") {
+    try {
+      const fileName = `bbd_${frente}.xlsx`
+      const outputExcel = `db_output/excel/${frente}`;
+      const downloader = new DatabaseDownloader();
+      await downloader.downloadDatabase(outputExcel, typeLower, fileName);
+    } catch (error) {
+      console.error("Error creating Excel for voucherCamion:", error);
+      return new NextResponse(
+        JSON.stringify({ error: "Failed to create Excel for voucherCamion" }),
+        {
+          status: 500,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+    }
   }
 
   const foundFrente = await prisma.frente.findUnique({
@@ -33,13 +74,12 @@ export async function POST(req: NextRequest) {
     });
   }
 
-  let blobUrl: string | null;
-  const areaLower = area.toLowerCase();
-
-  if (areaLower === "acarreos") {
+  if (typeLower === "acarreos") {
     blobUrl = foundFrente.excelUrlAcarreosBlob;
-  } else if (areaLower === "gasolina") {
+  } else if (typeLower === "gasolina") {
     blobUrl = foundFrente.excelUrlGasolinaBlob;
+  } else if (typeLower === "vouchercamion") {
+    blobUrl = foundFrente.excelUrlVoucherCamionBlob;
   } else {
     blobUrl = foundFrente.excelUrlConcretoBlob;
   }
@@ -59,7 +99,7 @@ export async function POST(req: NextRequest) {
     const headers = new Headers({
       "Content-Type":
         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-      "Content-Disposition": `attachment; filename="${area}.xlsx"`,
+      "Content-Disposition": `attachment; filename="${type}.xlsx"`,
     });
 
     return new Response(response.data, {

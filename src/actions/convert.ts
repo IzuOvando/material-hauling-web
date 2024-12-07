@@ -8,6 +8,9 @@ import { Readable } from 'stream';
 import { schemas, SchemaKeys } from "@/lib/schemas/headers";
 import { CreateTicketDto, filteredDataConfig, isCreateAcarreosDto, isCreateGasolinaDto, isCreateConcretoaDto } from '@/lib/schemas/csv_schemas';
 import CONFIG from "@/config";
+import DatabaseDownloader from "./databasedownloader";
+
+
 
 
 class FileProcessor {
@@ -676,6 +679,7 @@ class FileProcessor {
             console.error(`Invalid area type: ${key}`);
             throw new Error(`Invalid area type: ${key}`);
         }
+        const downloader = new DatabaseDownloader();
         const validHeaders = schemas[key];
         const desiredPart = fileName.split('_')[1].split('.')[0];
         const outputExcelFolder = `db_output/excel/${desiredPart}`;
@@ -695,7 +699,7 @@ class FileProcessor {
 
             await this.processCSVFiles(csvFilePaths, fileName, key);
 
-            await this.downloadDatabase(outputExcelFolder, key, fileName)
+            await downloader.downloadDatabase(outputExcelFolder, key as 'gasolina' | 'acarreos' | 'concreto', fileName);
 
             fetch(`${CONFIG.BASE_URL}/api/files/delete-blobs`, {
                 method: 'POST',
@@ -712,140 +716,6 @@ class FileProcessor {
     private async processCSVFiles(csvFilePaths: string[], fileName: string, key: string) {
         for (const csvFilePath of csvFilePaths) {
             await this.csvToSQLite(csvFilePath, fileName, key);
-        }
-    }
-
-    private convertCamelCaseToSpaces(key: string): string {
-        return key.replace(/([a-z])([A-Z])/g, '$1 $2')
-            .replace(/([A-Z])([A-Z][a-z])/g, '$1 $2')
-            .replace(/^./, str => str.toUpperCase());
-    }
-
-    private formatHour(hour: string): string {
-        const date = new Date(hour);
-        let hours = date.getUTCHours();
-        const minutes = date.getUTCMinutes();
-        const suffix = hours >= 12 ? 'p.m.' : 'a.m.';
-
-        hours = hours % 12;
-        hours = hours ? hours : 12;
-
-        const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
-
-        return `${hours}:${formattedMinutes} ${suffix}`;
-    }
-
-    private formatDateToDDMMYYYY(date: Date): string {
-
-        const day = date.getUTCDate().toString().padStart(2, '0'); 
-        const month = (date.getUTCMonth() + 1).toString().padStart(2, '0');
-        const year = date.getUTCFullYear().toString();
-    
-        return `${day}/${month}/${year}`;
-    }
-    
-      
-
-    private async downloadDatabase(outputExcel: string, key: string, fileName: string): Promise<void> {
-
-        try {
-            const underscoreIndex = fileName.indexOf('_');
-            const dotIndex = fileName.indexOf('.');
-            const cleanFrenteName = fileName.substring(underscoreIndex + 1, dotIndex).replace(/\s+/g, '');
-
-            let records: any[] = [];
-            if (key === 'gasolina') {
-                records = await prisma.gasolina.findMany({
-                    where: {
-                        frenteNombre: cleanFrenteName,
-                    },
-                });
-            } else if (key === 'acarreos') {
-                records = await prisma.acarreos.findMany({
-                    where: {
-                        frenteNombre: cleanFrenteName,
-                    },
-                });
-            } else if (key === 'concreto') {
-                records = await prisma.concreto.findMany({
-                    where: {
-                        frenteNombre: cleanFrenteName,
-                    },
-                });
-            } else {
-                throw new Error(`Unsupported key: ${key}`);
-            }
-
-            const processedRecords = records.map(record => {
-                const updatedRecord: any = {};
-                Object.keys(record).forEach(data => {
-                    const newKey = this.convertCamelCaseToSpaces(data);
-                    let value = record[data];
-
-                    if (newKey.toLowerCase() === 'hora' && value) {
-                        value = this.formatHour(value);
-                    }
-                    
-                    if (newKey.toLowerCase() === 'hora salida' && value) {
-                        value = this.formatHour(value);
-                    }
-
-                    if (newKey.toLowerCase() === 'hora llegada' && value) {
-                        value = this.formatHour(value);
-                    }
-
-                    if (newKey.toLowerCase().includes('uuid')) {
-                        value = value.toString();
-                    }
-
-                    if ((newKey.toLocaleLowerCase() === 'fecha'|| newKey.toLocaleLowerCase() === 'created at') && value) {
-                        value = this.formatDateToDDMMYYYY(value);
-                    }
-
-                    updatedRecord[newKey] = value;
-                });
-                return updatedRecord;
-            });
-
-            const worksheet = XLSX.utils.json_to_sheet(processedRecords, {
-                cellDates: false,
-                cellStyles: false
-            });
-
-            worksheet['!cols'] = [{ wch: 36 }];
-
-            const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, key.charAt(0).toUpperCase() + key.slice(1));
-
-            const filename = `${key}.xlsx`;
-
-            const buffer = XLSX.write(workbook, { type: 'buffer' });
-
-
-            const blobUrlResult = await blobClient.putBlob(`${outputExcel}${filename}`, buffer, { access: 'public' });
-
-            const blobUrl = blobUrlResult.url;
-
-            console.log('Excel file uploaded to Vercel Blob successfully.');
-
-            const updateField = key === 'acarreos' ? 'excelUrlAcarreosBlob' 
-            : key === 'gasolina' 
-            ? 'excelUrlGasolinaBlob'
-            : 'excelUrlConcretoBlob';
-
-            await prisma.frente.update({
-                where: {
-                    nombre: cleanFrenteName
-                },
-                data: {
-                    [updateField]: blobUrl
-                }
-            });
-
-
-        } catch (error) {
-            console.error('Error during database download and upload:', error);
-            throw error;
         }
     }
 

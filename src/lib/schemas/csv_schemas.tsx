@@ -1,6 +1,6 @@
 import { Gasolina, Acarreos, Concreto } from "@prisma/client";
 import { TicketArea } from "@/types";
-import { DateTime } from 'luxon';
+import { DateTime } from "luxon";
 
 type CreateGasolinaDto = Omit<Gasolina, "uuid" | "createdAt"> & {
   uuid?: string;
@@ -47,38 +47,39 @@ function normalizeValue(value: string): string {
 }
 
 function parseHoraTime(dateStr: string): Date {
-  const [time, period] = dateStr.split(" ");
+  const normalizedDateStr = dateStr.replace(/\./g, "").toLowerCase();
+  const [time, period] = normalizedDateStr.split(" ");
   const [hours, minutes] = time.split(":").map(Number);
+  const formattedMinutes = minutes.toString().padStart(2, "0");
+  const formattedTime = `${hours}:${formattedMinutes} ${period}`;
+  const dateTime = DateTime.fromFormat(formattedTime, "h:mm a", {
+    zone: "America/Mexico_City",
+  });
 
-  let adjustedHours = hours;
-
-  if (period.toLowerCase() === "p." || period.toLowerCase() === "pm") {
-    if (hours !== 12) {
-      adjustedHours += 12;
-    }
-  } else if (period.toLowerCase() === "a." || period.toLowerCase() === "am") {
-    if (hours === 12) {
-      adjustedHours = 0;
-    }
+  if (!dateTime.isValid) {
+    throw new Error("Formato de hora inválido");
   }
-  const date = new Date(0);
-  date.setUTCHours(adjustedHours, minutes, 0, 0);
-
-  return date;
+  return dateTime.toJSDate();
 }
 
 function parseUTCDate(dateStr: string): Date {
-
-  const date = DateTime.fromISO(dateStr, { zone: 'utc' });
-
+  const date = DateTime.fromISO(dateStr, { zone: "America/Mexico_City" });
   if (date.isValid) {
-      return date.toJSDate();
+    return date.toJSDate();
   }
 
-  const parsedDate = DateTime.fromFormat(dateStr, 'M/d/yy', { zone: 'utc' });
+  const isDDMMYYYY = /^\d{2}\/\d{2}\/\d{4}$/.test(dateStr);
+
+  if (isDDMMYYYY) {
+    const [dd, mm, yyyy] = dateStr.split("/");
+    dateStr = `${mm}/${parseInt(dd)}/${yyyy.slice(-2)}`;
+  }
+  const parsedDate = DateTime.fromFormat(dateStr, "M/d/yy", {
+    zone: "America/Mexico_City",
+  });
 
   if (!parsedDate.isValid) {
-      throw new Error(`Invalid date format: ${dateStr}`);
+    throw new Error(`Invalid date format: ${dateStr}`);
   }
 
   return parsedDate.toJSDate();

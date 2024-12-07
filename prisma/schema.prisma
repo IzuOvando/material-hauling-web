@@ -19,19 +19,21 @@ model User {
 }
 
 model Frente {
-  nombre               String          @id @unique
-  excelUrlGasolinaBlob String?
-  excelUrlAcarreosBlob String?
-  excelUrlConcretoBlob String?
-  ticketsGasolina      Gasolina[]      @relation("FrenteGasolina")
-  ticketsAcarreos      Acarreos[]      @relation("FrenteAcarreos")
-  VoucherCamion        VoucherCamion[] @relation("FrenteVoucherCamion")
-  ticketsConcreto      Concreto[]      @relation("FrenteConcreto")
+  nombre                    String          @id @unique
+  excelUrlGasolinaBlob      String?
+  excelUrlAcarreosBlob      String?
+  excelUrlConcretoBlob      String?
+  excelUrlVoucherCamionBlob String?
+  ticketsGasolina           Gasolina[]      @relation("FrenteGasolina")
+  ticketsAcarreos           Acarreos[]      @relation("FrenteAcarreos")
+  VoucherCamion             VoucherCamion[] @relation("FrenteVoucherCamion")
+  ticketsConcreto           Concreto[]      @relation("FrenteConcreto")
 }
 
 model VoucherCamion {
   uuid         String   @id @default(uuid())
   createdAt    DateTime @default(now())
+  voucherDate  DateTime
   voucherTime  DateTime
   tiro         String
   origen       String
@@ -48,6 +50,14 @@ model VoucherCamion {
   frenteNombre String
   idCamion     String
   frente       Frente   @relation("FrenteVoucherCamion", fields: [frenteNombre], references: [nombre], onDelete: Cascade)
+
+  @@index(createdAt)
+  @@index([frenteNombre, voucherDate])
+  @@index([frenteNombre, voucherTime])
+  @@index([frenteNombre, idCamion])
+  @@index([frenteNombre, origen])
+  @@index([frenteNombre, tiro])
+  @@index([frenteNombre, material])
 }
 
 model Acarreos {

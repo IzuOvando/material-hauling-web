@@ -4,7 +4,7 @@ import {
   setFacetedFiltersInCache,
 } from "@/actions/tickets";
 import prisma from "@/lib/db";
-import { TicketArea } from "@/types";
+import { TicketArea, Section } from "@/types";
 import { NextRequest, NextResponse } from "next/server";
 import { MD5 as md5 } from "crypto-js";
 
@@ -21,9 +21,12 @@ export async function GET(req: NextRequest) {
       { status: 400 }
     );
   if (
-    ![TicketArea.ACARREOS, TicketArea.GASOLINA, TicketArea.CONCRETO].includes(
-      area as TicketArea
-    )
+    ![
+      TicketArea.ACARREOS,
+      TicketArea.GASOLINA,
+      TicketArea.CONCRETO,
+      Section.VOUCHERCAMION,
+    ].includes(area as TicketArea | Section)
   )
     return NextResponse.json({ error: "Invalid area" }, { status: 400 });
   const frenteOnDB = await prisma.frente.findUnique({
@@ -43,6 +46,20 @@ export async function GET(req: NextRequest) {
     (area === TicketArea.CONCRETO && !frenteOnDB.excelUrlConcretoBlob)
   )
     return NextResponse.json({ facets: [] });
+  if (area === Section.VOUCHERCAMION) {
+    const frenteConVoucherCamion = await prisma.frente.findFirst({
+      where: {
+        VoucherCamion: {
+          some: {},
+        },
+      },
+      select: {
+        nombre: true,
+      },
+    });
+
+    if (!frenteConVoucherCamion) return NextResponse.json({ facets: [] });
+  }
 
   // Preparing cache key
   const cacheKey = `facets_${frente}_${area}${getPartialKeyFilters(filters)}`;

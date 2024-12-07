@@ -19,6 +19,7 @@ interface TableTicketPaginationProps {
   page: number;
   limit: number;
   selectedRows: number;
+  notSelectable?: boolean;
 }
 
 export function TableTicketPagination({
@@ -26,6 +27,7 @@ export function TableTicketPagination({
   page,
   limit,
   selectedRows,
+  notSelectable = false,
 }: TableTicketPaginationProps) {
   const totalPages = Math.ceil(total / limit);
   const cantGoBack = page == 1;
@@ -36,7 +38,13 @@ export function TableTicketPagination({
   return (
     <div className="flex items-center justify-between px-2 flex-wrap gap-2">
       <div className="flex-1 text-sm text-muted-foreground font-semibold text-primary text-center md:text-start">
-        {selectedRows} de {total} fila(s) seleccionadas
+        {notSelectable ? (
+          <>Total: {total} registros</>
+        ) : (
+          <>
+            {selectedRows} de {total} fila(s) seleccionadas
+          </>
+        )}
       </div>
       <div className="flex items-center space-x-6 lg:space-x-8 flex-wrap justify-center gap-2">
         <div className="flex items-center space-x-2">
