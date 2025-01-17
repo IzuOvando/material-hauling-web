@@ -106,11 +106,11 @@ export default class TicketConcretoSchema implements TicketSchema {
       .addTextStyle(false, false, false, writter.COLOR_1)
       .addText(`${ticket.rev} cm\n`)
       .addTextStyle(false, false, true, writter.COLOR_1)
-      .addText("T.Planta(C°): ")
+      .addText("T.Planta: ")
       .addTextStyle(false, false, false, writter.COLOR_1)
       .addText(`${ticket.tempConcreto} °C\t`)
       .addTextStyle(false, false, true, writter.COLOR_1)
-      .addText("T.A(C°): ")
+      .addText("T.A.: ")
       .addTextStyle(false, false, false, writter.COLOR_1)
       .addText(`${ticket.tempAmbiente} °C\n`)
       .addFeedLine(1);
