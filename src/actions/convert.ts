@@ -6,7 +6,7 @@ import blobClient from "@/lib/blobClient";
 import axios from 'axios';
 import { Readable } from 'stream';
 import { schemas, SchemaKeys } from "@/lib/schemas/headers";
-import { CreateTicketDto, filteredDataConfig, isCreateAcarreosDto, isCreateGasolinaDto, isCreateConcretoaDto } from '@/lib/schemas/csv_schemas';
+import { CreateTicketDto, filteredDataConfig, isCreateAcarreosDto, isCreateGasolinaDto, isCreateConcretoDto, isCreateAsfaltoDto } from '@/lib/schemas/csv_schemas';
 import CONFIG from "@/config";
 import DatabaseDownloader from "./databasedownloader";
 
@@ -409,7 +409,7 @@ class FileProcessor {
 
                 await this.updateFrenteInBatches(cleanFrenteName, gasolinaUuids, 'ticketsGasolina');
             } else if (key === 'concreto') {
-                const concretoData = records.filter(isCreateConcretoaDto).map(record => {
+                const concretoData = records.filter(isCreateConcretoDto).map(record => {
                     const concretoEntry: {
                         uuid?: string;
                         frenteNombre: string;
@@ -503,6 +503,89 @@ class FileProcessor {
                 });
 
                 await this.updateFrenteInBatches(cleanFrenteName, concretoUuids, 'ticketsConcreto');
+            } else if (key === 'asfalto') {
+                const asfaltoData = records.filter(isCreateAsfaltoDto).map(record => {
+                    const asfaltoEntry: {
+                        uuid?: string;
+                        frenteNombre: string;
+                        cubicacion: number;
+                        material: string;
+                        empresa: string;
+                        fecha: Date;
+                        planta: string;
+                        operador: string;
+                        destino: string;
+                        tempAsfalto: number;
+                        noEconomico: string;
+                        marca: string;
+                        placas: string;
+                    } = {
+                        frenteNombre: record.frenteNombre,
+                        cubicacion: record.cubicacion,
+                        material: record.material,
+                        empresa: record.empresa,
+                        fecha: record.fecha,
+                        planta: record.planta,
+                        operador: record.operador,
+                        destino: record.destino,
+                        tempAsfalto: record.tempAsfalto,
+                        noEconomico: record.noEconomico,
+                        marca: record.marca,
+                        placas: record.placas
+                    };
+
+                    if (record.uuid && record.uuid.trim() !== '') {
+                        asfaltoEntry.uuid = record.uuid;
+                    }
+
+                    return asfaltoEntry;
+                });
+
+                const uuids = asfaltoData
+                .map(record => record.uuid)
+                .filter((uuid): uuid is string => uuid !== undefined);
+            
+                const existingRecords = await prisma.asfalto.findMany({
+                    where: { uuid: { in: uuids } },
+                    select: { uuid: true },
+                });
+
+                const existingUUIDSet = new Set(existingRecords.map(record => record.uuid));
+
+                const recordsToUpdate = asfaltoData.filter(
+                    record => record.uuid && existingUUIDSet.has(record.uuid)
+                );
+
+                const recordsToCreate = asfaltoData.filter(
+                    record => !record.uuid || !existingUUIDSet.has(record.uuid)
+                );
+            
+                await Promise.all(
+                    recordsToUpdate.map(record =>
+                        prisma.asfalto.update({
+                            where: { uuid: record.uuid },
+                            data: record,
+                        })
+                    )
+                );
+            
+                if (recordsToCreate.length > 0) {
+                    await prisma.asfalto.createMany({
+                        data: recordsToCreate,
+                        skipDuplicates: true,
+                    });
+                }
+
+                const asfaltoUuids = await prisma.asfalto.findMany({
+                    where: {
+                        frenteNombre: cleanFrenteName,
+                    },
+                    select: {
+                        uuid: true,
+                    },
+                });
+
+                await this.updateFrenteInBatches(cleanFrenteName, asfaltoUuids, 'ticketsAsfalto');
             }
         } catch (error) {
             console.error("Error during batch processing:", error);
@@ -565,6 +648,11 @@ class FileProcessor {
                     where: { frenteNombre: cleanFrenteName },
                 });
                 console.log(`Deleted old concreto records with frenteNombre: ${cleanFrenteName}`);
+            } else if (key === 'asfalto') {
+                await prisma.asfalto.deleteMany({
+                    where: { frenteNombre: cleanFrenteName },
+                });
+                console.log(`Deleted old asfalto records with frenteNombre: ${cleanFrenteName}`);
             } else {
                 throw new Error(`Unsupported key: ${key}`);
             }
@@ -652,7 +740,7 @@ class FileProcessor {
     }
 
     public isValidKey(key: string): key is SchemaKeys {
-        return ['gasolina', 'acarreos', 'concreto'].includes(key);
+        return ['gasolina', 'acarreos', 'concreto', 'asfalto'].includes(key);
     }
 
     public async streamToNodeReadable(stream: ReadableStream<Uint8Array>): Promise<Readable> {
@@ -697,7 +785,7 @@ class FileProcessor {
 
             await this.processCSVFiles(csvFilePaths, fileName, key);
 
-            await downloader.downloadDatabase(outputExcelFolder, key as 'gasolina' | 'acarreos' | 'concreto', fileName);
+            await downloader.downloadDatabase(outputExcelFolder, key as 'gasolina' | 'acarreos' | 'concreto' | 'asfalto', fileName);
 
             fetch(`${CONFIG.BASE_URL}/api/files/delete-blobs`, {
                 method: 'POST',

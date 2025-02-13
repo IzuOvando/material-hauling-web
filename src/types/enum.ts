@@ -2,6 +2,7 @@ export enum TicketArea {
   ACARREOS = "ACARREOS",
   GASOLINA = "GASOLINA",
   CONCRETO = "CONCRETO",
+  ASFALTO = "ASFALTO",
 }
 
 export enum Section {
@@ -20,5 +21,9 @@ export const TicketAreaList = [
   {
     label: "Concreto",
     value: TicketArea.CONCRETO,
+  },
+  {
+    label: "Asfalto",
+    value: TicketArea.ASFALTO,
   },
 ];
