@@ -68,7 +68,6 @@ function parseHoraTime(dateStr: string): Date {
   const dateTime = DateTime.fromFormat(formattedTime, "h:mm a", {
     zone: "America/Mexico_City",
   });
-
   if (!dateTime.isValid) {
     throw new Error("Formato de hora inválido");
   }
@@ -187,8 +186,7 @@ export const filteredDataConfig: Record<
     };
   },
   asfalto: (rawData, fileName, cleanQuotes) => {
-    const data = normalizeKeysToLowerCase(rawData);
-    const horaSalida = parseHoraTime(cleanQuotes(data.horasalida));
+    const data = normalizeKeysToLowerCase(rawData);;
 
     const fechaStr = cleanQuotes(data.fecha);
 

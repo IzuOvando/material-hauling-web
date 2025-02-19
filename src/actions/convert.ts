@@ -122,7 +122,6 @@ class FileProcessor {
                         const cellRef = XLSX.utils.encode_cell(cellAddress);
                         const cell = worksheet[cellRef];
                         let cellValue = cell ? cell.w || cell.v : "";
-                
                         if (!cellValue || cellValue.trim() === '') {
                             emptyConsecutiveCount++;
                         } else {
@@ -191,7 +190,6 @@ class FileProcessor {
                 
                     csvOutput += row.join(",") + "\n";
                 }                
-
                 const fileNameWithoutExtension = path.basename(buffer.toString(), path.extname(buffer.toString()));
                 const match = fileNameWithoutExtension.match(/_(.*)/);
                 const extractedPart = match ? match[1] : '';

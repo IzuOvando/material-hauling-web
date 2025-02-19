@@ -9,7 +9,9 @@
     "lint": "next lint",
     "seed": "node ./prisma/seed.js",
     "clear-data": "node ./prisma/clear-data.js",
-    "test": "jest"
+    "test": "jest",
+    "migrate-dev": "npx prisma migrate dev",
+    "migrate-prod": "npx prisma migrate deploy"
   },
   "dependencies": {
     "@prisma/client": "^5.16.1",
