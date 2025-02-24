@@ -9,7 +9,7 @@ import {
   VisibilityState,
   TableOptions,
 } from "@tanstack/react-table";
-import { Acarreos, Gasolina, Concreto, VoucherCamion, Asfalto } from "@prisma/client";
+import { Acarreos, Gasolina, Concreto, VoucherCamion } from "@prisma/client";
 import {
   Table,
   TableHeader,
@@ -43,11 +43,6 @@ interface TableTicketConcretoProps {
   tickets: Concreto[];
 }
 
-interface TableTicketAsfaltoProps {
-  area: TicketArea.ASFALTO;
-  tickets: Asfalto[];
-}
-
 interface TableTicketVoucherCamionProps {
   area: Section.VOUCHERCAMION;
   tickets: VoucherCamion[];
@@ -65,7 +60,6 @@ type TableTicketProps = (
   | TableTicketAcarreoProps
   | TableTicketGasolinaProps
   | TableTicketConcretoProps
-  | TableTicketAsfaltoProps
   | TableTicketVoucherCamionProps
 ) &
   TableTicketGeneralProps;

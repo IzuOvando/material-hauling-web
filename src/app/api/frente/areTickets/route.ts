@@ -12,7 +12,6 @@ export async function POST(req: NextRequest) {
         excelUrlGasolinaBlob: true,
         excelUrlAcarreosBlob: true,
         excelUrlConcretoBlob: true,
-        excelUrlAsfaltoBlob: true,
       },
     });
 
@@ -29,9 +28,6 @@ export async function POST(req: NextRequest) {
         : false,
       [TicketArea.GASOLINA]: frente.excelUrlGasolinaBlob
         ? frente.excelUrlGasolinaBlob.length > 0
-        : false,
-      [TicketArea.ASFALTO]: frente.excelUrlAsfaltoBlob
-        ? frente.excelUrlAsfaltoBlob.length > 0
         : false,
       [TicketArea.CONCRETO]: frente.excelUrlConcretoBlob
         ? frente.excelUrlConcretoBlob.length > 0

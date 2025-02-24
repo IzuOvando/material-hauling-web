@@ -80,8 +80,6 @@ export async function POST(req: NextRequest) {
     blobUrl = foundFrente.excelUrlGasolinaBlob;
   } else if (typeLower === "vouchercamion") {
     blobUrl = foundFrente.excelUrlVoucherCamionBlob;
-  } else if (typeLower === "asfalto") {
-    blobUrl = foundFrente.excelUrlAsfaltoBlob;
   } else {
     blobUrl = foundFrente.excelUrlConcretoBlob;
   }

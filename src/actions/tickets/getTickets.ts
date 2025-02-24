@@ -1,6 +1,6 @@
 import prisma from "@/lib/db";
 import { Section, TicketArea } from "@/types";
-import { Acarreos, Gasolina, Concreto, VoucherCamion, Asfalto } from "@prisma/client";
+import { Acarreos, Gasolina, Concreto, VoucherCamion } from "@prisma/client";
 import { getFilters, getOrderBy } from "./helpers";
 
 type PaginationConfig = {
@@ -8,7 +8,7 @@ type PaginationConfig = {
   limit: number;
 };
 
-type TicketsType = Acarreos[] | Gasolina[] | Concreto[] | Asfalto[] | VoucherCamion[];
+type TicketsType = Acarreos[] | Gasolina[] | Concreto[] | VoucherCamion[];
 
 type getTicketReturn = {
   tickets: TicketsType;
@@ -38,7 +38,6 @@ export default async function getTickets(
       TicketArea.ACARREOS,
       TicketArea.GASOLINA,
       TicketArea.CONCRETO,
-      TicketArea.ASFALTO,
       Section.VOUCHERCAMION,
     ].includes(area as TicketArea)
   )
@@ -94,18 +93,6 @@ export default async function getTickets(
         where,
       }),
     ]);
-  else if (area === TicketArea.ASFALTO)
-    [tickets, count] = await prisma.$transaction([
-      prisma.asfalto.findMany({
-        skip: (page - 1) * limit,
-        take: limit,
-        where,
-        orderBy,
-      }),
-      prisma.asfalto.count({
-        where,
-      }),
-    ]);
   else
     [tickets, count] = await prisma.$transaction([
       prisma.voucherCamion.findMany({
@@ -158,15 +145,6 @@ export async function getSomeTickets(
       },
       orderBy,
     });
-  else if (area === TicketArea.ASFALTO)
-    tickets = await prisma.asfalto.findMany({
-      where: {
-        uuid: {
-          in: uuids,
-        },
-      },
-      orderBy,
-    });
   else
     tickets = await prisma.concreto.findMany({
       where: {
@@ -211,11 +189,6 @@ export async function getAllTickets(
     });
   else if (area === TicketArea.GASOLINA)
     tickets = await prisma.gasolina.findMany({
-      where,
-      orderBy,
-    });
-  else if (area === TicketArea.ASFALTO)
-    tickets = await prisma.asfalto.findMany({
       where,
       orderBy,
     });

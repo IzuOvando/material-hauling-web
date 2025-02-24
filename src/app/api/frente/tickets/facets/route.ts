@@ -25,7 +25,6 @@ export async function GET(req: NextRequest) {
       TicketArea.ACARREOS,
       TicketArea.GASOLINA,
       TicketArea.CONCRETO,
-      TicketArea.ASFALTO,
       Section.VOUCHERCAMION,
     ].includes(area as TicketArea | Section)
   )
@@ -36,7 +35,6 @@ export async function GET(req: NextRequest) {
       excelUrlGasolinaBlob: true,
       excelUrlAcarreosBlob: true,
       excelUrlConcretoBlob: true,
-      excelUrlAsfaltoBlob: true,
     },
   });
   if (!frenteOnDB)
@@ -45,7 +43,6 @@ export async function GET(req: NextRequest) {
   if (
     (area === TicketArea.ACARREOS && !frenteOnDB.excelUrlAcarreosBlob) ||
     (area === TicketArea.GASOLINA && !frenteOnDB.excelUrlGasolinaBlob) ||
-    (area === TicketArea.ASFALTO && !frenteOnDB.excelUrlAsfaltoBlob) ||
     (area === TicketArea.CONCRETO && !frenteOnDB.excelUrlConcretoBlob)
   )
     return NextResponse.json({ facets: [] });

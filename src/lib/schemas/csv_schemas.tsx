@@ -1,4 +1,4 @@
-import { Gasolina, Acarreos, Concreto, Asfalto } from "@prisma/client";
+import { Gasolina, Acarreos, Concreto } from "@prisma/client";
 import { TicketArea } from "@/types";
 import { DateTime } from "luxon";
 
@@ -16,16 +16,9 @@ type CreateConcretoDto = Omit<Concreto, "uuid" | "createdAt"> & {
   uuid?: string;
   tipoTicket: TicketArea.CONCRETO;
 };
-
-type CreateAsfaltoDto = Omit<Asfalto, "uuid" | "createdAt"> & {
-  uuid?: string;
-  tipoTicket: TicketArea.ASFALTO;
-};
-
 export type CreateTicketDto =
   | CreateGasolinaDto
   | CreateAcarreosDto
-  | CreateAsfaltoDto
   | CreateConcretoDto;
 
 export function isCreateAcarreosDto(
@@ -40,16 +33,10 @@ export function isCreateGasolinaDto(
   return dto.tipoTicket === TicketArea.GASOLINA;
 }
 
-export function isCreateConcretoDto(
+export function isCreateConcretoaDto(
   dto: CreateTicketDto
 ): dto is CreateConcretoDto {
   return dto.tipoTicket === TicketArea.CONCRETO;
-}
-
-export function isCreateAsfaltoDto(
-  dto: CreateTicketDto
-): dto is CreateAsfaltoDto {
-  return dto.tipoTicket === TicketArea.ASFALTO;
 }
 
 function normalizeValue(value: string): string {
@@ -68,6 +55,7 @@ function parseHoraTime(dateStr: string): Date {
   const dateTime = DateTime.fromFormat(formattedTime, "h:mm a", {
     zone: "America/Mexico_City",
   });
+
   if (!dateTime.isValid) {
     throw new Error("Formato de hora inválido");
   }
@@ -183,33 +171,6 @@ export const filteredDataConfig: Record<
         fileName.indexOf(".")
       ),
       tipoTicket: TicketArea.GASOLINA,
-    };
-  },
-  asfalto: (rawData, fileName, cleanQuotes) => {
-    const data = normalizeKeysToLowerCase(rawData);;
-
-    const fechaStr = cleanQuotes(data.fecha);
-
-    const fecha = parseUTCDate(fechaStr);
-
-    return {
-      uuid: cleanQuotes(data.uuid),
-      cubicacion: parseFloat(cleanQuotes(data.cubicacion)),
-      empresa: cleanQuotes(data.empresa),
-      fecha: fecha,
-      planta: cleanQuotes(data.planta),
-      material: cleanQuotes(data.material),
-      operador: cleanQuotes(data.operador),
-      destino: normalizeValue(cleanQuotes(data.destino)),
-      tempAsfalto: parseFloat(cleanQuotes(data.tempasfalto)),
-      noEconomico: cleanQuotes(data.noeconomico),
-      marca: cleanQuotes(data.marca),
-      placas: cleanQuotes(data.placas),
-      frenteNombre: fileName.substring(
-        fileName.indexOf("_") + 1,
-        fileName.indexOf(".")
-      ),
-      tipoTicket: TicketArea.ASFALTO,
     };
   },
   concreto: (rawData, fileName, cleanQuotes) => {

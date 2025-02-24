@@ -1,4 +1,4 @@
-export type SchemaKeys = 'gasolina' | 'acarreos' | 'camionesQR' | 'concreto' | 'asfalto';
+export type SchemaKeys = 'gasolina' | 'acarreos' | 'camionesQR' | 'concreto';
 
 export const schemas: Record<SchemaKeys, Set<string>> = {
     gasolina: new Set([
@@ -56,19 +56,6 @@ export const schemas: Record<SchemaKeys, Set<string>> = {
         "tempconcreto",
         "tempambiente",
         "horasalida",
-        "placas",
-    ]),
-    asfalto: new Set([
-        "empresa",
-        "operador",
-        "fecha",
-        "planta",
-        "cubicacion",
-        "destino",
-        "material",
-        "noeconomico",
-        "marca",
-        "tempasfalto",
         "placas",
     ])
 };

@@ -48,12 +48,11 @@ export default class DatabaseDownloader {
         return fileName.substring(underscoreIndex + 1, dotIndex).replace(/\s+/g, '');
     }
 
-    async fetchRecords(key: 'gasolina' | 'acarreos' | 'concreto' | 'vouchercamion' | 'asfalto', frenteName: string): Promise<any[]> {
+    async fetchRecords(key: 'gasolina' | 'acarreos' | 'concreto' | 'vouchercamion', frenteName: string): Promise<any[]> {
         const modelMap = {
             gasolina: prisma.gasolina,
             acarreos: prisma.acarreos,
             concreto: prisma.concreto,
-            asfalto: prisma.asfalto,
             vouchercamion: prisma.voucherCamion,
         };
     
@@ -71,12 +70,6 @@ export default class DatabaseDownloader {
             });
         } else if (key === 'concreto') {
             return modelMap.concreto.findMany({
-                where: {
-                    frenteNombre: frenteName,
-                },
-            });
-        } else if (key === 'asfalto') {
-            return modelMap.asfalto.findMany({
                 where: {
                     frenteNombre: frenteName,
                 },
@@ -191,14 +184,13 @@ export default class DatabaseDownloader {
 
     private async updateDatabase(
         cleanFrenteName: string, 
-        key: 'gasolina' | 'acarreos' | 'concreto' | 'vouchercamion' | 'asfalto', 
+        key: 'gasolina' | 'acarreos' | 'concreto' | 'vouchercamion', 
         blobUrl: string
     ): Promise<void> {
         const updateFieldMap = {
             acarreos: 'excelUrlAcarreosBlob',
             gasolina: 'excelUrlGasolinaBlob',
             concreto: 'excelUrlConcretoBlob',
-            asfalto: 'excelUrlAsfaltoBlob',
             vouchercamion: 'excelUrlVoucherCamionBlob'
         };
     
@@ -229,15 +221,6 @@ export default class DatabaseDownloader {
                     [updateFieldMap.concreto]: blobUrl,
                 },
             });
-        } else if (key === 'asfalto') {
-            await prisma.frente.update({
-                where: {
-                    nombre: cleanFrenteName,
-                },
-                data: {
-                    [updateFieldMap.asfalto]: blobUrl,
-                },
-            });
         } else if (key === 'vouchercamion') {
             await prisma.frente.update({
                 where: {
@@ -255,7 +238,7 @@ export default class DatabaseDownloader {
 
     public async downloadDatabase(
         outputExcel: string, 
-        key: 'gasolina' | 'acarreos' | 'concreto' | 'vouchercamion' | 'asfalto', 
+        key: 'gasolina' | 'acarreos' | 'concreto' | 'vouchercamion', 
         fileName: string
     ): Promise<void> {
         try {
