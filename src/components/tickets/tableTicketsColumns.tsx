@@ -11,7 +11,7 @@ import {
   formatDateAndTimeToString,
 } from "@/helpers/formatters/datetime";
 import { formatPrice, formatVolume } from "@/helpers/formatters/numbers";
-import { Acarreos, Gasolina, Concreto, VoucherCamion } from "@prisma/client";
+import { Acarreos, Gasolina, Concreto, VoucherCamion, Asfalto } from "@prisma/client";
 import { TicketArea, Section } from "@/types";
 
 const acarreosColumns: ColumnDef<Acarreos>[] = [
@@ -379,6 +379,108 @@ const concretoColumns: ColumnDef<Concreto>[] = [
   },
 ];
 
+const asfaltoColumns: ColumnDef<Asfalto>[] = [
+  {
+    id: "select",
+    header: () => <TableTicketAllSelector />,
+    cell: ({ row }) => <TableTicketRowSelector row={row} />,
+    enableSorting: false,
+    enableHiding: false,
+  },
+  {
+    accessorKey: "uuid",
+    header: ({ column }) => (
+      <TableTicketColumnHeader column={column} title="Folio" />
+    ),
+  },
+  {
+    accessorKey: "fecha",
+    header: ({ column }) => (
+      <TableTicketColumnHeader column={column} title="Fecha" />
+    ),
+    cell: ({ row }) => (
+      <>{formatLongSpanishDate(row.getValue("fecha") as Date)}</>
+    ),
+    filterFn: (row, id, value) => {
+      return value.includes(row.getValue(id));
+    },
+  },
+  {
+    accessorKey: "material",
+    header: ({ column }) => (
+      <TableTicketColumnHeader column={column} title="Material" />
+    ),
+    filterFn: (row, id, value) => {
+      return value.includes(row.getValue(id));
+    },
+  },
+  {
+    accessorKey: "cubicacion",
+    header: ({ column }) => (
+      <TableTicketColumnHeader column={column} title="Cubicación" />
+    ),
+    cell: ({ row }) => <>{formatVolume(row.getValue("cubicacion"), true)}</>,
+  },
+  {
+    accessorKey: "tempAsfalto",
+    header: ({ column }) => (
+      <TableTicketColumnHeader column={column} title="T°Asfalto" />
+    ),
+    cell: ({ row }) => <>{row.getValue("tempAsfalto")} °C</>,
+  },
+  {
+    accessorKey: "marca",
+    header: ({ column }) => (
+      <TableTicketColumnHeader column={column} title="Marca" />
+    ),
+  },
+  {
+    accessorKey: "empresa",
+    header: ({ column }) => (
+      <TableTicketColumnHeader column={column} title="Empresa" />
+    ),
+    filterFn: (row, id, value) => {
+      return value.includes(row.getValue(id));
+    },
+  },
+  {
+    accessorKey: "planta",
+    header: ({ column }) => (
+      <TableTicketColumnHeader column={column} title="Planta" />
+    ),
+  },
+  {
+    accessorKey: "destino",
+    header: ({ column }) => (
+      <TableTicketColumnHeader column={column} title="Destino" />
+    ),
+    filterFn: (row, id, value) => {
+      return value.includes(row.getValue(id));
+    },
+  },
+  {
+    accessorKey: "noEconomico",
+    header: ({ column }) => (
+      <TableTicketColumnHeader column={column} title="NoEconomico" />
+    ),
+    filterFn: (row, id, value) => {
+      return value.includes(row.getValue(id));
+    },
+  },
+  {
+    accessorKey: "operador",
+    header: ({ column }) => (
+      <TableTicketColumnHeader column={column} title="Operador" />
+    ),
+  },
+  {
+    accessorKey: "placas",
+    header: ({ column }) => (
+      <TableTicketColumnHeader column={column} title="Placas" />
+    ),
+  },
+];
+
 const voucherCamionColumns: ColumnDef<VoucherCamion>[] = [
   {
     accessorKey: "uuid",
@@ -501,5 +603,6 @@ export const ticketsColumns = {
   [TicketArea.ACARREOS]: acarreosColumns,
   [TicketArea.GASOLINA]: gasolinaColumns,
   [TicketArea.CONCRETO]: concretoColumns,
+  [TicketArea.ASFALTO] : asfaltoColumns,
   [Section.VOUCHERCAMION]: voucherCamionColumns,
 };

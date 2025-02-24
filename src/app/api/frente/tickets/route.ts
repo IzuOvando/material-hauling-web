@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
   try {
     // Validation Area
     if (
-      ![TicketArea.ACARREOS, TicketArea.GASOLINA, TicketArea.CONCRETO].includes(
+      ![TicketArea.ACARREOS, TicketArea.GASOLINA, TicketArea.CONCRETO, TicketArea.ASFALTO].includes(
         area as TicketArea
       )
     )

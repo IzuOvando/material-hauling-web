@@ -6,6 +6,7 @@ import {
   TicketAcarreoSchema,
   TicketGasolinaSchema,
   TicketConcretoSchema,
+  TicketAsfaltoSchema,
 } from "./schemas";
 
 export default class TicketPrinter extends EpsonPrinter {
@@ -15,6 +16,8 @@ export default class TicketPrinter extends EpsonPrinter {
     if (area === TicketArea.ACARREOS) this.schema = new TicketAcarreoSchema();
     else if (area === TicketArea.GASOLINA)
       this.schema = new TicketGasolinaSchema();
+    else if (area === TicketArea.ASFALTO)
+      this.schema = new TicketAsfaltoSchema();
     else this.schema = new TicketConcretoSchema();
   };
 
