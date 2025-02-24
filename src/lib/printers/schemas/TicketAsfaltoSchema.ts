@@ -125,7 +125,7 @@ export default class TicketAsfaltoSchema implements TicketSchema {
     writter
       .addTextAlign(writter.ALIGN_LEFT)
       .addTextStyle(false, false, true, writter.COLOR_1)
-      .addText("HRSALIDA: ")
+      .addText("HRSALIDA: \n")
       .addTextStyle(false, false, true, writter.COLOR_1)
       .addText("HRLLEGADA: \t\t\n")
       .addTextStyle(false, false, false, writter.COLOR_1)
