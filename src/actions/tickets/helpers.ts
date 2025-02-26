@@ -52,6 +52,7 @@ export const SORT_FIELDS = {
   [TicketArea.ASFALTO]: [
     "uuid",
     "fecha",
+    "horaSalida",
     "material",
     "cubicacion",
     "rev",

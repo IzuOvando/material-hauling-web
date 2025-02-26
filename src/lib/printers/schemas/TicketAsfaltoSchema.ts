@@ -3,6 +3,7 @@ import { Asfalto } from "@prisma/client";
 import { Ticket } from "@/types";
 import {
   formatIsoDateFromString,
+  formatTime12HourFromString
 } from "@/helpers/formatters/datetime";
 import { findClosestMatch } from "@/helpers/strings";
 
@@ -125,7 +126,9 @@ export default class TicketAsfaltoSchema implements TicketSchema {
     writter
       .addTextAlign(writter.ALIGN_LEFT)
       .addTextStyle(false, false, true, writter.COLOR_1)
-      .addText("HRSALIDA: \n")
+      .addText("HRSALIDA: ")
+      .addTextStyle(false, false, false, writter.COLOR_1)
+      .addText(`${formatTime12HourFromString(ticket.horaSalida as any)}\t`)
       .addTextStyle(false, false, true, writter.COLOR_1)
       .addText("HRLLEGADA: \t\t\n")
       .addTextStyle(false, false, false, writter.COLOR_1)

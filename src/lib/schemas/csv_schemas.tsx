@@ -186,8 +186,9 @@ export const filteredDataConfig: Record<
     };
   },
   asfalto: (rawData, fileName, cleanQuotes) => {
-    const data = normalizeKeysToLowerCase(rawData);;
-
+    const data = normalizeKeysToLowerCase(rawData);
+    const horaSalida = parseHoraTime(cleanQuotes(data.horasalida));
+    
     const fechaStr = cleanQuotes(data.fecha);
 
     const fecha = parseUTCDate(fechaStr);
@@ -204,6 +205,7 @@ export const filteredDataConfig: Record<
       tempAsfalto: parseFloat(cleanQuotes(data.tempasfalto)),
       noEconomico: cleanQuotes(data.noeconomico),
       marca: cleanQuotes(data.marca),
+      horaSalida: horaSalida,
       placas: cleanQuotes(data.placas),
       frenteNombre: fileName.substring(
         fileName.indexOf("_") + 1,
