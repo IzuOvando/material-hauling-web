@@ -516,6 +516,7 @@ class FileProcessor {
                         tempAsfalto: number;
                         noEconomico: string;
                         marca: string;
+                        horaSalida: Date;
                         placas: string;
                     } = {
                         frenteNombre: record.frenteNombre,
@@ -529,6 +530,7 @@ class FileProcessor {
                         tempAsfalto: record.tempAsfalto,
                         noEconomico: record.noEconomico,
                         marca: record.marca,
+                        horaSalida: record.horaSalida,
                         placas: record.placas
                     };
 

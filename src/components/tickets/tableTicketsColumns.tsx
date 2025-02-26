@@ -406,6 +406,15 @@ const asfaltoColumns: ColumnDef<Asfalto>[] = [
     },
   },
   {
+    accessorKey: "horaSalida",
+    header: ({ column }) => (
+      <TableTicketColumnHeader column={column} title="Hora Salida" />
+    ),
+    cell: ({ row }) => (
+      <>{formatTime12Hour(row.getValue("horaSalida") as Date, true)}</>
+    ),
+  },
+  {
     accessorKey: "material",
     header: ({ column }) => (
       <TableTicketColumnHeader column={column} title="Material" />

@@ -153,6 +153,7 @@ model Asfalto {
   tempAsfalto  Float
   noEconomico  String
   marca        String
+  horaSalida   DateTime @default(now())
   placas       String
   frente       Frente   @relation("FrenteAsfalto", fields: [frenteNombre], references: [nombre], onDelete: Cascade)
 
