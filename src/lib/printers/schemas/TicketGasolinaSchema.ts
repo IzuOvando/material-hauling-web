@@ -39,7 +39,7 @@ export default class TicketGasolinaSchema implements TicketSchema {
   private addEnterpriseInfo = (writter: any, ticket: Gasolina) => {
     writter
       .addText("Servicio El Morillo 2\n")
-      .addText("PL/2505/EXP/ES/2015\n")
+      .addText("PL/2376/EXP/ES/2015\n")
       // .addText("SERVICIOS ECOLOGICOS\n")
       .addText("G500 El Morillo\n")
       .addText("CEL: 8444171212\n")
@@ -89,8 +89,8 @@ export default class TicketGasolinaSchema implements TicketSchema {
       .addTextStyle(false, false, false, writter.COLOR_1)
       .addText(`Folio:\t${ticket.folio}\n`)
       .addText(`Autorización:\t*****${ticket.autorizacion}*****\n`)
-      .addText(`Nombre:\tSEDENA ${frente}\n`)
-      .addText("Cuenta:\t5892274\n")
+      .addText(`Nombre:\tEstudios Técnicos\n`)
+      .addText("Cuenta:\t6363180025292259\n")
       .addText(`Bomba:\t${ticket.bomba}\n`)
       .addText(`Placas:\t${ticket.placas}\n`)
       .addText(`Saldo próxima compra:\t${formatPrice(ticket.saldoCompra)}\n`)
