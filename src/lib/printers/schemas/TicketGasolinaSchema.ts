@@ -26,7 +26,7 @@ export default class TicketGasolinaSchema implements TicketSchema {
   private addEnterpriseLogo = (writter: any) => {
     try {
       // ! For now hardcoded FullGas Logo
-      const image = window.enterprises.images.fullgas;
+      const image = window.enterprises.images.g500;
       writter
         .addTextAlign(writter.ALIGN_CENTER)
         .addImage(image.context, 0, 0, image.canvas.width, image.canvas.height)
@@ -38,20 +38,20 @@ export default class TicketGasolinaSchema implements TicketSchema {
 
   private addEnterpriseInfo = (writter: any, ticket: Gasolina) => {
     writter
-      .addText("FULLGAS CARRILLO\n")
-      .addText("PL/20284/EXP/ES/2017\n")
-      .addText("SERVICIOS ECOLOGICOS\n")
-      .addText("MAYAPAN S.A DE C.V\n")
-      .addText("CEL: 9993772451\n")
-      .addText("RFC: SEM141031V5A\n")
-      .addText("SIC: 0000113435\n")
+      .addText("Servicio El Morillo 2\n")
+      .addText("PL/2505/EXP/ES/2015\n")
+      // .addText("SERVICIOS ECOLOGICOS\n")
+      .addText("G500 El Morillo\n")
+      .addText("CEL: 8444171212\n")
+      .addText("RFC: SMO010911AB8\n")
+      .addText("SIC: 0000106599\n")
       .addText("MATRIZ: \n")
-      .addText("CORREO: CARRILLOPUERTO@FULLGAS.COM.MX\n")
-      .addText("ESTACION: 13435\n")
-      .addText("TERMINAL: 1343500002\n")
-      .addText("AV. BENITO JUAREZ POR CALLE 79 #881\n")
-      .addText("JESUS MARTINEZ ROSS FELIPE CARRILLO\n")
-      .addText("PUERTO QUINTANA ROO CP. 77220\n");
+      .addText("CORREO: soporte@gasmanager.com\n")
+      .addText("ESTACION: 06599\n")
+      .addText("TERMINAL: 0659900002\n")
+      .addText("Periférico Luis Echeverría A.\n")
+      .addText("2865, Colonia Landín, Saltillo,\n")
+      .addText("Coahuila, C.P. 25071, México\n");
   };
 
   private addTypeTicket = (writter: any, original: boolean) => {
@@ -113,7 +113,7 @@ export default class TicketGasolinaSchema implements TicketSchema {
   private addWeb(writter: any) {
     try {
       // ! For now hardcoded FullGas Logo
-      const image = window.enterprises.images.web_fullgas;
+      const image = window.enterprises.images.g500;
       writter
         .addTextAlign(writter.ALIGN_LEFT)
         .addFeedLine(1)
@@ -121,7 +121,7 @@ export default class TicketGasolinaSchema implements TicketSchema {
         .addFeedLine(1);
     } catch (error) {
       console.error("Error loading enterprise logo:", error);
-      writter.addText("\nFULLGAS.COM.MX\n");
+      // writter.addText("\nFULLGAS.COM.MX\n");
     }
   }
 }
