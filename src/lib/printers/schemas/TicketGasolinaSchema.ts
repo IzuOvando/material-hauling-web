@@ -89,13 +89,13 @@ export default class TicketGasolinaSchema implements TicketSchema {
       .addTextStyle(false, false, false, writter.COLOR_1)
       .addText(`Folio:\t${ticket.folio}\n`)
       .addText(`Autorización:\t*****${ticket.autorizacion}*****\n`)
-      .addText(`Nombre:\tEstudios Técnicos\n`)
+      .addText(`Nombre: ESTUDIOS TÉCNICOS DE PREINVERSIÓN Y OBRAS COMPLEMENTARIAS DEL TREN DE PASAJEROS SALTILLO-NVO. LAREDO\n`)
       .addText("Cuenta:\t6363180025292259\n")
       .addText(`Bomba:\t${ticket.bomba}\n`)
       .addText(`Placas:\t${ticket.placas}\n`)
       .addText(`Saldo próxima compra:\t${formatPrice(ticket.saldoCompra)}\n`)
       .addText(
-        `Fecha y Hora:\t${formatLongSpanishDateFromString(
+        `Fecha y Hora: ${formatLongSpanishDateFromString(
           ticket.fecha as any
         )} ${formatTime12HourFromString(ticket.hora as any)}\n`
       );
