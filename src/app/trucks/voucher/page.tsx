@@ -2,6 +2,8 @@ import { Fragment } from "react";
 import { Truck } from "lucide-react";
 import { VoucherCamion } from "@prisma/client";
 import DataCompressor from "@/utils/qr/dataCompressor";
+import { PropertyType, CONCRETO_DISTRIBUTION, ConcreteMaterialData } from "@/assets/data";
+import getConcreteDescription from "@/utils/getConcreteDescription";
 
 export default function VoucherPreview({
   searchParams,
@@ -42,7 +44,7 @@ const VoucherInfo = ({ voucher }: { voucher: VoucherCamion }) => {
     },
     {
       label: "Material",
-      value: voucher.material,
+      value: getMaterial(voucher.material),
     },
     {
       label: "Cubicación",
@@ -85,6 +87,50 @@ const VoucherInfo = ({ voucher }: { voucher: VoucherCamion }) => {
       value: voucher.checkerNo,
     },
   ].filter((item) => item.value !== undefined);
+
+  function getMaterial(material: string): string {
+    try {
+      const parsed: ConcreteMaterialData = JSON.parse(material);
+  
+      if (
+        parsed &&
+        typeof parsed === 'object' &&
+        'tipo' in parsed &&
+        'fc' in parsed &&
+        'tma' in parsed &&
+        'dias' in parsed
+      ) {
+        const { tipo, fc, tma, dias, propiedades } = parsed;
+  
+        let selectedProps: PropertyType[] | undefined = undefined;
+  
+        if (Array.isArray(propiedades)) {
+          selectedProps = propiedades
+            .map(p => {
+              const matchedEntry = Object.entries(PropertyType).find(
+                ([key]) => key.toLowerCase() === p.toLowerCase()
+              );
+              return matchedEntry
+                ? PropertyType[matchedEntry[0] as keyof typeof PropertyType]
+                : null;
+            })
+            .filter((v): v is PropertyType => v !== null);
+        }
+  
+        return getConcreteDescription(
+          CONCRETO_DISTRIBUTION,
+          tipo,
+          fc.toString(),
+          tma.toString(),
+          dias.toString(),
+          selectedProps
+        );
+      }
+    } catch (e) {
+      console.error('Error al generar descripción de concreto:', e);
+    }
+    return material;
+  }  
 
   return (
     <main className="container my-10">
