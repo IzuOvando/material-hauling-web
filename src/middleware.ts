@@ -1,9 +1,13 @@
 import NextAuth from "next-auth";
 import { authConfig } from "./auth/auth.config";
 
+const publicRoutes = ["/trucks/voucher"];
+
 export default NextAuth(authConfig).auth((req) => {
   const isLoggedIn = !!req.auth?.user;
   const pathname = req.nextUrl.pathname;
+
+  if (publicRoutes.includes(pathname)) return;
 
   if (isLoggedIn && pathname === "/login")
     return Response.redirect(new URL("/", req.nextUrl.origin));
