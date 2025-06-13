@@ -11,6 +11,7 @@ import CONFIG from "@/config";
 import DatabaseDownloader from "./databasedownloader";
 
 
+
 class FileProcessor {
 
     private toCamelCase(str: string): string {
