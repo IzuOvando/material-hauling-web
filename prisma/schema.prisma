@@ -43,6 +43,7 @@ model VoucherCamion {
   placas       String
   operador     String
   turno        Int
+  ejido        String
   noEconomico  String
   empresa      String
   cubicacion   Float

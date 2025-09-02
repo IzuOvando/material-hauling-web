@@ -1,5 +1,6 @@
 "use client";
 import { FileDroper } from "@/components/common";
+import { FileTest } from "@/components/common";
 import { useToast } from "@/components/ui/use-toast";
 import { getMetadataCamionFromFile } from "@/utils/excel/excelValidatorQRs";
 import { getCamionesQRSVG } from "@/utils/excel/generatorDownloadQrs";
@@ -60,6 +61,14 @@ export default function QRPage() {
             "application/vnd.ms-excel": [".xls"],
           }}
           onFileChange={onFileChange}
+        />
+      </div>
+      <div className="mx-auto p-2 max-w-2xl">
+        <FileTest
+          filePath="/documents/test_metadatacamion.xlsx"
+          fileName="test_metadatacamion.xlsx"
+          downloadText="Click aquí"
+          description="Puedes descargar el template de ejemplo:"
         />
       </div>
     </main>

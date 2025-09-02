@@ -75,6 +75,10 @@ const VoucherInfo = ({ voucher }: { voucher: VoucherCamion }) => {
       value: voucher.turno === 1 ? "Primer Turno" : "Segundo Turno",
     },
     {
+      label: "Ejido",
+      value: voucher.ejido,
+    },
+    {
       label: "Empresa",
       value: voucher.empresa,
     },

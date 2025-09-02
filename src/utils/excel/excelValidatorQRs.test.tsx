@@ -9,7 +9,7 @@ const createMockFile = (name: string, type: string, contents: ArrayBuffer): File
 };
 
 describe('getMetadataCamionFromFile', () => {
-    const validHeaders = ["placas", "noeconomico", "operador", "turno", "frente", "cubicacion", "empresa", "noempleado"];
+    const validHeaders = ["placas", "noeconomico", "operador", "turno", "ejido", "frente", "cubicacion", "empresa", "noempleado"];
     const validData = [
         validHeaders,
         ["GHI123", "006", "Ana Silva", 1, "T9F7", 400, "Mabina SA de CV", "568TXP"],

@@ -98,6 +98,7 @@ export async function POST(req: NextRequest) {
                         placas: voucher.placas,
                         operador: voucher.operador,
                         turno: voucher.turno,
+                        ejido: voucher.ejido,
                         noEconomico: voucher.noEconomico,
                         empresa: voucher.empresa,
                         cubicacion: voucher.cubicacion,

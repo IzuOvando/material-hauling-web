@@ -24,6 +24,7 @@ describe("getCamionesQRSVG", () => {
         noeconomico: "001",
         operador: "Juan Pérez",
         turno: 1,
+        ejido: "Tepeji",
         frente: "T6F9",
         empresa: "Mabina SA de CV",
         noempleado: "568TXP"
@@ -34,6 +35,7 @@ describe("getCamionesQRSVG", () => {
         noeconomico: "002",
         operador: "María López",
         turno: 2,
+        ejido: "Tepeji",
         frente: "T9F5",
         empresa: "Mabina SA de CV",
         noempleado: "568TXP"

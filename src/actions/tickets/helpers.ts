@@ -77,6 +77,7 @@ export const SORT_FIELDS = {
     "operador",
     "noEmpleado",
     "turno",
+    "ejido",
     "empresa",
     "checkerName",
     "checkerNo",

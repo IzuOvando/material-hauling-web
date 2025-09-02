@@ -12,12 +12,13 @@ class DataCompressor {
     6: "placas",
     7: "operador",
     8: "turno",
-    9: "empresa",
-    10: "cubicacion",
-    11: "noEmpleado",
-    12: "idCamion",
-    13: "checkerName",
-    14: "checkerNo",
+    9: "ejido",
+    10: "empresa",
+    11: "cubicacion",
+    12: "noEmpleado",
+    13: "idCamion",
+    14: "checkerName",
+    15: "checkerNo",
   };
 
   public static compressTicketData(ticket: VoucherCamion): string {
@@ -30,12 +31,13 @@ class DataCompressor {
       6: ticket.placas,
       7: ticket.operador,
       8: ticket.turno,
-      9: ticket.empresa,
-      10: ticket.cubicacion,
-      11: ticket.noEmpleado,
-      12: ticket.idCamion,
-      13: ticket.checkerName,
-      14: ticket.checkerNo,
+      9: ticket.ejido,
+      10: ticket.empresa,
+      11: ticket.cubicacion,
+      12: ticket.noEmpleado,
+      13: ticket.idCamion,
+      14: ticket.checkerName,
+      15: ticket.checkerNo,
     };
 
     const dataQr = JSON.stringify(ticketCompacto);
