@@ -522,6 +522,13 @@ const voucherCamionColumns: ColumnDef<VoucherCamion>[] = [
     },
   },
   {
+    accessorKey: "odometer",
+    header: ({ column }) => (
+      <TableTicketColumnHeader column={column} title="Odómetro" />
+    ),
+    cell: ({ row }) => <>{row.getValue("odometer")}</>,
+  },
+  {
     accessorKey: "cubicacion",
     header: ({ column }) => (
       <TableTicketColumnHeader column={column} title="Cubicación" />

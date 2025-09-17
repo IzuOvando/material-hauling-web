@@ -69,6 +69,7 @@ export const SORT_FIELDS = {
     "uuid",
     "idCamion",
     "placas",
+    "odometer",
     "material",
     "cubicacion",
     "origen",
@@ -103,6 +104,7 @@ export const FILTER_FIELDS = {
   ],
   [Section.VOUCHERCAMION]: [
     "idCamion",
+    "odometer",
     "material",
     "origen",
     "tiro",

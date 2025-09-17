@@ -43,6 +43,10 @@ const VoucherInfo = ({ voucher }: { voucher: VoucherCamion }) => {
       value: voucher.placas,
     },
     {
+      label: "Odómetro",
+      value: voucher.odometer,
+    },
+    {
       label: "Material",
       value: getMaterial(voucher.material),
     },

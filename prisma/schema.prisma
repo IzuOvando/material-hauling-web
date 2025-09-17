@@ -41,6 +41,7 @@ model VoucherCamion {
   origen       String
   material     String
   placas       String
+  odometer     Int      @default(0)
   operador     String
   turno        Int
   ejido        String   @default("N/A")

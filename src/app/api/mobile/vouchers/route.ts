@@ -96,6 +96,7 @@ export async function POST(req: NextRequest) {
                         origen: voucher.origen,
                         material: voucher.material,
                         placas: voucher.placas,
+                        odometer: voucher.odometer,
                         operador: voucher.operador,
                         turno: voucher.turno,
                         ejido: voucher.ejido,

@@ -1,6 +1,7 @@
 export const vouchersFixture = [
     {
         voucherTime: "2024-10-01T12:00:00Z",
+        odometer: 100,
         tiro: "Tiro 1",
         origen: "Origen 1",
         material: "Material 1",
@@ -19,6 +20,7 @@ export const vouchersFixture = [
     },
     {
         voucherTime: "2024-10-01T12:00:00Z",
+        odometer: 100,
         tiro: "Tiro 1",
         origen: "Origen 1",
         material: "Material 1",
@@ -37,6 +39,7 @@ export const vouchersFixture = [
     },
     {
         voucherTime: "2024-10-01T12:00:00Z",
+        odometer: 100,
         tiro: "Tiro 1",
         origen: "Origen 1",
         material: "Material 1",
@@ -55,6 +58,7 @@ export const vouchersFixture = [
     },
     {
         voucherTime: "2024-10-01T12:00:00Z",
+        odometer: 100,
         tiro: "Tiro 1",
         origen: "Origen 1",
         material: "Material 1",
@@ -76,6 +80,7 @@ export const vouchersFixture = [
 export const invalidVouchersFixture = [
     {
         voucherTime: "2024-10-01T12:00:00Z",
+        odometer: 100,
         tiro: "Tiro 1",
         origen: "Origen 1",
         material: "Material 1",
