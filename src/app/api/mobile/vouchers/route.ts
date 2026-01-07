@@ -87,8 +87,21 @@ export async function POST(req: NextRequest) {
         }
 
         await prisma.$transaction(
-            vouchersArray.map((voucher) =>
-                prisma.voucherCamion.create({
+            vouchersArray.map((voucher, index) => {
+                const odometerInt =
+                    typeof voucher.odometer === "string"
+                        ? parseInt(voucher.odometer, 10)
+                        : voucher.odometer;
+
+                if (Number.isNaN(odometerInt)) {
+                    console.error(`❌ Odometer inválido en voucher [${index}]`, voucher.odometer);
+                    throw new Prisma.PrismaClientValidationError(
+                        `Odometer inválido: ${voucher.odometer}`,
+                        { clientVersion: "5.22.0" }
+                    );
+                }
+
+                return prisma.voucherCamion.create({
                     data: {
                         voucherDate: voucher.voucherDate,
                         voucherTime: voucher.voucherTime,
@@ -96,7 +109,7 @@ export async function POST(req: NextRequest) {
                         origen: voucher.origen,
                         material: voucher.material,
                         placas: voucher.placas,
-                        odometer: voucher.odometer,
+                        odometer: odometerInt,
                         operador: voucher.operador,
                         turno: voucher.turno,
                         ejido: voucher.ejido,
@@ -107,11 +120,16 @@ export async function POST(req: NextRequest) {
                         checkerName: voucher.checkerName,
                         noEmpleado: voucher.noEmpleado,
                         idCamion: voucher.idCamion,
-                        ...(voucher.checkerNo && { checkerNo: voucher.checkerNo }),
+                        ...(voucher.checkerNo !== undefined &&
+                        voucher.checkerNo !== null &&
+                        voucher.checkerNo !== ""
+                            ? { checkerNo: voucher.checkerNo }
+                            : {}),
                     },
-                })
-            )
+                });
+            })
         );
+
     } catch (error) {
         if (error instanceof VoucherDateTimeError) {
             return NextResponse.json(
