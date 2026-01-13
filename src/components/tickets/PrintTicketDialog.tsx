@@ -186,7 +186,7 @@ const PrintDialog = ({
     >
       <DialogContent className="sm:max-w-[460px] sm:min-h-[332px] flex flex-col overflow-auto max-h-[90vh]">
         <DialogHeader>
-          <DialogTitle>Imprimir Tickets</DialogTitle>
+          <DialogTitle>Imprimir Vouchers</DialogTitle>
         </DialogHeader>
         {actualView === "start" ? (
           <StartView
@@ -347,7 +347,7 @@ const PrintingFailedView = ({
         className="bg-secondary hover:bg-secondary-light active:bg-secondary-dark w-full"
         onClick={onPrintFailed}
       >
-        Imprimir tickets faltantes
+        Imprimir vouchers faltantes
       </Button>
       {printersWithErrorNames.length > 0 && (
         <>

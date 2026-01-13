@@ -46,7 +46,7 @@ export default function QRPage() {
   return (
     <main className="container my-10">
       <div className="container mx-auto p-4 max-w-2xl">
-        <h1 className="text-4xl font-bold text-center mb-2">QR Generator</h1>
+        <h1 className="text-4xl font-bold text-center mb-2">Generador de QRs</h1>
         <p className="text-center text-muted-foreground mb-6">
           Ingresa una hoja de cálculo con datos de camiones para poder generar
           sus respectivos QRs.

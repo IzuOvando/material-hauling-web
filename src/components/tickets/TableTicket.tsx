@@ -118,7 +118,7 @@ const TableTicket = (props: TableTicketProps) => {
             disabled={disablePrintTickets}
             onClick={() => setOpenPrintTickets(true)}
           >
-            Imprimir Tickets
+            Imprimir Vouchers
           </Button>
         )}
         {props.frente !== undefined && (

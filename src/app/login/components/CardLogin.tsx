@@ -90,10 +90,10 @@ const CardLogin = () => {
           <div className="grid w-full items-center gap-4">
             <div className="flex flex-col space-y-1.5">
               <Label htmlFor="username">Nombre de usuario</Label>
-              <Input id="username" name="username" placeholder="Username" />
+              <Input id="username" name="username" placeholder="Usuario" />
             </div>
             <div className="flex flex-col space-y-1.5">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">Contraseña</Label>
               <Input
                 id="password"
                 name="password"

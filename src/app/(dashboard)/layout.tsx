@@ -16,7 +16,7 @@ export default async function DashboardLayout({
       <section className="flex justify-center md:justify-between flex-wrap md:flex-nowrap gap-3">
         <div className="flex items-center flex-wrap justify-center gap-4 md:justify-start">
           <h1 className="text-4xl font-semibold block w-fit text-center">
-            Ticket Database
+            Base de Datos de Vouchers
           </h1>
           <FrenteTools frentes={frentes} />
         </div>

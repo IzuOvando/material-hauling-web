@@ -37,13 +37,13 @@ const TabTrucks = () => {
           value="qr"
           className="font-medium text-accent-dark data-[state=active]:bg-accent data-[state=active]:text-white"
         >
-          QR Generator
+          Generador de QRs
         </TabsTrigger>
         <TabsTrigger
           value="db"
           className="font-medium text-accent-dark data-[state=active]:bg-accent data-[state=active]:text-white"
         >
-          Database
+          Bases de Datos
         </TabsTrigger>
       </TabsList>
     </Tabs>

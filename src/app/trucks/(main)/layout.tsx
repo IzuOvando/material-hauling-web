@@ -10,7 +10,7 @@ export default async function TrucksLayout({
       <section className="flex justify-center md:justify-between flex-wrap md:flex-nowrap gap-3">
         <div className="flex items-center flex-wrap justify-center gap-4 md:justify-start">
           <h1 className="text-4xl font-semibold block w-fit text-center">
-            Trucks Application
+            Aplicación de Acarreos
           </h1>
         </div>
         <TabTrucks />
