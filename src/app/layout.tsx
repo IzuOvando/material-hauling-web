@@ -9,7 +9,7 @@ import { PrinterStoreInitializer } from "@/store";
 import { EnterprisesImagesInitializer } from "@/contexts";
 import { auth } from "@/auth";
 import { UserProvider } from '@/contexts/UserContext';
-import prisma from "@/lib/db";
+import { getAppUser } from "@/auth/auth.user";
 
 const montserrat = Montserrat({ subsets: ["latin"], variable: "--montserrat" });
 
@@ -23,16 +23,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const session = await auth();
-
-  let user = { name: "", role: "" }
-  if (session?.user?.name) {
-    const response = await prisma.user.findUnique({
-      where: { username: session.user.name },
-      select: { username: true, rol: true },
-    });
-    user = response ? { name: response.username, role: response.rol } : { name: "", role: "" };
-  }
+  const user = await getAppUser();
 
   return (
     <html lang="es" suppressHydrationWarning>

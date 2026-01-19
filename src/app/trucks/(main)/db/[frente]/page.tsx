@@ -5,6 +5,7 @@ import CONFIG from "@/config";
 import prisma from "@/lib/db";
 import { Section } from "@/types";
 import { notFound } from "next/navigation";
+import { requireFrenteAccess } from "@/auth/guards";
 
 export default async function DBPage({
   params,
@@ -18,7 +19,14 @@ export default async function DBPage({
     filters?: string;
   };
 }) {
-  const frentes = await prisma.frente.findMany();
+  const user = await requireFrenteAccess(params.frente);
+
+  const frentes =
+    user.role === "owner"
+      ? await prisma.frente.findMany()
+      : await prisma.frente.findMany({
+          where: { nombre: { in: user.frentes } },
+        });
 
   const page = Number(searchParams.page) || CONFIG.PAGINATION.DEFAULT_PAGE;
   const limit = Number(searchParams.limit) || CONFIG.PAGINATION.DEFAULT_LIMIT;
@@ -26,34 +34,29 @@ export default async function DBPage({
   const response = await getTickets(
     params.frente,
     Section.VOUCHERCAMION,
-    {
-      page,
-      limit,
-    },
+    { page, limit },
     searchParams.sort,
     searchParams.filters
   );
 
-  if (!response) {
-    return notFound();
-  }
+  if (!response) notFound();
 
   return (
     <>
-      <TableTicket
-        tickets={response.tickets as any}
-        frente={params.frente}
-        area={Section.VOUCHERCAMION}
-        page={page}
-        limit={limit}
-        total={response.total}
-        componentTopLeft={
-          <FrenteTrucksTools
-            frentes={frentes}
-            areTickets={response.tickets.length > 0}
-          />
-        }
-      />
+    <TableTicket
+      tickets={response.tickets as any}
+      frente={params.frente}
+      area={Section.VOUCHERCAMION}
+      page={page}
+      limit={limit}
+      total={response.total}
+      componentTopLeft={
+        <FrenteTrucksTools
+          frentes={frentes}
+          areTickets={response.tickets.length > 0}
+        />
+      }
+    />
     </>
   );
 }

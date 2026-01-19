@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { TicketArea } from "@/types";
 import { getTickets } from "@/actions/tickets";
 import CONFIG from "@/config";
+import { requireFrenteAccess } from "@/auth/guards";
 
 export default async function PageTickets({
   params,
@@ -16,23 +17,24 @@ export default async function PageTickets({
     filters?: string;
   };
 }) {
+  await requireFrenteAccess(params.frente);
+
+  if (!Object.values(TicketArea).includes(params.area as TicketArea)) {
+    notFound();
+  }
+
   const page = Number(searchParams.page) || CONFIG.PAGINATION.DEFAULT_PAGE;
   const limit = Number(searchParams.limit) || CONFIG.PAGINATION.DEFAULT_LIMIT;
 
   const response = await getTickets(
     params.frente,
     params.area as TicketArea,
-    {
-      page,
-      limit,
-    },
+    { page, limit },
     searchParams.sort,
     searchParams.filters
   );
 
-  if (!response) {
-    return notFound();
-  }
+  if (!response) notFound();
 
   return (
     <>

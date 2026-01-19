@@ -11,21 +11,21 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "../ui/use-toast";
+import { useRouter } from "next/navigation";
 
 interface AddFrenteDialogProps {
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  onAddFrente: (frente: string) => void;
 }
 
 const AddFrenteDialog = ({
   open,
   setOpen,
-  onAddFrente,
 }: AddFrenteDialogProps) => {
   const [error, setError] = useState("");
   const refName = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+  const router = useRouter();
 
   const handleAction = async () => {
     const name = refName.current?.value?.trim().toUpperCase();
@@ -61,7 +61,7 @@ const AddFrenteDialog = ({
         description: `Frente ${name} creado con éxito.`,
         variant: "success",
       });
-      onAddFrente(name);
+      router.refresh()
     } catch (error) {
       console.error("Error al crear nuevo frente:", error);
       toast({

@@ -1,50 +1,55 @@
 "use client";
-import {
-  createContext,
-  useContext,
-  ReactNode,
-  useState,
-  useEffect,
-} from "react";
 
-interface UserContextType {
-  name: string;
-  role: string;
-  setUser: (user: { name: string; role: string }) => void;
-}
+import { createContext, useContext, ReactNode, useState } from "react";
+import type { AppUser } from "@/types/auth";
+
+type UserContextType = {
+  user: AppUser | null;
+  isOwner: boolean;
+  isAdmin: boolean;
+  canAccessFrente: (frente: string) => boolean;
+  setUser: (user: AppUser | null) => void;
+};
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
-export const useUser = (): UserContextType => {
-  const context = useContext(UserContext);
-  if (!context) {
-    throw new Error("useUser must be used within a UserProvider");
-  }
-  return context;
-};
-
-export const UserProvider = ({
+export function UserProvider({
   children,
-  user,
+  user: initialUser,
 }: {
   children: ReactNode;
-  user: { name: string; role: string };
-}) => {
-  const [name, setName] = useState(user.name);
-  const [role, setRole] = useState(user.role);
+  user: AppUser | null;
+}) {
+  const [user, setUser] = useState<AppUser | null>(initialUser);
 
-  const setUser = (newUser: { name: string; role: string }) => {
-    setName(newUser.name);
-    setRole(newUser.role);
+  const value: UserContextType = {
+    user,
+
+    isOwner: user?.role === "owner",
+    isAdmin: user?.role === "admin" || user?.role === "owner",
+
+    canAccessFrente: (frente: string) => {
+      if (!user) return false;
+      if (user.role === "owner") return true;
+      return user.frentes.includes(frente);
+    },
+
+    setUser,
   };
 
-  useEffect(() => {
-    setUser(user);
-  }, [user]);
-
   return (
-    <UserContext.Provider value={{ name, role, setUser }}>
+    <UserContext.Provider value={value}>
       {children}
     </UserContext.Provider>
   );
-};
+}
+
+export function useUser() {
+  const context = useContext(UserContext);
+
+  if (!context) {
+    throw new Error("useUser must be used within a UserProvider");
+  }
+
+  return context;
+}

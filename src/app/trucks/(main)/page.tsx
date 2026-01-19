@@ -1,6 +1,6 @@
 "use client";
-import { FileDroper } from "@/components/common";
-import { FileTest } from "@/components/common";
+
+import { FileDroper, FileTest } from "@/components/common";
 import { useToast } from "@/components/ui/use-toast";
 import { getMetadataCamionFromFile } from "@/utils/excel/excelValidatorQRs";
 import { getCamionesQRSVG } from "@/utils/excel/generatorDownloadQrs";
@@ -16,6 +16,7 @@ export default function QRPage() {
         variant: "destructive",
         duration: 3000,
       });
+      return;
     }
 
     transformFile(files[0]);
@@ -51,6 +52,7 @@ export default function QRPage() {
           Ingresa una hoja de cálculo con datos de camiones para poder generar
           sus respectivos QRs.
         </p>
+
         <FileDroper
           description="Arrastra & suelta tu archivo Excel"
           buttonText="Selecciona archivo XLSX"
@@ -63,6 +65,7 @@ export default function QRPage() {
           onFileChange={onFileChange}
         />
       </div>
+
       <div className="mx-auto p-2 max-w-2xl">
         <FileTest
           filePath="/documents/test_metadatacamion.xlsx"

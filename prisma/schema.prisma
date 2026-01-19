@@ -16,7 +16,19 @@ model User {
   username String @id @unique
   password String
   rol      String
+  frentes  UserFrente[]
 }
+
+model UserFrente {
+  userId       String
+  frenteNombre String
+
+  user   User   @relation(fields: [userId], references: [username], onDelete: Cascade)
+  frente Frente @relation(fields: [frenteNombre], references: [nombre], onDelete: Cascade)
+
+  @@id([userId, frenteNombre])
+}
+
 
 model Frente {
   nombre                    String          @id @unique
@@ -30,6 +42,7 @@ model Frente {
   VoucherCamion             VoucherCamion[] @relation("FrenteVoucherCamion")
   ticketsConcreto           Concreto[]      @relation("FrenteConcreto")
   ticketsAsfalto            Asfalto[]       @relation("FrenteAsfalto")
+  users                     UserFrente[]
 }
 
 model VoucherCamion {

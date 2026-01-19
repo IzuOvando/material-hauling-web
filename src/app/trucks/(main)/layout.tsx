@@ -1,10 +1,13 @@
 import { TabTrucks } from "@/components/trucks";
+import { requireDashboardAccess } from "@/auth/guards";
 
 export default async function TrucksLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
+  await requireDashboardAccess();
+
   return (
     <main className="container my-10">
       <section className="flex justify-center md:justify-between flex-wrap md:flex-nowrap gap-3">

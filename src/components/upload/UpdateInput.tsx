@@ -9,7 +9,6 @@ import CONFIG from "@/config";
 import { Upload } from "lucide-react";
 import { Frente } from "@prisma/client";
 import { useUser } from '@/contexts/UserContext';
-import { PutBlobResult } from '@vercel/blob';
 
 interface FileUpdateProps {
   selectedFrente: Frente;
@@ -22,7 +21,7 @@ const FileUpdate: React.FC<FileUpdateProps> = ({
   selectedArea,
   onUpdate,
 }) => {
-  const { role } = useUser();
+  const { isAdmin } = useUser();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
@@ -70,7 +69,7 @@ const FileUpdate: React.FC<FileUpdateProps> = ({
 
   return (
     <>
-      {role === "admin" && (
+      {isAdmin && (
         <Input
           ref={fileInputRef}
           type="file"
@@ -81,8 +80,10 @@ const FileUpdate: React.FC<FileUpdateProps> = ({
       )}
       <Button
         onClick={triggerFileInput}
-        className={`w-full flex items-center gap-2 ${isLoading ? 'bg-secondary-light' : 'bg-secondary'} ${role !== 'admin' && 'opacity-50 cursor-not-allowed'}`}
-        disabled={isLoading || role !== 'admin'}
+        className={`w-full flex items-center gap-2 ${
+          isLoading ? "bg-secondary-light" : "bg-secondary"
+        } ${!isAdmin && "opacity-50 cursor-not-allowed"}`}
+        disabled={isLoading || !isAdmin}
       >
         <Upload size={18} color="white" />
         {isLoading ? "Subiendo..." : "Actualizar Archivo"}

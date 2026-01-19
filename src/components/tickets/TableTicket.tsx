@@ -178,7 +178,7 @@ const TableTicket = (props: TableTicketProps) => {
                   className="h-24 text-center"
                 >
                   No hay{" "}
-                  {props.area == Section.VOUCHERCAMION ? "vouchers" : "tickets"}{" "}
+                  {props.area == Section.VOUCHERCAMION ? "vouchers" : "vouchers"}{" "}
                   que mostrar
                 </TableCell>
               </TableRow>
