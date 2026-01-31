@@ -6,7 +6,7 @@ export default async function TrucksLayout({
 }: {
   children: React.ReactNode;
 }) {
-  await requireDashboardAccess();
+  const user = await requireDashboardAccess();
 
   return (
     <main className="container my-10">
@@ -16,7 +16,7 @@ export default async function TrucksLayout({
             Aplicación de Acarreos
           </h1>
         </div>
-        <TabTrucks />
+        <TabTrucks isOwner={user.role === "owner"}/>
       </section>
       <section className="mt-6">{children}</section>
     </main>
