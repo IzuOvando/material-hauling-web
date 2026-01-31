@@ -1,5 +1,6 @@
 import { InvalidDataError, ValidationError } from "@/errors";
 import generateQRString from "./generateQRString";
+import DataCompressor from "./dataCompressor";
 
 class MetaDataCamiones {
   private placas: string | null = null;
@@ -116,7 +117,7 @@ class MetaDataCamiones {
 
   private setIdcamion(): void {
     if (this.frenteNombre && this.noEconomico) {
-      this.idCamion = `TM-${this.frenteNombre}-${this.noEconomico}`;
+      this.idCamion = `SDN-${this.frenteNombre}-${this.noEconomico}`;
     } else {
       throw new InvalidDataError(
         "Frente y No Economico deben estar establecidos para generar el ID del camión."
@@ -150,8 +151,9 @@ class MetaDataCamiones {
       `No Empleado: ${this.noEmpleado}`,
       `Id Camion: ${this.idCamion}`
     ].join('\n');
-
-    return generateQRString(qrText);
+    const compressed = DataCompressor.compressString(qrText);
+    const value = `${compressed}${DataCompressor.DATA_CAMION_SUFFIX}`;
+    return generateQRString(value);
   }
 
   private isComplete(): boolean {

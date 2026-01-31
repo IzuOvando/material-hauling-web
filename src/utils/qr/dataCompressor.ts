@@ -3,6 +3,8 @@ import pako from "pako";
 import { Buffer } from "buffer";
 
 class DataCompressor {
+  public static readonly DATA_CAMION_SUFFIX = "::SDNQR";
+
   private static fieldMap: { [key: number]: keyof VoucherCamion } = {
     1: "uuid",
     2: "tiro",
@@ -21,6 +23,16 @@ class DataCompressor {
     15: "checkerName",
     16: "checkerNo",
   };
+
+  public static compressString(value: string): string {
+    const compressed = pako.deflate(value, { level: 9 });
+    return Buffer.from(compressed).toString("base64");
+  }
+
+  public static decompressString(base64: string): string {
+    const bytes = Buffer.from(base64, "base64");
+    return pako.inflate(bytes, { to: "string" });
+  }
 
   public static compressTicketData(ticket: VoucherCamion): string {
     const ticketCompacto = {
@@ -43,51 +55,45 @@ class DataCompressor {
     };
 
     const dataQr = JSON.stringify(ticketCompacto);
-    let compressedBase64 = "";
 
     try {
       const compressed = pako.deflate(dataQr, { level: 9 });
-      const byteArrayAsNumberArray = Array.from(compressed);
-      compressedBase64 = Buffer.from(byteArrayAsNumberArray).toString("base64");
+      return Buffer.from(compressed).toString("base64");
     } catch (error) {
       console.error("Error al comprimir los datos para el QR:", error);
       throw new Error("La compresión de los datos del ticket falló.");
     }
-
-    return compressedBase64;
   }
 
-  public static decompressTicketData(
-    compressedBase64: string
-  ): VoucherCamion | null {
+  public static decompressTicketData(compressedBase64: string): VoucherCamion | null {
     try {
-      const compressedBytes = Uint8Array.from(atob(compressedBase64), (c) =>
-        c.charCodeAt(0)
-      );
+      const compressedBytes = Buffer.from(compressedBase64, "base64");
       const decompressed = pako.inflate(compressedBytes, { to: "string" });
+
       const originalData = JSON.parse(decompressed);
       const ticket: any = {};
+
       for (const key in originalData) {
-        const numericKey = parseInt(key);
+        const numericKey = parseInt(key, 10);
         const fieldName = this.fieldMap[numericKey];
-        ticket[fieldName] = originalData[key];
+        if (fieldName) ticket[fieldName] = originalData[key];
       }
 
       if (ticket.idCamion) {
         const idParts = ticket.idCamion.split("-");
-        if (idParts.length === 3 && idParts[0] === "TM") {
+        if (idParts.length === 3 && idParts[0] === "SDN") {
           ticket.frenteNombre = idParts[1];
           ticket.noEconomico = idParts[2];
-        } else {
-          throw new Error("Formato de ID del camión no es válido.");
         }
       }
 
       return ticket as VoucherCamion;
     } catch (error) {
+      console.error("Error al descomprimir los datos del QR:", error);
       return null;
     }
   }
 }
 
 export default DataCompressor;
+
