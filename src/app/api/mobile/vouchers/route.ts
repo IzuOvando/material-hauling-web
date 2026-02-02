@@ -88,12 +88,12 @@ export async function POST(req: NextRequest) {
 
         await prisma.$transaction(
             vouchersArray.map((voucher, index) => {
-                const odometerInt =
+                const odometerFloat =
                     typeof voucher.odometer === "string"
-                        ? parseInt(voucher.odometer, 10)
+                        ? parseFloat(voucher.odometer)
                         : voucher.odometer;
 
-                if (Number.isNaN(odometerInt)) {
+                if (Number.isNaN(odometerFloat)) {
                     console.error(`❌ Odometer inválido en voucher [${index}]`, voucher.odometer);
                     throw new Prisma.PrismaClientValidationError(
                         `Odometer inválido: ${voucher.odometer}`,
@@ -105,14 +105,15 @@ export async function POST(req: NextRequest) {
                     data: {
                         voucherDate: voucher.voucherDate,
                         voucherTime: voucher.voucherTime,
-                        tiro: voucher.tiro,
+                        destino: voucher.destino,
                         origen: voucher.origen,
                         material: voucher.material,
                         placas: voucher.placas,
-                        odometer: odometerInt,
+                        odometer: odometerFloat,
+                        status: voucher.status ?? "IN_TRANSIT",
                         operador: voucher.operador,
                         turno: voucher.turno,
-                        ejido: voucher.ejido,
+                        localidad: voucher.localidad,
                         noEconomico: voucher.noEconomico,
                         empresa: voucher.empresa,
                         cubicacion: voucher.cubicacion,

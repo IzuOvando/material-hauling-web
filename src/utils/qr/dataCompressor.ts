@@ -7,7 +7,7 @@ class DataCompressor {
 
   private static fieldMap: { [key: number]: keyof VoucherCamion } = {
     1: "uuid",
-    2: "tiro",
+    2: "destino",
     3: "voucherTime",
     4: "origen",
     5: "material",
@@ -15,7 +15,7 @@ class DataCompressor {
     7: "odometer",
     8: "operador",
     9: "turno",
-    10: "ejido",
+    10: "localidad",
     11: "empresa",
     12: "cubicacion",
     13: "noEmpleado",
@@ -37,7 +37,7 @@ class DataCompressor {
   public static compressTicketData(ticket: VoucherCamion): string {
     const ticketCompacto = {
       1: ticket.uuid,
-      2: ticket.tiro,
+      2: ticket.destino,
       3: ticket.voucherTime,
       4: ticket.origen,
       5: ticket.material,
@@ -45,7 +45,7 @@ class DataCompressor {
       7: ticket.odometer,
       8: ticket.operador,
       9: ticket.turno,
-      10: ticket.ejido,
+      10: ticket.localidad,
       11: ticket.empresa,
       12: ticket.cubicacion,
       13: ticket.noEmpleado,

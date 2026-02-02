@@ -12,6 +12,12 @@ type DistinctValuesType = {
   [key: string]: any;
 };
 
+const keyOf = (value: unknown): string => {
+  if (value === null || value === undefined) return "";
+  if (value instanceof Date) return value.toISOString();
+  return String(value); // numbers (floats) -> "12.34", strings -> "abc"
+};
+
 // * DATABASE QUERIES *
 
 // This function is expected to be called from other function that validates the frente and area parameters
@@ -33,9 +39,10 @@ export default async function getFacetedFilters(
         | keyof VoucherCamion,
       options: distinctValues[index].map((distinct: DistinctValuesType) => {
         const value = distinct[field];
+        const counterKey = keyOf(value);
         return {
           value: value,
-          count: counters[value] || 0,
+          count: counters[counterKey] || 0,
         };
       }),
     })
@@ -231,7 +238,7 @@ const getCounts = async (
         const value = item[key];
         const count = item._count[key];
 
-        acc[value as string] = count;
+        acc[keyOf(value)] = count;
       }
     });
     return acc;

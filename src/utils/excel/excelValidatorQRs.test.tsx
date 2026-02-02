@@ -9,11 +9,11 @@ const createMockFile = (name: string, type: string, contents: ArrayBuffer): File
 };
 
 describe('getMetadataCamionFromFile', () => {
-    const validHeaders = ["placas", "noeconomico", "operador", "turno", "ejido", "frente", "cubicacion", "empresa", "noempleado"];
+    const validHeaders = ["placas", "noeconomico", "operador", "turno", "localidad", "frente", "cubicacion", "empresa", "noempleado"];
     const validData = [
         validHeaders,
-        ["GHI123", "006", "Ana Silva", 1, "T9F7", 400, "Mabina SA de CV", "568TXP"],
-        ["GHIJKD", "007", "Ana Silva", 2, "T3F5", 100, "Mabina SA de CV", "568TXP"],
+        ["GHI123", "006", "Ana Silva", 1, "Localidad 1", "T9F7", 400, "Mabina SA de CV", "568TXP"],
+        ["GHIJKD", "007", "Ana Silva", 2, "Localidad 2", "T3F5", 100, "Mabina SA de CV", "568TXP"],
     ];
     const invalidData = [
         validHeaders,

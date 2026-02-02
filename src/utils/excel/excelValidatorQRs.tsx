@@ -12,7 +12,7 @@ export function getMetadataCamionFromFile(
     noeconomico: "setNoeconomico",
     operador: "setOperador",
     turno: "setTurno",
-    ejido: "setEjido",
+    localidad: "setLocalidad",
     frente: "setFrente",
     cubicacion: "setVolumen",
     empresa: "setEmpresa",

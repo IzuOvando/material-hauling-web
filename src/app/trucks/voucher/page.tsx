@@ -43,7 +43,7 @@ const VoucherInfo = ({ voucher }: { voucher: VoucherCamion }) => {
       value: voucher.placas,
     },
     {
-      label: "Odómetro",
+      label: "Odómetro Origen",
       value: voucher.odometer,
     },
     {
@@ -59,8 +59,8 @@ const VoucherInfo = ({ voucher }: { voucher: VoucherCamion }) => {
       value: voucher.origen,
     },
     {
-      label: "Tiro",
-      value: voucher.tiro,
+      label: "Destino",
+      value: voucher.destino,
     },
     {
       label: "Fecha",
@@ -79,8 +79,8 @@ const VoucherInfo = ({ voucher }: { voucher: VoucherCamion }) => {
       value: voucher.turno === 1 ? "Primer Turno" : "Segundo Turno",
     },
     {
-      label: "Ejido",
-      value: voucher.ejido,
+      label: "Localidad",
+      value: voucher.localidad,
     },
     {
       label: "Empresa",

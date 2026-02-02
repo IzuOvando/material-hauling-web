@@ -7,7 +7,7 @@ class MetaDataCamiones {
   private noEconomico: string | null = null;
   private operador: string | null = null;
   private turno: number | null = null;
-  private ejido: string | null = null;
+  private localidad: string | null = null;
   private frenteNombre: string | null = null;
   private cubicacion: number | null = null;
   private idCamion: string | null = null;
@@ -70,14 +70,14 @@ class MetaDataCamiones {
     return this;
   }
 
-  public setEjido(ejido: string): MetaDataCamiones {
-    if (!ejido || ejido.trim() === "") {
+  public setLocalidad(localidad: string): MetaDataCamiones {
+    if (!localidad || localidad.trim() === "") {
       throw new ValidationError(
-        "ejido",
-        "El ejido es requerido y no puede estar vacío."
+        "localidad",
+        "La localidad es requerida y no puede estar vacía."
       );
     }
-    this.ejido = ejido;
+    this.localidad = localidad;
     return this;
   }
 
@@ -144,7 +144,7 @@ class MetaDataCamiones {
       `No Economico: ${this.noEconomico}`,
       `Operador: ${this.operador}`,
       `Turno: ${this.turno}`,
-      `Ejido: ${this.ejido}`,
+      `Localidad: ${this.localidad}`,
       `Frente: ${this.frenteNombre}`,
       `Cubicacion: ${this.cubicacion}`,
       `Empresa: ${this.empresa}`,
@@ -167,8 +167,8 @@ class MetaDataCamiones {
       this.operador !== null &&
       this.operador !== "" &&
       this.turno !== null &&
-      this.ejido !== null &&
-      this.ejido !== "" &&
+      this.localidad !== null &&
+      this.localidad !== "" &&
       this.frenteNombre !== null &&
       this.frenteNombre !== "" &&
       this.empresa !== null &&

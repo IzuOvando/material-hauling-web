@@ -545,9 +545,9 @@ const voucherCamionColumns: ColumnDef<VoucherCamion>[] = [
     },
   },
   {
-    accessorKey: "tiro",
+    accessorKey: "destino",
     header: ({ column }) => (
-      <TableTicketColumnHeader column={column} title="Tiro" />
+      <TableTicketColumnHeader column={column} title="Destino" />
     ),
     filterFn: (row, id, value) => {
       return value.includes(row.getValue(id));

@@ -12,6 +12,11 @@ datasource db {
   directUrl = env("POSTGRES_URL_NON_POOLING")
 }
 
+enum VoucherStatus {
+  IN_TRANSIT
+  ARRIVED
+}
+
 model User {
   username String @id @unique
   password String
@@ -50,14 +55,17 @@ model VoucherCamion {
   createdAt    DateTime @default(now())
   voucherDate  DateTime
   voucherTime  DateTime
-  tiro         String
+  destino      String
   origen       String
   material     String
   placas       String
-  odometer     Int      @default(0)
+  status       VoucherStatus @default(IN_TRANSIT)
+  odometerArrival Float?
+  odometer     Float      @default(0)
+  arrivalTime  DateTime?
   operador     String
   turno        Int
-  ejido        String   @default("N/A")
+  localidad    String   @default("N/A")
   noEconomico  String
   empresa      String
   cubicacion   Float
@@ -73,7 +81,7 @@ model VoucherCamion {
   @@index([frenteNombre, voucherTime])
   @@index([frenteNombre, idCamion])
   @@index([frenteNombre, origen])
-  @@index([frenteNombre, tiro])
+  @@index([frenteNombre, destino])
   @@index([frenteNombre, material])
 }
 

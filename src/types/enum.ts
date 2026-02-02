@@ -27,3 +27,8 @@ export const TicketAreaList = [
     value: TicketArea.ASFALTO,
   },
 ];
+
+export enum VoucherCamionStatus {
+  IN_TRANSIT = "IN_TRANSIT",
+  ARRIVED = "ARRIVED",
+}
