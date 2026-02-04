@@ -6,8 +6,7 @@ async function main() {
   await prisma.user.create({
     data: {
       username: "Ruben35",
-      password:
-        "441a0e91023c4658951e9ec6a3343b1639cd98d520aa5c8e2c84b0d64152a133",
+      password: "$2b$12$7q16hkrm3xFKzjX.Zu6slOgZKjVaId4ygNwqxSPZ6xjcpsEASD1TW",
       rol: "admin",
     },
   });
@@ -15,8 +14,7 @@ async function main() {
   await prisma.user.create({
     data: {
       username: "JuanOvando",
-      password:
-        "d76b823f60f2c47f8117792a4ab439f879c30873ba56ce103de7c923418d76ad",
+      password: "$2b$12$yjxMT3h3lDupY2i8NfeqBuPNPAZdTSEWMGboZiyhmrCVag/gFoKyi",
       rol: "owner",
     },
   });
@@ -24,8 +22,7 @@ async function main() {
   await prisma.user.create({
     data: {
       username: "MiguelPorras",
-      password:
-        "2518b30d074866418e68f8ac3110ebec7226af2cdcaab6da94495a6776c1f539",
+      password: "$2b$12$tDDuSVCMAgmADhpu7.QOeOVTfr2XMF43Hw/OgUcroS6V84Fu6/shS",
       rol: "user",
     },
   });

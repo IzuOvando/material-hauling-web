@@ -191,4 +191,24 @@ const config: Config = {
   // watchman: true,
 };
 
-export default createJestConfig(config);
+const asyncConfig = createJestConfig(config);
+
+const jestConfigWithExceljs = async () => {
+  const jestConfig = await asyncConfig();
+  // exceljs bundles uuid as ESM - ensure it gets transformed
+  jestConfig.transformIgnorePatterns = (jestConfig.transformIgnorePatterns || []).map(
+    (pattern: string) => {
+      if (pattern === '/node_modules/') {
+        return '/node_modules/(?!exceljs)/';
+      }
+      // Handle the Windows path pattern from next/jest
+      if (pattern.includes('node_modules')) {
+        return pattern.replace('node_modules', 'node_modules(?!/exceljs)');
+      }
+      return pattern;
+    }
+  );
+  return jestConfig;
+};
+
+export default jestConfigWithExceljs;

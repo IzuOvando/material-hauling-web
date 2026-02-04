@@ -54,7 +54,7 @@ const CardLogin = () => {
           sendErrorToast("Ocurrió un error inesperado.");
       }
     }
-  }, [state.error, toast]);
+  }, [state.error, state.attempts, toast]);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();

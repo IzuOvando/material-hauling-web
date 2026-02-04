@@ -1,4 +1,4 @@
-import * as XLSX from "xlsx";
+import ExcelJS, { Buffer as BufferExcelJs} from "exceljs"
 import * as path from "path";
 import prisma from "@/lib/db";
 import csvParser from "csv-parser";
@@ -9,6 +9,7 @@ import { schemas, SchemaKeys } from "@/lib/schemas/headers";
 import { CreateTicketDto, filteredDataConfig, isCreateAcarreosDto, isCreateGasolinaDto, isCreateConcretoDto, isCreateAsfaltoDto } from '@/lib/schemas/csv_schemas';
 import CONFIG from "@/config";
 import DatabaseDownloader from "./databasedownloader";
+import { validateUrlOrThrow } from "@/utils/urlValidator";
 
 
 
@@ -42,6 +43,30 @@ class FileProcessor {
         );
     }
 
+    private getCellStringValue(cell: ExcelJS.Cell): string {
+        const value = cell.value;
+        if (value === null || value === undefined) return "";
+        if (value instanceof Date) {
+            const d = value;
+            const dd = String(d.getDate()).padStart(2, '0');
+            const mm = String(d.getMonth() + 1).padStart(2, '0');
+            const yyyy = d.getFullYear();
+            return `${dd}/${mm}/${yyyy}`;
+        }
+        if (typeof value === 'object' && 'richText' in value) {
+            return (value as ExcelJS.CellRichTextValue).richText.map(rt => rt.text).join('');
+        }
+        if (typeof value === 'object' && 'text' in value) {
+            return (value as ExcelJS.CellHyperlinkValue).text;
+        }
+        if (typeof value === 'object' && 'result' in value) {
+            const result = (value as ExcelJS.CellFormulaValue).result;
+            if (result === null || result === undefined) return "";
+            return String(result);
+        }
+        return String(value);
+    }
+
     public async streamToBuffer(stream: Readable): Promise<Buffer> {
         const chunks: Buffer[] = [];
 
@@ -61,7 +86,7 @@ class FileProcessor {
     }
 
     public async excelToCSV(
-        buffer: Buffer,
+        buffer: BufferExcelJs,
         outputFolder: string,
         validHeaders: Set<string>,
         key: string
@@ -96,67 +121,66 @@ class FileProcessor {
         };
 
         try {
-            const workbook = XLSX.read(buffer, { type: 'buffer' });
+            const workbook = new ExcelJS.Workbook();
+            await workbook.xlsx.load(buffer);
 
-            const promises = workbook.SheetNames.map(async (sheetName) => {
-                const worksheet = workbook.Sheets[sheetName];
-                if (!worksheet["!ref"]) {
+            const promises = workbook.worksheets.map(async (worksheet) => {
+                const sheetName = worksheet.name;
+                if (worksheet.rowCount === 0) {
                     console.error(`Sheet ${sheetName} is empty or malformed.`);
                     return;
                 }
 
-                const range = XLSX.utils.decode_range(worksheet["!ref"]);
+                const colCount = worksheet.columnCount;
                 let csvOutput = "";
                 let dateColumns = new Set<number>();
                 let headerChecked = false;
                 let shouldStop = false;
 
-                for (let R = range.s.r; R <= range.e.r; ++R) {
+                for (let R = 1; R <= worksheet.rowCount; ++R) {
                     if (shouldStop) break;
 
                     let row: string[] = [];
                     let empty = true;
                     let emptyConsecutiveCount = 0;
-                
-                    for (let C = range.s.c; C <= range.e.c; ++C) {
-                        const cellAddress = { c: C, r: R };
-                        const cellRef = XLSX.utils.encode_cell(cellAddress);
-                        const cell = worksheet[cellRef];
-                        let cellValue = cell ? cell.w || cell.v : "";
+
+                    for (let C = 1; C <= colCount; ++C) {
+                        const cell = worksheet.getRow(R).getCell(C);
+                        let cellValue = this.getCellStringValue(cell);
                         if (!cellValue || cellValue.trim() === '') {
                             emptyConsecutiveCount++;
                         } else {
                             emptyConsecutiveCount = 0;
                         }
-                
+
                         if (emptyConsecutiveCount >= 3) {
                             console.warn(`Skipping the rest of the row due to 3 consecutive empty cells at row ${R}, column ${C}`);
                             if (empty) {
-                                shouldStop = true; 
+                                shouldStop = true;
                             }
                             break;
                         }
-                
+
                         if (typeof cellValue === 'string') {
                             cellValue = cellValue.replace(/"/g, '""');
                             if (cellValue.includes(',') || cellValue.includes('"')) {
                                 cellValue = `"${cellValue}"`;
                             }
                         }
-                
+
                         row.push(cellValue);
-                
+
                         if (this.isDateColumn(cellValue)) {
                             dateColumns.add(C);
                         }
-                
+
                         if (cellValue.trim() !== '') empty = false;
                     }
-                
+
                     if (empty) {
                         continue;
                     }
-                
+
                     if (!headerChecked) {
                         if (!isValidHeaderRow(row, validHeaders)) {
                             throw new Error("El encabezado del CSV no es válido.");
@@ -169,18 +193,18 @@ class FileProcessor {
                         headerChecked = true;
                         continue;
                     }
-                
+
                     row = row.map((cellValue, index) => {
-                        if (dateColumns.has(index) && cellValue) {
+                        if (dateColumns.has(index + 1) && cellValue) {
                             cellValue = cellValue.replace(/"/g, '""');
                             return `"${cellValue}"`;
                         }
-                
+
                         if (typeof cellValue === 'string' && (cellValue.includes(',') || cellValue.includes('"'))) {
                             cellValue = cellValue.replace(/"/g, '""');
                             return `"${cellValue}"`;
                         }
-                
+
                         const expectedType = 'string';
                         if (!validateCellType(cellValue, expectedType)) {
                             console.error(`Invalid cell type for value: ${cellValue}`);
@@ -188,9 +212,9 @@ class FileProcessor {
                         }
                         return (cellValue);
                     });
-                
+
                     csvOutput += row.join(",") + "\n";
-                }                
+                }
                 const fileNameWithoutExtension = path.basename(buffer.toString(), path.extname(buffer.toString()));
                 const match = fileNameWithoutExtension.match(/_(.*)/);
                 const extractedPart = match ? match[1] : '';
@@ -766,6 +790,10 @@ class FileProcessor {
             console.error(`Invalid area type: ${key}`);
             throw new Error(`Invalid area type: ${key}`);
         }
+
+        // Validate URL to prevent SSRF attacks (defense in depth)
+        validateUrlOrThrow(excelBlobUrl, "excelBlobUrl");
+
         const downloader = new DatabaseDownloader();
         const validHeaders = schemas[key];
         const desiredPart = fileName.split('_')[1].split('.')[0];
@@ -782,7 +810,7 @@ class FileProcessor {
             const arrayBuffer = await response.arrayBuffer();
             const buffer = Buffer.from(arrayBuffer);
 
-            const csvFilePaths = await this.excelToCSV(buffer, outputCSVFolder, validHeaders, key);
+            const csvFilePaths = await this.excelToCSV(buffer as unknown as BufferExcelJs, outputCSVFolder, validHeaders, key);
 
             await this.processCSVFiles(csvFilePaths, fileName, key);
 

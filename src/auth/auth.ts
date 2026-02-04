@@ -1,25 +1,27 @@
 import NextAuth from "next-auth";
 import { authConfig } from "./auth.config";
 import Credentials from "next-auth/providers/credentials";
-import prisma from "@/lib/db";
+import { validateUser } from "@/lib/db/validateUser";
+import { InvalidCredentialsError } from "./InvalidCredentialsError";
+import { logSecurityEvent, SecurityEventType } from "./securityLogger";
 
 export const { auth, signIn, signOut } = NextAuth({
   ...authConfig,
   providers: [
     Credentials({
       async authorize(credentials, request) {
-        const userCredentials = {
-          username: credentials?.username as string,
-          password: credentials?.password as string, // Ya está hasheada desde el cliente
-        };
+        const username = credentials?.username as string;
+        const password = credentials?.password as string; // Already hashed with SHA256 from the client
 
-        const user = await prisma.user.findUnique({
-          where: { username: userCredentials.username },
-        });
+        const user = await validateUser(username, password);
 
-        if (user && user.password === userCredentials.password)
+        if (user) {
+          logSecurityEvent({ type: SecurityEventType.AUTH_SUCCESS, userId: user.username, resource: "/login" });
           return { name: user.username };
-        else return null;
+        }
+
+        logSecurityEvent({ type: SecurityEventType.AUTH_FAILURE, resource: "/login", details: { username } });
+        throw new InvalidCredentialsError();
       },
     }),
   ],

@@ -6,8 +6,8 @@ import { Button } from "@/components/ui/button";
 import { handleFileUpload } from "@/actions/fileupload";
 import { Upload } from "lucide-react";
 import { Frente } from "@prisma/client";
-import { useUser } from '@/contexts/UserContext';
-import { PutBlobResult } from '@vercel/blob';
+import { useUser } from "@/contexts/UserContext";
+import { PutBlobResult } from "@vercel/blob";
 
 interface FileUpdateProps {
   selectedFrente: Frente;
@@ -67,7 +67,7 @@ const FileUpload: React.FC<FileUpdateProps> = ({
       )}
       <Button
         onClick={triggerFileInput}
-        className={`w-full flex items-center gap-2 ${isLoading ? 'bg-secondary-light' : 'bg-secondary'} ${isAdmin ? 'opacity-50 cursor-not-allowed' : ''}`}
+        className={`w-full flex items-center gap-2 ${isLoading ? "bg-secondary-light" : "bg-secondary"} ${!isAdmin ? "opacity-50 cursor-not-allowed" : ""}`}
         disabled={isLoading || !isAdmin}
       >
         <Upload size={18} color="white" />

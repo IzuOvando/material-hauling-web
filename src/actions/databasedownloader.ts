@@ -1,4 +1,4 @@
-import * as XLSX from "xlsx";
+import ExcelJS from "exceljs";
 import prisma from "@/lib/db";
 import blobClient from "@/lib/blobClient";
 import { DateTime } from "luxon";
@@ -170,18 +170,26 @@ export default class DatabaseDownloader {
         });
     }
 
-    private generateExcelSheet(processedRecords: any[], key: string): Buffer {
-        const worksheet = XLSX.utils.json_to_sheet(processedRecords, {
-            cellDates: false,
-            cellStyles: false
-        });
+    private async generateExcelSheet(processedRecords: any[], key: string): Promise<Buffer> {
+        const workbook = new ExcelJS.Workbook();
+        const sheetName = key.charAt(0).toUpperCase() + key.slice(1);
+        const worksheet = workbook.addWorksheet(sheetName);
 
-        worksheet['!cols'] = [{ wch: 36 }];
+        if (processedRecords.length > 0) {
+            const headers = Object.keys(processedRecords[0]);
+            worksheet.columns = headers.map((header, index) => ({
+                header,
+                key: header,
+                width: index === 0 ? 36 : undefined,
+            }));
 
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, key.charAt(0).toUpperCase() + key.slice(1));
+            for (const record of processedRecords) {
+                worksheet.addRow(record);
+            }
+        }
 
-        return XLSX.write(workbook, { type: 'buffer' });
+        const arrayBuffer = await workbook.xlsx.writeBuffer();
+        return Buffer.from(arrayBuffer);
     }
 
     private async uploadToBlob(path: string, buffer: Buffer): Promise<string> {
@@ -262,7 +270,7 @@ export default class DatabaseDownloader {
             const cleanFrenteName = await this.extractFrenteName(fileName);
             const records = await this.fetchRecords(key, cleanFrenteName);
             const processedRecords = this.processRecords(records);
-            const buffer = this.generateExcelSheet(processedRecords, key);
+            const buffer = await this.generateExcelSheet(processedRecords, key);
             const blobUrl = await this.uploadToBlob(`${outputExcel}${key}.xlsx`, buffer);
             await this.updateDatabase(cleanFrenteName, key, blobUrl);
     

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import blobClient from "@/lib/blobClient";
+import { logSecurityEvent, SecurityEventType } from "@/auth/securityLogger";
 
 export async function POST(req: NextRequest) {
     try {
@@ -22,6 +23,13 @@ export async function POST(req: NextRequest) {
         const deletePromises = blobUrls.map(url => blobClient.deleteBlob(url));
 
         await Promise.all(deletePromises);
+
+        logSecurityEvent({
+            type: SecurityEventType.DATA_DELETE,
+            ip: req.headers.get("x-forwarded-for")?.split(",")[0]?.trim(),
+            resource: "/api/files/delete-blobs",
+            details: { count: blobUrls.length },
+        });
 
         return NextResponse.json({
             message: "Blobs deleted successfully.",

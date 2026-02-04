@@ -1,6 +1,11 @@
 import jwt from 'jsonwebtoken';
 import CONFIG from "@/config";
 
+// TODO (SEC-011): Implement JWT token revocation using Redis (Vercel KV).
+//  - authenticate(): store tokens in Redis with a TTL matching their expiration.
+//  - verify(): check that the token exists in Redis in addition to validating the signature.
+//  - refresh(): revoke previous tokens in Redis when issuing new ones (rotation).
+//  - Create a logout endpoint (e.g. POST /api/mobile/auth/logout) to revoke tokens on demand.
 export class TokenAuthenticator {
 
   private static ACCESS_TOKEN_SECRET = CONFIG.ACCESS_TOKEN_SECRET || (() => { throw new Error("ACCESS_TOKEN_SECRET is not defined in CONFIG") })();

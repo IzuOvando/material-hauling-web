@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import blobClient from "@/lib/blobClient";
 import { invalidateFacetsCache } from "@/actions/tickets";
 import { TicketArea } from "@/types";
+import { logSecurityEvent, SecurityEventType } from "@/auth/securityLogger";
 
 export async function POST(req: NextRequest) {
   try {
@@ -35,6 +36,13 @@ export async function POST(req: NextRequest) {
 
     await invalidateFacetsCache(nombre, TicketArea.ACARREOS);
     await invalidateFacetsCache(nombre, TicketArea.GASOLINA);
+
+    logSecurityEvent({
+      type: SecurityEventType.DATA_DELETE,
+      ip: req.headers.get("x-forwarded-for")?.split(",")[0]?.trim(),
+      resource: "/api/files/deletefrente",
+      details: { frenteNombre: nombre },
+    });
 
     return NextResponse.json(
       {

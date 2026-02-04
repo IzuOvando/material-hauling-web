@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/db";
 import { requireDashboardAccess } from "@/auth/guards";
+import { logSecurityEvent, SecurityEventType } from "@/auth/securityLogger";
 
 export async function POST(req: NextRequest) {
   try {
@@ -27,6 +28,13 @@ export async function POST(req: NextRequest) {
           },
         },
       },
+    });
+
+    logSecurityEvent({
+      type: SecurityEventType.PERMISSION_CHANGE,
+      userId: user.name ?? undefined,
+      resource: "/api/user/assign-frentes",
+      details: { targetUser: username, added: add, removed: remove },
     });
 
     return NextResponse.json({ ok: true });

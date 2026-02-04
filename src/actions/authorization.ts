@@ -1,9 +1,10 @@
 "use server";
 import { signIn } from "@/auth";
+import { InvalidCredentialsError } from "@/auth/InvalidCredentialsError";
 
 export async function authenticate(
   prevState: { attempts: number; error: string },
-  formData: FormData
+  formData: FormData,
 ) {
   const username = formData.get("username");
   const password = formData.get("password");
@@ -26,7 +27,7 @@ export async function authenticate(
       error: "Done",
     };
   } catch (error: any) {
-    if (error?.cause?.err?.code === "credentials")
+    if (error instanceof InvalidCredentialsError)
       return {
         attempts: attempts + 1,
         error: "Invalid Credentials",

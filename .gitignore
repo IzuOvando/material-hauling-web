@@ -40,3 +40,6 @@ next-env.d.ts
 *.db
 /db_input
 /db_output
+
+# Claude Local Settings
+/.claude/*.local.*

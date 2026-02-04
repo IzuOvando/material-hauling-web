@@ -1,5 +1,6 @@
 import prisma from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
+import { logSecurityEvent, SecurityEventType } from "@/auth/securityLogger";
 
 export async function POST(req: NextRequest) {
   try {
@@ -14,6 +15,13 @@ export async function POST(req: NextRequest) {
 
     const deleted = await prisma.voucherCamion.deleteMany({
       where: { frenteNombre },
+    });
+
+    logSecurityEvent({
+      type: SecurityEventType.DATA_DELETE,
+      ip: req.headers.get("x-forwarded-for")?.split(",")[0]?.trim(),
+      resource: "/api/trucks/deleteVoucher",
+      details: { frenteNombre, count: deleted.count },
     });
 
     return NextResponse.json({

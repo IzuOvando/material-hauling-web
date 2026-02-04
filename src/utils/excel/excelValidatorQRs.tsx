@@ -1,6 +1,26 @@
-import * as XLSX from "xlsx";
+import ExcelJS from "exceljs";
 import { schemas } from "@/lib/schemas/headers";
 import MetaDataCamiones from "@/utils/qr/MetaDataCamiones";
+
+function getCellStringValue(cell: ExcelJS.Cell): string {
+  const value = cell.value;
+  if (value === null || value === undefined) return "";
+  if (value instanceof Date) {
+    return value.toISOString();
+  }
+  if (typeof value === 'object' && 'richText' in value) {
+    return (value as ExcelJS.CellRichTextValue).richText.map(rt => rt.text).join('');
+  }
+  if (typeof value === 'object' && 'text' in value) {
+    return (value as ExcelJS.CellHyperlinkValue).text;
+  }
+  if (typeof value === 'object' && 'result' in value) {
+    const result = (value as ExcelJS.CellFormulaValue).result;
+    if (result === null || result === undefined) return "";
+    return String(result);
+  }
+  return String(value);
+}
 
 export function getMetadataCamionFromFile(
   file: File
@@ -43,38 +63,35 @@ export function getMetadataCamionFromFile(
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
 
-    reader.onload = (event) => {
+    reader.onload = async (event) => {
       try {
         const arrayBuffer = event.target?.result as ArrayBuffer;
         if (!arrayBuffer) {
           throw new Error("Error al leer el archivo.");
         }
 
-        const data = new Uint8Array(arrayBuffer);
-        const workbook = XLSX.read(data, { type: "array" });
+        const workbook = new ExcelJS.Workbook();
+        await workbook.xlsx.load(arrayBuffer as Buffer);
 
         const qrBuilders: MetaDataCamiones[] = [];
 
-        const sheetPromises = workbook.SheetNames.map(async (sheetName) => {
-          const worksheet = workbook.Sheets[sheetName];
-          if (!worksheet["!ref"]) {
-            console.error(`Sheet ${sheetName} is empty or malformed.`);
-            return;
+        for (const worksheet of workbook.worksheets) {
+          if (worksheet.rowCount === 0) {
+            console.error(`Sheet ${worksheet.name} is empty or malformed.`);
+            continue;
           }
 
-          const range = XLSX.utils.decode_range(worksheet["!ref"]);
+          const colCount = worksheet.columnCount;
           let headerChecked = false;
           let headers: string[] = [];
 
-          for (let R = range.s.r; R <= range.e.r; ++R) {
+          for (let R = 1; R <= worksheet.rowCount; ++R) {
             let row: string[] = [];
             let empty = true;
 
-            for (let C = range.s.c; C <= range.e.c; ++C) {
-              const cellAddress = { c: C, r: R };
-              const cellRef = XLSX.utils.encode_cell(cellAddress);
-              const cell = worksheet[cellRef];
-              let cellValue = cell ? cell.w || cell.v : "";
+            for (let C = 1; C <= colCount; ++C) {
+              const cell = worksheet.getRow(R).getCell(C);
+              let cellValue = getCellStringValue(cell);
 
               if (typeof cellValue === "string") {
                 cellValue = cellValue.replace(/"/g, '""');
@@ -118,11 +135,9 @@ export function getMetadataCamionFromFile(
             qrBuilder.build();
             qrBuilders.push(qrBuilder);
           }
-        });
+        }
 
-        Promise.all(sheetPromises)
-          .then(() => resolve(qrBuilders))
-          .catch((error) => reject(error));
+        resolve(qrBuilders);
       } catch (error) {
         reject(error);
       }
