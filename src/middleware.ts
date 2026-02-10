@@ -98,6 +98,31 @@ export default NextAuth(authConfig).auth(async (req) => {
   if (!isLoggedIn && pathname !== "/login") {
     return Response.redirect(new URL("/login", req.nextUrl.origin));
   }
+  // TODO: Implement role-based access control
+  // --- Web routes ---
+  // console.log("req.auth:", req.auth);
+  // const isLoggedIn = !!req.auth?.user;
+  // const role = (req.auth?.user as { role?: string })?.role;
+  // const isOwner = role === "owner";
+
+  // if (publicWebRoutes.has(pathname)) return;
+
+  // if (isLoggedIn && pathname === "/login") {
+  //   return Response.redirect(
+  //     new URL(isOwner ? "/" : "/trucks/db", req.nextUrl.origin)
+  //   );
+  // }
+
+  // if (isLoggedIn && pathname.startsWith("/trucks")) {
+  //   const isDb = pathname === "/trucks/db" || pathname.startsWith("/trucks/db/");
+  //   if (!isOwner && !isDb) {
+  //     return Response.redirect(new URL("/trucks/db", req.nextUrl.origin));
+  //   }
+  // }
+
+  // if (!isLoggedIn && pathname !== "/login") {
+  //   return Response.redirect(new URL("/login", req.nextUrl.origin));
+  // }
 });
 
 export const config = {

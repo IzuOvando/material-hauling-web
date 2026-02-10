@@ -26,17 +26,22 @@ export const formatLongSpanishDateFromString = (date: string) => {
   });
 };
 
-export const formatTime12Hour = (time: Date, lowercase?: boolean) => {
-  const dt = DateTime.fromJSDate(time);
-  const format = "h:mm a";
+export const formatTime12Hour = (
+  time?: Date | null,
+  lowercase?: boolean
+) => {
+  if (!time) return "—";
 
+  const dt = DateTime.fromJSDate(time);
+
+  if (!dt.isValid) return "—";
+
+  const format = "h:mm a";
   const formattedTime = dt.toFormat(format);
 
-  if (lowercase) {
-    return formattedTime.replace("AM", "a.m.").replace("PM", "p.m.");
-  } else {
-    return formattedTime.replace("am", "AM").replace("pm", "PM");
-  }
+  return lowercase
+    ? formattedTime.replace("AM", "a.m.").replace("PM", "p.m.")
+    : formattedTime.replace("am", "AM").replace("pm", "PM");
 };
 
 export const formatTime12HourFromString = (

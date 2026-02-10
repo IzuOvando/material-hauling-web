@@ -32,14 +32,16 @@ export type ConcreteDistribution = {
 export const MATERIALS_LIST: string[] = [
   'Terraplén',
   'Pedraplén',
+  'Trancision',
   'Subrasante',
-  'Balasto',
   'Subbalasto',
+  'Balasto',
   'Asfalto',
   'Grava',
   'Arena',
-  'Cemento',
-  'Concreto',
+  // 'Cemento',
+  'Base Hidráulica',
+  // 'Concreto',
   'Otro...',
 ];
 

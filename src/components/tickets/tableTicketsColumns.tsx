@@ -524,9 +524,32 @@ const voucherCamionColumns: ColumnDef<VoucherCamion>[] = [
   {
     accessorKey: "odometer",
     header: ({ column }) => (
-      <TableTicketColumnHeader column={column} title="Odómetro" />
+      <TableTicketColumnHeader column={column} title="Odómetro Origen" />
     ),
     cell: ({ row }) => <>{row.getValue("odometer")}</>,
+  },
+  {
+    accessorKey: "odometerArrival",
+    header: ({ column }) => (
+      <TableTicketColumnHeader column={column} title="Odómetro Destino" />
+    ),
+    cell: ({ row }) => {
+      const odometerArrival = row.getValue("odometerArrival") as number | null;
+      const status = row.original.status;
+
+      if (
+        (odometerArrival === null || odometerArrival === undefined) &&
+        status === "IN_TRANSIT"
+      ) {
+        return (
+          <span className="italic text-accent font-semibold">
+            En tránsito
+          </span>
+        );
+      }
+
+      return <>{odometerArrival}</>;
+    },
   },
   {
     accessorKey: "cubicacion",
@@ -575,10 +598,20 @@ const voucherCamionColumns: ColumnDef<VoucherCamion>[] = [
     ),
   },
   {
-    accessorKey: "operador",
+    accessorKey: "arrivalTime",
     header: ({ column }) => (
-      <TableTicketColumnHeader column={column} title="Operador" />
+      <TableTicketColumnHeader column={column} title="Hora Llegada" />
     ),
+    cell: ({ row }) => {
+      const arrivalTime = row.getValue("arrivalTime") as Date | null;
+      const status = row.original.status;
+
+      if (!arrivalTime && status === "IN_TRANSIT") {
+        return <span className="italic text-accent font-semibold">En tránsito</span>;
+      }
+
+      return formatTime12Hour(arrivalTime);
+    },
   },
   {
     accessorKey: "noEmpleado",

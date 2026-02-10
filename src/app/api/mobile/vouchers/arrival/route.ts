@@ -107,7 +107,10 @@ export async function POST(req: NextRequest) {
           data: {
             arrivalTime: current.arrivalTime ?? u.arrivalTime,
             odometerArrival: current.odometerArrival ?? u.odometerArrival,
-            status: VoucherCamionStatus.ARRIVED,
+            status:
+              current.status === VoucherCamionStatus.ARRIVED
+                ? current.status
+                : VoucherCamionStatus.ARRIVED,
           },
         });
       });
