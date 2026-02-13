@@ -1,2 +1,2 @@
-export { auth, signIn, signOut } from "./auth";
+export { auth, signIn, signOut, getPostLoginRoute } from "./auth";
 export { authConfig } from "./auth.config";

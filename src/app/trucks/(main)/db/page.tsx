@@ -3,10 +3,10 @@ import { TableTicket } from "@/components/tickets";
 import CONFIG from "@/config";
 import prisma from "@/lib/db";
 import { Section } from "@/types";
-import { requireDashboardAccess } from "@/auth/guards";
+import { requireAuth } from "@/auth/guards";
 
 export default async function DBEmptyPage() {
-  const user = await requireDashboardAccess();
+  const user = await requireAuth();
 
   const frentes =
     user.role === "owner"

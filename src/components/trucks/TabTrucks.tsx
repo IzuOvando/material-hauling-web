@@ -5,8 +5,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { usePathname, useRouter } from "next/navigation";
 
 const TabTrucks = ({ isOwner }: { isOwner: boolean }) => {
-  // TODO: Implement role-based access control
-  const [activeTab, setActiveTab] = useState("qr");
+  const [activeTab, setActiveTab] = useState(isOwner ? "qr" : "db");
   const pathname = usePathname();
   const router = useRouter();
 
@@ -34,12 +33,14 @@ const TabTrucks = ({ isOwner }: { isOwner: boolean }) => {
           backgroundColor: "rgba(var(--accent-light-color) / 40%)",
         }}
       >
-        <TabsTrigger
-          value="qr"
-          className="font-medium text-accent-dark data-[state=active]:bg-accent data-[state=active]:text-white"
-        >
-          Generador de QRs
-        </TabsTrigger>
+        {isOwner && (
+          <TabsTrigger
+            value="qr"
+            className="font-medium text-accent-dark data-[state=active]:bg-accent data-[state=active]:text-white"
+          >
+            Generador de QRs
+          </TabsTrigger>
+        )}
 
         <TabsTrigger
           value="db"

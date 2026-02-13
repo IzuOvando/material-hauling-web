@@ -1,10 +1,14 @@
 "use client";
 import { usePathname, useRouter } from "next/navigation";
+import { useUser } from "@/contexts/UserContext";
 import { Button } from "../ui/button";
 
 const ToggleNavButton = () => {
+  const { isOwner } = useUser();
   const pathname = usePathname();
   const router = useRouter();
+
+  if (!isOwner) return null;
 
   const isTrucks = pathname.includes("/trucks");
 

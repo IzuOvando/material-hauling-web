@@ -1,13 +1,12 @@
 import { ShieldX } from "lucide-react";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { ForbiddenActions } from "./ForbiddenActions";
 
 export default function ForbiddenPage() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center gap-6 text-center">
-      <ShieldX className="h-14 w-14 text-accent" />
+    <main className="flex h-[calc(100dvh-4rem)] flex-col items-center justify-center gap-6 text-center">
+      <ShieldX className="h-20 w-20 text-accent" />
 
-      <div className="space-y-2">
+      <div className="space-y-4">
         <h1 className="text-2xl font-semibold text-primary-dark">
           Acceso no autorizado
         </h1>
@@ -16,9 +15,7 @@ export default function ForbiddenPage() {
         </p>
       </div>
 
-      <Button asChild className="bg-secondary hover:bg-secondary-light">
-        <Link href="/">Volver al inicio</Link>
-      </Button>
+      <ForbiddenActions />
     </main>
   );
 }

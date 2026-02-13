@@ -1,8 +1,7 @@
 "use server";
 import Image from "next/image";
-import { Button } from "./ui/button";
 import { signOut } from "@/auth";
-import { ToggleNavButton } from "./common";
+import { ToggleNavButton, LogoutButton } from "./common";
 
 const Navbar = ({ userName }: { userName: string | undefined }) => {
   return (
@@ -27,12 +26,7 @@ const Navbar = ({ userName }: { userName: string | undefined }) => {
           <>
             <ToggleNavButton />
             <span className="hidden md:block">Bienvenido, {userName}</span>
-            <Button
-              type="submit"
-              className="bg-accent hover:bg-accent-light active:bg-accent-dark"
-            >
-              Cerrar Sesión
-            </Button>
+            <LogoutButton />
           </>
         ) : null}
       </form>

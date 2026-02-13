@@ -14,10 +14,13 @@ import {
 } from "@/lib/rateLimit";
 import { logSecurityEvent, SecurityEventType } from "@/auth/securityLogger";
 import { corsHeaders } from "./cors";
+import type { Role } from "@/types/roles";
 import {
   publicWebRoutes,
   strictRateLimitRoutes,
   isPublicOrMobileApiRoute,
+  roleDefaultRoute,
+  canRoleAccessRoute,
 } from "./accessControl";
 
 export interface HandlerContext {
@@ -142,14 +145,28 @@ export function handleWebRoute(
     return createSecureWebResponse(req, ctx);
   }
 
-  // Logged in user on login page - redirect to home
-  if (isLoggedIn && pathname === "/login") {
-    return createSecureRedirect(new URL("/", req.nextUrl.origin), ctx);
-  }
-
-  // Not logged in and not on login page - redirect to login
+  // Not logged in — redirect to /login (unless already there)
   if (!isLoggedIn && pathname !== "/login") {
     return createSecureRedirect(new URL("/login", req.nextUrl.origin), ctx);
+  }
+
+  // Not logged in and on /login — allow
+  if (!isLoggedIn) {
+    return createSecureWebResponse(req, ctx);
+  }
+
+  // Logged in: determine role and default route
+  const role = (req.auth?.user as any)?.role as Role | undefined;
+  const defaultRoute = role ? roleDefaultRoute[role] : "/";
+
+  // Logged in on /login — redirect to role's default route
+  if (pathname === "/login") {
+    return createSecureRedirect(new URL(defaultRoute, req.nextUrl.origin), ctx);
+  }
+
+  // Role-based route access check
+  if (role && !canRoleAccessRoute(role, pathname)) {
+    return createSecureRedirect(new URL(defaultRoute, req.nextUrl.origin), ctx);
   }
 
   // Default: allow request with security headers

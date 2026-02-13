@@ -22,7 +22,7 @@ export async function requireDashboardAccess() {
 }
 
 export async function requireFrenteAccess(frente: string) {
-  const user = await requireDashboardAccess();
+  const user = await requireAuth();
 
   if (user.role === "owner") return user;
 

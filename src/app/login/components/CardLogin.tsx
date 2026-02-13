@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useFormState } from "react-dom";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,6 +15,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import { authenticate } from "@/actions/authorization";
 import sha256 from 'crypto-js/sha256';
+import { Loader2 } from "lucide-react";
 
 const CardLogin = () => {
   const [state, dispatch] = useFormState(authenticate, {
@@ -22,6 +23,7 @@ const CardLogin = () => {
     error: "",
   });
   const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
 
   const sendErrorToast = (message: string) => {
     const { dismiss } = toast({
@@ -37,6 +39,7 @@ const CardLogin = () => {
 
   useEffect(() => {
     if (state.error) {
+      setIsLoading(false);
       switch (state.error) {
         case "Required attributes username & password":
           sendErrorToast("Debes ingresar un username y password");
@@ -77,6 +80,7 @@ const CardLogin = () => {
 
     formData.set("password", hashedPassword);
 
+    setIsLoading(true);
     dispatch(formData);
   };
 
@@ -107,8 +111,10 @@ const CardLogin = () => {
           <Button
             className="bg-secondary hover:bg-secondary-light active:bg-secondary-dark text-white"
             size={"lg"}
+            disabled={isLoading}
           >
-            Entrar
+            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {isLoading ? "Ingresando..." : "Entrar"}
           </Button>
         </CardFooter>
       </form>

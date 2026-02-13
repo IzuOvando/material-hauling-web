@@ -1,12 +1,12 @@
 import { TabTrucks } from "@/components/trucks";
-import { requireDashboardAccess } from "@/auth/guards";
+import { requireAuth } from "@/auth/guards";
 
 export default async function TrucksLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const user = await requireDashboardAccess();
+  const user = await requireAuth();
 
   return (
     <main className="container my-10">

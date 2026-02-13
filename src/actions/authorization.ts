@@ -1,13 +1,14 @@
 "use server";
-import { signIn } from "@/auth";
+import { signIn, getPostLoginRoute } from "@/auth";
 import { InvalidCredentialsError } from "@/auth/InvalidCredentialsError";
+import { redirect } from "next/navigation";
 
 export async function authenticate(
   prevState: { attempts: number; error: string },
   formData: FormData,
 ) {
-  const username = formData.get("username");
-  const password = formData.get("password");
+  const username = formData.get("username") as string;
+  const password = formData.get("password") as string;
   const attempts = prevState?.attempts || 0;
 
   if (!username || !password)
@@ -17,15 +18,7 @@ export async function authenticate(
     };
 
   try {
-    await signIn("credentials", {
-      username: username,
-      password: password,
-      redirectTo: "/",
-    });
-    return {
-      attempts: attempts,
-      error: "Done",
-    };
+    await signIn("credentials", { username, password });
   } catch (error: any) {
     if (error instanceof InvalidCredentialsError)
       return {
@@ -37,7 +30,7 @@ export async function authenticate(
         attempts: attempts + 1,
         error: "Something went wrong",
       };
-
-    throw error;
   }
+
+  redirect(getPostLoginRoute(username));
 }

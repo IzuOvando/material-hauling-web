@@ -1,6 +1,12 @@
 "use client";
 
-import { createContext, useContext, ReactNode, useState } from "react";
+import {
+  createContext,
+  useContext,
+  ReactNode,
+  useState,
+  useEffect,
+} from "react";
 import type { AppUser } from "@/types/auth";
 
 type UserContextType = {
@@ -22,6 +28,15 @@ export function UserProvider({
 }) {
   const [user, setUser] = useState<AppUser | null>(initialUser);
 
+  const userSignature = initialUser
+    ? [initialUser.name, initialUser.role].join("|")
+    : "anon";
+
+  useEffect(() => {
+    setUser(initialUser);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userSignature]);
+
   const value: UserContextType = {
     user,
 
@@ -37,11 +52,7 @@ export function UserProvider({
     setUser,
   };
 
-  return (
-    <UserContext.Provider value={value}>
-      {children}
-    </UserContext.Provider>
-  );
+  return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
 }
 
 export function useUser() {
