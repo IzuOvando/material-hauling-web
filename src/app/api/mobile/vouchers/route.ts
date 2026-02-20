@@ -148,29 +148,28 @@ export async function POST(req: NextRequest) {
 
         const data = {
           uuid: voucher.uuid,
-
           voucherDate: voucher.voucherDate,
           voucherTime: voucher.voucherTime,
-          destino: voucher.destino,
-          origen: voucher.origen,
-          material: voucher.material,
-          placas: voucher.placas,
+          destino: voucher.destino.trim(),
+          origen: voucher.origen.trim(),
+          material: voucher.material.trim(),
+          placas: voucher.placas.trim(),
           odometer: odometerFloat,
           status: voucher.status ?? "IN_TRANSIT",
-          operador: voucher.operador,
+          operador: voucher.operador.trim(),
           turno: voucher.turno,
-          localidad: voucher.localidad,
-          noEconomico: voucher.noEconomico,
-          empresa: voucher.empresa,
+          localidad: voucher.localidad.trim(),
+          noEconomico: voucher.noEconomico.trim(),
+          empresa: voucher.empresa.trim(),
           cubicacion: voucher.cubicacion,
           frenteNombre: voucher.frenteNombre,
-          checkerName: voucher.checkerName,
-          noEmpleado: voucher.noEmpleado,
-          idCamion: voucher.idCamion,
+          checkerName: voucher.checkerName.trim(),
+          noEmpleado: voucher.noEmpleado.trim(),
+          idCamion: voucher.idCamion.trim(),
           ...(voucher.checkerNo !== undefined &&
           voucher.checkerNo !== null &&
           voucher.checkerNo !== ""
-            ? { checkerNo: voucher.checkerNo }
+            ? { checkerNo: voucher.checkerNo.trim() }
             : {}),
         };
 
