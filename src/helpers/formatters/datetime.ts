@@ -5,7 +5,9 @@ export const formatIsoDate = (date: Date) => {
 };
 
 export const formatIsoDateFromString = (date: string) => {
-  return new Date(date).toLocaleDateString("en-GB").replace(/\//g, "-");
+  // return new Date(date).toLocaleDateString("en-GB").replace(/\//g, "-");
+  // TODO: CHECK IF THIS HOTFIX DOESN'T KILL TICKETS DATE IMPLEMENTATION
+  return date.split("T")[0];
 };
 
 export const formatLongSpanishDate = (date: Date) => {
@@ -26,10 +28,7 @@ export const formatLongSpanishDateFromString = (date: string) => {
   });
 };
 
-export const formatTime12Hour = (
-  time?: Date | null,
-  lowercase?: boolean
-) => {
+export const formatTime12Hour = (time?: Date | null, lowercase?: boolean) => {
   if (!time) return "—";
 
   const dt = DateTime.fromJSDate(time);
@@ -46,7 +45,7 @@ export const formatTime12Hour = (
 
 export const formatTime12HourFromString = (
   time: string,
-  lowercase?: boolean
+  lowercase?: boolean,
 ) => {
   const lang = lowercase ? "es-MX" : "en-US";
   return new Date(time).toLocaleTimeString(lang, {
