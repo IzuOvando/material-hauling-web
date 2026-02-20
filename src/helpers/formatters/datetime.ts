@@ -1,7 +1,7 @@
 import { DateTime } from "luxon";
 
 export const formatIsoDate = (date: Date) => {
-  return date.toLocaleDateString("en-GB").replace(/\//g, "-");
+  return date.toISOString().split("T")[0];
 };
 
 export const formatIsoDateFromString = (date: string) => {

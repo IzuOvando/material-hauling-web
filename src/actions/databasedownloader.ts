@@ -130,7 +130,7 @@ export default class DatabaseDownloader {
                     throw new Error(`Invalid DateTime for 'voucher date': ${dt.invalidExplanation}`);
                 }
 
-                const formattedDate = dt.setZone('America/Mexico_City').toFormat('yyyy-MM-dd');
+                const formattedDate = dt.toISODate()!;
                 return formattedDate;
             }
 
