@@ -9,19 +9,33 @@ export class VoucherDateTimeUtil {
             throw new VoucherDateTimeError("Formato de fecha/hora inválido");
         }
 
-        const voucherDate = new Date(dateTime);
-        voucherDate.setHours(0, 0, 0, 0);
-    
-        const voucherTime = new Date(dateTime);
-        voucherTime.setFullYear(1970, 0, 1);
+        const voucherDate = new Date(Date.UTC(
+            dateTime.getUTCFullYear(),
+            dateTime.getUTCMonth(),
+            dateTime.getUTCDate(),
+            0, 0, 0, 0
+        ));
+
+        const voucherTime = new Date(Date.UTC(
+            1970, 0, 1,
+            dateTime.getUTCHours(),
+            dateTime.getUTCMinutes(),
+            dateTime.getUTCSeconds(),
+            dateTime.getUTCMilliseconds()
+        ));
+
         return { voucherDate, voucherTime };
     }
-  
+
     static combineDateTime(voucherDate: Date, voucherTime: Date): Date {
-        const combinedDate = new Date(voucherDate);
-        combinedDate.setHours(voucherTime.getHours(), voucherTime.getMinutes(), voucherTime.getSeconds());
-        return combinedDate;
+        return new Date(Date.UTC(
+            voucherDate.getUTCFullYear(),
+            voucherDate.getUTCMonth(),
+            voucherDate.getUTCDate(),
+            voucherTime.getUTCHours(),
+            voucherTime.getUTCMinutes(),
+            voucherTime.getUTCSeconds(),
+            voucherTime.getUTCMilliseconds()
+        ));
     }
   }
-
-  

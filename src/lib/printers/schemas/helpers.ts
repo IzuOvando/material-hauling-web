@@ -20,6 +20,7 @@ const getFormatter = (metaname: string) => {
     case "fecha":
       return formatIsoDateFromString;
     case "hora":
+    case "horaSalida":
       return formatTime12HourFromString;
     case "cubicacion":
       return (value: any) => formatVolume(value as number, true, false);

@@ -37,7 +37,10 @@ export async function GET(req: NextRequest) {
 
     const formattedVouchers = vouchers.map((voucher) => ({
       ...voucher,
-      voucherTime: VoucherDateTimeUtil.combineDateTime(voucher.voucherDate, voucher.voucherTime),
+      voucherTime: VoucherDateTimeUtil.combineDateTime(voucher.voucherDate, voucher.voucherTime).toISOString(),
+      voucherDate: voucher.voucherDate.toISOString(),
+      createdAt: voucher.createdAt.toISOString(),
+      arrivalTime: voucher.arrivalTime?.toISOString() ?? null,
     }));
 
     return NextResponse.json(formattedVouchers);
