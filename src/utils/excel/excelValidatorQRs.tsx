@@ -71,7 +71,7 @@ export function getMetadataCamionFromFile(
         }
 
         const workbook = new ExcelJS.Workbook();
-        await workbook.xlsx.load(arrayBuffer as Buffer);
+        await workbook.xlsx.load(arrayBuffer);
 
         const qrBuilders: MetaDataCamiones[] = [];
 

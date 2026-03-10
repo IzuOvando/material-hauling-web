@@ -24,6 +24,21 @@ class DataCompressor {
     16: "checkerNo",
   };
 
+  private static fromBase64Url(b64url: string) {
+    const b64 = b64url.replace(/-/g, "+").replace(/_/g, "/");
+    return b64.padEnd(Math.ceil(b64.length / 4) * 4, "=");
+  }
+
+  private static normalizeDigest(digest: string) {
+    const s = (digest || "").trim();
+    if (!s) return "";
+
+    const isBase64Url =
+      /^[A-Za-z0-9\-_]+$/.test(s) && !/[+/=]/.test(s) && /[-_]/.test(s);
+
+    return isBase64Url ? this.fromBase64Url(s) : s;
+  }
+
   public static compressString(value: string): string {
     const compressed = pako.deflate(value, { level: 9 });
     return Buffer.from(compressed).toString("base64");
@@ -38,7 +53,7 @@ class DataCompressor {
     const ticketCompacto = {
       1: ticket.uuid,
       2: ticket.destino,
-      3: ticket.voucherTime,
+      3: new Date(ticket.voucherTime).getTime(),
       4: ticket.origen,
       5: ticket.material,
       6: ticket.placas,
@@ -54,9 +69,8 @@ class DataCompressor {
       16: ticket.checkerNo,
     };
 
-    const dataQr = JSON.stringify(ticketCompacto);
-
     try {
+      const dataQr = JSON.stringify(ticketCompacto);
       const compressed = pako.deflate(dataQr, { level: 9 });
       return Buffer.from(compressed).toString("base64");
     } catch (error) {
@@ -65,23 +79,32 @@ class DataCompressor {
     }
   }
 
-  public static decompressTicketData(compressedBase64: string): VoucherCamion | null {
+  public static decompressTicketData(digest: string): VoucherCamion | null {
     try {
-      const compressedBytes = Buffer.from(compressedBase64, "base64");
-      const decompressed = pako.inflate(compressedBytes, { to: "string" });
+      const normalized = this.normalizeDigest(digest);
+      if (!normalized) return null;
 
+      const compressedBytes = Buffer.from(normalized, 'base64');
+      const decompressed = pako.inflate(compressedBytes, { to: 'string' });
       const originalData = JSON.parse(decompressed);
-      const ticket: any = {};
 
+      const ticket: any = {};
       for (const key in originalData) {
         const numericKey = parseInt(key, 10);
         const fieldName = this.fieldMap[numericKey];
         if (fieldName) ticket[fieldName] = originalData[key];
       }
 
+      if (ticket.voucherTime) {
+        const asNumber = Number(ticket.voucherTime);
+        ticket.voucherTime = !isNaN(asNumber)
+          ? new Date(asNumber)
+          : new Date(ticket.voucherTime);
+      }
+
       if (ticket.idCamion) {
-        const idParts = ticket.idCamion.split("-");
-        if (idParts.length === 3 && idParts[0] === "SDN") {
+        const idParts = ticket.idCamion.split('-');
+        if (idParts.length === 3 && idParts[0] === 'SDN') {
           ticket.frenteNombre = idParts[1];
           ticket.noEconomico = idParts[2];
         }
@@ -89,7 +112,7 @@ class DataCompressor {
 
       return ticket as VoucherCamion;
     } catch (error) {
-      console.error("Error al descomprimir los datos del QR:", error);
+      console.error('Error al descomprimir los datos del QR:', error);
       return null;
     }
   }

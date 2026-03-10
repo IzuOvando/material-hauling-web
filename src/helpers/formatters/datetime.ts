@@ -1,16 +1,30 @@
 import { DateTime } from "luxon";
+import CONFIG from "@/config";
+
+export const formatDateToDDMMYYYY = (date: Date) => {
+  return DateTime.fromJSDate(date, { zone: "utc" })
+    .setZone(CONFIG.TIMEZONE)
+    .toFormat("dd/MM/yyyy");
+};
+
+export const formatDateTimeToDDMMYYYY_HHMM = (date: Date): string =>
+  `${formatDateToDDMMYYYY(date)} ${formatTime12Hour(date, true)}`;
 
 export const formatIsoDate = (date: Date) => {
-  return DateTime.fromJSDate(date, { zone: "utc" }).toLocal().toISODate();
+  return DateTime.fromJSDate(date, { zone: "utc" })
+    .setZone(CONFIG.TIMEZONE)
+    .toISODate();
 };
 
 export const formatIsoDateFromString = (date: string) => {
-  return DateTime.fromISO(date, { zone: "utc" }).toLocal().toISODate();
+  return DateTime.fromISO(date, { zone: "utc" })
+    .setZone(CONFIG.TIMEZONE)
+    .toISODate();
 };
 
 export const formatLongSpanishDate = (date: Date) => {
   return DateTime.fromJSDate(date, { zone: "utc" })
-    .toLocal()
+    .setZone(CONFIG.TIMEZONE)
     .setLocale("es-MX")
     .toLocaleString({
       weekday: "long",
@@ -22,7 +36,7 @@ export const formatLongSpanishDate = (date: Date) => {
 
 export const formatLongSpanishDateFromString = (date: string) => {
   return DateTime.fromISO(date, { zone: "utc" })
-    .toLocal()
+    .setZone(CONFIG.TIMEZONE)
     .setLocale("es-MX")
     .toLocaleString({
       weekday: "long",
@@ -35,12 +49,11 @@ export const formatLongSpanishDateFromString = (date: string) => {
 export const formatTime12Hour = (time?: Date | null, lowercase?: boolean) => {
   if (!time) return "\u2014";
 
-  const dt = DateTime.fromJSDate(time, { zone: "utc" }).toLocal();
+  const dt = DateTime.fromJSDate(time, { zone: "utc" }).setZone(CONFIG.TIMEZONE);
 
   if (!dt.isValid) return "\u2014";
 
-  const format = "h:mm a";
-  const formattedTime = dt.toFormat(format);
+  const formattedTime = dt.toFormat("h:mm a");
 
   return lowercase
     ? formattedTime.replace("AM", "a.m.").replace("PM", "p.m.")
@@ -51,12 +64,11 @@ export const formatTime12HourFromString = (
   time: string,
   lowercase?: boolean,
 ) => {
-  const dt = DateTime.fromISO(time, { zone: "utc" }).toLocal();
+  const dt = DateTime.fromISO(time, { zone: "utc" }).setZone(CONFIG.TIMEZONE);
 
   if (!dt.isValid) return "\u2014";
 
-  const format = "h:mm a";
-  const formattedTime = dt.toFormat(format);
+  const formattedTime = dt.toFormat("h:mm a");
 
   return lowercase
     ? formattedTime.replace("AM", "a.m.").replace("PM", "p.m.")
@@ -64,11 +76,8 @@ export const formatTime12HourFromString = (
 };
 
 export const formatDateAndTimeToString = (date: Date) => {
-  const luxonDate = DateTime.fromJSDate(date, { zone: "utc" }).toLocal();
-
-  const formattedDate = luxonDate.toLocaleString(DateTime.DATETIME_SHORT, {
-    locale: "es",
-  });
-
-  return formattedDate;
+  return DateTime.fromJSDate(date, { zone: "utc" })
+    .setZone(CONFIG.TIMEZONE)
+    .setLocale("es")
+    .toLocaleString(DateTime.DATETIME_SHORT);
 };

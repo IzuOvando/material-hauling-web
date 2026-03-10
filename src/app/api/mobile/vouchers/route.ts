@@ -20,16 +20,26 @@ export async function POST(req: NextRequest) {
 
   if (!accessToken || !TokenAuthenticator.verify(accessToken)) {
     return NextResponse.json(
-      {
-        message:
-          "No autorizado, proporcione credenciales válidas para realizar esta acción",
-      },
+      { error: "No autorizado, proporcione credenciales válidas para realizar esta acción" },
       { status: 401 }
+    );
+  }
+
+  const decoded = TokenAuthenticator.decode(accessToken);
+  if (!decoded) {
+    return NextResponse.json({ error: "Token inválido" }, { status: 401 });
+  }
+
+  if (decoded.role === "user") {
+    return NextResponse.json(
+      { error: "No tienes permiso para realizar esta acción." },
+      { status: 403 }
     );
   }
 
   let requestBody: any;
   let vouchersArray: PrismaVoucherCamion[] = [];
+  let frenteNombre: string;
 
   try {
     requestBody = await req.json();
@@ -61,7 +71,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const frenteNombre = frenteNombres.values().next().value as string;
+    frenteNombre = frenteNombres.values().next().value as string;
 
     if (typeof frenteNombre === "string") {
       validateFrenteNombre(frenteNombre);
@@ -71,6 +81,22 @@ export async function POST(req: NextRequest) {
         { error: "Este frente no existe en la base de datos global" },
         { status: 400 }
       );
+    }
+
+    if (decoded.role === "admin") {
+      const userRecord = await prisma.user.findUnique({
+        where: { username: decoded.username },
+        include: { frentes: true },
+      });
+
+      const allowedFrentes = userRecord?.frentes.map(f => f.frenteNombre) ?? [];
+
+      if (!allowedFrentes.includes(frenteNombre)) {
+        return NextResponse.json(
+          { error: "No tienes permiso para subir vouchers de este frente." },
+          { status: 403 }
+        );
+      }
     }
 
     const validationErrors: ValidationError[] = [];
@@ -113,6 +139,7 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
+    console.error("❌ Error en validación/caché:", error);
     return NextResponse.json(
       { error: "Formato JSON inválido o error de validación" },
       { status: 400 }
@@ -122,7 +149,7 @@ export async function POST(req: NextRequest) {
   try {
     for (const voucher of vouchersArray) {
       const { voucherDate, voucherTime } = VoucherDateTimeUtil.splitDateTime(
-        new Date(voucher.voucherTime)
+        new Date(String(voucher.voucherTime))
       );
       voucher.voucherDate = voucherDate;
       voucher.voucherTime = voucherTime;
@@ -136,10 +163,7 @@ export async function POST(req: NextRequest) {
             : voucher.odometer;
 
         if (Number.isNaN(odometerFloat)) {
-          console.error(
-            `❌ Odometer inválido en voucher [${index}]`,
-            voucher.odometer
-          );
+          console.error(`❌ Odometer inválido en voucher [${index}]`, voucher.odometer);
           throw new Prisma.PrismaClientValidationError(
             `Odometer inválido: ${voucher.odometer}`,
             { clientVersion: "5.22.0" }
@@ -181,6 +205,7 @@ export async function POST(req: NextRequest) {
       })
     );
   } catch (error) {
+    console.error("❌ Error en transacción Prisma:", error);
     if (error instanceof VoucherDateTimeError) {
       return NextResponse.json(
         { error: "Error en el formato de fecha/hora proporcionado" },

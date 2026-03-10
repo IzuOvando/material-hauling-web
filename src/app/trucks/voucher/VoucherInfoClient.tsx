@@ -62,9 +62,18 @@ export default function VoucherInfoClient({
 }: {
   voucher: VoucherCamion;
 }) {
-  const localDate = voucher.voucherTime
-    ? new Date(voucher.voucherTime).toLocaleString()
-    : "Cargando…";
+  const [localDate, setLocalDate] = useState<string>("Cargando…");
+
+  useEffect(() => {
+    if (voucher.voucherTime) {
+      setLocalDate(
+        new Date(voucher.voucherTime).toLocaleString("es-MX", {
+          timeZone: "America/Mexico_City",
+        })
+      );
+    }
+  }, [voucher.voucherTime]);
+
   const voucherData = [
     { label: "ID", value: voucher.uuid },
     { label: "IdCamión", value: voucher.idCamion },
@@ -74,10 +83,7 @@ export default function VoucherInfoClient({
     { label: "Cubicación", value: voucher.cubicacion },
     { label: "Origen", value: voucher.origen },
     { label: "Destino", value: voucher.destino },
-    {
-      label: "Fecha",
-      value: localDate ?? "Cargando…",
-    },
+    { label: "Fecha", value: localDate },
     { label: "Operador", value: voucher.operador },
     { label: "No Operador", value: voucher.noEmpleado },
     {
@@ -93,7 +99,7 @@ export default function VoucherInfoClient({
   return (
     <main className="container my-10">
       <h1 className="text-3xl md:text-4xl font-bold text-center mb-4">
-        Voucher Preview
+        Detalle del Voucher
       </h1>
       <div className="flex flex-col lg:flex-row items-center gap-10 lg:gap-28 w-full justify-center">
         <div className="flex aspect-square w-[60%] max-w-[400px] items-center justify-center rounded-xl bg-white shadow-2xl">

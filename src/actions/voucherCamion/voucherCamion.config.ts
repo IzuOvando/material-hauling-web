@@ -1,0 +1,30 @@
+export const voucherCamionHeaderMap: Record<string, string> = {
+  Uuid: "UUID",
+  "Created At": "Creado el",
+  "Voucher Date": "Fecha del vale",
+  "Voucher Time": "Hora del vale",
+  Destino: "Destino",
+  Origen: "Origen",
+  Material: "Material",
+  Placas: "Placas",
+  Status: "Estatus",
+  "Odometer Arrival": "Odómetro llegada",
+  Odometer: "Odómetro",
+  "Arrival Time": "Fecha/Hora llegada",
+  Operador: "Operador",
+  Turno: "Turno",
+  Localidad: "Localidad",
+  "No Economico": "No. económico",
+  Empresa: "Empresa",
+  Cubicacion: "Cubicación",
+  "Checker Name": "Nombre checador",
+  "No Empleado": "No. empleado",
+  "Checker No": "No. checador",
+  "Frente Nombre": "Frente",
+  "Id Camion": "ID camión",
+};
+
+export const voucherCamionStatusMap: Record<string, string> = {
+  IN_TRANSIT: "EN TRÁNSITO",
+  ARRIVED: "ARRIBÓ",
+};

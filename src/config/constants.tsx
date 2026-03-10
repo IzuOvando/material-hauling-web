@@ -1,4 +1,5 @@
 const CONSTANTS = {
+  TIMEZONE: "America/Mexico_City",
   BATCHES_RECORDS: Number(process.env.BATCHES_RECORDS) || 5000,
   BATCHES_CSV_LINES: Number(process.env.BATCHES_CSV_LINES) || 10000,
   PAGINATION: {

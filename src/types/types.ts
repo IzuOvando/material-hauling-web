@@ -17,3 +17,17 @@ export type FacetedFilter = {
 };
 
 export type Ticket = Acarreos | Gasolina | Concreto | VoucherCamion |Asfalto;
+
+export type DatasetKey =
+  | "gasolina"
+  | "acarreos"
+  | "concreto"
+  | "vouchercamion"
+  | "asfalto";
+
+export type TransformFn = (value: any, record: any) => any;
+
+export type DatasetConfig = {
+  headerMap?: Record<string, string>;
+  transforms?: Record<string, TransformFn>;
+};

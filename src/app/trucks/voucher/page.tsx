@@ -18,7 +18,7 @@ export default function VoucherPreview({
   return (
     <main className="container my-10">
       <h1 className="text-3xl md:text-4xl font-bold text-center mb-32">
-        Voucher Preview
+        Detalle del Voucher
       </h1>
       <h2 className="text-3xl md:text-2xl text-center">
         No se encontró ningún voucher en la URL

@@ -38,6 +38,16 @@ export class TokenAuthenticator {
     }
   }
 
+  static decode(accessToken: string): { username: string; role: string } | null {
+    try {
+      const decoded = jwt.verify(accessToken, TokenAuthenticator.ACCESS_TOKEN_SECRET) as jwt.JwtPayload;
+      if (!decoded.username || !decoded.role) return null;
+      return { username: decoded.username, role: decoded.role };
+    } catch {
+      return null;
+    }
+  }
+
   static refresh(refreshToken: string): { accessToken: string, refreshToken: string } {
     try {
       const decoded = jwt.verify(refreshToken, TokenAuthenticator.REFRESH_TOKEN_SECRET) as jwt.JwtPayload;
