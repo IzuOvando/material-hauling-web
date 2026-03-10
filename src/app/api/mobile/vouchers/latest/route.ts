@@ -4,6 +4,8 @@ import { VoucherCamion as PrismaVoucherCamion } from "@prisma/client";
 import { TokenAuthenticator } from "@/auth/TokenAuthenticator";
 import { VoucherDateTimeUtil } from "@/helpers/formatters/voucherdatetime";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(req: NextRequest) {
   try {
     const authHeader = req.headers.get("authorization");
