@@ -15,7 +15,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import { authenticate } from "@/actions/authorization";
 import sha256 from 'crypto-js/sha256';
-import { Loader2 } from "lucide-react";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 
 const CardLogin = () => {
   const [state, dispatch] = useFormState(authenticate, {
@@ -24,6 +24,7 @@ const CardLogin = () => {
   });
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const sendErrorToast = (message: string) => {
     const { dismiss } = toast({
@@ -98,12 +99,25 @@ const CardLogin = () => {
             </div>
             <div className="flex flex-col space-y-1.5">
               <Label htmlFor="password">Contraseña</Label>
-              <Input
-                id="password"
-                name="password"
-                type="password"
-                placeholder="******"
-              />
+              <div className="relative">
+                <Input
+                  id="password"
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="******"
+                  className="pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(prev => !prev)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                  aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                >
+                  {showPassword
+                    ? <EyeOff size={16} />
+                    : <Eye size={16} />}
+                </button>
+              </div>
             </div>
           </div>
         </CardContent>
