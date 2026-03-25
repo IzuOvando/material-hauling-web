@@ -76,6 +76,20 @@ model VoucherCamion {
   idCamion     String
   frente       Frente   @relation("FrenteVoucherCamion", fields: [frenteNombre], references: [nombre], onDelete: Cascade)
 
+  latitude          Float?
+  longitude         Float?
+  locationAccuracy  Float?
+  locationTimestamp DateTime?
+  locationStatus    String?
+  locationSource    String?
+
+  arrivalLatitude          Float?
+  arrivalLongitude         Float?
+  arrivalLocationAccuracy  Float?
+  arrivalLocationTimestamp DateTime?
+  arrivalLocationStatus    String?
+  arrivalLocationSource    String?
+
   @@index(createdAt)
   @@index([frenteNombre, voucherDate])
   @@index([frenteNombre, voucherTime])

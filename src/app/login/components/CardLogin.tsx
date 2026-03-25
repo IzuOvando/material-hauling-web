@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useFormState } from "react-dom";
 import { Button } from "@/components/ui/button";
 import {
@@ -26,7 +26,7 @@ const CardLogin = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  const sendErrorToast = (message: string) => {
+  const sendErrorToast = useCallback((message: string) => {
     const { dismiss } = toast({
       title: "Error",
       description: message,
@@ -36,7 +36,7 @@ const CardLogin = () => {
     setTimeout(() => {
       dismiss();
     }, 2000);
-  };
+  }, [toast]);
 
   useEffect(() => {
     if (state.error) {

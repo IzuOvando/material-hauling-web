@@ -5,9 +5,15 @@ import { TokenAuthenticator } from "@/auth/TokenAuthenticator";
 import { VoucherCamionStatus } from "@/types/enum";
 
 type ArrivalUpdateInput = {
-  uuid: string;
-  arrivalTime: string;
-  odometerArrival: number | string;
+  uuid:                    string;
+  arrivalTime:             string;
+  odometerArrival:         number | string;
+  latitude?:               number | null;
+  longitude?:              number | null;
+  locationAccuracy?:       number | null;
+  locationTimestamp?:      string | null;
+  locationStatus?:         string | null;
+  locationSource?:         string | null;
 };
 
 type ArrivalBatchBody = {
@@ -40,7 +46,17 @@ export async function POST(req: NextRequest) {
   }
 
   const invalid: { uuid: string; error: string }[] = [];
-  const normalized: { uuid: string; arrivalTime: Date; odometerArrival: number }[] = [];
+  const normalized: {
+    uuid:                    string;
+    arrivalTime:             Date;
+    odometerArrival:         number;
+    arrivalLatitude:         number | null;
+    arrivalLongitude:        number | null;
+    arrivalLocationAccuracy: number | null;
+    arrivalLocationTimestamp: Date | null;
+    arrivalLocationStatus:   string | null;
+    arrivalLocationSource:   string | null;
+  }[] = [];
 
   for (let i = 0; i < body.updates.length; i++) {
     const u = body.updates[i];
@@ -71,7 +87,21 @@ export async function POST(req: NextRequest) {
       continue;
     }
 
-    normalized.push({ uuid, arrivalTime: arrivalDate, odometerArrival: odoFloat });
+    const arrivalLocationTimestamp = u.locationTimestamp
+      ? new Date(u.locationTimestamp)
+      : null;
+
+    normalized.push({
+      uuid,
+      arrivalTime:              arrivalDate,
+      odometerArrival:          odoFloat,
+      arrivalLatitude:          u.latitude          ?? null,
+      arrivalLongitude:         u.longitude         ?? null,
+      arrivalLocationAccuracy:  u.locationAccuracy  ?? null,
+      arrivalLocationTimestamp: arrivalLocationTimestamp,
+      arrivalLocationStatus:    u.locationStatus    ?? null,
+      arrivalLocationSource:    u.locationSource    ?? null,
+    });
   }
 
   if (normalized.length === 0) {
@@ -87,10 +117,10 @@ export async function POST(req: NextRequest) {
     const existing = await prisma.voucherCamion.findMany({
       where: { uuid: { in: uuids } },
       select: {
-        uuid: true,
-        arrivalTime: true,
+        uuid:           true,
+        arrivalTime:    true,
         odometerArrival: true,
-        status: true,
+        status:         true,
       },
     });
 
@@ -105,12 +135,19 @@ export async function POST(req: NextRequest) {
         return prisma.voucherCamion.update({
           where: { uuid: u.uuid },
           data: {
-            arrivalTime: current.arrivalTime ?? u.arrivalTime,
+            arrivalTime:     current.arrivalTime     ?? u.arrivalTime,
             odometerArrival: current.odometerArrival ?? u.odometerArrival,
             status:
               current.status === VoucherCamionStatus.ARRIVED
                 ? current.status
                 : VoucherCamionStatus.ARRIVED,
+
+            arrivalLatitude:          u.arrivalLatitude,
+            arrivalLongitude:         u.arrivalLongitude,
+            arrivalLocationAccuracy:  u.arrivalLocationAccuracy,
+            arrivalLocationTimestamp: u.arrivalLocationTimestamp,
+            arrivalLocationStatus:    u.arrivalLocationStatus,
+            arrivalLocationSource:    u.arrivalLocationSource,
           },
         });
       });

@@ -195,6 +195,14 @@ export async function POST(req: NextRequest) {
           voucher.checkerNo !== ""
             ? { checkerNo: voucher.checkerNo.trim() }
             : {}),
+          latitude:          voucher.latitude          ?? null,
+          longitude:         voucher.longitude         ?? null,
+          locationAccuracy:  voucher.locationAccuracy  ?? null,
+          locationTimestamp: voucher.locationTimestamp
+            ? new Date(voucher.locationTimestamp)
+            : null,
+          locationStatus:    voucher.locationStatus    ?? null,
+          locationSource:    voucher.locationSource    ?? null,
         };
 
         return prisma.voucherCamion.upsert({
