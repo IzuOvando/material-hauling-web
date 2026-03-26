@@ -37,6 +37,29 @@ export const validateFrenteExists = async (frente: string, prisma: any) => {
     where: { nombre: frente },
   });
   if (!frenteExists) {
-    throw new ValidationError("frente", "El frente no existe en la base de datos.");
+    throw new ValidationError(
+      "frente",
+      "El frente no existe en la base de datos.",
+    );
+  }
+};
+
+// TODO: Implement this validator when mayority of users have recent changes when uploading tickets
+export const validateMaterialForFrente = async (
+  material: string,
+  frenteNombre: string,
+  prisma: any,
+) => {
+  const assignment = await prisma.materialFrente.findFirst({
+    where: {
+      frenteNombre,
+      material: { nombre: material, isActive: true },
+    },
+  });
+  if (!assignment) {
+    throw new ValidationError(
+      "material",
+      `El material "${material}" no es válido para el frente ${frenteNombre}.`,
+    );
   }
 };

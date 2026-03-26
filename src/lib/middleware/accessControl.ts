@@ -43,7 +43,7 @@ export const strictRateLimitRoutes = new Set([
 ]);
 
 /** Mobile API prefixes that use JWT (have internal token verification) */
-const mobileApiPrefixes = ["/api/mobile/vouchers"];
+const mobileApiPrefixes = ["/api/mobile"];
 
 /**
  * Check if a route is a public API route or uses mobile JWT auth

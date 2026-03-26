@@ -1,3 +1,10 @@
+/**
+ * @deprecated Materials are now managed per-frente in the database via the Material model.
+ * See prisma/schema.prisma. CONCRETO_DISTRIBUTION is deprecated — concrete flow has been removed.
+ * MATERIALS_LIST is no longer the source of truth — use GET /api/mobile/materials.
+ * This file is kept for backward compatibility with VoucherInfoClient.tsx and QR parsing.
+ */
+
 export enum PropertyType {
   Fibra = 0,
   Microfibra = 1,

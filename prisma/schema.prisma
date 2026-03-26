@@ -48,6 +48,28 @@ model Frente {
   ticketsConcreto           Concreto[]      @relation("FrenteConcreto")
   ticketsAsfalto            Asfalto[]       @relation("FrenteAsfalto")
   users                     UserFrente[]
+  materials                 MaterialFrente[]
+}
+
+model Material {
+  id        String   @id @default(uuid())
+  nombre    String   @unique
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  frentes MaterialFrente[]
+}
+
+model MaterialFrente {
+  materialId   String
+  frenteNombre String
+
+  material Material @relation(fields: [materialId], references: [id], onDelete: Cascade)
+  frente   Frente   @relation(fields: [frenteNombre], references: [nombre], onDelete: Cascade)
+
+  @@id([materialId, frenteNombre])
+  @@index([frenteNombre])
 }
 
 model VoucherCamion {
