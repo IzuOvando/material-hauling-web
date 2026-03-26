@@ -25,11 +25,14 @@ export async function POST(req: NextRequest) {
     let blobUrl: string | null;
     const areaLower = area.toLowerCase();
 
-    if (areaLower === "acarreos") {
-      blobUrl = foundFrente.excelUrlAcarreosBlob;
-    } else {
-      blobUrl = foundFrente.excelUrlGasolinaBlob;
-    }
+    const areaFieldMap: Record<string, keyof typeof foundFrente> = {
+      acarreos: "excelUrlAcarreosBlob",
+      gasolina: "excelUrlGasolinaBlob",
+      concreto: "excelUrlConcretoBlob",
+      asfalto: "excelUrlAsfaltoBlob",
+      vouchercamion: "excelUrlVoucherCamionBlob",
+    };
+    blobUrl = (foundFrente[areaFieldMap[areaLower]] as string | null) ?? null;
 
 
     try {

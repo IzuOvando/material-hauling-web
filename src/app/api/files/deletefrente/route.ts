@@ -14,6 +14,9 @@ export async function POST(req: NextRequest) {
       select: {
         excelUrlGasolinaBlob: true,
         excelUrlAcarreosBlob: true,
+        excelUrlConcretoBlob: true,
+        excelUrlAsfaltoBlob: true,
+        excelUrlVoucherCamionBlob: true,
       },
     });
 
@@ -24,12 +27,15 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (frente.excelUrlAcarreosBlob) {
-      await blobClient.deleteBlob(frente.excelUrlAcarreosBlob);
-    }
-    if (frente.excelUrlGasolinaBlob) {
-      await blobClient.deleteBlob(frente.excelUrlGasolinaBlob);
-    }
+    const blobsToDelete = [
+      frente.excelUrlAcarreosBlob,
+      frente.excelUrlGasolinaBlob,
+      frente.excelUrlConcretoBlob,
+      frente.excelUrlAsfaltoBlob,
+      frente.excelUrlVoucherCamionBlob,
+    ].filter(Boolean) as string[];
+
+    await Promise.allSettled(blobsToDelete.map((url) => blobClient.deleteBlob(url)));
     await prisma.frente.delete({
       where: { nombre },
     });

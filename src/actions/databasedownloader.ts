@@ -86,6 +86,37 @@ export default class DatabaseDownloader {
     return Buffer.from(arrayBuffer);
   }
 
+  private async deleteOldBlobIfExists(frenteName: string, key: DatasetKey): Promise<void> {
+    const frente = await prisma.frente.findUnique({
+      where: { nombre: frenteName },
+      select: {
+        excelUrlAcarreosBlob: true,
+        excelUrlGasolinaBlob: true,
+        excelUrlConcretoBlob: true,
+        excelUrlAsfaltoBlob: true,
+        excelUrlVoucherCamionBlob: true,
+      },
+    });
+
+    const oldUrlMap: Record<DatasetKey, string | null | undefined> = {
+      acarreos: frente?.excelUrlAcarreosBlob,
+      gasolina: frente?.excelUrlGasolinaBlob,
+      concreto: frente?.excelUrlConcretoBlob,
+      asfalto: frente?.excelUrlAsfaltoBlob,
+      vouchercamion: frente?.excelUrlVoucherCamionBlob,
+    };
+
+    const oldUrl = oldUrlMap[key];
+    if (oldUrl) {
+      try {
+        await blobClient.deleteBlob(oldUrl);
+        console.log(`Deleted old blob for ${frenteName}/${key}: ${oldUrl}`);
+      } catch (error) {
+        console.warn(`Failed to delete old blob (${oldUrl}):`, error);
+      }
+    }
+  }
+
   private async uploadToBlob(path: string, buffer: Buffer): Promise<string> {
     const blobUrlResult = await blobClient.putBlob(path, buffer, { access: "public" });
     return blobUrlResult.url;
@@ -125,6 +156,7 @@ export default class DatabaseDownloader {
 
       const buffer = await this.generateExcelSheet(processedRecords, key);
 
+      await this.deleteOldBlobIfExists(cleanFrenteName, key);
       const blobUrl = await this.uploadToBlob(`${outputExcel}${key}.xlsx`, buffer);
 
       await this.updateDatabase(cleanFrenteName, key, blobUrl);

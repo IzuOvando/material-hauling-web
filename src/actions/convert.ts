@@ -812,13 +812,15 @@ class FileProcessor {
 
             await this.processCSVFiles(csvFilePaths, fileName, key);
 
+            await Promise.allSettled(csvFilePaths.map((url) => blobClient.deleteBlob(url)));
+
             await downloader.downloadDatabase(outputExcelFolder, key as 'gasolina' | 'acarreos' | 'concreto' | 'asfalto', fileName);
 
-            fetch(`${CONFIG.BASE_URL}/api/files/delete-blobs`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ blobUrls: [excelBlobUrl, ...csvFilePaths] }),
-            }).catch(error => console.error('Error al llamar al endpoint de eliminación de blobs:', error));
+            try {
+                await blobClient.deleteBlob(excelBlobUrl);
+            } catch (error) {
+                console.warn(`Failed to cleanup input blob (${excelBlobUrl}):`, error);
+            }
 
         } catch (error) {
             console.error("Error during file processing:", error);
