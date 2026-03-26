@@ -116,7 +116,7 @@ const FrenteTools = ({ frentes, role }: Props) => {
         onValueChange={handleSelectFrente}
         value={selectedFrente?.nombre}
       >
-        <SelectTrigger className="w-[120px] border-2 border-accent text-accent font-bold text-lg">
+        <SelectTrigger className="w-[180px] border-2 border-accent text-accent font-bold text-lg">
           <SelectValue placeholder="Frente..." />
         </SelectTrigger>
 

@@ -54,7 +54,7 @@ const FrenteTrucksTools = ({
         onValueChange={handleSelectFrente}
         value={selectedFrente ? selectedFrente?.nombre : undefined}
       >
-        <SelectTrigger className="w-[120px] border-2 border-accent text-accent font-bold text-lg">
+        <SelectTrigger className="w-[180px] border-2 border-accent text-accent font-bold text-lg">
           <SelectValue placeholder="Frente..." className="mx-0" />
         </SelectTrigger>
         <SelectContent>

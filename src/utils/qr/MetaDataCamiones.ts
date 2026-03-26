@@ -82,11 +82,11 @@ class MetaDataCamiones {
   }
 
   public setFrente(frente: string): MetaDataCamiones {
-    const frenteRegex = /^[a-zA-Z0-9]{1,6}$/;
+    const frenteRegex = /^[A-Z0-9]+-F([0-9]+T?[0-9]*|G)$/;
     if (!frente || !frenteRegex.test(frente)) {
       throw new ValidationError(
         "frente",
-        "El frente debe ser un valor alfanumérico de hasta 6 caracteres."
+        "frenteNombre must match format {SIGLAS}-F{identifier} (e.g. TPCDMXP-F1, TPCDMXP-F1T2, TPQI-FG)"
       );
     }
     this.frenteNombre = frente;

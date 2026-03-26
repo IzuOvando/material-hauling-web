@@ -15,11 +15,11 @@ export class ValidationError extends Error {
 }
 
 export const validateFrenteNombre = (frente: string) => {
-  const frenteRegex = /^[a-zA-Z0-9]{4}$/;
+  const frenteRegex = /^[A-Z0-9]+-F([0-9]+T?[0-9]*|G)$/;
   if (!frente || !frenteRegex.test(frente)) {
     throw new ValidationError(
       "frente",
-      "El frente debe ser un valor de 4 caracteres alfanuméricos."
+      "frenteNombre must match format {SIGLAS}-F{identifier} (e.g. TPCDMXP-F1, TPCDMXP-F1T2, TPQI-FG)"
     );
   }
 };

@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import { Loader2 } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -23,6 +24,7 @@ const AddFrenteDialog = ({
   setOpen,
 }: AddFrenteDialogProps) => {
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const refName = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const router = useRouter();
@@ -35,13 +37,14 @@ const AddFrenteDialog = ({
       return;
     }
 
-    const alphanumericRegex = /^[a-zA-Z0-9]{4}$/;
+    const alphanumericRegex = /^[A-Z0-9]+-F([0-9]+T?[0-9]*|G)$/;
     if (!alphanumericRegex.test(name)) {
-      setError("Nombre invalido");
+      setError("Formato inválido.");
       return;
     }
 
     setError("");
+    setLoading(true);
 
     try {
       const response = await fetch("/api/files/addfrente", {
@@ -52,25 +55,37 @@ const AddFrenteDialog = ({
         body: JSON.stringify({ nombre: name }),
       });
 
-      if (!response.ok) {
-        throw new Error("Error en la solicitud");
+      const data = await response.json();
+
+      if (response.status === 409) {
+        toast({
+          title: "Error",
+          description: data.error || `El frente ${name} ya existe.`,
+          variant: "destructive",
+        });
+        return;
       }
 
+      if (!response.ok) {
+        throw new Error(data.error || "Error en la solicitud");
+      }
       toast({
         title: "Éxito",
         description: `Frente ${name} creado con éxito.`,
         variant: "success",
       });
-      router.refresh()
+      router.refresh();
+      setOpen(false);
+
     } catch (error) {
       console.error("Error al crear nuevo frente:", error);
       toast({
         title: "Error",
-        description: "No se pudo crear el nuevo frente.",
+        description: error instanceof Error ? error.message : "No se pudo crear el nuevo frente.",
         variant: "destructive",
       });
     } finally {
-      setOpen(false);
+      setLoading(false);
     }
   };
 
@@ -79,13 +94,13 @@ const AddFrenteDialog = ({
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={loading ? undefined : setOpen}>
       <DialogContent className="sm:max-w-[450px]" onKeyDown={handleEnter}>
         <DialogHeader>
           <DialogTitle>Crear Frente</DialogTitle>
           <DialogDescription>
-            Ingresa un nombre de 4 carácteres alfanuméricos para identificar el
-            Frente. Posteriormente podrás editarlo para llenar su base de datos.
+            Ingresa el nombre del frente (ej. ABCD-F1 o ABCD-FG). 
+            Podrás editar los detalles después.
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
@@ -95,9 +110,10 @@ const AddFrenteDialog = ({
             </Label>
             <Input
               ref={refName}
-              placeholder="Ex. DP05"
+              placeholder="Ex. ABCD-F1"
               className="col-span-3 uppercase"
-              maxLength={4}
+              maxLength={20}
+              disabled={loading}
             />
           </div>
         </div>
@@ -105,7 +121,10 @@ const AddFrenteDialog = ({
           {error}
         </span>
         <DialogFooter className="mt-[-1rem]">
-          <Button onClick={handleAction}>Crear</Button>
+          <Button onClick={handleAction} disabled={loading}>
+            {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {loading ? "Creando..." : "Crear"}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

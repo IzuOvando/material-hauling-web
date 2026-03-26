@@ -104,9 +104,9 @@ class DataCompressor {
 
       if (ticket.idCamion) {
         const idParts = ticket.idCamion.split('-');
-        if (idParts.length === 3 && idParts[0] === 'SDN') {
-          ticket.frenteNombre = idParts[1];
-          ticket.noEconomico = idParts[2];
+        if (idParts.length >= 3 && idParts[0] === 'SDN') {
+          ticket.frenteNombre = idParts.slice(1, -1).join('-');
+          ticket.noEconomico = idParts[idParts.length - 1];
         }
       }
 
