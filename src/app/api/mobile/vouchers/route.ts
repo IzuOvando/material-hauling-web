@@ -76,7 +76,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (decoded.role === "admin") {
+    if (decoded.role === "admin" || decoded.role === "user") {
       const userRecord = await prisma.user.findUnique({
         where: { username: decoded.username },
         include: { frentes: true },
