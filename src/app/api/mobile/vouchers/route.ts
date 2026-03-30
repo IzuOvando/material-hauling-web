@@ -30,13 +30,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Token inválido" }, { status: 401 });
   }
 
-  if (decoded.role === "user") {
-    return NextResponse.json(
-      { error: "No tienes permiso para realizar esta acción." },
-      { status: 403 }
-    );
-  }
-
   let requestBody: any;
   let vouchersArray: PrismaVoucherCamion[] = [];
   let frenteNombre: string;
