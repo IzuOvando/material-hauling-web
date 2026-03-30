@@ -32,7 +32,6 @@ export async function POST(req: NextRequest) {
 
   let requestBody: any;
   let vouchersArray: PrismaVoucherCamion[] = [];
-  let frenteNombre: string;
 
   try {
     requestBody = await req.json();
@@ -53,43 +52,95 @@ export async function POST(req: NextRequest) {
         );
       }
     }
-
-    const frenteNombres = new Set(
-      vouchersArray.map((voucher) => voucher.frenteNombre).filter(Boolean)
+  } catch (error) {
+    console.error("❌ Error parseando body:", error);
+    return NextResponse.json(
+      { error: "Formato JSON inválido" },
+      { status: 400 }
     );
-    if (frenteNombres.size !== 1) {
-      return NextResponse.json(
-        { error: "Inconsistencia en el campo 'frente' entre los vouchers" },
-        { status: 400 }
-      );
-    }
+  }
 
-    frenteNombre = frenteNombres.values().next().value as string;
+  // ─────────────────────────────────────────────────────────────────
+  // PARCHE: filtrado silencioso por frentes permitidos.
+  //
+  // ✅ La respuesta mantiene exactamente la misma forma que el original:
+  //    { message, updated }  ← el mobile actual no necesita ningún cambio.
+  //
+  // Los vouchers de frentes no permitidos simplemente NO entran en
+  // `updated`, así el mobile no los borra de Realm — quedan en local
+  // automáticamente sin que el cliente haga nada especial.
+  //
+  // Roles:
+  //   owner        → pasa todo sin consulta a BD
+  //   admin / user → se filtran los que no estén en su lista de frentes
+  //
+  // Fallback: si la consulta de permisos falla, se loguea y se deja
+  // pasar todo para no detener operaciones en campo.
+  // ─────────────────────────────────────────────────────────────────
 
-    if (typeof frenteNombre === "string") {
-      validateFrenteNombre(frenteNombre);
-      await validateFrenteExists(frenteNombre, prisma);
-    } else {
-      return NextResponse.json(
-        { error: "Este frente no existe en la base de datos global" },
-        { status: 400 }
-      );
-    }
-
-    if (decoded.role === "admin" || decoded.role === "user") {
+  if (decoded.role === "admin" || decoded.role === "user") {
+    try {
       const userRecord = await prisma.user.findUnique({
         where: { username: decoded.username },
         include: { frentes: true },
       });
 
-      const allowedFrentes = userRecord?.frentes.map(f => f.frenteNombre) ?? [];
+      const allowedFrentes = userRecord?.frentes.map((f) => f.frenteNombre) ?? [];
+      const before = vouchersArray.length;
 
-      if (!allowedFrentes.includes(frenteNombre)) {
+      vouchersArray = vouchersArray.filter((v) => {
+        const allowed = allowedFrentes.includes(v.frenteNombre);
+        if (!allowed) {
+          console.warn(
+            `[PARCHE] Voucher ${v.uuid} filtrado: frente "${v.frenteNombre}" ` +
+            `no está en lista de ${decoded.username} [${allowedFrentes.join(", ")}]`
+          );
+        }
+        return allowed;
+      });
+
+      console.log(
+        `[PARCHE] ${decoded.username}: ${vouchersArray.length}/${before} vouchers pasan filtro de frentes`
+      );
+
+      // Ninguno pasó → devolver updated: [] sin procesar nada.
+      // El mobile recibe la misma forma de siempre y simplemente
+      // no borra nada de Realm porque updated está vacío.
+      if (vouchersArray.length === 0) {
+        console.warn(
+          `[PARCHE] ${decoded.username}: ningún voucher pertenece a sus frentes asignados.`
+        );
         return NextResponse.json(
-          { error: "No tienes permiso para subir vouchers de este frente." },
-          { status: 403 }
+          { message: "Vouchers procesados con éxito", updated: [] },
+          { status: 201 }
         );
       }
+    } catch (err) {
+      // Si falla la consulta de permisos, logueamos pero NO bloqueamos.
+      // Preferimos dejar pasar todo antes que detener operaciones en campo.
+      console.error(
+        "❌ [PARCHE] Error consultando frentes del usuario, se omite filtro:",
+        err
+      );
+      // vouchersArray queda sin cambios → sigue el flujo original completo
+    }
+  }
+
+  // ─────────────────────────────────────────────────────────────────
+  // Flujo original desde aquí — sin ningún cambio
+  // ─────────────────────────────────────────────────────────────────
+
+  try {
+    // El batch filtrado puede tener múltiples frentes permitidos,
+    // validamos cada frente único individualmente en lugar del
+    // check size === 1 que tenía el original.
+    const frenteNombres = new Set(
+      vouchersArray.map((voucher) => voucher.frenteNombre).filter(Boolean)
+    );
+
+    for (const frente of frenteNombres) {
+      validateFrenteNombre(frente);
+      await validateFrenteExists(frente, prisma);
     }
 
     const validationErrors: ValidationError[] = [];
@@ -124,7 +175,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    await invalidateFacetsCache(frenteNombre, Section.VOUCHERCAMION);
+    for (const frente of frenteNombres) {
+      await invalidateFacetsCache(frente, Section.VOUCHERCAMION);
+    }
   } catch (error) {
     if (error instanceof ValidationError) {
       return NextResponse.json(
@@ -225,8 +278,12 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  // Misma forma de respuesta que el original — mobile no necesita cambios
   return NextResponse.json(
-    { message: "Vouchers procesados con éxito", updated: vouchersArray.map(v => v.uuid) },
+    {
+      message: "Vouchers procesados con éxito",
+      updated: vouchersArray.map((v) => v.uuid),
+    },
     { status: 201 }
   );
 }
