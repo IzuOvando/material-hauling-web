@@ -21,13 +21,6 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Token inválido" }, { status: 401 });
     }
 
-    if (decoded.role === "user") {
-      return NextResponse.json(
-        { error: "No tienes permiso para realizar esta acción." },
-        { status: 403 }
-      );
-    }
-
     // Determine frentes based on role
     let frenteNombres: string[];
 
