@@ -207,7 +207,6 @@ export async function POST(req: NextRequest) {
 
   vouchersArray = allowed;
 
-  // Validar turnos (sin tocar DB)
   const turnoErrors = validateTurnos(vouchersArray);
   if (turnoErrors.length > 0) {
     return NextResponse.json(
@@ -216,7 +215,6 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // Invalidar caché por frente
   try {
     const uniqueFrentes = [...new Set(vouchersArray.map((v) => v.frenteNombre))];
     for (const frente of uniqueFrentes) {
@@ -230,7 +228,6 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // Procesar fechas
   try {
     for (const voucher of vouchersArray) {
       const { voucherDate, voucherTime } = VoucherDateTimeUtil.splitDateTime(
@@ -253,7 +250,6 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // Persistir en DB
   try {
     await prisma.$transaction(
       vouchersArray.map((voucher, index) => {
