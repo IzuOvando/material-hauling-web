@@ -6,7 +6,7 @@ class DataCompressor {
   public static readonly DATA_CAMION_SUFFIX = "::SDNQR";
 
   private static fieldMap: { [key: number]: keyof VoucherCamion } = {
-    1: "uuid",
+    1: "folio",
     2: "destino",
     3: "voucherTime",
     4: "origen",
@@ -51,7 +51,7 @@ class DataCompressor {
 
   public static compressTicketData(ticket: VoucherCamion): string {
     const ticketCompacto = {
-      1: ticket.uuid,
+      1: ticket.folio,
       2: ticket.destino,
       3: new Date(ticket.voucherTime).getTime(),
       4: ticket.origen,

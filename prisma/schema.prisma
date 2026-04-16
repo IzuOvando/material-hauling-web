@@ -73,7 +73,7 @@ model MaterialFrente {
 }
 
 model VoucherCamion {
-  uuid         String   @id @default(uuid())
+  folio        String   @id
   createdAt    DateTime @default(now())
   voucherDate  DateTime
   voucherTime  DateTime

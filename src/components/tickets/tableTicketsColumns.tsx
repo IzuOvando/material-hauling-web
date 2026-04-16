@@ -11,6 +11,7 @@ import {
   formatDateAndTimeToString,
 } from "@/helpers/formatters/datetime";
 import { formatPrice, formatVolume } from "@/helpers/formatters/numbers";
+import { formatVoucherId } from "@/helpers/formatters/formatVoucherId";
 import { Acarreos, Gasolina, Concreto, VoucherCamion, Asfalto } from "@prisma/client";
 import { TicketArea, Section } from "@/types";
 
@@ -492,10 +493,11 @@ const asfaltoColumns: ColumnDef<Asfalto>[] = [
 
 const voucherCamionColumns: ColumnDef<VoucherCamion>[] = [
   {
-    accessorKey: "uuid",
+    accessorKey: "folio",
     header: ({ column }) => (
-      <TableTicketColumnHeader column={column} title="ID" />
+      <TableTicketColumnHeader column={column} title="Folio" />
     ),
+    cell: ({ row }) => <>{formatVoucherId(row.getValue("folio"))}</>,
   },
   {
     accessorKey: "idCamion",

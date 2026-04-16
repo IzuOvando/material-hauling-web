@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Frente not found" }, { status: 404 });
 
     const tickets = (await getAllTickets(frente, area, filters, sort)).filter(
-      (ticket) => !ticketsIds.includes(ticket.uuid)
+      (ticket) => !ticketsIds.includes((ticket as { uuid: string }).uuid)
     );
 
     return NextResponse.json(tickets);

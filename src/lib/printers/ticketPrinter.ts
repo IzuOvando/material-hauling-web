@@ -29,7 +29,7 @@ export default class TicketPrinter extends EpsonPrinter {
   ) => {
     let { writter, sender } = this.createPrint();
 
-    console.debug(`Printing ticket ${ticket.uuid}...`);
+    console.debug(`Printing ticket ${(ticket as { uuid?: string; folio?: string }).uuid ?? (ticket as { folio?: string }).folio}...`);
 
     this.configTicket(writter);
     this.schema.generateTicket(writter, ticket, original, frente);

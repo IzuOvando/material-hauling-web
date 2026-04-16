@@ -9,6 +9,7 @@ import {
   ConcreteMaterialData,
 } from "@/assets/data";
 import getConcreteDescription from "@/utils/getConcreteDescription";
+import { formatVoucherId } from "@/helpers/formatters/formatVoucherId";
 
 const propertyEntries = Object.entries(PropertyType);
 
@@ -75,7 +76,7 @@ export default function VoucherInfoClient({
   }, [voucher.voucherTime]);
 
   const voucherData = [
-    { label: "ID", value: voucher.uuid },
+    { label: "Folio", value: formatVoucherId(voucher.folio) },
     { label: "IdCamión", value: voucher.idCamion },
     { label: "Placas", value: voucher.placas },
     { label: "Odómetro Origen", value: voucher.odometer },

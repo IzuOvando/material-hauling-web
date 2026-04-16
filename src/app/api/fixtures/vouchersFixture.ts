@@ -1,5 +1,6 @@
 export const vouchersFixture = [
     {
+        folio: "D2F7K7M3P9F2",
         voucherTime: "2024-10-01T12:00:00Z",
         odometer: 100,
         odometerArrival: null,
@@ -22,6 +23,7 @@ export const vouchersFixture = [
         idCamion: "asda312d",
     },
     {
+        folio: "D2F7K7M3P9F3",
         voucherTime: "2024-10-01T12:00:00Z",
         odometer: 100,
         odometerArrival: null,
@@ -44,6 +46,7 @@ export const vouchersFixture = [
         idCamion: "asda312d",
     },
     {
+        folio: "D2F7K7M3P9F4",
         voucherTime: "2024-10-01T12:00:00Z",
         odometer: 100,
         odometerArrival: null,
@@ -66,6 +69,7 @@ export const vouchersFixture = [
         idCamion: "asda312d",
     },
     {
+        folio: "D2F7K7M3P9F5",
         voucherTime: "2024-10-01T12:00:00Z",
         odometer: 100,
         odometerArrival: null,
@@ -91,6 +95,7 @@ export const vouchersFixture = [
 
 export const invalidVouchersFixture = [
     {
+        folio: "D2F7K7M3P9FA",
         voucherTime: "2024-10-01T12:00:00Z",
         odometer: 100,
         odometerArrival: null,

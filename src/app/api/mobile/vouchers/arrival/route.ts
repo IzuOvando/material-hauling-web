@@ -115,16 +115,16 @@ export async function POST(req: NextRequest) {
     const uuids = Array.from(new Set(normalized.map((u) => u.uuid)));
 
     const existing = await prisma.voucherCamion.findMany({
-      where: { uuid: { in: uuids } },
+      where: { folio: { in: uuids } },
       select: {
-        uuid:           true,
+        folio:          true,
         arrivalTime:    true,
         odometerArrival: true,
         status:         true,
       },
     });
 
-    const existingMap = new Map(existing.map((e) => [e.uuid, e]));
+    const existingMap = new Map(existing.map((e) => [e.folio, e]));
     const notFoundYet = uuids.filter((uuid) => !existingMap.has(uuid));
 
     const toUpdate = normalized
@@ -133,7 +133,7 @@ export async function POST(req: NextRequest) {
         const current = existingMap.get(u.uuid)!;
 
         return prisma.voucherCamion.update({
-          where: { uuid: u.uuid },
+          where: { folio: u.uuid },
           data: {
             arrivalTime:     current.arrivalTime     ?? u.arrivalTime,
             odometerArrival: current.odometerArrival ?? u.odometerArrival,

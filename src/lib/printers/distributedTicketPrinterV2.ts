@@ -191,15 +191,15 @@ class PrinterWithBuffer {
       // Check which print job was completed
       if (printJobId === "original") {
         this.status.original = true;
-        console.debug(`Printed original ticket for ${this.buffer?.uuid}`);
+        console.debug(`Printed original ticket for ${(this.buffer as { uuid?: string; folio?: string } | undefined)?.uuid ?? (this.buffer as { folio?: string } | undefined)?.folio}`);
       } else {
         this.status.copy = true;
-        console.debug(`Printed copy ticket for ${this.buffer?.uuid}`);
+        console.debug(`Printed copy ticket for ${(this.buffer as { uuid?: string; folio?: string } | undefined)?.uuid ?? (this.buffer as { folio?: string } | undefined)?.folio}`);
       }
       // Check if both print jobs were completed
       if (this.status.original && this.status.copy) {
         this.status = { original: false, copy: false };
-        this.onSuccess(this.buffer?.uuid, this);
+        this.onSuccess(((this.buffer as { uuid?: string; folio?: string } | undefined)?.uuid ?? (this.buffer as { folio?: string } | undefined)?.folio) ?? '', this);
       }
     } else {
       // All print job failed as error

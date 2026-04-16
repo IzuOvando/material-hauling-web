@@ -14,7 +14,7 @@ import { VoucherDateTimeError } from "@/errors";
 
 
 type RejectedVoucher = {
-  uuid: string;
+  folio: string;
   frenteNombre: string;
   reason: string;
 };
@@ -50,7 +50,7 @@ function partitionVouchers(
       allowed.push(voucher);
     } else {
       rejected.push({
-        uuid: voucher.uuid,
+        folio: voucher.folio,
         frenteNombre: voucher.frenteNombre,
         reason: "No tienes permiso para subir vouchers de este frente",
       });
@@ -97,7 +97,7 @@ function buildVoucherData(voucher: PrismaVoucherCamion, index: number) {
   }
 
   return {
-    uuid: voucher.uuid,
+    folio: voucher.folio,
     voucherDate: voucher.voucherDate,
     voucherTime: voucher.voucherTime,
     destino: voucher.destino.trim(),
@@ -172,9 +172,9 @@ export async function POST(req: NextRequest) {
   }
 
   for (const [i, v] of vouchersArray.entries()) {
-    if (!v?.uuid || typeof v.uuid !== "string" || !v.uuid.trim()) {
+    if (!v?.folio || typeof v.folio !== "string" || !v.folio.trim()) {
       return NextResponse.json(
-        { error: `Voucher [${i}] no trae uuid válido` },
+        { error: `Voucher [${i}] no trae folio válido` },
         { status: 400 }
       );
     }
@@ -255,7 +255,7 @@ export async function POST(req: NextRequest) {
       vouchersArray.map((voucher, index) => {
         const data = buildVoucherData(voucher, index);
         return prisma.voucherCamion.upsert({
-          where: { uuid: voucher.uuid },
+          where: { folio: voucher.folio },
           create: data,
           update: {},
         });
@@ -296,7 +296,7 @@ export async function POST(req: NextRequest) {
   return NextResponse.json(
     {
       message: "Vouchers procesados con éxito",
-      updated: vouchersArray.map((v) => v.uuid),
+      updated: vouchersArray.map((v) => v.folio),
       rejected,
     },
     { status: 201 }
