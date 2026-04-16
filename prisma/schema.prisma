@@ -18,10 +18,14 @@ enum VoucherStatus {
 }
 
 model User {
-  username String @id @unique
-  password String
-  rol      String
-  frentes  UserFrente[]
+  username   String  @id @unique
+  password   String
+  rol        String
+  nombre     String?
+  apPaterno  String?
+  apMaterno  String?
+  noEmpleado String?
+  frentes    UserFrente[]
 }
 
 model UserFrente {

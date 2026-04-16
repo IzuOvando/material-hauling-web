@@ -6,11 +6,8 @@ import { requireDashboardAccess } from "@/auth/guards";
 import { logSecurityEvent, SecurityEventType } from "@/auth/securityLogger";
 
 const BCRYPT_SALT_ROUNDS = 12;
+const ALLOWED_ROLES = ["user", "admin"] as const;
 
-// TODO: Define whether this endpoint should only be called from the web UI
-// (current approach: session-based auth via requireDashboardAccess)
-// or if it should also be exposed for external/mobile use with JWT-based auth
-// (like the mobile voucher endpoints using TokenAuthenticator).
 export async function POST(req: NextRequest) {
   try {
     const currentUser = await requireDashboardAccess();
@@ -28,7 +25,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { username, password } = await req.json();
+    const { username, password, rol, nombre, apPaterno, apMaterno, noEmpleado } = await req.json();
 
     if (!username || !password) {
       return NextResponse.json(
@@ -37,11 +34,26 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (password.length < 6)
+    if (password.length < 6) {
       return NextResponse.json(
         { message: "Password length should be more than 6 characters" },
         { status: 400 }
       );
+    }
+
+    if (!rol || !ALLOWED_ROLES.includes(rol)) {
+      return NextResponse.json(
+        { message: "Invalid role. Allowed values: user, admin" },
+        { status: 400 }
+      );
+    }
+
+    if (!nombre || !apPaterno || !noEmpleado) {
+      return NextResponse.json(
+        { message: "Required attributes: nombre, apPaterno, noEmpleado" },
+        { status: 400 }
+      );
+    }
 
     // Password arrives as SHA256 from the client
     // We hash it with bcrypt for secure storage
@@ -49,9 +61,13 @@ export async function POST(req: NextRequest) {
 
     const user = await prisma.user.create({
       data: {
-        username: username,
+        username,
         password: hashedPassword,
-        rol: "user",
+        rol,
+        nombre,
+        apPaterno,
+        apMaterno: apMaterno ?? null,
+        noEmpleado,
       },
     });
 
@@ -59,7 +75,7 @@ export async function POST(req: NextRequest) {
       type: SecurityEventType.USER_CREATED,
       userId: currentUser.name ?? undefined,
       resource: "/api/user",
-      details: { createdUser: user.username },
+      details: { createdUser: user.username, role: user.rol },
     });
 
     return NextResponse.json({ username: user.username }, { status: 201 });

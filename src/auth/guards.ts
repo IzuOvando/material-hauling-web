@@ -21,6 +21,16 @@ export async function requireDashboardAccess() {
   return user;
 }
 
+export async function requireOwnerAccess() {
+  const user = await requireAuth();
+
+  if (user.role !== "owner") {
+    redirect("/forbidden");
+  }
+
+  return user;
+}
+
 export async function requireFrenteAccess(frente: string) {
   const user = await requireAuth();
 

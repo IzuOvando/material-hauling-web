@@ -2,6 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Suppress native password reveal button in all browsers */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+  display: none;
+}
+input[type="password"]::-webkit-contacts-auto-fill-button,
+input[type="password"]::-webkit-credentials-auto-fill-button {
+  visibility: hidden;
+  pointer-events: none;
+}
+
 
 :root{
     --primary-color: 19 50 43;

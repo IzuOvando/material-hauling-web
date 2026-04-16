@@ -12,6 +12,10 @@ export async function validateUser(username: string, hashedPassword: string) {
       username: true,
       password: true,
       rol: true,
+      nombre: true,
+      apPaterno: true,
+      apMaterno: true,
+      noEmpleado: true,
     },
   });
 

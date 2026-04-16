@@ -34,6 +34,13 @@ export async function POST(request: Request) {
           hash,
         },
         tokens,
+        profile: {
+          role: user.rol,
+          nombre: user.nombre ?? null,
+          apPaterno: user.apPaterno ?? null,
+          apMaterno: user.apMaterno ?? null,
+          noEmpleado: user.noEmpleado ?? null,
+        },
       },
       { status: 201 }
     );
@@ -41,4 +48,3 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: 'Algo salió mal' }, { status: 500 });
   }
 }
-

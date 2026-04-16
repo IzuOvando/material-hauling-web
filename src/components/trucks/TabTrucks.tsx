@@ -14,6 +14,8 @@ const TabTrucks = ({ isOwner }: { isOwner: boolean }) => {
       setActiveTab("db");
     } else if (pathname.includes("/trucks/materials")) {
       setActiveTab("materials");
+    } else if (pathname.includes("/trucks/users")) {
+      setActiveTab("users");
     } else if (pathname.includes("/trucks")) {
       setActiveTab("qr");
     }
@@ -26,6 +28,8 @@ const TabTrucks = ({ isOwner }: { isOwner: boolean }) => {
       router.push("/trucks/db");
     } else if (value === "materials") {
       router.push("/trucks/materials");
+    } else if (value === "users") {
+      router.push("/trucks/users");
     }
   };
 
@@ -59,6 +63,15 @@ const TabTrucks = ({ isOwner }: { isOwner: boolean }) => {
             className="font-medium text-accent-dark data-[state=active]:bg-accent data-[state=active]:text-white"
           >
             Materiales
+          </TabsTrigger>
+        )}
+
+        {isOwner && (
+          <TabsTrigger
+            value="users"
+            className="font-medium text-accent-dark data-[state=active]:bg-accent data-[state=active]:text-white"
+          >
+            Usuarios
           </TabsTrigger>
         )}
       </TabsList>
