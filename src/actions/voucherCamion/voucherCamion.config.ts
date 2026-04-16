@@ -1,5 +1,4 @@
 export const voucherCamionHeaderMap: Record<string, string> = {
-  Uuid: "UUID",
   "Created At": "Creado el",
   "Voucher Date": "Fecha del vale",
   "Voucher Time": "Hora del vale",

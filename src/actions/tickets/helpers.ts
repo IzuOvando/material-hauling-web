@@ -66,7 +66,7 @@ export const SORT_FIELDS = {
     "placas",
   ],
   [Section.VOUCHERCAMION]: [
-    "uuid",
+    "folio",
     "idCamion",
     "placas",
     "odometer",

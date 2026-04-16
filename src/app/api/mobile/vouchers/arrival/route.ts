@@ -5,7 +5,7 @@ import { TokenAuthenticator } from "@/auth/TokenAuthenticator";
 import { VoucherCamionStatus } from "@/types/enum";
 
 type ArrivalUpdateInput = {
-  uuid:                    string;
+  folio:                    string;
   arrivalTime:             string;
   odometerArrival:         number | string;
   latitude?:               number | null;
@@ -45,9 +45,9 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const invalid: { uuid: string; error: string }[] = [];
+  const invalid: { folio: string; error: string }[] = [];
   const normalized: {
-    uuid:                    string;
+    folio:                    string;
     arrivalTime:             Date;
     odometerArrival:         number;
     arrivalLatitude:         number | null;
@@ -60,16 +60,16 @@ export async function POST(req: NextRequest) {
 
   for (let i = 0; i < body.updates.length; i++) {
     const u = body.updates[i];
-    const uuid = (u?.uuid || "").trim();
+    const folio = (u?.folio || "").trim();
 
-    if (!uuid) {
-      invalid.push({ uuid: "(missing)", error: `uuid requerido (index ${i})` });
+    if (!folio) {
+      invalid.push({ folio: "(missing)", error: `folio requerido (index ${i})` });
       continue;
     }
 
     const arrivalDate = new Date(u.arrivalTime);
     if (Number.isNaN(arrivalDate.getTime())) {
-      invalid.push({ uuid, error: "arrivalTime inválido (usa ISO string)" });
+      invalid.push({ folio, error: "arrivalTime inválido (usa ISO string)" });
       continue;
     }
 
@@ -79,11 +79,11 @@ export async function POST(req: NextRequest) {
         : u.odometerArrival;
 
     if (odoFloat === null || odoFloat === undefined || Number.isNaN(odoFloat)) {
-      invalid.push({ uuid, error: "odometerArrival inválido" });
+      invalid.push({ folio, error: "odometerArrival inválido" });
       continue;
     }
     if (odoFloat < 0) {
-      invalid.push({ uuid, error: "odometerArrival no puede ser negativo" });
+      invalid.push({ folio, error: "odometerArrival no puede ser negativo" });
       continue;
     }
 
@@ -92,7 +92,7 @@ export async function POST(req: NextRequest) {
       : null;
 
     normalized.push({
-      uuid,
+      folio,
       arrivalTime:              arrivalDate,
       odometerArrival:          odoFloat,
       arrivalLatitude:          u.latitude          ?? null,
@@ -112,10 +112,10 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const uuids = Array.from(new Set(normalized.map((u) => u.uuid)));
+    const folios = Array.from(new Set(normalized.map((u) => u.folio)));
 
     const existing = await prisma.voucherCamion.findMany({
-      where: { folio: { in: uuids } },
+      where: { folio: { in: folios } },
       select: {
         folio:          true,
         arrivalTime:    true,
@@ -125,15 +125,15 @@ export async function POST(req: NextRequest) {
     });
 
     const existingMap = new Map(existing.map((e) => [e.folio, e]));
-    const notFoundYet = uuids.filter((uuid) => !existingMap.has(uuid));
+    const notFoundYet = folios.filter((folio) => !existingMap.has(folio));
 
     const toUpdate = normalized
-      .filter((u) => existingMap.has(u.uuid))
+      .filter((u) => existingMap.has(u.folio))
       .map((u) => {
-        const current = existingMap.get(u.uuid)!;
+        const current = existingMap.get(u.folio)!;
 
         return prisma.voucherCamion.update({
-          where: { folio: u.uuid },
+          where: { folio: u.folio },
           data: {
             arrivalTime:     current.arrivalTime     ?? u.arrivalTime,
             odometerArrival: current.odometerArrival ?? u.odometerArrival,
@@ -157,7 +157,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(
       {
         updated: toUpdate.length
-          ? normalized.filter((u) => existingMap.has(u.uuid)).map((u) => u.uuid)
+          ? normalized.filter((u) => existingMap.has(u.folio)).map((u) => u.folio)
           : [],
         notFoundYet,
         invalid,

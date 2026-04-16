@@ -10,6 +10,7 @@ import {
   formatTime12Hour,
 } from "@/helpers/formatters/datetime";
 import { DateTime } from "luxon";
+import { formatVoucherId } from "@/helpers/formatters/formatVoucherId";
 
 export const datasetConfigs: Record<DatasetKey, DatasetConfig> = {
   gasolina: {},
@@ -20,7 +21,7 @@ export const datasetConfigs: Record<DatasetKey, DatasetConfig> = {
   vouchercamion: {
     headerMap: voucherCamionHeaderMap,
     transforms: {
-      Uuid: (v) => (v ? String(v) : v),
+      Folio: (v) => (v ? formatVoucherId(String(v)) : v),
 
       "Created At": (v) => (v ? formatDateToDDMMYYYY(v) : v),
       "Voucher Date": (v) => {
