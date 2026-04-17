@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { TokenAuthenticator } from "@/auth/TokenAuthenticator";
 import { logSecurityEvent, SecurityEventType } from "@/auth/securityLogger";
 
+
 export async function POST(req: NextRequest) {
     const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim();
 
