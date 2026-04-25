@@ -24,9 +24,11 @@ import { Trash } from "lucide-react";
 const FrenteTrucksTools = ({
   frentes,
   areTickets,
+  readOnly = false,
 }: {
   frentes: Frente[];
   areTickets?: boolean;
+  readOnly?: boolean;
 }) => {
   // Hooks
   const { selectedFrente, setSelectedFrente } = useFrenteStore();
@@ -72,7 +74,7 @@ const FrenteTrucksTools = ({
           </SelectGroup>
         </SelectContent>
       </Select>
-      {selectedFrente && areTickets && (
+      {selectedFrente && areTickets && !readOnly && (
         <>
           <DownloadVoucherCamionButton
             frente={selectedFrente.nombre}

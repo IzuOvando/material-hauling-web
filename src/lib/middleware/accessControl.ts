@@ -18,6 +18,7 @@ export const roleDefaultRoute: Record<Role, string> = {
   owner: "/",
   admin: "/trucks/db",
   user: "/forbidden",
+  general: "/trucks/db",
 };
 
 /** Check if a role can access a given pathname */

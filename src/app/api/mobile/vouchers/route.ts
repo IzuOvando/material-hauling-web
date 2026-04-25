@@ -24,7 +24,7 @@ async function resolveAllowedFrentes(
   role: string,
   username: string
 ): Promise<string[] | null> {
-  if (role === "owner") return null;
+  if (role === "owner" || role === "general") return null;
 
   const userRecord = await prisma.user.findUnique({
     where: { username },

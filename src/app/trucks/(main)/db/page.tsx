@@ -9,7 +9,7 @@ export default async function DBEmptyPage() {
   const user = await requireAuth();
 
   const frentes =
-    user.role === "owner"
+    user.role === "owner" || user.role === "general"
       ? await prisma.frente.findMany()
       : await prisma.frente.findMany({
           where: { nombre: { in: user.frentes } },
@@ -23,7 +23,7 @@ export default async function DBEmptyPage() {
       page={CONFIG.PAGINATION.DEFAULT_PAGE}
       limit={CONFIG.PAGINATION.DEFAULT_LIMIT}
       total={0}
-      componentTopLeft={<FrenteTrucksTools frentes={frentes} />}
+      componentTopLeft={<FrenteTrucksTools frentes={frentes} readOnly={user.role === "general"} />}
     />
     </>
   );

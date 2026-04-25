@@ -3,29 +3,31 @@ const prisma = new PrismaClient();
 
 async function main() {
   console.log("Inserting data into the database...");
-  await prisma.user.create({
-    data: {
+
+  const users = [
+    {
       username: "Ruben35",
       password: "$2b$12$7q16hkrm3xFKzjX.Zu6slOgZKjVaId4ygNwqxSPZ6xjcpsEASD1TW",
-      rol: "admin",
-    },
-  });
-
-  await prisma.user.create({
-    data: {
-      username: "JuanOvando",
-      password: "$2b$12$yjxMT3h3lDupY2i8NfeqBuPNPAZdTSEWMGboZiyhmrCVag/gFoKyi",
       rol: "owner",
     },
-  });
-
-  await prisma.user.create({
-    data: {
-      username: "MiguelPorras",
-      password: "$2b$12$tDDuSVCMAgmADhpu7.QOeOVTfr2XMF43Hw/OgUcroS6V84Fu6/shS",
-      rol: "user",
+    {
+      username: "IRG",
+      password: "$2b$12$xovX9zyN0gUMvQCMwQoqd.MP6cAveN/XYVQI1zJRUBgiL1VCg8Du2",
+      rol: "general",
     },
-  });
+  ];
+
+  for (const user of users) {
+    try {
+      await prisma.user.create({ data: user });
+    } catch (e) {
+      if (e.code === "P2002") {
+        // User already exists, skip
+      } else {
+        throw e;
+      }
+    }
+  }
 
   console.log("Succesfully inserted users into the database!");
 

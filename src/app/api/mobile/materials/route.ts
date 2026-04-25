@@ -24,13 +24,13 @@ export async function GET(req: NextRequest) {
     // Determine frentes based on role
     let frenteNombres: string[];
 
-    if (decoded.role === "owner") {
+    if (decoded.role === "owner" || decoded.role === "general") {
       const frentes = await prisma.frente.findMany({
         select: { nombre: true },
       });
       frenteNombres = frentes.map((f) => f.nombre);
     } else {
-      // admin: only assigned frentes
+      // admin/user: only assigned frentes
       const userRecord = await prisma.user.findUnique({
         where: { username: decoded.username },
         include: { frentes: true },

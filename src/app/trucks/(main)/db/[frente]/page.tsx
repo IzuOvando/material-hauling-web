@@ -22,7 +22,7 @@ export default async function DBPage({
   const user = await requireFrenteAccess(params.frente);
 
   const frentes =
-    user.role === "owner"
+    user.role === "owner" || user.role === "general"
       ? await prisma.frente.findMany()
       : await prisma.frente.findMany({
           where: { nombre: { in: user.frentes } },
@@ -54,6 +54,7 @@ export default async function DBPage({
         <FrenteTrucksTools
           frentes={frentes}
           areTickets={response.tickets.length > 0}
+          readOnly={user.role === "general"}
         />
       }
     />

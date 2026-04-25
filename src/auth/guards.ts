@@ -34,7 +34,7 @@ export async function requireOwnerAccess() {
 export async function requireFrenteAccess(frente: string) {
   const user = await requireAuth();
 
-  if (user.role === "owner") return user;
+  if (user.role === "owner" || user.role === "general") return user;
 
   if (!user.frentes.includes(frente)) {
     redirect("/forbidden");
