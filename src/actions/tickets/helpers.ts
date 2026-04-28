@@ -143,9 +143,11 @@ export function getFilters(filters: string, area: TicketArea | Section): any {
         .split("^")
         .map((value) => value.trim())
         .filter((value) => value !== "");
-      if (FILTER_FIELDS[area].includes(field) && values.length !== 0)
-        if (field === "bomba") values = values.map((value) => Number(value));
-      filtersOnWhere[field] = { in: values };
+      if (FILTER_FIELDS[area].includes(field) && values.length !== 0) {
+        if (field === "bomba" || field === "odometer")
+          values = values.map((value) => Number(value));
+        filtersOnWhere[field] = { in: values };
+      }
     }
   });
 
