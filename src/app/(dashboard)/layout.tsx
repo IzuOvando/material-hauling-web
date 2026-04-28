@@ -14,7 +14,7 @@ export default async function DashboardLayout({
   const user = await requireDashboardAccess();
   let frentes: Frente[] = [];
 
-  if (user?.role === "owner") {
+  if (user?.role === "owner" || user?.role === "general") {
     frentes = await prisma.frente.findMany();
   }
 

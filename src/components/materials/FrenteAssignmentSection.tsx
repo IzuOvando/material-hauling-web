@@ -38,23 +38,6 @@ export function FrenteAssignmentSection({
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
-  useEffect(() => {
-    if (selectedFrente) {
-      loadFrenteMaterials(selectedFrente);
-    } else {
-      setAssigned([]);
-      setAvailable([]);
-    }
-  }, [selectedFrente]);
-
-  useEffect(() => {
-    if (refreshRef) {
-      refreshRef.current = () => {
-        if (selectedFrente) loadFrenteMaterials(selectedFrente);
-      };
-    }
-  });
-
   const loadFrenteMaterials = async (frente: string) => {
     try {
       setLoading(true);
@@ -71,6 +54,24 @@ export function FrenteAssignmentSection({
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (selectedFrente) {
+      loadFrenteMaterials(selectedFrente);
+    } else {
+      setAssigned([]);
+      setAvailable([]);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedFrente]);
+
+  useEffect(() => {
+    if (refreshRef) {
+      refreshRef.current = () => {
+        if (selectedFrente) loadFrenteMaterials(selectedFrente);
+      };
+    }
+  });
 
   const handleAssign = async (material: MaterialItem) => {
     try {

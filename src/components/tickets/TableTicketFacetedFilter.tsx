@@ -83,6 +83,7 @@ export const TableTicketFacetedFilter = forwardRef(
     useEffect(() => {
       if (isCleaned) setIsCleaned(false);
       else onUpdateFilter(title, Array.from(selectedValues));
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedValues, isCleaned]);
 
     return (

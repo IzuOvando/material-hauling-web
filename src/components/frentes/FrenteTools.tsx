@@ -23,7 +23,7 @@ import DownloadFrenteButton from "./DownloadFrenteButton";
 
 type Props = {
   frentes: Frente[];
-  role: "owner" | "admin" | "user";
+  role: "owner" | "admin" | "user" | "general";
 };
 
 const FrenteTools = ({ frentes, role }: Props) => {

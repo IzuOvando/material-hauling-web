@@ -105,7 +105,8 @@ const TableTicket = (props: TableTicketProps) => {
         ? Object.keys(ticketsIds).length === props.total
         : Object.keys(ticketsIds).length === 0
     );
-  }, [ticketsIds, selectedAll]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ticketsIds, selectedAll, props.total]);
 
   return (
     <TableTicketsProvider>

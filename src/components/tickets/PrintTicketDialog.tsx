@@ -177,7 +177,8 @@ const PrintDialog = ({
       ticketsPrinted === ticketsToPrint * 2 // Cause is original and copy
     )
       handleFinishPrinting();
-  }, [ticketsPrinted]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ticketsPrinted, actualView, ticketsToPrint]);
 
   return (
     <Dialog
@@ -328,7 +329,7 @@ const PrintingFailedView = ({
         clearTimeout(timerReconnect);
       };
     }
-  }, [printersWithErrorNames]);
+  }, [printersWithErrorNames, printersWithError]);
 
   return (
     <div className="flex flex-1 justify-center items-center flex-col gap-8 mt-[-1rem] py-4">
@@ -409,7 +410,7 @@ const PrintingView = ({
         clearTimeout(timerReconnect);
       };
     }
-  }, [printersWithErrorNames]);
+  }, [printersWithErrorNames, printersWithError]);
 
   return (
     <div className="flex flex-1 justify-center items-center flex-col gap-8 mt-[-1rem] py-4">

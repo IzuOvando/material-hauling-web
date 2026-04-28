@@ -48,7 +48,7 @@ const FrenteTrucksTools = ({
     if (selectedFrente) {
       router.push(`/trucks/db/${selectedFrente.nombre}`);
     }
-  }, [selectedFrente]);
+  }, [selectedFrente, router]);
 
   return (
     <div className="flex items-center gap-2 flex-wrap justify-center">

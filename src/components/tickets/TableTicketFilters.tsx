@@ -53,12 +53,14 @@ export function TableTicketFilters({ frente, area }: TableTicketFiltersProps) {
     }
 
     updateFilters(field, activeFacets, area);
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [area, updateFilters]);
 
   useEffect(() => {
     const newFiltersParams = activeParams.get("filters");
     if (newFiltersParams !== filterParams) setFilterParams(newFiltersParams);
-  }, [activeParams]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeParams, filterParams]);
 
   useEffect(() => {
     const getFacets = () => {
