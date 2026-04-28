@@ -1,5 +1,9 @@
+"use client";
+
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
+import FullScreenLoader from "@/components/ui/full-screen-loader";
 import { Section } from "@/types";
 import { Download } from "lucide-react";
 import CONFIG from "@/config";
@@ -12,6 +16,7 @@ const DownloadFrenteButton = ({
   section: Section;
 }) => {
   const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
 
   const saveFile = (blob: Blob, filename: string) => {
     const url = window.URL.createObjectURL(blob);
@@ -25,6 +30,7 @@ const DownloadFrenteButton = ({
   };
 
   const downloadDatabase = async () => {
+    setIsLoading(true);
     let disableToast: () => void;
     try {
       const response = await fetch(`${CONFIG.BASE_URL}/api/files/downloadbbd`, {
@@ -56,6 +62,8 @@ const DownloadFrenteButton = ({
         variant: "destructive",
       });
       disableToast = dismiss;
+    } finally {
+      setIsLoading(false);
     }
 
     setTimeout(() => {
@@ -64,12 +72,16 @@ const DownloadFrenteButton = ({
   };
 
   return (
-    <Button
-      className="py-2 px-[0.5rem] bg-white hover:bg-[rgba(var(--accent-light-color)/50%)] group ml-[-2.5px]"
-      onClick={downloadDatabase}
-    >
-      <Download className="text-accent" />
-    </Button>
+    <>
+      {isLoading && <FullScreenLoader message="Generando Excel..." />}
+      <Button
+        className="py-2 px-[0.5rem] bg-white hover:bg-[rgba(var(--accent-light-color)/50%)] group ml-[-2.5px]"
+        onClick={downloadDatabase}
+        disabled={isLoading}
+      >
+        <Download className="text-accent" />
+      </Button>
+    </>
   );
 };
 
