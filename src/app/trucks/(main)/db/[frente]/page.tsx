@@ -55,6 +55,7 @@ export default async function DBPage({
           frentes={frentes}
           areTickets={response.tickets.length > 0}
           readOnly={user.role === "general"}
+          isOwner={user.role === "owner"}
         />
       }
     />

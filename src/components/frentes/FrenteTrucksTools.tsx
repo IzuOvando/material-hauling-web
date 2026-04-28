@@ -16,19 +16,22 @@ import { useEffect } from "react";
 import {
   DeleteVouchersDialog,
   DownloadVoucherCamionButton,
+  CloseCycleSheet,
 } from "@/components/trucks";
 import { Section } from "@/types";
 import { Button } from "../ui/button";
-import { Trash } from "lucide-react";
+import { Trash, CircleCheck } from "lucide-react";
 
 const FrenteTrucksTools = ({
   frentes,
   areTickets,
   readOnly = false,
+  isOwner,
 }: {
   frentes: Frente[];
   areTickets?: boolean;
   readOnly?: boolean;
+  isOwner?: boolean;
 }) => {
   // Hooks
   const { selectedFrente, setSelectedFrente } = useFrenteStore();
@@ -36,6 +39,7 @@ const FrenteTrucksTools = ({
   // States
   const [frentesDisplay, setFrentesDisplay] = useState<Frente[]>(frentes);
   const [openDelete, setOpenDelete] = useState(false);
+  const [openCloseCycle, setOpenCloseCycle] = useState(false);
 
   const handleSelectFrente = (value: string) => {
     const frente = frentesDisplay.find((f) => f.nombre === value);
@@ -76,16 +80,34 @@ const FrenteTrucksTools = ({
       </Select>
       {selectedFrente && areTickets && !readOnly && (
         <>
-          <DownloadVoucherCamionButton
-            frente={selectedFrente.nombre}
-            section={Section.VOUCHERCAMION}
-          />
-          <Button
-            className="p-2 bg-transparent hover:bg-[rgba(var(--accent-light-color)/50%)] group ml-[-0.5rem]"
-            onClick={() => setOpenDelete(true)}
-          >
-            <Trash className="text-accent" />
-          </Button>
+          <div className="flex items-center">
+            <DownloadVoucherCamionButton
+              frente={selectedFrente.nombre}
+              section={Section.VOUCHERCAMION}
+            />
+            {isOwner && (
+              <Button
+                className="p-2 -ml-[2.5px] bg-transparent hover:bg-[rgba(var(--accent-light-color)/50%)]"
+                onClick={() => setOpenCloseCycle(true)}
+                title="Cierre manual de ciclos"
+              >
+                <CircleCheck className="text-accent" />
+              </Button>
+            )}
+            <Button
+              className="p-2 -ml-[2.5px] bg-transparent hover:bg-[rgba(var(--accent-light-color)/50%)]"
+              onClick={() => setOpenDelete(true)}
+            >
+              <Trash className="text-accent" />
+            </Button>
+          </div>
+          {isOwner && (
+            <CloseCycleSheet
+              open={openCloseCycle}
+              setOpen={setOpenCloseCycle}
+              onSuccess={() => router.refresh()}
+            />
+          )}
           <DeleteVouchersDialog
             open={openDelete}
             setOpen={setOpenDelete}
