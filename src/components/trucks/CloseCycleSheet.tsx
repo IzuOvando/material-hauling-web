@@ -12,10 +12,12 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { DatePicker } from "@/components/ui/date-picker";
+import { DateTime } from "luxon";
 import { formatVoucherId } from "@/helpers/formatters/formatVoucherId";
 import { formatIsoDate } from "@/helpers/formatters/datetime";
 import { parseVoucherFolios } from "@/utils/normalizeVoucherFolio";
 import { useToast } from "@/components/ui/use-toast";
+import CONFIG from "@/config";
 import {
   CheckCircle2,
   XCircle,
@@ -53,15 +55,31 @@ type ViewState = "input" | "loading" | "preview" | "closing" | "result";
 
 function getOdometerError(entry: ArrivalEntry, ticket: FoundTicket): string | null {
   if (entry.odometerArrival === "") return null;
-  const val = parseFloat(entry.odometerArrival);
-  if (isNaN(val)) return "Ingresa un número válido.";
+
+  const trimmed = entry.odometerArrival.trim();
+  const match = trimmed.match(/^(\d+)(?:\.(\d+))?$/);
+  if (!match) return "Ingresa un número válido.";
+
+  const intPart = match[1];
+  const decPart = match[2] || "";
+
+  if (intPart.length > 7) return "Máximo 7 dígitos enteros.";
+  if (decPart.length > 2) return "Máximo 2 decimales.";
+
+  const val = parseFloat(trimmed);
   if (val < ticket.odometer)
     return `El odometro de llegada debe ser mayor o igual al de salida (${ticket.odometer}).`;
   return null;
 }
 
-function getDateError(entry: ArrivalEntry, ticket: FoundTicket): string | null {
-  if (entry.arrivalDate === "") return null;
+function getDateTimeError(entry: ArrivalEntry, ticket: FoundTicket): string | null {
+  const hasDate = entry.arrivalDate !== "";
+  const hasTime = entry.arrivalTime !== "";
+
+  if (!hasDate && !hasTime) return null;
+  if (hasDate && !hasTime) return "Ingresa también la hora de llegada.";
+  if (!hasDate && hasTime) return "Ingresa también la fecha de llegada.";
+
   const voucherDay = ticket.voucherDate.substring(0, 10);
   if (entry.arrivalDate < voucherDay)
     return `La fecha de llegada debe ser igual o posterior a ${formatIsoDate(new Date(ticket.voucherDate))}.`;
@@ -137,16 +155,21 @@ const CloseCycleSheet = ({ open, setOpen, onSuccess }: CloseCycleSheetProps) => 
 
     const entries = found.map((t) => {
       const entry = arrivalEntries[t.folio];
-      const hasDate = entry?.arrivalDate && entry?.arrivalTime;
+      const hasDateTime = entry?.arrivalDate && entry?.arrivalTime;
+      let arrivalTimeISO: string | null = null;
+      if (hasDateTime) {
+        arrivalTimeISO = DateTime.fromISO(
+          `${entry.arrivalDate}T${entry.arrivalTime}:00`,
+          { zone: CONFIG.TIMEZONE }
+        ).toUTC().toISO();
+      }
       return {
         folio: t.folio,
         odometerArrival:
           entry?.odometerArrival !== ""
             ? parseFloat(entry.odometerArrival)
             : t.odometer,
-        arrivalTime: hasDate
-          ? `${entry.arrivalDate}T${entry.arrivalTime}:00`
-          : null,
+        arrivalTime: arrivalTimeISO,
       };
     });
 
@@ -202,6 +225,9 @@ const CloseCycleSheet = ({ open, setOpen, onSuccess }: CloseCycleSheetProps) => 
     field: keyof ArrivalEntry,
     value: string
   ) => {
+    if (field === "odometerArrival" && value !== "") {
+      if (!/^(\d{0,7})(\.\d{0,2})?$/.test(value)) return;
+    }
     setArrivalEntries((prev) => ({
       ...prev,
       [folio]: { ...prev[folio], [field]: value },
@@ -243,7 +269,7 @@ const CloseCycleSheet = ({ open, setOpen, onSuccess }: CloseCycleSheetProps) => 
           )}
           {view === "closing" && <LoadingView message="Cerrando ciclos..." />}
           {view === "result" && closeResult && (
-            <ResultView result={closeResult} onFinish={handleReset} />
+            <ResultView result={closeResult} onFinish={() => handleOpenChange(false)} />
           )}
         </div>
       </SheetContent>
@@ -343,7 +369,7 @@ const PreviewView = ({
   const hasValidationError = found.some((t) => {
     const entry = arrivalEntries[t.folio];
     if (!entry) return false;
-    return !!getOdometerError(entry, t) || !!getDateError(entry, t);
+    return !!getOdometerError(entry, t) || !!getDateTimeError(entry, t);
   });
 
   return (
@@ -382,7 +408,7 @@ const PreviewView = ({
               {found.map((ticket) => {
                 const entry = arrivalEntries[ticket.folio] ?? { odometerArrival: "", arrivalDate: "", arrivalTime: "" };
                 const odomError = getOdometerError(entry, ticket);
-                const dateError = getDateError(entry, ticket);
+                const dateError = getDateTimeError(entry, ticket);
                 return (
                   <div
                     key={ticket.folio}
@@ -409,8 +435,8 @@ const PreviewView = ({
                           Odómetro llegada <span className="text-primary/40">(opcional)</span>
                         </label>
                         <Input
-                          type="number"
-                          min={0}
+                          type="text"
+                          inputMode="decimal"
                           placeholder="km/mi"
                           className="h-8 w-32 text-sm"
                           value={entry.odometerArrival}
