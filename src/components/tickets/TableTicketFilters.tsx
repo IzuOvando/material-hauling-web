@@ -122,7 +122,7 @@ export function TableTicketFilters({ frente, area }: TableTicketFiltersProps) {
             onUpdateFilter={handleFilters}
             ref={(element: any) => (facetsRefs.current[index] = element)}
             area={area}
-            formatDate={facet.field === "fecha" || facet.field === "voucherDate"}
+            formatDate={facet.field === "fecha" || facet.field === "voucherDatetime"}
           />
         ))}
         {isFiltered && (
