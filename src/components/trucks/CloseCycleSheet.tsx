@@ -33,7 +33,7 @@ interface FoundTicket {
   frenteNombre: string;
   placas: string;
   material: string;
-  voucherDate: string;
+  voucherDatetime: string;
   operador: string;
   odometer: number;
 }
@@ -80,9 +80,9 @@ function getDateTimeError(entry: ArrivalEntry, ticket: FoundTicket): string | nu
   if (hasDate && !hasTime) return "Ingresa también la hora de llegada.";
   if (!hasDate && hasTime) return "Ingresa también la fecha de llegada.";
 
-  const voucherDay = ticket.voucherDate.substring(0, 10);
+  const voucherDay = formatIsoDate(new Date(ticket.voucherDatetime))!;
   if (entry.arrivalDate < voucherDay)
-    return `La fecha de llegada debe ser igual o posterior a ${formatIsoDate(new Date(ticket.voucherDate))}.`;
+    return `La fecha de llegada debe ser igual o posterior a ${voucherDay}.`;
   return null;
 }
 
@@ -425,7 +425,7 @@ const PreviewView = ({
                     <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-primary/70">
                       <span>Placas: <b className="text-primary">{ticket.placas}</b></span>
                       <span>Material: <b className="text-primary">{ticket.material}</b></span>
-                      <span>Fecha: <b className="text-primary">{formatIsoDate(new Date(ticket.voucherDate))}</b></span>
+                      <span>Fecha: <b className="text-primary">{formatIsoDate(new Date(ticket.voucherDatetime))}</b></span>
                     </div>
 
                     {/* Fields row */}

@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/db";
 import { VoucherCamion as PrismaVoucherCamion } from "@prisma/client";
 import { TokenAuthenticator } from "@/auth/TokenAuthenticator";
-import { VoucherDateTimeUtil } from "@/helpers/formatters/voucherdatetime";
 
 export const dynamic = "force-dynamic";
 
@@ -33,14 +32,13 @@ export async function GET(req: NextRequest) {
     }
 
     const vouchers: PrismaVoucherCamion[] = await prisma.voucherCamion.findMany({
-      orderBy: { voucherTime: "desc" },
+      orderBy: { voucherDatetime: "desc" },
       take: limit,
     });
 
     const formattedVouchers = vouchers.map((voucher) => ({
       ...voucher,
-      voucherTime: VoucherDateTimeUtil.combineDateTime(voucher.voucherDate, voucher.voucherTime).toISOString(),
-      voucherDate: voucher.voucherDate.toISOString(),
+      voucherTime: voucher.voucherDatetime.toISOString(),
       createdAt: voucher.createdAt.toISOString(),
       arrivalTime: voucher.arrivalTime?.toISOString() ?? null,
     }));

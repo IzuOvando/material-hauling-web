@@ -1,4 +1,6 @@
 import { TicketArea, Section } from "@/types";
+import { DateTime } from "luxon";
+import CONFIG from "@/config";
 
 export const SORT_FIELDS = {
   [TicketArea.ACARREOS]: [
@@ -77,7 +79,8 @@ export const SORT_FIELDS = {
     "cubicacion",
     "origen",
     "destino",
-    "voucherTime",
+    "voucherDate",   // UI column id → maps to voucherDatetime in DB
+    "voucherTime",   // UI column id → maps to voucherDatetime in DB
     "operador",
     "noEmpleado",
     "turno",
@@ -111,7 +114,7 @@ export const FILTER_FIELDS = {
     "material",
     "origen",
     "destino",
-    "voucherDate",
+    "voucherDatetime",
   ],
 };
 
@@ -126,8 +129,12 @@ export function getOrderBy(sort: string, area: TicketArea | Section): any {
 
   if (!SORT_FIELDS[area].includes(field)) return undefined;
 
+  // UI columns voucherDate and voucherTime both sort by the single DB column
+  const prismaField =
+    field === "voucherDate" || field === "voucherTime" ? "voucherDatetime" : field;
+
   return {
-    [field]: sign === "-" ? "asc" : "desc",
+    [prismaField]: sign === "-" ? "asc" : "desc",
   };
 }
 
@@ -143,11 +150,33 @@ export function getFilters(filters: string, area: TicketArea | Section): any {
         .split("^")
         .map((value) => value.trim())
         .filter((value) => value !== "");
-      if (FILTER_FIELDS[area].includes(field) && values.length !== 0) {
-        if (field === "bomba" || field === "odometer")
-          values = values.map((value) => Number(value));
-        filtersOnWhere[field] = { in: values };
+
+      if (!FILTER_FIELDS[area].includes(field) || values.length === 0) return;
+
+      // Date-range query: filter values are local date strings (YYYY-MM-DD)
+      if (field === "voucherDatetime") {
+        const ranges = (values as string[]).map((localDate) => ({
+          gte: DateTime.fromISO(localDate, { zone: CONFIG.TIMEZONE })
+            .startOf("day")
+            .toUTC()
+            .toJSDate(),
+          lte: DateTime.fromISO(localDate, { zone: CONFIG.TIMEZONE })
+            .endOf("day")
+            .toUTC()
+            .toJSDate(),
+        }));
+        if (ranges.length === 1) {
+          filtersOnWhere[field] = ranges[0];
+        } else {
+          // Prisma doesn't support field-level OR; place it at the where root
+          filtersOnWhere["OR"] = ranges.map((r) => ({ voucherDatetime: r }));
+        }
+        return;
       }
+
+      if (field === "bomba" || field === "odometer")
+        values = values.map((value) => Number(value));
+      filtersOnWhere[field] = { in: values };
     }
   });
 

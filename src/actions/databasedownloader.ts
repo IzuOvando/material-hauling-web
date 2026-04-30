@@ -30,8 +30,15 @@ export default class DatabaseDownloader {
         return prisma.concreto.findMany({ where });
         case "asfalto":
         return prisma.asfalto.findMany({ where });
-        case "vouchercamion":
-        return prisma.voucherCamion.findMany({ where });
+        case "vouchercamion": {
+          const vouchers = await prisma.voucherCamion.findMany({ where });
+          // Split voucherDatetime
+          return vouchers.map(({ voucherDatetime, ...rest }) => ({
+            ...rest,
+            voucherDatetimeDate: voucherDatetime,
+            voucherDatetimeTime: voucherDatetime,
+          }));
+        }
         default: {
         const _exhaustive: never = key;
         throw new Error(`Unsupported key: ${_exhaustive}`);

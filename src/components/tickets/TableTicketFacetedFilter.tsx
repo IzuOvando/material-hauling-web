@@ -29,6 +29,7 @@ import {
 
 interface TableTicketFacetedFilterProps {
   title: string;
+  label?: string;
   options: FacetedFilter["options"];
   onUpdateFilter: (field: string, activeFacets: string[]) => void;
   area: TicketArea | Section;
@@ -39,6 +40,7 @@ export const TableTicketFacetedFilter = forwardRef(
   function TableTicketFacetedFilter(
     {
       title,
+      label,
       options,
       onUpdateFilter,
       area,
@@ -95,7 +97,7 @@ export const TableTicketFacetedFilter = forwardRef(
             className="group h-8 border-2 border-primary text-primary hover:bg-primary hover:!text-accent-light capitalize"
           >
             <PlusCircledIcon className="mr-2 h-4 w-4" />
-            {title == "voucherDate" ? "Fecha" : title}
+            {label ?? title}
             {selectedValues?.size > 0 && (
               <>
                 <Separator
@@ -136,7 +138,10 @@ export const TableTicketFacetedFilter = forwardRef(
         </PopoverTrigger>
         <PopoverContent className="w-[200px] p-0" align="start">
           <Command>
-            <CommandInput placeholder={title} className="capitalize" />
+            <CommandInput
+              placeholder={label ?? title}
+              className="capitalize"
+            />
             <CommandList>
               <CommandEmpty>Sin resultados</CommandEmpty>
               <CommandGroup>

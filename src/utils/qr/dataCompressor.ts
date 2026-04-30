@@ -8,7 +8,7 @@ class DataCompressor {
   private static fieldMap: { [key: number]: keyof VoucherCamion } = {
     1: "folio",
     2: "destino",
-    3: "voucherTime",
+    3: "voucherDatetime",
     4: "origen",
     5: "material",
     6: "placas",
@@ -53,7 +53,7 @@ class DataCompressor {
     const ticketCompacto = {
       1: ticket.folio,
       2: ticket.destino,
-      3: new Date(ticket.voucherTime).getTime(),
+      3: new Date(ticket.voucherDatetime).getTime(),
       4: ticket.origen,
       5: ticket.material,
       6: ticket.placas,
@@ -95,11 +95,11 @@ class DataCompressor {
         if (fieldName) ticket[fieldName] = originalData[key];
       }
 
-      if (ticket.voucherTime) {
-        const asNumber = Number(ticket.voucherTime);
-        ticket.voucherTime = !isNaN(asNumber)
+      if (ticket.voucherDatetime) {
+        const asNumber = Number(ticket.voucherDatetime);
+        ticket.voucherDatetime = !isNaN(asNumber)
           ? new Date(asNumber)
-          : new Date(ticket.voucherTime);
+          : new Date(ticket.voucherDatetime as any);
       }
 
       if (ticket.idCamion) {

@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
       frenteNombre: true,
       placas: true,
       material: true,
-      voucherDate: true,
+      voucherDatetime: true,
       operador: true,
       odometer: true,
     },

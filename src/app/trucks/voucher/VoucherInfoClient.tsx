@@ -66,14 +66,14 @@ export default function VoucherInfoClient({
   const [localDate, setLocalDate] = useState<string>("Cargando…");
 
   useEffect(() => {
-    if (voucher.voucherTime) {
+    if (voucher.voucherDatetime) {
       setLocalDate(
-        new Date(voucher.voucherTime).toLocaleString("es-MX", {
+        new Date(voucher.voucherDatetime).toLocaleString("es-MX", {
           timeZone: "America/Mexico_City",
         })
       );
     }
-  }, [voucher.voucherTime]);
+  }, [voucher.voucherDatetime]);
 
   const voucherData = [
     { label: "Folio", value: formatVoucherId(voucher.folio) },
