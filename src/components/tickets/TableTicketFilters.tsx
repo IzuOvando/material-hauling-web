@@ -11,6 +11,22 @@ import { useSearchParams } from "next/navigation";
 import axios from "axios";
 import { useFrenteStore } from "@/store";
 
+const FIELD_LABELS: Record<string, string> = {
+  fecha: "Fecha",
+  voucherDate: "Fecha",
+  voucherDatetime: "Fecha",
+  odometer: "Odómetro",
+  idCamion: "ID Camión",
+  material: "Material",
+  origen: "Origen",
+  destino: "Destino",
+  placas: "Placas",
+  bomba: "Bomba",
+  empresa: "Empresa",
+  elemento: "Elemento",
+  noEconomico: "No. Económico",
+};
+
 interface TableTicketFiltersProps {
   frente: string;
   area: TicketArea | Section;
@@ -101,13 +117,12 @@ export function TableTicketFilters({ frente, area }: TableTicketFiltersProps) {
           <TableTicketFacetedFilter
             key={facet.field}
             title={facet.field}
+            label={FIELD_LABELS[facet.field] ?? facet.field}
             options={facet.options}
             onUpdateFilter={handleFilters}
             ref={(element: any) => (facetsRefs.current[index] = element)}
             area={area}
-            formatDate={
-              facet.field === "fecha" || facet.field === "voucherDate"
-            }
+            formatDate={facet.field === "fecha" || facet.field === "voucherDate"}
           />
         ))}
         {isFiltered && (

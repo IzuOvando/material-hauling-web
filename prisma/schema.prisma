@@ -79,8 +79,7 @@ model MaterialFrente {
 model VoucherCamion {
   folio        String   @id
   createdAt    DateTime @default(now())
-  voucherDate  DateTime
-  voucherTime  DateTime
+  voucherDatetime  DateTime
   destino      String
   origen       String
   material     String
@@ -117,8 +116,7 @@ model VoucherCamion {
   arrivalLocationSource    String?
 
   @@index(createdAt)
-  @@index([frenteNombre, voucherDate])
-  @@index([frenteNombre, voucherTime])
+  @@index([frenteNombre, voucherDatetime])
   @@index([frenteNombre, idCamion])
   @@index([frenteNombre, origen])
   @@index([frenteNombre, destino])

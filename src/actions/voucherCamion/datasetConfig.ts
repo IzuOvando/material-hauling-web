@@ -6,10 +6,8 @@ import {
 import {
   formatDateToDDMMYYYY,
   formatDateTimeToDDMMYYYY_HHMM,
-  formatIsoDateFromString,
   formatTime12Hour,
 } from "@/helpers/formatters/datetime";
-import { DateTime } from "luxon";
 import { formatVoucherId } from "@/helpers/formatters/formatVoucherId";
 
 export const datasetConfigs: Record<DatasetKey, DatasetConfig> = {
@@ -24,23 +22,14 @@ export const datasetConfigs: Record<DatasetKey, DatasetConfig> = {
       Folio: (v) => (v ? formatVoucherId(String(v)) : v),
 
       "Created At": (v) => (v ? formatDateToDDMMYYYY(v) : v),
-      "Voucher Date": (v) => {
+      "Voucher Datetime Date": (v) => {
         if (!v) return v;
-
-        if (typeof v === "string" && v.includes("T")) return formatIsoDateFromString(v);
-
-        if (typeof v === "string" && /^\d{4}-\d{2}-\d{2}$/.test(v)) return v;
-
-        if (v instanceof Date) {
-          return DateTime.fromJSDate(v, { zone: "utc" }).toISODate();
-        }
-
-        return String(v);
+        return formatDateToDDMMYYYY(v instanceof Date ? v : new Date(String(v)));
       },
 
-      "Voucher Time": (v) => {
+      "Voucher Datetime Time": (v) => {
         if (!v) return v;
-        return formatTime12Hour(v);
+        return formatTime12Hour(v instanceof Date ? v : new Date(String(v)), true);
       },
 
       "Arrival Time": (v) => (v ? formatDateTimeToDDMMYYYY_HHMM(v) : v),

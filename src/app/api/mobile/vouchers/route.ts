@@ -9,8 +9,6 @@ import {
 } from "@/utils/validators";
 import { invalidateFacetsCache } from "@/actions/tickets";
 import { Section } from "@/types";
-import { VoucherDateTimeUtil } from "@/helpers/formatters/voucherdatetime";
-import { VoucherDateTimeError } from "@/errors";
 
 
 type RejectedVoucher = {
@@ -98,8 +96,7 @@ function buildVoucherData(voucher: PrismaVoucherCamion, index: number) {
 
   return {
     folio: voucher.folio,
-    voucherDate: voucher.voucherDate,
-    voucherTime: voucher.voucherTime,
+    voucherDatetime: (voucher as any).voucherDatetime,
     destino: voucher.destino.trim(),
     origen: voucher.origen.trim(),
     material: voucher.material.trim(),
@@ -230,20 +227,18 @@ export async function POST(req: NextRequest) {
 
   try {
     for (const voucher of vouchersArray) {
-      const { voucherDate, voucherTime } = VoucherDateTimeUtil.splitDateTime(
-        new Date(String(voucher.voucherTime))
-      );
-      voucher.voucherDate = voucherDate;
-      voucher.voucherTime = voucherTime;
+      // Mobile sends "voucherTime" as the full UTC ISO string; preserve wire compat
+      const rawTime = String((voucher as any).voucherTime ?? (voucher as any).voucherDatetime);
+      const parsed = new Date(rawTime);
+      if (isNaN(parsed.getTime())) {
+        return NextResponse.json(
+          { error: "Error en el formato de fecha/hora proporcionado" },
+          { status: 400 }
+        );
+      }
+      (voucher as any).voucherDatetime = parsed;
     }
-  } catch (error) {
-    if (error instanceof VoucherDateTimeError) {
-      return NextResponse.json(
-        { error: "Error en el formato de fecha/hora proporcionado" },
-        { status: 400 }
-      );
-    }
-    console.error("❌ Error procesando fechas:", error);
+  } catch {
     return NextResponse.json(
       { error: "Error interno procesando fechas" },
       { status: 500 }
@@ -271,13 +266,6 @@ export async function POST(req: NextRequest) {
           { status: 400 }
         );
       }
-    }
-
-    if (error instanceof VoucherDateTimeError) {
-      return NextResponse.json(
-        { error: "Error en el formato de fecha/hora proporcionado" },
-        { status: 400 }
-      );
     }
 
     if (error instanceof Prisma.PrismaClientValidationError) {

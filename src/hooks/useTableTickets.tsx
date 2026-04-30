@@ -1,8 +1,21 @@
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import CONFIG from "@/config";
-import { getFilters } from "@/actions/tickets/helpers";
 import { TicketArea, Section } from "@/types";
 import { useRef } from "react";
+
+function parseFilterString(filterStr: string): Record<string, string[]> {
+  const result: Record<string, string[]> = {};
+  if (!filterStr) return result;
+  filterStr.split("|").forEach((part) => {
+    const eqIdx = part.indexOf("=");
+    if (eqIdx === -1) return;
+    const field = part.slice(0, eqIdx).trim();
+    const valStr = part.slice(eqIdx + 1).trim();
+    const vals = valStr.split("^").filter(Boolean);
+    if (field && vals.length > 0) result[field] = vals;
+  });
+  return result;
+}
 
 const useTableTickets = () => {
   const { replace } = useRouter();
@@ -62,31 +75,19 @@ const useTableTickets = () => {
     options: string[],
     area: TicketArea | Section
   ) => {
-    // Getting actual filters
-    const paramFilters = filters.current || "";
-    let actualFilters = getFilters(paramFilters, area) || {};
+    // Parse current filter string to a field→values map (raw strings, no Prisma objects)
+    const actualFilters = parseFilterString(filters.current || "");
 
-    // Adding/Deleting new filter
     if (options.length === 0) delete actualFilters[field];
-    else
-      actualFilters[field] = {
-        in: options,
-      };
+    else actualFilters[field] = options;
 
-    // Build newFilterParam
-    let newFilter = "";
-    const fields = Object.keys(actualFilters);
-    const values: any[] = Object.values(actualFilters);
+    // Rebuild filter string
+    const newFilter = Object.entries(actualFilters)
+      .map(([f, vals]) => `${f}=${vals.join("^")}`)
+      .join("|");
 
-    fields.forEach((field, index) => {
-      newFilter += `${field}=${values[index].in.join("^")}|`;
-    });
-
-    newFilter = newFilter.slice(0, -1);
-
-    // Update filters
     page.current = 1;
-    filters.current = newFilter;
+    filters.current = newFilter || null;
     reloadTable();
   };
 

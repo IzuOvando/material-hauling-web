@@ -1,7 +1,7 @@
 export const voucherCamionHeaderMap: Record<string, string> = {
   "Created At": "Creado el",
-  "Voucher Date": "Fecha del vale",
-  "Voucher Time": "Hora del vale",
+  "Voucher Datetime Date": "Fecha del vale",
+  "Voucher Datetime Time": "Hora del vale",
   Destino: "Destino",
   Origen: "Origen",
   Material: "Material",

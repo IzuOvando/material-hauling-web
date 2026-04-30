@@ -3,6 +3,7 @@ import { FacetedFilter, TicketArea, Section } from "@/types";
 import { Acarreos, Gasolina, Concreto, VoucherCamion, Asfalto } from "@prisma/client";
 import { FILTER_FIELDS, getFilters } from "./helpers";
 import { kv } from "@vercel/kv";
+import { formatIsoDate } from "@/helpers/formatters/datetime";
 
 type CountsType = {
   [key: string]: number;
@@ -138,10 +139,12 @@ const getDistinctValues = async (
       return group.map((item: any) => ({
         fecha: item.fecha.toISOString(),
       }));
-    else if (Object.hasOwn(group[0], "voucherDate")) {
-      return group.map((item: any) => ({
-        voucherDate: item.voucherDate.toISOString(),
-      }));
+    else if (group.length > 0 && Object.hasOwn(group[0], "voucherDatetime")) {
+      // distinct UTC timestamps → map to local dates and deduplicate
+      const localDates = group.map((item: any) =>
+        formatIsoDate(item.voucherDatetime as Date)!
+      );
+      return [...new Set(localDates)].sort().map((d) => ({ voucherDatetime: d }));
     } else return group;
   });
 
@@ -169,6 +172,9 @@ const getCounts = async (
   const groupsPromises = FILTER_FIELDS[area].map((field) => {
     const localWhere = JSON.parse(JSON.stringify(where));
     if (where.AND && where.AND[field]) delete localWhere.AND[field];
+    // Multi-date voucherDatetime filter is stored as AND.OR (not AND.voucherDatetime),
+    // so we need to explicitly remove it when computing date counts.
+    if (field === "voucherDatetime" && where.AND?.OR) delete localWhere.AND.OR;
     if (area === TicketArea.ACARREOS) {
       return prisma.acarreos.groupBy({
         by: [field as keyof Acarreos],
@@ -221,12 +227,18 @@ const getCounts = async (
         ...item,
         fecha: item.fecha.toISOString(),
       }));
-    else if (Object.hasOwn(group[0], "voucherDate"))
-      return group.map((item: any) => ({
-        ...item,
-        voucherDate: item.voucherDate.toISOString(),
+    else if (group.length > 0 && Object.hasOwn(group[0], "voucherDatetime")) {
+      // counts per UTC timestamp → aggregate by local date
+      const agg: Record<string, number> = {};
+      for (const item of group) {
+        const localDate = formatIsoDate(item.voucherDatetime as Date)!;
+        agg[localDate] = (agg[localDate] ?? 0) + (item._count?.voucherDatetime ?? 1);
+      }
+      return Object.entries(agg).map(([d, count]) => ({
+        voucherDatetime: d,
+        _count: { voucherDatetime: count },
       }));
-    else return group;
+    } else return group;
   });
 
   // Changing schema

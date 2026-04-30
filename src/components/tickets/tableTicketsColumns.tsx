@@ -579,19 +579,19 @@ const voucherCamionColumns: ColumnDef<VoucherCamion>[] = [
     },
   },
   {
-    accessorKey: "voucherDate",
+    id: "voucherDate",
+    accessorFn: (row) => formatIsoDate((row as any).voucherDatetime),
     header: ({ column }) => (
       <TableTicketColumnHeader column={column} title="Fecha" />
     ),
-    cell: ({ row }) => (
-      <>{formatIsoDate(row.getValue("voucherDate") as Date)}</>
-    ),
+    cell: ({ row }) => <>{row.getValue("voucherDate")}</>,
     filterFn: (row, id, value) => {
       return value.includes(row.getValue(id));
     },
   },
   {
-    accessorKey: "voucherTime",
+    id: "voucherTime",
+    accessorFn: (row) => (row as any).voucherDatetime,
     header: ({ column }) => (
       <TableTicketColumnHeader column={column} title="Hora" />
     ),
