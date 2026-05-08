@@ -42,3 +42,13 @@ export interface StepMeta {
   label: string;
   icon: ReactNode;
 }
+
+export interface UserRow {
+  username: string;
+  rol: string;
+  nombre: string;
+  apPaterno: string;
+  apMaterno: string | null;
+  noEmpleado: string;
+  frentes: string[];
+}
