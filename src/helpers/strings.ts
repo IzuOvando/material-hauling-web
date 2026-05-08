@@ -1,3 +1,7 @@
+export function getProject(frente: string): string {
+  return frente.split("-")[0].trim();
+}
+
 export function findClosestMatch(
   word: string,
   possibleMatches: string[]

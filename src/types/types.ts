@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { TicketPrinter } from "@/lib/printers";
 import { Acarreos, Gasolina, Concreto, VoucherCamion, Asfalto } from "@prisma/client";
 
@@ -31,3 +32,13 @@ export type DatasetConfig = {
   headerMap?: Record<string, string>;
   transforms?: Record<string, TransformFn>;
 };
+
+// ─── Users / Stepper ─────────────────────────────────────────────────────────
+
+export type StepId = 1 | 2 | 3;
+
+export interface StepMeta {
+  id: StepId;
+  label: string;
+  icon: ReactNode;
+}
