@@ -17,10 +17,12 @@ import { SelectGroup, SelectLabel } from "@radix-ui/react-select";
 import { AlertDialog, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Frente } from "@prisma/client";
+import { Separator } from "@/components/ui/separator";
 import { Trash } from "lucide-react";
 import DeleteFrenteAlertDialog from "./DeleteFrenteAlertDialog";
 import FileUpdate from "../upload/UpdateInput";
 import FileUpload from "../upload/UploadInput";
+import FrenteLogoUpload from "./FrenteLogoUpload";
 import { TicketArea, TicketAreaList } from "@/types";
 
 interface EditFrenteDialogProps {
@@ -31,7 +33,9 @@ interface EditFrenteDialogProps {
     [key in TicketArea]: boolean;
   };
   onFrenteUpdated: () => void;
+  onLogoUpdated: () => void;
   onDeleteFrente: (name: string) => void;
+  isOwner?: boolean;
 }
 
 const EditFrenteDialog = ({
@@ -40,7 +44,9 @@ const EditFrenteDialog = ({
   frente,
   areTickets,
   onFrenteUpdated,
+  onLogoUpdated,
   onDeleteFrente,
+  isOwner = false,
 }: EditFrenteDialogProps) => {
   const [area, setArea] = useState<TicketArea>(TicketArea.ACARREOS);
 
@@ -98,6 +104,18 @@ const EditFrenteDialog = ({
               Si ya existe una base de datos en el área del frente, ésta{" "}
               <b>sera reeplazada</b> con la nueva base de datos.
             </span>
+
+            {isOwner && (
+              <>
+                <Separator />
+                <FrenteLogoUpload
+                  frente={frente}
+                  onLogoUpdated={onLogoUpdated}
+                />
+                <Separator />
+              </>
+            )}
+
             <AlertDialogTrigger asChild>
               <Button
                 className="flex items-center gap-2 hover:bg-red-500 group"

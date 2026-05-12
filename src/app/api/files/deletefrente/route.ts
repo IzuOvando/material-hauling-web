@@ -17,6 +17,7 @@ export async function POST(req: NextRequest) {
         excelUrlConcretoBlob: true,
         excelUrlAsfaltoBlob: true,
         excelUrlVoucherCamionBlob: true,
+        logoUrl: true,
       },
     });
 
@@ -33,6 +34,7 @@ export async function POST(req: NextRequest) {
       frente.excelUrlConcretoBlob,
       frente.excelUrlAsfaltoBlob,
       frente.excelUrlVoucherCamionBlob,
+      frente.logoUrl,
     ].filter(Boolean) as string[];
 
     await Promise.allSettled(blobsToDelete.map((url) => blobClient.deleteBlob(url)));

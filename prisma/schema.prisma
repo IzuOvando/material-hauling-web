@@ -41,6 +41,10 @@ model UserFrente {
 
 model Frente {
   nombre                    String          @id @unique
+  frenteKey                 String?         @unique
+  logoUrl                   String?
+  logoHash                  String?
+  logoUpdatedAt             DateTime?
   excelUrlGasolinaBlob      String?
   excelUrlAcarreosBlob      String?
   excelUrlConcretoBlob      String?

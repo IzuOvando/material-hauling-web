@@ -83,6 +83,10 @@ const FrenteTools = ({ frentes, role }: Props) => {
     router.refresh();
   };
 
+  const handleOnLogoUpdated = () => {
+    router.refresh();
+  };
+
   const handleOnDeleteFrente = (name: string) => {
     resetSelection();
     resetFrente();
@@ -109,6 +113,14 @@ const FrenteTools = ({ frentes, role }: Props) => {
       fetchAreTickets(selectedFrente.nombre);
     }
   }, [selectedFrente]);
+
+  useEffect(() => {
+    if (!selectedFrente) return;
+    const fresh = frentes.find((f) => f.nombre === selectedFrente.nombre);
+    if (fresh && fresh.logoUrl !== selectedFrente.logoUrl) {
+      setSelectedFrente(fresh);
+    }
+  }, [frentes]);
 
   return (
     <div className="flex items-center gap-2 flex-wrap justify-center">
@@ -176,7 +188,9 @@ const FrenteTools = ({ frentes, role }: Props) => {
                 frente={selectedFrente}
                 areTickets={areTickets}
                 onFrenteUpdated={handleOnFrenteUpdated}
+                onLogoUpdated={handleOnLogoUpdated}
                 onDeleteFrente={handleOnDeleteFrente}
+                isOwner={role === "owner"}
               />
             </>
           )}
