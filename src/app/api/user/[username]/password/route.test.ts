@@ -99,7 +99,7 @@ describe("PUT /api/user/[username]/password", () => {
 
     const { Prisma } = await import("@prisma/client");
     (prisma.user.update as jest.Mock).mockRejectedValue(
-      new Prisma.PrismaClientKnownRequestError("User not found", { code: "P2025" })
+      new Prisma.PrismaClientKnownRequestError("User not found", { code: "P2025", clientVersion: "0.0.0" })
     );
 
     const res = await PUT(makeRequest({ password: "sha256clienthash" }), {

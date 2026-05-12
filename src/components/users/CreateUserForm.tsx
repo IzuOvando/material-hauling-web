@@ -52,6 +52,7 @@ export function CreateUserForm({ frentes }: CreateUserFormProps) {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword]       = useState(false);
   const [showConfirm, setShowConfirm]         = useState(false);
+  const [passwordBlurred, setPasswordBlurred] = useState(false);
 
   const [selectedFrentes, setSelectedFrentes] = useState<string[]>([]);
   const [search, setSearch]                   = useState("");
@@ -260,6 +261,7 @@ export function CreateUserForm({ frentes }: CreateUserFormProps) {
                           placeholder="Mínimo 7 caracteres"
                           value={form.password}
                           onChange={(e) => handleFieldChange("password", e.target.value)}
+                          onBlur={() => setPasswordBlurred(true)}
                           onPaste={(e) => e.preventDefault()}
                           className="pr-10 shadow-sm"
                         />
@@ -272,6 +274,9 @@ export function CreateUserForm({ frentes }: CreateUserFormProps) {
                           {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                         </button>
                       </div>
+                      {passwordBlurred && form.password.length > 0 && form.password.length <= 6 && (
+                        <p className="text-xs text-red-400">La contraseña debe tener más de 6 caracteres</p>
+                      )}
                     </div>
 
                     <div className="flex flex-col gap-1.5">
@@ -379,7 +384,7 @@ export function CreateUserForm({ frentes }: CreateUserFormProps) {
               <>
                 <div className="bg-primary px-4 py-3">
                   <h2 className="text-lg font-semibold text-accent">Asignar frentes</h2>
-                  <p className="text-sm text-primary-light mt-0.5">
+                  <p className="text-xs text-white/70 mt-0.5">
                     Paso 2 de 3 —{" "}
                     Usuario <span className="font-semibold text-white">{createdUsername}</span> creado.
                     Selecciona los frentes a los que tendrá acceso.

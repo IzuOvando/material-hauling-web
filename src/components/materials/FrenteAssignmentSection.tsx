@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type MutableRefObject } from "react";
+import { useCallback, useEffect, useState, type MutableRefObject } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/ui/use-toast";
@@ -38,7 +38,7 @@ export function FrenteAssignmentSection({
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
-  const loadFrenteMaterials = async (frente: string) => {
+  const loadFrenteMaterials = useCallback(async (frente: string) => {
     try {
       setLoading(true);
       const data = await getFrenteMaterials(frente);
@@ -53,7 +53,7 @@ export function FrenteAssignmentSection({
     } finally {
       setLoading(false);
     }
-  };
+  }, [toast]);
 
   useEffect(() => {
     if (selectedFrente) {
@@ -62,8 +62,7 @@ export function FrenteAssignmentSection({
       setAssigned([]);
       setAvailable([]);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedFrente]);
+  }, [selectedFrente, loadFrenteMaterials]);
 
   useEffect(() => {
     if (refreshRef) {
@@ -71,7 +70,7 @@ export function FrenteAssignmentSection({
         if (selectedFrente) loadFrenteMaterials(selectedFrente);
       };
     }
-  });
+  }, [refreshRef, selectedFrente, loadFrenteMaterials]);
 
   const handleAssign = async (material: MaterialItem) => {
     try {

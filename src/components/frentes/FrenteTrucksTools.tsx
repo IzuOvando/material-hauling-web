@@ -55,7 +55,7 @@ const FrenteTrucksTools = ({
   }, [selectedFrente, router]);
 
   return (
-    <div className="flex items-center gap-2 flex-wrap justify-center">
+    <div className="flex items-center gap-2 shrink-0">
       <Select
         onValueChange={handleSelectFrente}
         value={selectedFrente ? selectedFrente?.nombre : undefined}
@@ -80,14 +80,14 @@ const FrenteTrucksTools = ({
       </Select>
       {selectedFrente && areTickets && !readOnly && (
         <>
-          <div className="flex items-center">
+          <div className="flex items-center gap-0.5">
             <DownloadVoucherCamionButton
               frente={selectedFrente.nombre}
               section={Section.VOUCHERCAMION}
             />
             {isOwner && (
               <Button
-                className="p-2 -ml-[2.5px] bg-transparent hover:bg-[rgba(var(--accent-light-color)/50%)]"
+                className="p-2 bg-transparent hover:bg-[rgba(var(--accent-light-color)/50%)]"
                 onClick={() => setOpenCloseCycle(true)}
                 title="Cierre manual de ciclos"
               >
@@ -95,8 +95,9 @@ const FrenteTrucksTools = ({
               </Button>
             )}
             <Button
-              className="p-2 -ml-[2.5px] bg-transparent hover:bg-[rgba(var(--accent-light-color)/50%)]"
+              className="p-2 bg-transparent hover:bg-[rgba(var(--accent-light-color)/50%)]"
               onClick={() => setOpenDelete(true)}
+              title="Eliminar registros"
             >
               <Trash className="text-accent" />
             </Button>

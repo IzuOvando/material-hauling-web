@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/db";
 import { requireDashboardAccess } from "@/auth/guards";
 
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   try {
     const currentUser = await requireDashboardAccess();
