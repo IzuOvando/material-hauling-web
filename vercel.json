@@ -1,9 +1,5 @@
 {
-    "crons": [
-      {
-        "path": "/api/trucks/cleanup",
-        "schedule": "0 2 1 * *"
-      }
-    ]
+  "git": {
+    "deploymentEnabled": false
   }
-  
+}
