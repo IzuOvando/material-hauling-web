@@ -73,3 +73,61 @@ yarn dev
 # or
 pnpm dev
 ```
+
+# Releases & CI/CD 🚀
+
+## Branch Strategy
+
+| Branch | Environment | Trigger |
+|---|---|---|
+| `main` | Staging | Every push auto-deploys to Vercel staging |
+| GitHub Release (tag `vX.Y.Z`) | Production | Publishing a release deploys to Vercel production |
+
+## Staging Auto-Deploy
+
+Every push to `main` automatically runs:
+1. Lint + type check
+2. Prisma migrations against the staging database
+3. Vercel staging deployment
+
+If migrations or quality checks fail, the deploy is skipped. No manual action needed.
+
+## How to Do a Production Release
+
+### Without new database migrations
+
+1. Merge all changes to `main` and verify staging looks correct
+2. Go to GitHub → **Releases** → **Draft a new release**
+3. Create a new tag following semver: `v1.2.3`
+4. Add release notes and click **Publish release**
+5. The release workflow runs automatically: quality checks → migration gate (passes) → version bump commit → Vercel production deploy
+
+### With new database migrations
+
+1. Merge all changes to `main` and verify staging looks correct (migrations will have already been applied to staging by the auto-deploy)
+2. Go to GitHub → **Actions** → **Manual — Database Migration** → **Run workflow**
+   - `environment`: `production`
+   - `action`: `deploy`
+3. Verify the workflow completes successfully
+4. Go to GitHub → **Releases** → **Draft a new release** → create tag `vX.Y.Z` → **Publish release**
+5. The release workflow checks that production migrations are up to date, bumps `package.json` version, and deploys to Vercel production
+
+> [!WARNING]
+> If you publish a release without applying migrations first, the release workflow will fail at the migration gate and tell you to run the manual workflow. No deployment will occur.
+
+## Manual Migration Workflow
+
+The **"Manual — Database Migration"** workflow (triggered from GitHub Actions → Run workflow) supports three use cases:
+
+| Use case | `environment` | `action` | `migration_name` |
+|---|---|---|---|
+| Apply pending migrations to staging | `staging` | `deploy` | — |
+| Apply pending migrations to production | `production` | `deploy` | — |
+| Mark a failed migration as rolled back | `staging` or `production` | `rollback` | e.g. `20241121165401_first_migration` |
+
+## Rollback
+
+Prisma does not support automatic rollback. Use the **"Manual — Database Migration"** workflow with `action=rollback` and the exact migration folder name to mark a failed migration as resolved in `_prisma_migrations`, then fix the underlying issue and re-run `deploy`.
+
+> [!WARNING]
+> `rollback` does **not** undo any SQL already executed — it only updates the migration record. If DDL was partially applied, inspect the database manually before re-running migrations.

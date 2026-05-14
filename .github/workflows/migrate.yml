@@ -1,0 +1,97 @@
+name: Manual — Database Migration
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment'
+        required: true
+        type: choice
+        options:
+          - staging
+          - production
+      action:
+        description: 'Action to perform'
+        required: true
+        type: choice
+        options:
+          - deploy
+          - rollback
+      migration_name:
+        description: 'Migration name (required for rollback — e.g. 20241121165401_first_migration)'
+        required: false
+        type: string
+
+jobs:
+  migrate:
+    name: ${{ inputs.action == 'deploy' && 'Apply' || 'Rollback' }} migrations on ${{ inputs.environment }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Resolve database connection string
+        id: resolve_db
+        run: |
+          if [ "${{ inputs.environment }}" = "production" ]; then
+            echo "db_url=${{ secrets.PRODUCTION_POSTGRES_URL_NON_POOLING }}" >> "$GITHUB_OUTPUT"
+            echo "Running against: PRODUCTION"
+          else
+            echo "db_url=${{ secrets.STAGING_POSTGRES_URL_NON_POOLING }}" >> "$GITHUB_OUTPUT"
+            echo "Running against: STAGING"
+          fi
+
+      - name: Show current migration status
+        env:
+          DATABASE_URL: ${{ steps.resolve_db.outputs.db_url }}
+          POSTGRES_URL_NON_POOLING: ${{ steps.resolve_db.outputs.db_url }}
+        run: |
+          echo "=== Current migration status (${{ inputs.environment }}) ==="
+          npx prisma migrate status || true
+          echo "======================================================"
+
+      - name: Deploy pending migrations
+        if: inputs.action == 'deploy'
+        env:
+          DATABASE_URL: ${{ steps.resolve_db.outputs.db_url }}
+          POSTGRES_URL_NON_POOLING: ${{ steps.resolve_db.outputs.db_url }}
+        run: |
+          echo "Applying pending migrations to ${{ inputs.environment }} database..."
+          npx prisma migrate deploy
+          echo "All migrations applied successfully."
+
+      - name: Rollback failed migration
+        if: inputs.action == 'rollback'
+        env:
+          DATABASE_URL: ${{ steps.resolve_db.outputs.db_url }}
+          POSTGRES_URL_NON_POOLING: ${{ steps.resolve_db.outputs.db_url }}
+        run: |
+          if [ -z "${{ inputs.migration_name }}" ]; then
+            echo "::error::migration_name is required for rollback. Provide the exact migration folder name (e.g. 20241121165401_first_migration)."
+            exit 1
+          fi
+
+          echo "Marking migration '${{ inputs.migration_name }}' as rolled back on ${{ inputs.environment }}..."
+          npx prisma migrate resolve --rolled-back "${{ inputs.migration_name }}"
+          echo ""
+          echo "::warning::migrate resolve --rolled-back only marks the migration record as failed in _prisma_migrations."
+          echo "::warning::It does NOT undo any SQL that was already applied. Review the database state manually if DDL was partially executed."
+
+      - name: Show final migration status
+        env:
+          DATABASE_URL: ${{ steps.resolve_db.outputs.db_url }}
+          POSTGRES_URL_NON_POOLING: ${{ steps.resolve_db.outputs.db_url }}
+        run: |
+          echo "=== Final migration status (${{ inputs.environment }}) ==="
+          npx prisma migrate status || true
+          echo "======================================================"

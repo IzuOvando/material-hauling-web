@@ -1,0 +1,95 @@
+name: Release — Production Deploy
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  release:
+    name: Quality Check, Migrate Gate & Deploy to Production
+    runs-on: ubuntu-latest
+    if: ${{ !github.event.release.prerelease }}
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Type check
+        run: npx tsc --noEmit
+
+      - name: Check production migration status
+        id: migration_check
+        env:
+          DATABASE_URL: ${{ secrets.PRODUCTION_POSTGRES_URL_NON_POOLING }}
+          POSTGRES_URL_NON_POOLING: ${{ secrets.PRODUCTION_POSTGRES_URL_NON_POOLING }}
+        run: |
+          echo "Running prisma migrate status against production database..."
+          STATUS_OUTPUT=$(npx prisma migrate status 2>&1)
+          STATUS_EXIT=$?
+          echo "$STATUS_OUTPUT"
+
+          if [ $STATUS_EXIT -ne 0 ]; then
+            echo ""
+            echo "::error::Production database has pending migrations."
+            echo "::error::Run the 'Manual Database Migration' workflow first (environment=production, action=deploy), then re-publish this release."
+            exit 1
+          fi
+
+          if echo "$STATUS_OUTPUT" | grep -q "following migration.*not yet been applied\|Database schema is not up to date"; then
+            echo "::error::Pending migrations detected in status output. Run the manual migration workflow first."
+            exit 1
+          fi
+
+          echo "Production database is up to date. Proceeding with release."
+
+      - name: Extract version from release tag
+        id: extract_version
+        run: |
+          TAG="${{ github.ref_name }}"
+          VERSION="${TAG#v}"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Extracted version: $VERSION from tag: $TAG"
+
+      - name: Bump version in package.json
+        run: |
+          VERSION="${{ steps.extract_version.outputs.version }}"
+          node -e "
+            const fs = require('fs');
+            const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+            pkg.version = '$VERSION';
+            fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2) + '\n');
+            console.log('Updated package.json version to: ' + pkg.version);
+          "
+
+      - name: Commit version bump to main
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add package.json
+          git commit -m "chore: 🔖 bump version to ${{ steps.extract_version.outputs.version }} [skip ci]"
+          git push origin HEAD:main
+
+      - name: Deploy to Vercel production
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_PRODUCTION }}
+        run: npx vercel deploy --prod --token "$VERCEL_TOKEN" --yes

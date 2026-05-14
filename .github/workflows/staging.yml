@@ -1,0 +1,46 @@
+name: Staging — Auto Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  staging:
+    name: Quality Check, Migrate & Deploy to Staging
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Type check
+        run: npx tsc --noEmit
+
+      - name: Run migrations on staging database
+        env:
+          DATABASE_URL: ${{ secrets.STAGING_POSTGRES_URL_NON_POOLING }}
+          POSTGRES_URL_NON_POOLING: ${{ secrets.STAGING_POSTGRES_URL_NON_POOLING }}
+        run: |
+          echo "Deploying pending migrations to staging database..."
+          npx prisma migrate deploy
+          echo "Staging migrations complete."
+
+      - name: Deploy to Vercel staging
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_STAGING }}
+        run: npx vercel deploy --prod --token "$VERCEL_TOKEN" --yes
