@@ -92,4 +92,7 @@ jobs:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          VERCEL_GIT_COMMIT_AUTHOR_LOGIN: github-actions[bot]
+          VERCEL_GIT_COMMIT_AUTHOR_NAME: github-actions[bot]
+          VERCEL_GIT_COMMIT_AUTHOR_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
         run: npx vercel deploy --prod --token "$VERCEL_TOKEN" --yes
