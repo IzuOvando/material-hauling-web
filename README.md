@@ -78,10 +78,10 @@ pnpm dev
 
 ## Branch Strategy
 
-| Branch | Environment | Trigger |
-|---|---|---|
-| `main` | Staging | Every push auto-deploys to Vercel staging |
-| GitHub Release (tag `vX.Y.Z`) | Production | Publishing a release deploys to Vercel production |
+| Branch                        | Environment    | Trigger                                           |
+| ----------------------------- | -------------- | ------------------------------------------------- |
+| `main`                        | **Staging**    | Every push auto-deploys to Vercel staging         |
+| GitHub Release (tag `vX.Y.Z`) | **Production** | Publishing a release deploys to Vercel production |
 
 ## Staging Auto-Deploy
 
@@ -119,10 +119,10 @@ If migrations or quality checks fail, the deploy is skipped. No manual action ne
 
 The **"Manual — Database Migration"** workflow (triggered from GitHub Actions → Run workflow) supports three use cases:
 
-| Use case | `environment` | `action` | `migration_name` |
-|---|---|---|---|
-| Apply pending migrations to staging | `staging` | `deploy` | — |
-| Apply pending migrations to production | `production` | `deploy` | — |
+| Use case                               | `environment`             | `action`   | `migration_name`                      |
+| -------------------------------------- | ------------------------- | ---------- | ------------------------------------- |
+| Apply pending migrations to staging    | `staging`                 | `deploy`   | —                                     |
+| Apply pending migrations to production | `production`              | `deploy`   | —                                     |
 | Mark a failed migration as rolled back | `staging` or `production` | `rollback` | e.g. `20241121165401_first_migration` |
 
 ## Rollback
