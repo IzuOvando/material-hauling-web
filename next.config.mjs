@@ -6,6 +6,19 @@ const nextConfig = {
     BATCHES_CSV_LINES: process.env.BATCHES_CSV_LINES || 10000,
     PRINTERS_TIMEOUT: process.env.PRINTERS_TIMEOUT || 10000,
   },
+  async headers() {
+    return [
+      {
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'Content-Security-Policy',
+            value: `img-src 'self' data: blob: https://*.public.blob.vercel-storage.com`,
+          },
+        ],
+      },
+    ];
+  },
 };
 
 export default nextConfig;
