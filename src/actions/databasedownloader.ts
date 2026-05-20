@@ -32,8 +32,8 @@ export default class DatabaseDownloader {
         return prisma.asfalto.findMany({ where });
         case "vouchercamion": {
           const vouchers = await prisma.voucherCamion.findMany({ where });
-          // Split voucherDatetime
-          return vouchers.map(({ voucherDatetime, ...rest }) => ({
+          // Split voucherDatetime, exclude createdByUsername (internal field)
+          return vouchers.map(({ voucherDatetime, createdByUsername, ...rest }) => ({
             ...rest,
             voucherDatetimeDate: voucherDatetime,
             voucherDatetimeTime: voucherDatetime,

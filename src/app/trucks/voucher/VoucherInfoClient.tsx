@@ -93,9 +93,11 @@ export default function VoucherInfoClient({
     },
     { label: "Localidad", value: voucher.localidad },
     { label: "Empresa", value: voucher.empresa },
-    { label: "Checador", value: voucher.checkerName },
+    { label: "Checador Salida", value: voucher.checkerName },
     { label: "No Checador", value: voucher.checkerNo },
-  ].filter((item) => item.value !== undefined);
+    { label: "Checador Llegada", value: voucher.arrivalCheckerName ?? undefined },
+    { label: "No. Empleado Llegada", value: voucher.arrivalCheckerEmployeeNumber ?? undefined },
+  ].filter((item) => item.value !== undefined && item.value !== null);
 
   return (
     <main className="container my-10">

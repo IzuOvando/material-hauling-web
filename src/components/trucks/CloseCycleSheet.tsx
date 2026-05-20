@@ -296,7 +296,7 @@ const InputView = ({
   return (
     <div className="flex flex-col flex-1 px-6 py-5 gap-4">
       <div className="flex flex-col gap-1">
-        <label className="text-sm font-medium text-primary">Folios del documento</label>
+        <label className="text-sm font-medium text-primary">Folios del váucher</label>
         <p className="text-xs text-primary/50">
           Ingresa los folios, uno por línea o separados por comas.
         </p>
@@ -341,7 +341,7 @@ const InputView = ({
         disabled={!hasValid}
         onClick={onSearch}
       >
-        Buscar tickets →
+        Buscar váuchers →
       </Button>
     </div>
   );

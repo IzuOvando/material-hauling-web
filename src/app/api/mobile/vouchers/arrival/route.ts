@@ -5,15 +5,17 @@ import { TokenAuthenticator } from "@/auth/TokenAuthenticator";
 import { VoucherCamionStatus } from "@/types/enum";
 
 type ArrivalUpdateInput = {
-  folio:                    string;
-  arrivalTime:             string;
-  odometerArrival:         number | string;
-  latitude?:               number | null;
-  longitude?:              number | null;
-  locationAccuracy?:       number | null;
-  locationTimestamp?:      string | null;
-  locationStatus?:         string | null;
-  locationSource?:         string | null;
+  folio:                         string;
+  arrivalTime:                   string;
+  odometerArrival:               number | string;
+  latitude?:                     number | null;
+  longitude?:                    number | null;
+  locationAccuracy?:             number | null;
+  locationTimestamp?:            string | null;
+  locationStatus?:               string | null;
+  locationSource?:               string | null;
+  arrivalCheckerName?:           string | null;
+  arrivalCheckerEmployeeNumber?: string | null;
 };
 
 type ArrivalBatchBody = {
@@ -46,15 +48,17 @@ export async function POST(req: NextRequest) {
   }
 
   const normalized: {
-    folio:                    string;
-    arrivalTime:             Date;
-    odometerArrival:         number;
-    arrivalLatitude:         number | null;
-    arrivalLongitude:        number | null;
-    arrivalLocationAccuracy: number | null;
-    arrivalLocationTimestamp: Date | null;
-    arrivalLocationStatus:   string | null;
-    arrivalLocationSource:   string | null;
+    folio:                         string;
+    arrivalTime:                   Date;
+    odometerArrival:               number;
+    arrivalLatitude:               number | null;
+    arrivalLongitude:              number | null;
+    arrivalLocationAccuracy:       number | null;
+    arrivalLocationTimestamp:      Date | null;
+    arrivalLocationStatus:         string | null;
+    arrivalLocationSource:         string | null;
+    arrivalCheckerName:            string | null;
+    arrivalCheckerEmployeeNumber:  string | null;
   }[] = [];
 
   for (let i = 0; i < body.updates.length; i++) {
@@ -77,12 +81,14 @@ export async function POST(req: NextRequest) {
       folio,
       arrivalTime:              arrivalDate,
       odometerArrival:          odoFloat,
-      arrivalLatitude:          u.latitude          ?? null,
-      arrivalLongitude:         u.longitude         ?? null,
-      arrivalLocationAccuracy:  u.locationAccuracy  ?? null,
-      arrivalLocationTimestamp: u.locationTimestamp ? new Date(u.locationTimestamp) : null,
-      arrivalLocationStatus:    u.locationStatus    ?? null,
-      arrivalLocationSource:    u.locationSource    ?? null,
+      arrivalLatitude:              u.latitude                     ?? null,
+      arrivalLongitude:             u.longitude                    ?? null,
+      arrivalLocationAccuracy:      u.locationAccuracy             ?? null,
+      arrivalLocationTimestamp:     u.locationTimestamp ? new Date(u.locationTimestamp) : null,
+      arrivalLocationStatus:        u.locationStatus               ?? null,
+      arrivalLocationSource:        u.locationSource               ?? null,
+      arrivalCheckerName:           u.arrivalCheckerName           ?? null,
+      arrivalCheckerEmployeeNumber: u.arrivalCheckerEmployeeNumber ?? null,
     });
   }
 
@@ -131,8 +137,10 @@ export async function POST(req: NextRequest) {
             arrivalLongitude:         u.arrivalLongitude,
             arrivalLocationAccuracy:  u.arrivalLocationAccuracy,
             arrivalLocationTimestamp: u.arrivalLocationTimestamp,
-            arrivalLocationStatus:    u.arrivalLocationStatus,
-            arrivalLocationSource:    u.arrivalLocationSource,
+            arrivalLocationStatus:        u.arrivalLocationStatus,
+            arrivalLocationSource:        u.arrivalLocationSource,
+            arrivalCheckerName:           u.arrivalCheckerName,
+            arrivalCheckerEmployeeNumber: u.arrivalCheckerEmployeeNumber,
           },
         });
       });

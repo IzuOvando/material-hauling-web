@@ -618,7 +618,7 @@ const voucherCamionColumns: ColumnDef<VoucherCamion>[] = [
   {
     accessorKey: "noEmpleado",
     header: ({ column }) => (
-      <TableTicketColumnHeader column={column} title="NoOperador" />
+      <TableTicketColumnHeader column={column} title="No. Operador" />
     ),
   },
   {
@@ -639,13 +639,13 @@ const voucherCamionColumns: ColumnDef<VoucherCamion>[] = [
   {
     accessorKey: "checkerName",
     header: ({ column }) => (
-      <TableTicketColumnHeader column={column} title="Checador" />
+      <TableTicketColumnHeader column={column} title="Checador Salida" />
     ),
   },
   {
     accessorKey: "checkerNo",
     header: ({ column }) => (
-      <TableTicketColumnHeader column={column} title="NoChecador" />
+      <TableTicketColumnHeader column={column} title="No. Checador Salida" />
     ),
   },
 ];
