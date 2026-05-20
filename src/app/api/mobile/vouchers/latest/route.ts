@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/db";
-import { VoucherCamion as PrismaVoucherCamion } from "@prisma/client";
+import { Prisma, VoucherCamion as PrismaVoucherCamion } from "@prisma/client";
 import { TokenAuthenticator } from "@/auth/TokenAuthenticator";
 
 export const dynamic = "force-dynamic";
@@ -12,6 +12,11 @@ export async function GET(req: NextRequest) {
 
     if (!accessToken || !TokenAuthenticator.verify(accessToken)) {
       return NextResponse.json({ message: "No autorizado, proporcione credenciales válidas para realizar esta acción" }, { status: 401 });
+    }
+
+    const decoded = TokenAuthenticator.decode(accessToken);
+    if (!decoded) {
+      return NextResponse.json({ message: "Token inválido" }, { status: 401 });
     }
 
     const { searchParams } = new URL(req.url);
@@ -31,7 +36,25 @@ export async function GET(req: NextRequest) {
       limit = parsedLimit;
     }
 
+    const { role, username } = decoded;
+    let whereClause: Prisma.VoucherCamionWhereInput = {};
+
+    if (role !== "owner" && role !== "general") {
+      const userRecord = await prisma.user.findUnique({
+        where: { username },
+        include: { frentes: true },
+      });
+
+      const userFrentes = userRecord?.frentes.map((f) => f.frenteNombre) ?? [];
+      whereClause = { frenteNombre: { in: userFrentes } };
+
+      if (role === "user") {
+        whereClause = { ...whereClause, createdByUsername: username };
+      }
+    }
+
     const vouchers: PrismaVoucherCamion[] = await prisma.voucherCamion.findMany({
+      where: whereClause,
       orderBy: { voucherDatetime: "desc" },
       take: limit,
     });
@@ -52,4 +75,3 @@ export async function GET(req: NextRequest) {
     );
   }
 }
-

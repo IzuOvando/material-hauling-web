@@ -80,7 +80,7 @@ function validateTurnos(vouchers: PrismaVoucherCamion[]): ValidationError[] {
   return errors;
 }
 
-function buildVoucherData(voucher: PrismaVoucherCamion, index: number) {
+function buildVoucherData(voucher: PrismaVoucherCamion, index: number, createdByUsername: string) {
   const odometerFloat =
     typeof voucher.odometer === "string"
       ? parseFloat(voucher.odometer)
@@ -126,6 +126,7 @@ function buildVoucherData(voucher: PrismaVoucherCamion, index: number) {
       : null,
     locationStatus:    voucher.locationStatus    ?? null,
     locationSource:    voucher.locationSource    ?? null,
+    createdByUsername,
   };
 }
 
@@ -248,7 +249,7 @@ export async function POST(req: NextRequest) {
   try {
     await prisma.$transaction(
       vouchersArray.map((voucher, index) => {
-        const data = buildVoucherData(voucher, index);
+        const data = buildVoucherData(voucher, index, decoded.username);
         return prisma.voucherCamion.upsert({
           where: { folio: voucher.folio },
           create: data,
