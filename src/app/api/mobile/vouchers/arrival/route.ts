@@ -45,7 +45,6 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const invalid: { folio: string; error: string }[] = [];
   const normalized: {
     folio:                    string;
     arrivalTime:             Date;
@@ -61,35 +60,18 @@ export async function POST(req: NextRequest) {
   for (let i = 0; i < body.updates.length; i++) {
     const u = body.updates[i];
     const folio = (u?.folio || "").trim();
-
-    if (!folio) {
-      invalid.push({ folio: "(missing)", error: `folio requerido (index ${i})` });
-      continue;
-    }
+    if (!folio) continue;
 
     const arrivalDate = new Date(u.arrivalTime);
-    if (Number.isNaN(arrivalDate.getTime())) {
-      invalid.push({ folio, error: "arrivalTime inválido (usa ISO string)" });
-      continue;
-    }
+    if (Number.isNaN(arrivalDate.getTime())) continue;
 
     const odoFloat =
       typeof u.odometerArrival === "string"
         ? parseFloat(u.odometerArrival)
         : u.odometerArrival;
 
-    if (odoFloat === null || odoFloat === undefined || Number.isNaN(odoFloat)) {
-      invalid.push({ folio, error: "odometerArrival inválido" });
-      continue;
-    }
-    if (odoFloat < 0) {
-      invalid.push({ folio, error: "odometerArrival no puede ser negativo" });
-      continue;
-    }
-
-    const arrivalLocationTimestamp = u.locationTimestamp
-      ? new Date(u.locationTimestamp)
-      : null;
+    if (odoFloat === null || odoFloat === undefined || Number.isNaN(odoFloat)) continue;
+    if (odoFloat < 0) continue;
 
     normalized.push({
       folio,
@@ -98,7 +80,7 @@ export async function POST(req: NextRequest) {
       arrivalLatitude:          u.latitude          ?? null,
       arrivalLongitude:         u.longitude         ?? null,
       arrivalLocationAccuracy:  u.locationAccuracy  ?? null,
-      arrivalLocationTimestamp: arrivalLocationTimestamp,
+      arrivalLocationTimestamp: u.locationTimestamp ? new Date(u.locationTimestamp) : null,
       arrivalLocationStatus:    u.locationStatus    ?? null,
       arrivalLocationSource:    u.locationSource    ?? null,
     });
@@ -106,7 +88,7 @@ export async function POST(req: NextRequest) {
 
   if (normalized.length === 0) {
     return NextResponse.json(
-      { error: "Todas las actualizaciones son inválidas", invalid },
+      { error: "No se proporcionaron actualizaciones válidas" },
       { status: 400 }
     );
   }
@@ -117,31 +99,34 @@ export async function POST(req: NextRequest) {
     const existing = await prisma.voucherCamion.findMany({
       where: { folio: { in: folios } },
       select: {
-        folio:          true,
-        arrivalTime:    true,
+        folio:           true,
+        arrivalTime:     true,
         odometerArrival: true,
-        status:         true,
+        status:          true,
       },
     });
 
     const existingMap = new Map(existing.map((e) => [e.folio, e]));
+
     const notFoundYet = folios.filter((folio) => !existingMap.has(folio));
 
+    const repeat = normalized
+      .filter((u) => existingMap.get(u.folio)?.status === VoucherCamionStatus.ARRIVED)
+      .map((u) => u.folio);
+
+    const repeatSet = new Set(repeat);
+
     const toUpdate = normalized
-      .filter((u) => existingMap.has(u.folio))
+      .filter((u) => existingMap.has(u.folio) && !repeatSet.has(u.folio))
       .map((u) => {
         const current = existingMap.get(u.folio)!;
 
         return prisma.voucherCamion.update({
           where: { folio: u.folio },
           data: {
-            arrivalTime:     current.arrivalTime     ?? u.arrivalTime,
-            odometerArrival: current.odometerArrival ?? u.odometerArrival,
-            status:
-              current.status === VoucherCamionStatus.ARRIVED
-                ? current.status
-                : VoucherCamionStatus.ARRIVED,
-
+            arrivalTime:              current.arrivalTime     ?? u.arrivalTime,
+            odometerArrival:          current.odometerArrival ?? u.odometerArrival,
+            status:                   VoucherCamionStatus.ARRIVED,
             arrivalLatitude:          u.arrivalLatitude,
             arrivalLongitude:         u.arrivalLongitude,
             arrivalLocationAccuracy:  u.arrivalLocationAccuracy,
@@ -156,11 +141,11 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(
       {
-        updated: toUpdate.length
-          ? normalized.filter((u) => existingMap.has(u.folio)).map((u) => u.folio)
-          : [],
+        updated:     normalized
+                       .filter((u) => existingMap.has(u.folio) && !repeatSet.has(u.folio))
+                       .map((u) => u.folio),
         notFoundYet,
-        invalid,
+        repeat,
       },
       { status: 200 }
     );
