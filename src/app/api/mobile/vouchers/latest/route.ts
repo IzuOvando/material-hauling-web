@@ -49,7 +49,13 @@ export async function GET(req: NextRequest) {
       whereClause = { frenteNombre: { in: userFrentes } };
 
       if (role === "user") {
-        whereClause = { ...whereClause, createdByUsername: username };
+        whereClause = {
+          ...whereClause,
+          OR: [
+            { createdByUsername: username },
+            { arrivalCreatedByUsername: username },
+          ],
+        };
       }
     }
 

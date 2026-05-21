@@ -33,6 +33,11 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  const decoded = TokenAuthenticator.decode(accessToken);
+  if (!decoded) {
+    return NextResponse.json({ message: "Token inválido" }, { status: 401 });
+  }
+
   let body: ArrivalBatchBody;
   try {
     body = (await req.json()) as ArrivalBatchBody;
@@ -133,6 +138,7 @@ export async function POST(req: NextRequest) {
             arrivalTime:              current.arrivalTime     ?? u.arrivalTime,
             odometerArrival:          current.odometerArrival ?? u.odometerArrival,
             status:                   VoucherCamionStatus.ARRIVED,
+            arrivalCreatedByUsername: decoded.username,
             arrivalLatitude:          u.arrivalLatitude,
             arrivalLongitude:         u.arrivalLongitude,
             arrivalLocationAccuracy:  u.arrivalLocationAccuracy,

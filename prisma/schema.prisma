@@ -102,6 +102,7 @@ model VoucherCamion {
   noEmpleado   String
   checkerNo                    String?
   createdByUsername            String?
+  arrivalCreatedByUsername     String?
   arrivalCheckerName           String?
   arrivalCheckerEmployeeNumber String?
   frenteNombre String
