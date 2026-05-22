@@ -209,6 +209,57 @@ All mobile endpoints:
 - ValidationError for business logic validation
 - Proper HTTP status codes in API responses
 
+## Chart Components Pattern
+
+### Technology
+- **Library**: `shadcn/ui chart` (`src/components/ui/chart.tsx`) — wrapper over Recharts
+- **Install**: `npx shadcn@latest add chart`
+- **Key exports**: `ChartContainer`, `ChartTooltip`, `ChartTooltipContent`, `ChartLegend`, `ChartLegendContent`, `ChartConfig`
+
+### Location & Naming
+- Domain folder: `src/components/dashboard/` — same convention as `printers/`, `tickets/`
+- File naming: `{Domain}{ChartType}Chart.tsx` (e.g. `AcarreosTripsBarChart.tsx`)
+- Shared empty state: `src/components/dashboard/EmptyChart.tsx`
+- Barrel export in `index.ts` — only what is used outside the folder
+
+### Color System
+`components.json` has `cssVariables: false` — `--chart-1..5` globals **do not exist**.
+Colors are declared per-chart inside `chartConfig` using explicit hex. `ChartContainer` injects them as scoped `var(--color-{key})` at runtime; use those vars in Recharts `fill`/`stroke` props — never hardcode hex in Recharts directly.
+
+**Brand base colors (UI chrome, single-series charts):**
+- Primary green: `#133223`
+- Accent gold: `#bc955c`
+- Secondary magenta: `#9d2449`
+
+**Series palette (multi-series — bars, lines, pie slices):** use in order, stop before saturating:
+1. `#22543d` — medium green
+2. `#bc955c` — gold
+3. `#9d2449` — magenta
+4. `#4a7c59` — light green
+5. `#d4a843` — amber
+
+> `chart.tsx` must carry a comment documenting this constraint (no CSS variable globals, colors via chartConfig only).
+
+### Rules
+- All chart components are `"use client"` — Recharts is browser-only
+- `chartConfig` is declared per-file with `satisfies ChartConfig` — never `as`, never shared globally
+- Props typed from `src/types/dashboard.ts` (`TimeseriesPoint`, `BreakdownItem`, etc.)
+- Pure presentational — no `useState`, `useEffect`, or data fetching inside chart components
+- Always handle `isLoading` (→ `<Skeleton>`) and empty data (→ `<EmptyChart>`)
+- Always accept `className?: string` — parent controls layout and sizing
+- Always wrap in `Card` with `CardHeader` (title + description) and `CardContent`
+- `accessibilityLayer` prop on every Recharts root element
+
+### Layers
+
+| Layer | Location | Responsibility |
+|---|---|---|
+| Types | `src/types/dashboard.ts` | `DashboardFilters`, `TimeseriesPoint`, `BreakdownItem`, etc. |
+| Validation | `src/actions/dashboard/helpers.ts` | `getDashboardFilters()` |
+| API | `src/app/api/dashboard/*` | Endpoints returning typed data |
+| Charts | `src/components/dashboard/*Chart.tsx` | Pure visual, receives data as props |
+| Pages | `src/app/(dashboard)/trucks/dashboard/` | Composes charts, fetches data |
+
 ## Environment Setup
 
 Required environment variables (see `.env.example`):
