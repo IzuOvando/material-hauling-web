@@ -37,10 +37,14 @@ const publicApiRoutes = new Set([
   "/api/enterprises/images",
 ]);
 
+/** Auth endpoint paths — each has its own rate-limit bucket */
+export const AUTH_LOGIN_ROUTE = "/api/mobile/auth";
+export const AUTH_REFRESH_ROUTE = "/api/mobile/auth/refresh";
+
 /** API routes with stricter rate limiting (auth endpoints) */
 export const strictRateLimitRoutes = new Set([
-  "/api/mobile/auth",
-  "/api/mobile/auth/refresh",
+  AUTH_LOGIN_ROUTE,
+  AUTH_REFRESH_ROUTE,
 ]);
 
 /** Mobile API prefixes that use JWT (have internal token verification) */

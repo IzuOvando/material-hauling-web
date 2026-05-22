@@ -8,7 +8,8 @@
 import { NextResponse } from "next/server";
 import { NextAuthRequest } from "next-auth";
 import {
-  authRateLimit,
+  authLoginRateLimit,
+  authRefreshRateLimit,
   apiRateLimit,
   rateLimitResponse,
 } from "@/lib/rateLimit";
@@ -18,6 +19,7 @@ import type { Role } from "@/types/roles";
 import {
   publicWebRoutes,
   strictRateLimitRoutes,
+  AUTH_REFRESH_ROUTE,
   isPublicOrMobileApiRoute,
   roleDefaultRoute,
   canRoleAccessRoute,
@@ -38,6 +40,16 @@ function handleCorsPreflight(): NextResponse {
 }
 
 /**
+ * Pick the rate limiter for a path. Login and refresh use separate buckets so
+ * automatic refresh traffic can't exhaust the login budget (and vice versa).
+ */
+function selectRateLimiter(pathname: string) {
+  if (pathname === AUTH_REFRESH_ROUTE) return authRefreshRateLimit;
+  if (strictRateLimitRoutes.has(pathname)) return authLoginRateLimit;
+  return apiRateLimit;
+}
+
+/**
  * Apply rate limiting for API routes
  * @returns Response if rate limited, null otherwise
  */
@@ -47,9 +59,7 @@ async function applyRateLimit(
 ): Promise<Response | null> {
   const ip =
     headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "anonymous";
-  const limiter = strictRateLimitRoutes.has(pathname)
-    ? authRateLimit
-    : apiRateLimit;
+  const limiter = selectRateLimiter(pathname);
 
   const { success, limit, remaining, reset } = await limiter.limit(ip);
 

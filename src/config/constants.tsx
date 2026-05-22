@@ -12,8 +12,12 @@ const CONSTANTS = {
     REFRESH: process.env.TOKEN_EXPIRACY_REFRESH || "1d",
   },
   RATE_LIMIT: {
-    AUTH: {
+    AUTH_LOGIN: {
       REQUESTS: 10,
+      WINDOW: "15 m",
+    },
+    AUTH_REFRESH: {
+      REQUESTS: 60,
       WINDOW: "15 m",
     },
     API: {
