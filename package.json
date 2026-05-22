@@ -1,6 +1,6 @@
 {
   "name": "ticket_printer_web_app",
-  "version": "3.2.0",
+  "version": "3.2.1",
   "private": true,
   "scripts": {
     "dev": "next dev",
