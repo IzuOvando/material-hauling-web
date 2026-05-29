@@ -58,14 +58,14 @@ function BreakdownTooltip({
   metricLabel,
 }: {
   active?: boolean;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  payload?: any[];
+  payload?: unknown[];
   displayData: BreakdownItem[];
   metricLabel: string;
 }) {
   if (!active || !payload?.length) return null;
-  const entry = payload[0]?.payload as BreakdownItem | undefined;
-  const value = payload[0]?.value as number | undefined;
+  const item = payload[0] as Record<string, unknown> | undefined;
+  const entry = item?.payload as BreakdownItem | undefined;
+  const value = item?.value as number | undefined;
   const idx   = displayData.findIndex((d) => d.label === entry?.label);
   const color = paletteColor(idx >= 0 ? idx : 0);
   return (

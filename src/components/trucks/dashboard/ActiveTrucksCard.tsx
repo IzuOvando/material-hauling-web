@@ -17,22 +17,22 @@ export function ActiveTrucksCard({ frente, className }: ActiveTrucksCellProps) {
   const [error, setError] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  async function fetchActive() {
-    try {
-      const res = await fetch(
-        `/api/trucks/dashboard/active?frente=${encodeURIComponent(frente)}`,
-        { cache: "no-store" }
-      );
-      if (!res.ok) throw new Error();
-      const data: ActiveResponse = await res.json();
-      setCount(data.inTransitNow);
-      setError(false);
-    } catch {
-      setError(true);
-    }
-  }
-
   useEffect(() => {
+    async function fetchActive() {
+      try {
+        const res = await fetch(
+          `/api/trucks/dashboard/active?frente=${encodeURIComponent(frente)}`,
+          { cache: "no-store" }
+        );
+        if (!res.ok) throw new Error();
+        const data: ActiveResponse = await res.json();
+        setCount(data.inTransitNow);
+        setError(false);
+      } catch {
+        setError(true);
+      }
+    }
+
     fetchActive();
     timerRef.current = setInterval(fetchActive, POLL_INTERVAL_MS);
     return () => {

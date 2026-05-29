@@ -237,7 +237,7 @@ export function DashboardFrenteSelector({
       {filtered.size === 0 && (
         <div className="py-16 text-center text-sm text-slate-500">
           Sin resultados para{" "}
-          <span className="font-semibold">"{search}"</span>
+          <span className="font-semibold">&quot;{search}&quot;</span>
         </div>
       )}
 

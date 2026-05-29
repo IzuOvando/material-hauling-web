@@ -42,15 +42,14 @@ function AreaTooltip({
   formatLabel,
 }: {
   active?: boolean;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  payload?: any[];
+  payload?: unknown[];
   label?: string;
   color: string;
   seriesLabel: string;
   formatLabel: (d: string) => string;
 }) {
   if (!active || !payload?.length) return null;
-  const value = payload[0]?.value as number | undefined;
+  const value = (payload[0] as Record<string, unknown>)?.value as number | undefined;
   return (
     <div className="bg-white rounded-xl border border-slate-200 shadow-md px-3 py-2 text-xs">
       <p className="font-bold text-slate-900 mb-1">{formatLabel(label as string)}</p>
