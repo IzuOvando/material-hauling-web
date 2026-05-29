@@ -35,7 +35,7 @@ export default async function RootLayout({
         )}
       >
         <UserProvider user={user}>
-          <Navbar userName={user?.name} />
+<Navbar userName={user?.name} />
           {children}
           <Toaster />
           <PrinterStoreInitializer />

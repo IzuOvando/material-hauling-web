@@ -12,7 +12,7 @@ export default async function TrucksLayout({
   return (
     <main className="container my-10">
       <h1 className="text-4xl font-semibold mb-8">Aplicación de Acarreos</h1>
-      <TrucksLayoutClient nav={<TrucksNav isOwner={user.role === "owner"} />}>
+      <TrucksLayoutClient nav={<TrucksNav userRole={user.role} />}>
         {children}
       </TrucksLayoutClient>
     </main>

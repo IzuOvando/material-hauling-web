@@ -75,11 +75,6 @@ const TabTrucks = ({ isOwner }: { isOwner: boolean }) => {
           </TabsTrigger>
         )}
 
-        {/* SDN-151: agregar tab "dashboard" aquí.
-            Visibilidad inicial: solo owner y general.
-            Admin: backend ya preparado (rol verificado en /api/trucks/dashboard/*) pero tab oculto
-            y ruta bloqueada en middleware hasta liberación explícita. Ver accessControl.ts.
-            user: sin acceso en front ni en API (403 en route + redirect en middleware). */}
       </TabsList>
     </Tabs>
   );

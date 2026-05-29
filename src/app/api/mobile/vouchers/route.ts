@@ -133,10 +133,6 @@ function buildVoucherData(voucher: PrismaVoucherCamion, index: number, createdBy
   };
 }
 
-// ─────────────────────────────────────────────────────────────────
-// POST /vouchers
-// ─────────────────────────────────────────────────────────────────
-
 export async function POST(req: NextRequest) {
   const authHeader = req.headers.get("authorization");
   const accessToken = authHeader && authHeader.split(" ")[1];
@@ -229,7 +225,6 @@ export async function POST(req: NextRequest) {
 
   try {
     for (const voucher of vouchersArray) {
-      // Mobile sends "voucherTime" as the full UTC ISO string; preserve wire compat
       const rawTime = String((voucher as any).voucherTime ?? (voucher as any).voucherDatetime);
       const parsed = new Date(rawTime);
       if (isNaN(parsed.getTime())) {
