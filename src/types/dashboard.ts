@@ -1,4 +1,7 @@
-export type DashboardPeriod = "today" | "yesterday" | "week" | "month";
+export type DashboardPeriod =
+  | { type: "week";  weekStart: string }
+  | { type: "month"; year: number; month: number }
+  | { type: "year";  year: number };
 
 export interface DashboardFilters {
   frenteNombre: string;
@@ -10,10 +13,13 @@ export interface SummaryResponse {
   totalTrips: number;
   totalM3: number;
   avgM3PerTrip: number;
-  activeTrucks: number;
-  activeOperators: number;
-  topMaterial: string | null;
-  topDestino: string | null;
+  arrivalRate: number;
+  turno1Arrived: number;
+  turno2Arrived: number;
+}
+
+export interface ActiveResponse {
+  inTransitNow: number;
 }
 
 export interface TimeseriesPoint {
@@ -27,3 +33,7 @@ export interface BreakdownItem {
   trips: number;
   m3: number;
 }
+
+// TODO (SDN-141): add "origen" and "destino" to this allowlist when the module is ready
+export const ALLOWED_GROUP_BY = ["material", "checkerName"] as const;
+export type BreakdownGroupBy = (typeof ALLOWED_GROUP_BY)[number];

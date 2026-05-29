@@ -2,13 +2,16 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/db";
 import { Prisma } from "@prisma/client";
 import { VoucherCamion as PrismaVoucherCamion } from "@prisma/client";
+import { DateTime } from "luxon";
 import { TokenAuthenticator } from "@/auth/TokenAuthenticator";
 import {
   ValidationError,
   validateTurno,
 } from "@/utils/validators";
 import { invalidateFacetsCache } from "@/actions/tickets";
+import { invalidateDashboardCache } from "@/actions/dashboard";
 import { Section } from "@/types";
+import CONFIG from "@/config";
 
 
 type RejectedVoucher = {
@@ -215,9 +218,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const uniqueFrentes = [...new Set(vouchersArray.map((v) => v.frenteNombre))];
-    for (const frente of uniqueFrentes) {
-      await invalidateFacetsCache(frente, Section.VOUCHERCAMION);
-    }
+    await Promise.all(uniqueFrentes.map((frente) => invalidateFacetsCache(frente, Section.VOUCHERCAMION)));
   } catch (error) {
     console.error("❌ Error invalidando caché:", error);
     return NextResponse.json(
@@ -245,6 +246,15 @@ export async function POST(req: NextRequest) {
       { status: 500 }
     );
   }
+
+  const existingFolioSet = new Set(
+    (
+      await prisma.voucherCamion.findMany({
+        where: { folio: { in: vouchersArray.map((v) => v.folio) } },
+        select: { folio: true },
+      })
+    ).map((v) => v.folio)
+  );
 
   try {
     await prisma.$transaction(
@@ -280,6 +290,42 @@ export async function POST(req: NextRequest) {
       { error: "Error interno del servidor" },
       { status: 500 }
     );
+  }
+
+  try {
+    const newVouchers = vouchersArray.filter((v) => !existingFolioSet.has(v.folio));
+
+    type DayKey = `${string}|${string}`;
+    const byFrenteDate = new Map<DayKey, { frenteNombre: string; date: string; count: number }>();
+
+    for (const v of newVouchers) {
+      const cdmxDate = DateTime.fromJSDate((v as any).voucherDatetime as Date)
+        .setZone(CONFIG.TIMEZONE)
+        .toISODate()!;
+      const key: DayKey = `${v.frenteNombre}|${cdmxDate}`;
+      const entry = byFrenteDate.get(key) ?? { frenteNombre: v.frenteNombre, date: cdmxDate, count: 0 };
+      entry.count += 1;
+      byFrenteDate.set(key, entry);
+    }
+
+    await Promise.all(
+      Array.from(byFrenteDate.values()).map((m) =>
+        prisma.$executeRaw`
+          INSERT INTO "DashboardDailyMetrics"
+            ("frenteNombre", "date", "totalVouchers", "totalTrips", "totalM3", "turno1Arrived", "turno2Arrived", "updatedAt")
+          VALUES
+            (${m.frenteNombre}, ${m.date}, ${m.count}, 0, 0, 0, 0, NOW())
+          ON CONFLICT ("frenteNombre", "date") DO UPDATE
+          SET "totalVouchers" = "DashboardDailyMetrics"."totalVouchers" + EXCLUDED."totalVouchers",
+              "updatedAt"     = NOW()
+        `
+      )
+    );
+
+    const affectedFrentes = new Set(newVouchers.map((v) => v.frenteNombre));
+    await Promise.all(Array.from(affectedFrentes).map((frente) => invalidateDashboardCache(frente)));
+  } catch (error) {
+    console.error("❌ Error updating dashboard metrics:", error);
   }
 
   return NextResponse.json(

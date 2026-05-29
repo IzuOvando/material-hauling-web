@@ -57,6 +57,7 @@ model Frente {
   ticketsAsfalto            Asfalto[]       @relation("FrenteAsfalto")
   users                     UserFrente[]
   materials                 MaterialFrente[]
+  dashboardDailyMetrics     DashboardDailyMetrics[]
 }
 
 model Material {
@@ -129,6 +130,21 @@ model VoucherCamion {
   @@index([frenteNombre, origen])
   @@index([frenteNombre, destino])
   @@index([frenteNombre, material])
+}
+
+model DashboardDailyMetrics {
+  frenteNombre  String
+  date          String
+  totalTrips    Int      @default(0)
+  totalM3       Float    @default(0)
+  turno1Arrived Int      @default(0)
+  turno2Arrived Int      @default(0)
+  totalVouchers Int      @default(0)
+  updatedAt     DateTime @updatedAt
+
+  frente Frente @relation(fields: [frenteNombre], references: [nombre], onDelete: Cascade)
+
+  @@id([frenteNombre, date])
 }
 
 model Acarreos {

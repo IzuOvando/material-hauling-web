@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/db";
 import { Prisma } from "@prisma/client";
+import { DateTime } from "luxon";
 import { TokenAuthenticator } from "@/auth/TokenAuthenticator";
 import { VoucherCamionStatus } from "@/types/enum";
+import { invalidateDashboardCache } from "@/actions/dashboard";
+import CONFIG from "@/config";
 
 type ArrivalUpdateInput = {
   folio:                         string;
@@ -114,6 +117,10 @@ export async function POST(req: NextRequest) {
         arrivalTime:     true,
         odometerArrival: true,
         status:          true,
+        frenteNombre:    true,
+        voucherDatetime: true,
+        cubicacion:      true,
+        turno:           true,
       },
     });
 
@@ -127,37 +134,91 @@ export async function POST(req: NextRequest) {
 
     const repeatSet = new Set(repeat);
 
-    const toUpdate = normalized
-      .filter((u) => existingMap.has(u.folio) && !repeatSet.has(u.folio))
-      .map((u) => {
-        const current = existingMap.get(u.folio)!;
+    const toUpdateFolios = normalized.filter(
+      (u) => existingMap.has(u.folio) && !repeatSet.has(u.folio)
+    );
 
-        return prisma.voucherCamion.update({
-          where: { folio: u.folio },
-          data: {
-            arrivalTime:              current.arrivalTime     ?? u.arrivalTime,
-            odometerArrival:          current.odometerArrival ?? u.odometerArrival,
-            status:                   VoucherCamionStatus.ARRIVED,
-            arrivalCreatedByUsername: decoded.username,
-            arrivalLatitude:          u.arrivalLatitude,
-            arrivalLongitude:         u.arrivalLongitude,
-            arrivalLocationAccuracy:  u.arrivalLocationAccuracy,
-            arrivalLocationTimestamp: u.arrivalLocationTimestamp,
-            arrivalLocationStatus:        u.arrivalLocationStatus,
-            arrivalLocationSource:        u.arrivalLocationSource,
-            arrivalCheckerName:           u.arrivalCheckerName,
-            arrivalCheckerEmployeeNumber: u.arrivalCheckerEmployeeNumber,
-          },
-        });
+    const toUpdateOps = toUpdateFolios.map((u) => {
+      const current = existingMap.get(u.folio)!;
+      return prisma.voucherCamion.update({
+        where: { folio: u.folio },
+        data: {
+          arrivalTime:              current.arrivalTime     ?? u.arrivalTime,
+          odometerArrival:          current.odometerArrival ?? u.odometerArrival,
+          status:                   VoucherCamionStatus.ARRIVED,
+          arrivalCreatedByUsername: decoded.username,
+          arrivalLatitude:          u.arrivalLatitude,
+          arrivalLongitude:         u.arrivalLongitude,
+          arrivalLocationAccuracy:  u.arrivalLocationAccuracy,
+          arrivalLocationTimestamp: u.arrivalLocationTimestamp,
+          arrivalLocationStatus:        u.arrivalLocationStatus,
+          arrivalLocationSource:        u.arrivalLocationSource,
+          arrivalCheckerName:           u.arrivalCheckerName,
+          arrivalCheckerEmployeeNumber: u.arrivalCheckerEmployeeNumber,
+        },
       });
+    });
 
-    await prisma.$transaction(toUpdate);
+    await prisma.$transaction(toUpdateOps);
+
+    try {
+      type DayKey = `${string}|${string}`;
+      const byFrenteDate = new Map<DayKey, {
+        frenteNombre: string;
+        date: string;
+        totalTrips: number;
+        totalM3: number;
+        turno1Arrived: number;
+        turno2Arrived: number;
+      }>();
+
+      for (const u of toUpdateFolios) {
+        const v = existingMap.get(u.folio)!;
+        const cdmxDate = DateTime.fromJSDate(v.voucherDatetime)
+          .setZone(CONFIG.TIMEZONE)
+          .toISODate()!;
+        const key: DayKey = `${v.frenteNombre}|${cdmxDate}`;
+        const entry = byFrenteDate.get(key) ?? {
+          frenteNombre: v.frenteNombre,
+          date: cdmxDate,
+          totalTrips: 0,
+          totalM3: 0,
+          turno1Arrived: 0,
+          turno2Arrived: 0,
+        };
+        entry.totalTrips += 1;
+        entry.totalM3 += v.cubicacion;
+        entry.turno1Arrived += v.turno === 1 ? 1 : 0;
+        entry.turno2Arrived += v.turno === 2 ? 1 : 0;
+        byFrenteDate.set(key, entry);
+      }
+
+      await Promise.all(
+        Array.from(byFrenteDate.values()).map((m) =>
+          prisma.$executeRaw`
+            INSERT INTO "DashboardDailyMetrics"
+              ("frenteNombre", "date", "totalTrips", "totalM3", "turno1Arrived", "turno2Arrived", "updatedAt")
+            VALUES
+              (${m.frenteNombre}, ${m.date}, ${m.totalTrips}, ${m.totalM3}, ${m.turno1Arrived}, ${m.turno2Arrived}, NOW())
+            ON CONFLICT ("frenteNombre", "date") DO UPDATE
+            SET "totalTrips"    = "DashboardDailyMetrics"."totalTrips" + EXCLUDED."totalTrips",
+                "totalM3"       = "DashboardDailyMetrics"."totalM3" + EXCLUDED."totalM3",
+                "turno1Arrived" = "DashboardDailyMetrics"."turno1Arrived" + EXCLUDED."turno1Arrived",
+                "turno2Arrived" = "DashboardDailyMetrics"."turno2Arrived" + EXCLUDED."turno2Arrived",
+                "updatedAt"     = NOW()
+          `
+        )
+      );
+
+      const affectedFrentes = new Set(Array.from(byFrenteDate.values()).map((m) => m.frenteNombre));
+      await Promise.all(Array.from(affectedFrentes).map((frente) => invalidateDashboardCache(frente)));
+    } catch (error) {
+      console.error("❌ Error updating dashboard metrics:", error);
+    }
 
     return NextResponse.json(
       {
-        updated:     normalized
-                       .filter((u) => existingMap.has(u.folio) && !repeatSet.has(u.folio))
-                       .map((u) => u.folio),
+        updated:     toUpdateFolios.map((u) => u.folio),
         notFoundYet,
         repeat,
       },
