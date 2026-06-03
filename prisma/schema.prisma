@@ -42,6 +42,7 @@ model UserFrente {
 model Frente {
   nombre                    String          @id @unique
   frenteKey                 String?         @unique
+  displayName               String?
   logoUrl                   String?
   logoHash                  String?
   logoUpdatedAt             DateTime?

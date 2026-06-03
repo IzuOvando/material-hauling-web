@@ -191,6 +191,14 @@ const FrenteTools = ({ frentes, role }: Props) => {
                 onLogoUpdated={handleOnLogoUpdated}
                 onDeleteFrente={handleOnDeleteFrente}
                 isOwner={role === "owner"}
+                siblingDisplayName={(() => {
+                  const prefix = selectedFrente.nombre.split(/-F\d/)[0];
+                  return frentes.find(
+                    (f) => f.nombre !== selectedFrente.nombre &&
+                      f.nombre.startsWith(prefix + "-F") &&
+                      f.displayName
+                  )?.displayName ?? null;
+                })()}
               />
             </>
           )}

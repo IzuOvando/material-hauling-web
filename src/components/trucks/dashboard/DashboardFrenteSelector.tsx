@@ -170,14 +170,23 @@ export function DashboardFrenteSelector({
 
   const allGrouped = useMemo(() => groupByProject(frentes), [frentes]);
 
+  const stableProjectIndex = useMemo(() => {
+    const map = new Map<string, number>();
+    Array.from(allGrouped.keys()).forEach((project, i) => map.set(project, i));
+    return map;
+  }, [allGrouped]);
+
   const filtered = useMemo(() => {
     if (!search.trim()) return allGrouped;
     const q = search.trim().toLowerCase();
     const result = new Map<string, Frente[]>();
     for (const [project, projectFrentes] of allGrouped) {
-      const matching = projectFrentes.filter(
-        (f) => f.nombre.toLowerCase().includes(q) || project.toLowerCase().includes(q)
-      );
+      const displayName = projectFrentes.find((f) => f.displayName)?.displayName ?? "";
+      const projectMatches =
+        project.toLowerCase().includes(q) || displayName.toLowerCase().includes(q);
+      const matching = projectMatches
+        ? projectFrentes
+        : projectFrentes.filter((f) => f.nombre.toLowerCase().includes(q));
       if (matching.length > 0) result.set(project, matching);
     }
     return result;
@@ -242,9 +251,10 @@ export function DashboardFrenteSelector({
       )}
 
       <div className="space-y-6">
-        {Array.from(filtered.entries()).map(([project, projectFrentes], projectIndex) => {
-          const palette = PROJECT_PALETTE[projectIndex % PROJECT_PALETTE.length];
+        {Array.from(filtered.entries()).map(([project, projectFrentes]) => {
+          const palette = PROJECT_PALETTE[(stableProjectIndex.get(project) ?? 0) % PROJECT_PALETTE.length];
           const isCollapsed = !isSearching && collapsed.has(project);
+          const projectDisplayName = projectFrentes.find((f) => f.displayName)?.displayName ?? null;
 
           return (
             <div key={project} className="space-y-3">
@@ -253,9 +263,21 @@ export function DashboardFrenteSelector({
                 className="w-full flex items-center gap-3 pl-1 group/header"
               >
                 <div className={cn("w-0.5 h-6 rounded-full shrink-0 transition-colors duration-150", palette.stripe)} />
-                <span className={cn("text-sm font-bold uppercase tracking-widest", palette.headerText)}>
-                  {project}
-                </span>
+                <div className="flex flex-col items-start">
+                  {projectDisplayName && (
+                    <span className={cn("text-sm font-bold leading-tight", palette.headerText)}>
+                      {projectDisplayName}
+                    </span>
+                  )}
+                  <span className={cn(
+                    "font-bold uppercase tracking-widest",
+                    projectDisplayName
+                      ? "text-[10px] text-slate-400"
+                      : cn("text-sm", palette.headerText)
+                  )}>
+                    {project}
+                  </span>
+                </div>
                 <span className="text-xs font-medium text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">
                   {projectFrentes.length}{" "}
                   {projectFrentes.length === 1 ? "frente" : "frentes"}
