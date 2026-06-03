@@ -20,8 +20,16 @@ const CONSTANTS = {
       REQUESTS: 60,
       WINDOW: "15 m",
     },
+    // Default bucket for all web + mobile endpoints that aren't auth or
+    // dashboard. Keyed per-user (web session) or per-IP (mobile / pre-auth).
     API: {
-      REQUESTS: 30,
+      REQUESTS: 60,
+      WINDOW: "1 m",
+    },
+    // Read-only dashboard KPI endpoints: fired in parallel (3 per filter change)
+    // plus 30s polling. Keyed per-user, so a generous budget is safe.
+    DASHBOARD: {
+      REQUESTS: 120,
       WINDOW: "1 m",
     },
   },

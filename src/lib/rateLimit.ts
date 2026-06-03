@@ -2,7 +2,7 @@ import { Ratelimit } from "@upstash/ratelimit";
 import { kv } from "@vercel/kv";
 import CONSTANTS from "@/config/constants";
 
-const { AUTH_LOGIN, AUTH_REFRESH, API } = CONSTANTS.RATE_LIMIT;
+const { AUTH_LOGIN, AUTH_REFRESH, API, DASHBOARD } = CONSTANTS.RATE_LIMIT;
 
 type Window = Parameters<typeof Ratelimit.slidingWindow>[1];
 
@@ -28,6 +28,12 @@ export const apiRateLimit = new Ratelimit({
   redis: kv,
   limiter: Ratelimit.slidingWindow(API.REQUESTS, API.WINDOW as Window),
   prefix: "rl:api",
+});
+
+export const dashboardRateLimit = new Ratelimit({
+  redis: kv,
+  limiter: Ratelimit.slidingWindow(DASHBOARD.REQUESTS, DASHBOARD.WINDOW as Window),
+  prefix: "rl:dashboard",
 });
 
 export function rateLimitResponse(

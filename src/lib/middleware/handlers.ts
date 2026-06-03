@@ -11,6 +11,7 @@ import {
   authLoginRateLimit,
   authRefreshRateLimit,
   apiRateLimit,
+  dashboardRateLimit,
   rateLimitResponse,
 } from "@/lib/rateLimit";
 import { logSecurityEvent, SecurityEventType } from "@/auth/securityLogger";
@@ -21,6 +22,7 @@ import {
   strictRateLimitRoutes,
   AUTH_REFRESH_ROUTE,
   isPublicOrMobileApiRoute,
+  isDashboardApiRoute,
   roleDefaultRoute,
   canRoleAccessRoute,
 } from "./accessControl";
@@ -42,11 +44,27 @@ function handleCorsPreflight(): NextResponse {
 /**
  * Pick the rate limiter for a path. Login and refresh use separate buckets so
  * automatic refresh traffic can't exhaust the login budget (and vice versa).
+ * Dashboard KPI endpoints get their own generous bucket because they are
+ * fetched in parallel bursts (3 per filter change) and polled.
  */
 function selectRateLimiter(pathname: string) {
   if (pathname === AUTH_REFRESH_ROUTE) return authRefreshRateLimit;
   if (strictRateLimitRoutes.has(pathname)) return authLoginRateLimit;
+  if (isDashboardApiRoute(pathname)) return dashboardRateLimit;
   return apiRateLimit;
+}
+
+/**
+ * Build the rate-limit key. Authenticated web requests are keyed per-user so
+ * multiple users behind a shared office IP don't drain a single bucket; mobile
+ * and pre-auth requests (no NextAuth session) fall back to the client IP.
+ */
+type RateLimitUser = { name?: string | null } | undefined;
+
+function rateLimitKey(user: RateLimitUser, ip: string): string {
+  // `name` is the unique username on the NextAuth session (see auth.user.ts).
+  const userId = user?.name;
+  return userId ? `u:${userId}` : `ip:${ip}`;
 }
 
 /**
@@ -56,12 +74,14 @@ function selectRateLimiter(pathname: string) {
 async function applyRateLimit(
   pathname: string,
   headers: Headers,
+  user: RateLimitUser,
 ): Promise<Response | null> {
   const ip =
     headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "anonymous";
   const limiter = selectRateLimiter(pathname);
+  const key = rateLimitKey(user, ip);
 
-  const { success, limit, remaining, reset } = await limiter.limit(ip);
+  const { success, limit, remaining, reset } = await limiter.limit(key);
 
   if (!success) {
     logSecurityEvent({
@@ -100,7 +120,11 @@ export async function handleApiRoute(
 
   // Rate limiting (production only)
   if (ctx.isProduction) {
-    const rateLimitResponse = await applyRateLimit(pathname, req.headers);
+    const rateLimitResponse = await applyRateLimit(
+      pathname,
+      req.headers,
+      req.auth?.user,
+    );
     if (rateLimitResponse) return rateLimitResponse;
   }
 

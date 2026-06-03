@@ -40,6 +40,12 @@ export const strictRateLimitRoutes = new Set([
 
 const mobileApiPrefixes = ["/api/mobile"];
 
+const dashboardApiPrefix = "/api/trucks/dashboard";
+
+export function isDashboardApiRoute(pathname: string): boolean {
+  return pathname.startsWith(dashboardApiPrefix);
+}
+
 export function isPublicOrMobileApiRoute(pathname: string): boolean {
   return (
     publicApiRoutes.has(pathname) ||
