@@ -9,3 +9,6 @@ export { ActiveTrucksCard } from "./ActiveTrucksCard";
 export { TimeseriesCharts } from "./TimeseriesCharts";
 export { BreakdownChart } from "./BreakdownChart";
 export type { BreakdownChartProps } from "./BreakdownChart";
+export { DrilldownSection } from "./DrilldownSection";
+export { CheckersTab } from "./CheckersTab";
+export { OrigenDestinoTab } from "./OrigenDestinoTab";

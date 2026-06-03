@@ -206,7 +206,7 @@ export function DashboardFrenteSelector({
   if (frentes.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-24 text-center gap-3">
-        <BarChart3 className="h-12 w-12 text-slate-300" />
+        <BarChart3 className="h-12 w-12 text-slate-400" />
         <p className="text-base font-semibold text-slate-600">
           No tienes frentes asignados
         </p>

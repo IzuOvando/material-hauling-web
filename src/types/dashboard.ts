@@ -32,8 +32,9 @@ export interface BreakdownItem {
   label: string;
   trips: number;
   m3: number;
+  rate?: number; // departure: arrival rate 0-100%; arrival: avg transit minutes
 }
 
 // TODO (SDN-141): add "origen" and "destino" to this allowlist when the module is ready
-export const ALLOWED_GROUP_BY = ["material", "checkerName"] as const;
+export const ALLOWED_GROUP_BY = ["material", "departureChecker", "arrivalChecker"] as const;
 export type BreakdownGroupBy = (typeof ALLOWED_GROUP_BY)[number];

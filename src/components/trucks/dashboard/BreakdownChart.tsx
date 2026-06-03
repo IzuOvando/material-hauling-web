@@ -1,8 +1,5 @@
 "use client";
 
-// NOTE (SDN-141): To support new groupBy values (e.g. "origen", "destino"),
-// add them to ALLOWED_GROUP_BY in src/types/dashboard.ts — no changes needed here.
-
 import {
   BarChart,
   Bar,
@@ -16,6 +13,7 @@ import {
   Pie,
   Legend,
 } from "recharts";
+import { BarChart2 } from "lucide-react";
 import { ChartContainer, type ChartConfig } from "@/components/ui/chart";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import type { BreakdownItem, BreakdownGroupBy } from "@/types/dashboard";
@@ -42,10 +40,10 @@ const barConfig = { value: { label: "Valor" } } satisfies ChartConfig;
 export interface BreakdownChartProps {
   title: string;
   data: BreakdownItem[];
-  groupBy: BreakdownGroupBy; // extend via ALLOWED_GROUP_BY in types/dashboard.ts (SDN-141)
+  groupBy: BreakdownGroupBy;
   primaryMetric: "trips" | "m3";
   variant?: "bar" | "pie";
-  onBarClick?: (label: string) => void;
+  onBarClick?: (label: string, color: string) => void;
   maxItems?: number;
   isLoading?: boolean;
   className?: string;
@@ -117,8 +115,9 @@ function PieChartSkeleton() {
 
 function Empty() {
   return (
-    <div className="flex items-center justify-center h-52 text-sm text-slate-400">
-      Sin datos para el período seleccionado
+    <div className="flex flex-col items-center justify-center gap-2 h-52">
+      <BarChart2 className="h-6 w-6 text-slate-200" />
+      <p className="text-sm font-medium text-slate-400">Sin datos para el período seleccionado</p>
     </div>
   );
 }
@@ -201,7 +200,7 @@ function BarVariant({
   displayData: BreakdownItem[];
   dataKey: "trips" | "m3";
   metricLabel: string;
-  onBarClick?: (label: string) => void;
+  onBarClick?: (label: string, color: string) => void;
 }) {
   const barHeight = Math.max(192, displayData.length * 36);
 
@@ -239,7 +238,10 @@ function BarVariant({
             dataKey={dataKey}
             radius={[0, 4, 4, 0]}
             cursor={onBarClick ? "pointer" : undefined}
-            onClick={onBarClick ? (entry: BreakdownItem) => onBarClick(entry.label) : undefined}
+            onClick={onBarClick ? (entry: BreakdownItem) => {
+              const idx = displayData.findIndex((d) => d.label === entry.label);
+              onBarClick(entry.label, paletteColor(idx >= 0 ? idx : 0));
+            } : undefined}
           >
             {displayData.map((entry, i) => (
               <Cell key={entry.label} fill={paletteColor(i)} fillOpacity={0.9} />
@@ -312,7 +314,7 @@ function PieVariant({
   displayData: BreakdownItem[];
   dataKey: "trips" | "m3";
   metricLabel: string;
-  onBarClick?: (label: string) => void;
+  onBarClick?: (label: string, color: string) => void;
 }) {
   const pieConfig = displayData.reduce<ChartConfig>((acc, item, i) => {
     acc[item.label] = { label: item.label, color: paletteColor(i) };
@@ -331,7 +333,10 @@ function PieVariant({
             cy="46%"
             outerRadius={65}
             cursor={onBarClick ? "pointer" : undefined}
-            onClick={onBarClick ? (entry: BreakdownItem) => onBarClick(entry.label) : undefined}
+            onClick={onBarClick ? (entry: BreakdownItem) => {
+              const idx = displayData.findIndex((d) => d.label === entry.label);
+              onBarClick(entry.label, paletteColor(idx >= 0 ? idx : 0));
+            } : undefined}
             label={SmartPieLabel}
             labelLine={false}
           >

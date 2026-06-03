@@ -10,6 +10,7 @@ import {
   Tooltip,
 } from "recharts";
 import { DateTime } from "luxon";
+import { BarChart2 } from "lucide-react";
 import { ChartContainer, type ChartConfig } from "@/components/ui/chart";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import type { TimeseriesPoint, DashboardPeriod } from "@/types/dashboard";
@@ -102,8 +103,9 @@ function CardShell({ title, children }: { title: string; children: React.ReactNo
 
 function EmptyContent() {
   return (
-    <div className="flex items-center justify-center h-36 text-sm text-slate-400">
-      Sin datos para el período seleccionado
+    <div className="flex flex-col items-center justify-center gap-2 h-36">
+      <BarChart2 className="h-6 w-6 text-slate-200" />
+      <p className="text-sm font-medium text-slate-400">Sin datos para el período seleccionado</p>
     </div>
   );
 }

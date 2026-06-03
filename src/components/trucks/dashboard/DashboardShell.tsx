@@ -11,6 +11,9 @@ import { StatCardsRow, StatCardsRowSkeleton } from "./StatCardsRow";
 import { ActiveTrucksCard } from "./ActiveTrucksCard";
 import { TimeseriesCharts } from "./TimeseriesCharts";
 import { BreakdownChart } from "./BreakdownChart";
+import { DrilldownSection } from "./DrilldownSection";
+import { CheckersTab } from "./CheckersTab";
+import { OrigenDestinoTab } from "./OrigenDestinoTab";
 import type { SummaryResponse, TimeseriesPoint, BreakdownItem } from "@/types/dashboard";
 
 interface DashboardShellProps {
@@ -20,9 +23,12 @@ interface DashboardShellProps {
 export function DashboardShell({ frente }: DashboardShellProps) {
   const router = useRouter();
   const { period, setSelectedMaterial } = useDashboardStore();
+  const [materialColor, setMaterialColor] = useState<string>("#22543d");
   const [summary, setSummary] = useState<SummaryResponse | null>(null);
   const [timeseries, setTimeseries] = useState<TimeseriesPoint[]>([]);
   const [breakdown, setBreakdown] = useState<BreakdownItem[]>([]);
+  const [departureCheckers, setDepartureCheckers] = useState<BreakdownItem[]>([]);
+  const [arrivalCheckers, setArrivalCheckers] = useState<BreakdownItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -51,11 +57,21 @@ export function DashboardShell({ frente }: DashboardShellProps) {
         if (!res.ok) return res.json().then((e) => Promise.reject(e.error));
         return res.json() as Promise<BreakdownItem[]>;
       }),
+      fetch(`/api/trucks/dashboard/breakdown?${params}&groupBy=departureChecker`, { signal }).then((res) => {
+        if (!res.ok) return res.json().then((e) => Promise.reject(e.error));
+        return res.json() as Promise<BreakdownItem[]>;
+      }),
+      fetch(`/api/trucks/dashboard/breakdown?${params}&groupBy=arrivalChecker`, { signal }).then((res) => {
+        if (!res.ok) return res.json().then((e) => Promise.reject(e.error));
+        return res.json() as Promise<BreakdownItem[]>;
+      }),
     ])
-      .then(([summaryData, timeseriesData, breakdownData]) => {
+      .then(([summaryData, timeseriesData, breakdownData, departureData, arrivalData]) => {
         setSummary(summaryData);
         setTimeseries(timeseriesData);
         setBreakdown(breakdownData);
+        setDepartureCheckers(departureData);
+        setArrivalCheckers(arrivalData);
         setLoading(false);
       })
       .catch((err) => {
@@ -101,7 +117,7 @@ export function DashboardShell({ frente }: DashboardShellProps) {
         <TabsList>
           <TabsTrigger value="resumen">Resumen</TabsTrigger>
           <TabsTrigger value="checadores">Checadores</TabsTrigger>
-          {/* <TabsTrigger value="origen-destino">Origen / Destino</TabsTrigger> — hidden until SDN-141 */}
+          {/* <TabsTrigger value="origen-destino">Origen / Destino</TabsTrigger> */}
         </TabsList>
         <TabsContent value="resumen">
           <div className="mt-4 space-y-4">
@@ -114,7 +130,7 @@ export function DashboardShell({ frente }: DashboardShellProps) {
                 primaryMetric="trips"
                 variant="bar"
                 isLoading={loading}
-                onBarClick={(label) => setSelectedMaterial(label)}
+                onBarClick={(label, color) => { setSelectedMaterial(label); setMaterialColor(color); }}
               />
               <BreakdownChart
                 title="Distribución por material"
@@ -123,15 +139,17 @@ export function DashboardShell({ frente }: DashboardShellProps) {
                 primaryMetric="trips"
                 variant="pie"
                 isLoading={loading}
-                onBarClick={(label) => setSelectedMaterial(label)}
+                onBarClick={(label, color) => { setSelectedMaterial(label); setMaterialColor(color); }}
               />
             </div>
+            <DrilldownSection frente={frente} period={period} materialColor={materialColor} />
           </div>
         </TabsContent>
         <TabsContent value="checadores">
-          <div className="h-48 rounded-xl bg-slate-100 flex items-center justify-center text-sm text-slate-400 mt-4">
-            Checadores — próximamente (SDN-155)
-          </div>
+          <CheckersTab departureData={departureCheckers} arrivalData={arrivalCheckers} isLoading={loading} />
+        </TabsContent>
+        <TabsContent value="origen-destino">
+          <OrigenDestinoTab />
         </TabsContent>
       </Tabs>
     </div>

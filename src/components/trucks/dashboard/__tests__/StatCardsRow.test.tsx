@@ -15,11 +15,11 @@ const mockSummary: SummaryResponse = {
 describe("StatCardsRow", () => {
   it("renders all 5 stat cards", () => {
     render(<StatCardsRow data={mockSummary} />);
-    expect(screen.getByText("Viajes completados")).toBeInTheDocument();
+    expect(screen.getByText("Viajes")).toBeInTheDocument();
     expect(screen.getByText("M³ acarreados")).toBeInTheDocument();
-    expect(screen.getByText("M³ por viaje")).toBeInTheDocument();
-    expect(screen.getByText("Tasa de arribo")).toBeInTheDocument();
-    expect(screen.getByText("Distribución turnos")).toBeInTheDocument();
+    expect(screen.getByText("M³ / viaje")).toBeInTheDocument();
+    expect(screen.getByText("Arribo")).toBeInTheDocument();
+    expect(screen.getByText("Turnos")).toBeInTheDocument();
   });
 
   it("displays correct values", () => {

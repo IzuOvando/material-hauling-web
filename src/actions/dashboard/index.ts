@@ -158,22 +158,53 @@ async function _getDashboardBreakdown(
     return rows.map((r) => ({ label: r.label, trips: Number(r.trips), m3: Number(r.m3) }));
   }
 
-  const rows = await prisma.voucherCamion.groupBy({
-    by: ["checkerName"],
-    where: {
-      frenteNombre: filters.frenteNombre,
-      status: "ARRIVED",
-      voucherDatetime: { gte: filters.dateFrom, lte: filters.dateTo },
-    },
-    _count: { checkerName: true },
-    _sum: { cubicacion: true },
-    orderBy: { _count: { checkerName: "desc" } },
-  });
+  if (groupBy === "departureChecker") {
+    type RawRow = { label: string; trips: bigint; arrived: bigint; m3: number };
+    const rows: RawRow[] = await prisma.$queryRaw(Prisma.sql`
+      SELECT
+        "checkerName"                                          AS label,
+        COUNT(*)                                               AS trips,
+        COUNT(*) FILTER (WHERE status = 'ARRIVED'::"VoucherStatus") AS arrived,
+        COALESCE(SUM(cubicacion) FILTER (WHERE status = 'ARRIVED'::"VoucherStatus"), 0) AS m3
+      FROM "VoucherCamion"
+      WHERE "frenteNombre" = ${filters.frenteNombre}
+        AND "voucherDatetime" >= ${filters.dateFrom}
+        AND "voucherDatetime" <= ${filters.dateTo}
+        AND "checkerName" IS NOT NULL AND "checkerName" <> ''
+      GROUP BY "checkerName"
+      ORDER BY COUNT(*) DESC
+      LIMIT 20`);
+    return rows.map((r) => ({
+      label: r.label,
+      trips: Number(r.trips),
+      m3: Number(r.m3),
+      rate: Number(r.trips) > 0 ? Math.round((Number(r.arrived) / Number(r.trips)) * 100) : 0,
+    }));
+  }
 
+  // arrivalChecker
+  type RawArrival = { label: string; trips: bigint; m3: number; avg_transit_min: number };
+  const rows: RawArrival[] = await prisma.$queryRaw(Prisma.sql`
+    SELECT
+      "arrivalCheckerName"                                                         AS label,
+      COUNT(*)                                                                     AS trips,
+      COALESCE(SUM(cubicacion), 0)                                                 AS m3,
+      ROUND(AVG(EXTRACT(EPOCH FROM ("arrivalTime" - "voucherDatetime")) / 60))::int AS avg_transit_min
+    FROM "VoucherCamion"
+    WHERE "frenteNombre" = ${filters.frenteNombre}
+      AND status = 'ARRIVED'::"VoucherStatus"
+      AND "arrivalCheckerName" IS NOT NULL AND "arrivalCheckerName" <> ''
+      AND "arrivalTime" IS NOT NULL
+      AND "voucherDatetime" >= ${filters.dateFrom}
+      AND "voucherDatetime" <= ${filters.dateTo}
+    GROUP BY "arrivalCheckerName"
+    ORDER BY COUNT(*) DESC
+    LIMIT 20`);
   return rows.map((r) => ({
-    label: r.checkerName,
-    trips: r._count.checkerName,
-    m3: r._sum.cubicacion ?? 0,
+    label: r.label,
+    trips: Number(r.trips),
+    m3: Number(r.m3),
+    rate: Number(r.avg_transit_min),
   }));
 }
 

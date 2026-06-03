@@ -4,3 +4,4 @@ export { default as DownloadVoucherCamionButton } from "./DownloadVoucherCamionB
 export { default as DeleteVoucherButton } from "./DeleteVoucherButton";
 export { default as DeleteVouchersDialog } from "./DeleteVouchersDialog";
 export { default as CloseCycleSheet } from "./CloseCycleSheet";
+export * from "./dashboard";

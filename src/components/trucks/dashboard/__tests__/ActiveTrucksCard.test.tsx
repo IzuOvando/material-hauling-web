@@ -25,7 +25,7 @@ describe("ActiveTrucksCard", () => {
   it("shows skeleton while loading", () => {
     mockFetchResponse(5);
     render(<ActiveTrucksCard frente={FRENTE} />);
-    expect(screen.getByText("En tránsito ahora")).toBeInTheDocument();
+    expect(screen.getByText("En tránsito")).toBeInTheDocument();
     expect(screen.queryByText("5")).not.toBeInTheDocument();
   });
 
@@ -33,7 +33,7 @@ describe("ActiveTrucksCard", () => {
     mockFetchResponse(7);
     render(<ActiveTrucksCard frente={FRENTE} />);
     await waitFor(() => expect(screen.getByText("7")).toBeInTheDocument());
-    expect(screen.getByText("En vivo")).toBeInTheDocument();
+    expect(screen.getByText("En tránsito")).toBeInTheDocument();
   });
 
   it("shows dash on fetch error", async () => {
