@@ -3,6 +3,7 @@ import { createHash } from "crypto";
 import { revalidatePath } from "next/cache";
 import prisma from "@/lib/db";
 import blobClient from "@/lib/blobClient";
+import { getAppUser } from "@/auth/auth.user";
 import { normalizeFrenteKey } from "@/utils/normalizeFrenteKey";
 
 const MAX_SIZE_BYTES = 500 * 1024;
@@ -12,6 +13,14 @@ export async function POST(
   req: NextRequest,
   { params }: { params: { frenteKey: string } }
 ) {
+  const user = await getAppUser();
+  if (!user) {
+    return NextResponse.json({ error: "No autenticado." }, { status: 401 });
+  }
+  if (user.role !== "owner") {
+    return NextResponse.json({ error: "Sin autorización." }, { status: 403 });
+  }
+
   const frenteKey = normalizeFrenteKey(params.frenteKey);
 
   const contentType = req.headers.get("content-type") ?? "";

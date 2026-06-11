@@ -94,13 +94,15 @@ const FrenteTrucksTools = ({
                 <CircleCheck className="text-accent" />
               </Button>
             )}
-            <Button
-              className="p-2 bg-transparent hover:bg-[rgba(var(--accent-light-color)/50%)]"
-              onClick={() => setOpenDelete(true)}
-              title="Eliminar registros"
-            >
-              <Trash className="text-accent" />
-            </Button>
+            {isOwner && (
+              <Button
+                className="p-2 bg-transparent hover:bg-[rgba(var(--accent-light-color)/50%)]"
+                onClick={() => setOpenDelete(true)}
+                title="Eliminar registros"
+              >
+                <Trash className="text-accent" />
+              </Button>
+            )}
           </div>
           {isOwner && (
             <CloseCycleSheet

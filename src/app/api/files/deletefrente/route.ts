@@ -1,4 +1,5 @@
 import prisma from "@/lib/db";
+import { getAppUser } from "@/auth/auth.user";
 import { NextRequest, NextResponse } from "next/server";
 import blobClient from "@/lib/blobClient";
 import { invalidateFacetsCache } from "@/actions/tickets";
@@ -6,6 +7,14 @@ import { TicketArea } from "@/types";
 import { logSecurityEvent, SecurityEventType } from "@/auth/securityLogger";
 
 export async function POST(req: NextRequest) {
+  const user = await getAppUser();
+  if (!user) {
+    return NextResponse.json({ error: "No autenticado." }, { status: 401 });
+  }
+  if (user.role !== "owner") {
+    return NextResponse.json({ error: "Sin autorización." }, { status: 403 });
+  }
+
   try {
     const { nombre } = await req.json();
 

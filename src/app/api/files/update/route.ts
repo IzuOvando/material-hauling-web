@@ -1,8 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/db";
 import blobClient from "@/lib/blobClient";
+import { getAppUser } from "@/auth/auth.user";
 
 export async function POST(req: NextRequest) {
+  const user = await getAppUser();
+  if (!user) {
+    return NextResponse.json({ error: "No autenticado." }, { status: 401 });
+  }
+  if (user.role !== "owner") {
+    return NextResponse.json({ error: "Sin autorización." }, { status: 403 });
+  }
+
   if (req.method !== "POST") {
     return NextResponse.json({ error: "Method Not Allowed" }, { status: 405 });
   }
