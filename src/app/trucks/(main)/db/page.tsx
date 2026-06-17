@@ -1,30 +1,52 @@
-import { FrenteTrucksTools } from "@/components/frentes";
-import { TableTicket } from "@/components/tickets";
-import CONFIG from "@/config";
+import { redirect } from "next/navigation";
 import prisma from "@/lib/db";
-import { Section } from "@/types";
 import { requireAuth } from "@/auth/guards";
+import { FrenteSelector, type FrenteKpiSnapshot } from "@/components/trucks";
+
+function getTodayCDMX(): string {
+  return new Date().toLocaleDateString("sv-SE", {
+    timeZone: "America/Mexico_City",
+  });
+}
 
 export default async function DBEmptyPage() {
   const user = await requireAuth();
 
   const frentes =
     user.role === "owner" || user.role === "general"
-      ? await prisma.frente.findMany()
+      ? await prisma.frente.findMany({ orderBy: { nombre: "asc" } })
       : await prisma.frente.findMany({
           where: { nombre: { in: user.frentes } },
+          orderBy: { nombre: "asc" },
         });
 
+  if (user.role === "admin" && frentes.length === 1) {
+    redirect(`/trucks/db/${frentes[0].nombre}`);
+  }
+
+  const todayRows = await prisma.dashboardDailyMetrics.findMany({
+    where: { date: getTodayCDMX() },
+    select: {
+      frenteNombre: true,
+      totalTrips: true,
+      totalM3: true,
+      turno1Arrived: true,
+      turno2Arrived: true,
+    },
+  });
+
+  const todayMetrics: Record<string, FrenteKpiSnapshot> = Object.fromEntries(
+    todayRows.map((r) => [r.frenteNombre, r])
+  );
+
   return (
-    <>
-    <TableTicket
-      tickets={[]}
-      area={Section.VOUCHERCAMION}
-      page={CONFIG.PAGINATION.DEFAULT_PAGE}
-      limit={CONFIG.PAGINATION.DEFAULT_LIMIT}
-      total={0}
-      componentTopLeft={<FrenteTrucksTools frentes={frentes} readOnly={user.role === "general"} isOwner={user.role === "owner"} />}
+    <FrenteSelector
+      frentes={frentes}
+      todayMetrics={todayMetrics}
+      basePath="/trucks/db"
+      title="Selecciona un frente"
+      subtitle="Elige el frente para ver y filtrar sus vouchers"
+      ctaLabel="Ver vouchers"
     />
-    </>
   );
 }

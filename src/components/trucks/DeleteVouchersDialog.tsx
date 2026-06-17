@@ -1,4 +1,5 @@
 "use client";
+import { useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -8,6 +9,7 @@ import {
 } from "@/components/ui/dialog";
 
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Frente } from "@prisma/client";
 import { DeleteVoucherButton } from ".";
 
@@ -22,29 +24,57 @@ const DeleteVouchersDialog = ({
   setOpen,
   frente,
 }: DeleteVouchersDialogProps) => {
-  const handleAction = async () => {
-    setOpen(false);
-  };
+  const [confirmText, setConfirmText] = useState("");
 
-  const handleEnter = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") handleAction();
+  // Reset the confirmation field whenever the dialog opens or closes.
+  useEffect(() => {
+    if (!open) setConfirmText("");
+  }, [open]);
+
+  const isConfirmed = confirmText.trim() === frente.nombre;
+
+  const handleCancel = () => {
+    setOpen(false);
   };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="sm:max-w-[450px]" onKeyDown={handleEnter}>
+      <DialogContent className="sm:max-w-[450px]">
         <DialogHeader>
-          <DialogTitle>Eliminar Datos de Trucks</DialogTitle>
+          <DialogTitle>Eliminar datos de Trucks</DialogTitle>
         </DialogHeader>
-        <span className="text-left text-sm mb-5">
-          Al realizar esta acción eliminaras todos los registros de Trucks en el
-          frente <b>{frente.nombre}</b>.
-        </span>
-        <DialogFooter className="mt-[-1rem]">
-          <Button variant="outline" onClick={handleAction}>
+        <div className="space-y-4 text-left text-sm">
+          <p>
+            Al realizar esta acción eliminarás{" "}
+            <b>todos los registros de Trucks</b> en el frente{" "}
+            <b>{frente.nombre}</b>. Esta acción no se puede deshacer.
+          </p>
+          <div className="space-y-1.5">
+            <label
+              htmlFor="confirm-frente"
+              className="block text-xs text-slate-500"
+            >
+              Escribe{" "}
+              <span className="font-mono font-semibold text-secondary">
+                {frente.nombre}
+              </span>{" "}
+              para confirmar.
+            </label>
+            <Input
+              id="confirm-frente"
+              autoComplete="off"
+              autoFocus
+              value={confirmText}
+              onChange={(e) => setConfirmText(e.target.value)}
+              placeholder={frente.nombre}
+            />
+          </div>
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={handleCancel}>
             Cancelar
           </Button>
-          <DeleteVoucherButton frente={frente.nombre} />
+          <DeleteVoucherButton frente={frente.nombre} disabled={!isConfirmed} />
         </DialogFooter>
       </DialogContent>
     </Dialog>

@@ -4,7 +4,13 @@ import { useToast } from "@/components/ui/use-toast";
 import { Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-const DeleteVouchersButton = ({ frente }: { frente: string }) => {
+const DeleteVouchersButton = ({
+  frente,
+  disabled = false,
+}: {
+  frente: string;
+  disabled?: boolean;
+}) => {
   const { toast } = useToast();
   const router = useRouter();
 
@@ -50,8 +56,9 @@ const DeleteVouchersButton = ({ frente }: { frente: string }) => {
 
   return (
     <Button
-      className="py-2 px-4 bg-red-500 text-white hover:bg-red-600"
+      className="py-2 px-4 bg-red-500 text-white hover:bg-red-600 disabled:opacity-50 disabled:hover:bg-red-500"
       onClick={deleteVouchers}
+      disabled={disabled}
     >
       <Trash className="mr-2" />
       Eliminar Registros
