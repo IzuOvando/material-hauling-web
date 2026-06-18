@@ -1,7 +1,7 @@
 "use server";
 import Image from "next/image";
 import { signOut } from "@/auth";
-import { ToggleNavButton, LogoutButton } from "./common";
+import { LogoutButton } from "./common";
 
 const Navbar = ({ userName }: { userName: string | undefined }) => {
   return (
@@ -24,7 +24,6 @@ const Navbar = ({ userName }: { userName: string | undefined }) => {
       >
         {userName ? (
           <>
-            <ToggleNavButton />
             <span className="hidden md:block">Bienvenido, {userName}</span>
             <LogoutButton />
           </>
