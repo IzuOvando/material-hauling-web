@@ -10,26 +10,26 @@ const TabTrucks = ({ isOwner }: { isOwner: boolean }) => {
   const router = useRouter();
 
   useEffect(() => {
-    if (pathname.includes("/trucks/db")) {
+    if (pathname.includes("/db")) {
       setActiveTab("db");
-    } else if (pathname.includes("/trucks/materials")) {
+    } else if (pathname.includes("/materials")) {
       setActiveTab("materials");
-    } else if (pathname.includes("/trucks/users")) {
+    } else if (pathname.includes("/users")) {
       setActiveTab("users");
-    } else if (pathname.includes("/trucks")) {
+    } else if (pathname === "/") {
       setActiveTab("qr");
     }
   }, [pathname]);
 
   const handleTabChange = (value: string) => {
     if (value === "qr") {
-      router.push("/trucks");
+      router.push("/");
     } else if (value === "db") {
-      router.push("/trucks/db");
+      router.push("/db");
     } else if (value === "materials") {
-      router.push("/trucks/materials");
+      router.push("/materials");
     } else if (value === "users") {
-      router.push("/trucks/users");
+      router.push("/users");
     }
   };
 

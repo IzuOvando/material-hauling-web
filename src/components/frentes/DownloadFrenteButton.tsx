@@ -4,21 +4,10 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import FullScreenLoader from "@/components/ui/full-screen-loader";
-import { TicketArea } from "@/types";
 import { Download } from "lucide-react";
 import CONFIG from "@/config";
 
-const DownloadFrenteButton = ({
-  frente,
-  area,
-  areTickets,
-}: {
-  frente: string;
-  area: TicketArea;
-  areTickets: {
-    [key in TicketArea]: boolean;
-  };
-}) => {
+const DownloadFrenteButton = ({ frente }: { frente: string }) => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -42,7 +31,7 @@ const DownloadFrenteButton = ({
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ frente: frente, area: area }),
+        body: JSON.stringify({ frente, section: "VOUCHERCAMION" }),
       });
 
       if (!response.ok) {
@@ -50,11 +39,11 @@ const DownloadFrenteButton = ({
       }
 
       const blob = await response.blob();
-      const filename = `${frente}_${area}_tickets.xlsx`;
+      const filename = `${frente}_vouchercamion.xlsx`;
       saveFile(blob, filename);
       const { dismiss } = toast({
         title: "Descarga Exitosa",
-        description: `La base de datos de tickets de ${area.toLowerCase()} para el frente "${frente}" se ha descargado correctamente como ${filename}.`,
+        description: `La base de datos de vouchers para el frente "${frente}" se ha descargado correctamente como ${filename}.`,
         variant: "success",
       });
       disableToast = dismiss;
@@ -74,8 +63,6 @@ const DownloadFrenteButton = ({
       disableToast();
     }, 3000);
   };
-
-  if (!areTickets[area]) return null;
 
   return (
     <>

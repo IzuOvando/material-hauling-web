@@ -11,11 +11,6 @@ import {
 import { formatVoucherId } from "@/helpers/formatters/formatVoucherId";
 
 export const datasetConfigs: Record<DatasetKey, DatasetConfig> = {
-  gasolina: {},
-  acarreos: {},
-  concreto: {},
-  asfalto: {},
-
   vouchercamion: {
     headerMap: voucherCamionHeaderMap,
     transforms: {

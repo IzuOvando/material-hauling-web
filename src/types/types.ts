@@ -1,30 +1,17 @@
 import type { ReactNode } from "react";
-import { TicketPrinter } from "@/lib/printers";
-import { Acarreos, Gasolina, Concreto, VoucherCamion, Asfalto } from "@prisma/client";
-
-export type Printer = {
-  name: string;
-  ip: string;
-  status: "online" | "offline" | "connecting" | "paperEnd";
-  device?: TicketPrinter;
-};
+import { VoucherCamion } from "@prisma/client";
 
 export type FacetedFilter = {
-  field: keyof Acarreos | keyof Gasolina | keyof Concreto | keyof VoucherCamion | keyof Asfalto;
+  field: keyof VoucherCamion;
   options: {
     value: string;
     count: number;
   }[];
 };
 
-export type Ticket = Acarreos | Gasolina | Concreto | VoucherCamion |Asfalto;
+export type Ticket = VoucherCamion;
 
-export type DatasetKey =
-  | "gasolina"
-  | "acarreos"
-  | "concreto"
-  | "vouchercamion"
-  | "asfalto";
+export type DatasetKey = "vouchercamion";
 
 export type TransformFn = (value: any, record: any) => any;
 

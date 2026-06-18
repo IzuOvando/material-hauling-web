@@ -50,7 +50,7 @@ const FrenteTrucksTools = ({
 
   useEffect(() => {
     if (selectedFrente) {
-      router.push(`/trucks/db/${selectedFrente.nombre}`);
+      router.push(`/db/${selectedFrente.nombre}`);
     }
   }, [selectedFrente, router]);
 

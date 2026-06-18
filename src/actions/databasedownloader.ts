@@ -22,14 +22,6 @@ export default class DatabaseDownloader {
     const where = { frenteNombre: frenteName };
 
     switch (key) {
-        case "gasolina":
-        return prisma.gasolina.findMany({ where });
-        case "acarreos":
-        return prisma.acarreos.findMany({ where });
-        case "concreto":
-        return prisma.concreto.findMany({ where });
-        case "asfalto":
-        return prisma.asfalto.findMany({ where });
         case "vouchercamion": {
           const vouchers = await prisma.voucherCamion.findMany({ where });
           // Split voucherDatetime, exclude createdByUsername (internal field)
@@ -97,19 +89,11 @@ export default class DatabaseDownloader {
     const frente = await prisma.frente.findUnique({
       where: { nombre: frenteName },
       select: {
-        excelUrlAcarreosBlob: true,
-        excelUrlGasolinaBlob: true,
-        excelUrlConcretoBlob: true,
-        excelUrlAsfaltoBlob: true,
         excelUrlVoucherCamionBlob: true,
       },
     });
 
     const oldUrlMap: Record<DatasetKey, string | null | undefined> = {
-      acarreos: frente?.excelUrlAcarreosBlob,
-      gasolina: frente?.excelUrlGasolinaBlob,
-      concreto: frente?.excelUrlConcretoBlob,
-      asfalto: frente?.excelUrlAsfaltoBlob,
       vouchercamion: frente?.excelUrlVoucherCamionBlob,
     };
 
@@ -135,10 +119,6 @@ export default class DatabaseDownloader {
     blobUrl: string
   ): Promise<void> {
     const updateFieldMap: Record<DatasetKey, string> = {
-      acarreos: "excelUrlAcarreosBlob",
-      gasolina: "excelUrlGasolinaBlob",
-      concreto: "excelUrlConcretoBlob",
-      asfalto: "excelUrlAsfaltoBlob",
       vouchercamion: "excelUrlVoucherCamionBlob",
     };
 

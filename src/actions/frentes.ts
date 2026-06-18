@@ -1,6 +1,11 @@
 "use server";
 
 import prisma from "@/lib/db";
+import type { Frente } from "@prisma/client";
+
+export async function getAllFreentes(): Promise<Frente[]> {
+  return prisma.frente.findMany({ orderBy: { nombre: "asc" } });
+}
 
 export async function updateFrenteDisplayName(
   nombre: string,

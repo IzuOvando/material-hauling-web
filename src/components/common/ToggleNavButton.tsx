@@ -10,10 +10,15 @@ const ToggleNavButton = () => {
 
   if (!isOwner) return null;
 
-  const isTrucks = pathname.includes("/trucks");
+  const isAcarreos =
+    pathname === "/" ||
+    pathname.startsWith("/db") ||
+    pathname.startsWith("/dashboard") ||
+    pathname.startsWith("/materials") ||
+    pathname.startsWith("/users");
 
   const handleGoTo = () => {
-    router.push(isTrucks ? "/" : "/trucks");
+    router.push(isAcarreos ? "/voucher" : "/");
   };
 
   return (
@@ -22,7 +27,7 @@ const ToggleNavButton = () => {
       onClick={handleGoTo}
       className="bg-primary hover:bg-primary-light active:bg-primary-dark hidden md:block"
     >
-      {isTrucks ? "Ir a Vouchers" : "Ir a Acarreos"}
+      {isAcarreos ? "Ir a Vouchers" : "Ir a Acarreos"}
     </Button>
   );
 };

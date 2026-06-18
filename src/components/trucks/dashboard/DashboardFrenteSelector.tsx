@@ -21,7 +21,7 @@ export function DashboardFrenteSelector({
     <FrenteSelector
       frentes={frentes}
       todayMetrics={todayMetrics}
-      basePath="/trucks/dashboard"
+      basePath="/dashboard"
       title="Selecciona un frente"
       subtitle="Elige el frente para visualizar su dashboard de KPIs"
       ctaLabel="Ver dashboard"

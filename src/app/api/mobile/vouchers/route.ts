@@ -8,7 +8,7 @@ import {
   ValidationError,
   validateTurno,
 } from "@/utils/validators";
-import { invalidateFacetsCache } from "@/actions/tickets";
+
 import { invalidateDashboardCache } from "@/actions/dashboard";
 import { Section } from "@/types";
 import CONFIG from "@/config";
@@ -214,7 +214,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const uniqueFrentes = [...new Set(vouchersArray.map((v) => v.frenteNombre))];
-    await Promise.all(uniqueFrentes.map((frente) => invalidateFacetsCache(frente, Section.VOUCHERCAMION)));
+
   } catch (error) {
     console.error("❌ Error invalidando caché:", error);
     return NextResponse.json(

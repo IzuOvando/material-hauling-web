@@ -1,8 +1,7 @@
 import { redirect } from "next/navigation";
 import prisma from "@/lib/db";
-import { requireDashboardAccess } from "@/auth/guards";
-import { DashboardFrenteSelector } from "@/components/trucks/dashboard/DashboardFrenteSelector";
-import type { FrenteKpiSnapshot } from "@/components/trucks/dashboard/DashboardFrenteSelector";
+import { requireAuth } from "@/auth/guards";
+import { FrenteSelector, type FrenteKpiSnapshot } from "@/components/trucks";
 
 function getTodayCDMX(): string {
   return new Date().toLocaleDateString("sv-SE", {
@@ -10,8 +9,8 @@ function getTodayCDMX(): string {
   });
 }
 
-export default async function DashboardPage() {
-  const user = await requireDashboardAccess();
+export default async function DBEmptyPage() {
+  const user = await requireAuth();
 
   const frentes =
     user.role === "owner" || user.role === "general"
@@ -22,7 +21,7 @@ export default async function DashboardPage() {
         });
 
   if (user.role === "admin" && frentes.length === 1) {
-    redirect(`/trucks/dashboard/${frentes[0].nombre}`);
+    redirect(`/db/${frentes[0].nombre}`);
   }
 
   const todayRows = await prisma.dashboardDailyMetrics.findMany({
@@ -40,5 +39,14 @@ export default async function DashboardPage() {
     todayRows.map((r) => [r.frenteNombre, r])
   );
 
-  return <DashboardFrenteSelector frentes={frentes} todayMetrics={todayMetrics} />;
+  return (
+    <FrenteSelector
+      frentes={frentes}
+      todayMetrics={todayMetrics}
+      basePath="/db"
+      title="Selecciona un frente"
+      subtitle="Elige el frente para ver y filtrar sus vouchers"
+      ctaLabel="Ver vouchers"
+    />
+  );
 }

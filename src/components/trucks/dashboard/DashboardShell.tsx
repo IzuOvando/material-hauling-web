@@ -87,7 +87,7 @@ export function DashboardShell({ frente }: DashboardShellProps) {
     <div className="space-y-4">
       <div className="flex items-center gap-3">
         <button
-          onClick={() => router.push("/trucks/dashboard")}
+          onClick={() => router.push("/dashboard")}
           aria-label="Volver a proyectos"
           className="h-8 w-8 rounded-full border-2 border-accent/50 flex items-center justify-center text-accent hover:bg-accent hover:border-accent hover:text-white transition-all shrink-0"
         >

@@ -37,7 +37,7 @@ const DeleteVouchersButton = ({
       });
       disableToast = dismiss;
       setTimeout(() => {
-        router.push("/trucks/db");
+        router.push("/db");
       }, 2000);
     } catch (error) {
       console.error("Error al eliminar los registros:", error);

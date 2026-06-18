@@ -16,7 +16,7 @@ export interface FrenteKpiSnapshot {
 interface FrenteSelectorProps {
   frentes: Frente[];
   todayMetrics?: Record<string, FrenteKpiSnapshot>;
-  /** Route prefix the cards navigate to, e.g. "/trucks/dashboard" or "/trucks/db". */
+  /** Route prefix the cards navigate to, e.g. "/dashboard" or "/db". */
   basePath: string;
   title?: string;
   subtitle?: string;

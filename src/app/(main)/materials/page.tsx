@@ -7,7 +7,7 @@ export default async function MaterialsManagementPage() {
   const user = await requireAuth();
 
   if (user.role !== "owner") {
-    redirect("/trucks/db");
+    redirect("/db");
   }
 
   const frentes = await prisma.frente.findMany({

@@ -4,6 +4,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { QrCode, Database, Package, Users, BarChart3 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Role } from "@/types/roles";
+import { FrentesManagerSheet } from "@/components/frentes/FrentesManagerSheet";
 
 interface NavItem {
   value: string;
@@ -22,7 +23,7 @@ const NAV_ITEMS: NavItem[] = [
     label: "Generador de QRs",
     description: "Genera QRs para camiones",
     icon: QrCode,
-    href: "/trucks",
+    href: "/",
     allowedRoles: ["owner"],
     iconColor: "text-emerald-600",
     iconBg:    "bg-emerald-500/10 group-hover:bg-emerald-500/20",
@@ -32,7 +33,7 @@ const NAV_ITEMS: NavItem[] = [
     label: "Bases de Datos",
     description: "Historial de vouchers",
     icon: Database,
-    href: "/trucks/db",
+    href: "/db",
     allowedRoles: ["owner", "admin", "general"],
     iconColor: "text-blue-500",
     iconBg:    "bg-blue-500/10 group-hover:bg-blue-500/20",
@@ -42,7 +43,7 @@ const NAV_ITEMS: NavItem[] = [
     label: "Dashboard",
     description: "KPIs y métricas",
     icon: BarChart3,
-    href: "/trucks/dashboard",
+    href: "/dashboard",
     allowedRoles: ["owner", "general"],
     iconColor: "text-violet-500",
     iconBg:    "bg-violet-500/10 group-hover:bg-violet-500/20",
@@ -52,7 +53,7 @@ const NAV_ITEMS: NavItem[] = [
     label: "Materiales",
     description: "Gestión de materiales",
     icon: Package,
-    href: "/trucks/materials",
+    href: "/materials",
     allowedRoles: ["owner"],
     iconColor: "text-amber-500",
     iconBg:    "bg-amber-500/10 group-hover:bg-amber-500/20",
@@ -62,7 +63,7 @@ const NAV_ITEMS: NavItem[] = [
     label: "Usuarios",
     description: "CRM de usuarios",
     icon: Users,
-    href: "/trucks/users",
+    href: "/users",
     allowedRoles: ["owner"],
     iconColor: "text-sky-500",
     iconBg:    "bg-sky-500/10 group-hover:bg-sky-500/20",
@@ -74,7 +75,7 @@ export function TrucksNav({ userRole }: { userRole: Role }) {
   const router = useRouter();
 
   const isActive = (item: NavItem) => {
-    if (item.href === "/trucks") return pathname === "/trucks";
+    if (item.href === "/") return pathname === "/";
     return pathname.startsWith(item.href);
   };
 
@@ -126,6 +127,15 @@ export function TrucksNav({ userRole }: { userRole: Role }) {
             </button>
           );
         })}
+
+        {userRole === "owner" && (
+          <div className="mt-4 pt-4 border-t border-slate-200">
+            <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground px-4 mb-2">
+              Administración
+            </p>
+            <FrentesManagerSheet />
+          </div>
+        )}
       </nav>
 
       <nav className="flex md:hidden gap-1.5 overflow-x-auto pb-1 w-full">

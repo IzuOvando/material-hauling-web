@@ -121,7 +121,11 @@ const AddFrenteDialog = ({
           {error}
         </span>
         <DialogFooter className="mt-[-1rem]">
-          <Button onClick={handleAction} disabled={loading}>
+          <Button
+            onClick={handleAction}
+            disabled={loading}
+            className="bg-secondary hover:bg-secondary-dark text-white"
+          >
             {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             {loading ? "Creando..." : "Crear"}
           </Button>

@@ -131,6 +131,7 @@ export default function LogoCropModal({ imageSrc, open, onConfirm, onClose }: Pr
                 size="sm"
                 onClick={handlePreview}
                 disabled={processing || !completedCrop}
+                className="bg-secondary hover:bg-secondary-dark text-white"
               >
                 {processing ? (
                   <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
@@ -167,7 +168,11 @@ export default function LogoCropModal({ imageSrc, open, onConfirm, onClose }: Pr
                 <ArrowLeft className="mr-1.5 h-3.5 w-3.5" />
                 Volver
               </Button>
-              <Button size="sm" onClick={handleConfirm}>
+              <Button
+                size="sm"
+                onClick={handleConfirm}
+                className="bg-primary hover:bg-primary-dark text-white"
+              >
                 <Check className="mr-1.5 h-3.5 w-3.5" />
                 Confirmar
               </Button>

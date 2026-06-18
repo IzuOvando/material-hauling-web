@@ -2,21 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import axios from "axios";
 import prisma from "@/lib/db";
 import { getAppUser } from "@/auth/auth.user";
-import { Section, TicketArea } from "@/types";
+import { Section } from "@/types";
 import DatabaseDownloader from "@/actions/databasedownloader";
 
 const isValidAreaOrSection = (type: string) => {
   const upperCaseType = type.toUpperCase();
-
-  if (Object.values(TicketArea).includes(upperCaseType as TicketArea)) {
-    return true;
-  }
-
-  if (Object.values(Section).includes(upperCaseType as Section)) {
-    return true;
-  }
-
-  return false;
+  return Object.values(Section).includes(upperCaseType as Section);
 };
 
 export async function POST(req: NextRequest) {
@@ -38,7 +29,7 @@ export async function POST(req: NextRequest) {
   }
 
   const data = await req.json();
-  
+
   const { frente, area, section } = data;
   const type = area || section;
 
@@ -49,12 +40,11 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  let blobUrl: string | null;
   const typeLower = type.toLowerCase();
 
   if (typeLower === "vouchercamion") {
     try {
-      const fileName = `bbd_${frente}.xlsx`
+      const fileName = `bbd_${frente}.xlsx`;
       const outputExcel = `db_output/excel/${frente}`;
       const downloader = new DatabaseDownloader();
       await downloader.downloadDatabase(outputExcel, typeLower, fileName);
@@ -83,17 +73,7 @@ export async function POST(req: NextRequest) {
     });
   }
 
-  if (typeLower === "acarreos") {
-    blobUrl = foundFrente.excelUrlAcarreosBlob;
-  } else if (typeLower === "gasolina") {
-    blobUrl = foundFrente.excelUrlGasolinaBlob;
-  } else if (typeLower === "vouchercamion") {
-    blobUrl = foundFrente.excelUrlVoucherCamionBlob;
-  } else if (typeLower === "asfalto") {
-    blobUrl = foundFrente.excelUrlAsfaltoBlob;
-  } else {
-    blobUrl = foundFrente.excelUrlConcretoBlob;
-  }
+  const blobUrl = foundFrente.excelUrlVoucherCamionBlob;
 
   if (!blobUrl) {
     return new NextResponse(

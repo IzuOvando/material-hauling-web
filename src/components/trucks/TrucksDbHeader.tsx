@@ -2,17 +2,20 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Trash, CircleCheck, MoreVertical } from "lucide-react";
+import { ArrowLeft, Trash, CircleCheck, MoreVertical, Plus, Pencil } from "lucide-react";
 import { Frente } from "@prisma/client";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useFrenteStore } from "@/store";
 import { DeleteVouchersDialog, CloseCycleSheet } from "@/components/trucks";
+import AddFrenteDialog from "@/components/frentes/AddFrenteDialog";
+import EditFrenteDialog from "@/components/frentes/EditFrenteDialog";
 
 interface TrucksDbHeaderProps {
   frente: string;
@@ -33,6 +36,8 @@ export function TrucksDbHeader({
   const { selectedFrente, setSelectedFrente } = useFrenteStore();
   const [openDelete, setOpenDelete] = useState(false);
   const [openCloseCycle, setOpenCloseCycle] = useState(false);
+  const [openAddFrente, setOpenAddFrente] = useState(false);
+  const [openEditFrente, setOpenEditFrente] = useState(false);
 
   const current = frentes.find((f) => f.nombre === frente);
 
@@ -46,12 +51,18 @@ export function TrucksDbHeader({
 
   const project = current?.nombre.split(/-F\d/)[0] ?? frente;
 
+  // Find sibling frentes (same project prefix) to share displayName
+  const siblingDisplayName =
+    frentes.find(
+      (f) => f.nombre !== frente && f.nombre.startsWith(project) && f.displayName
+    )?.displayName ?? null;
+
   return (
     <div className="flex flex-wrap items-center justify-between gap-3">
       <div className="flex items-center gap-3 min-w-0">
         <button
           type="button"
-          onClick={() => router.push("/trucks/db")}
+          onClick={() => router.push("/db")}
           className="h-9 w-9 shrink-0 rounded-full border-2 border-accent/50 flex items-center justify-center text-accent hover:bg-accent hover:border-accent hover:text-white transition-all"
           aria-label="Volver a la selección de frentes"
           title="Cambiar de frente"
@@ -68,7 +79,7 @@ export function TrucksDbHeader({
         </div>
       </div>
 
-      {canActOnVouchers && !readOnly && (
+      {!readOnly && (
         <div className="flex items-center gap-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -85,6 +96,24 @@ export function TrucksDbHeader({
             <DropdownMenuContent align="end" className="w-48">
               {isOwner && (
                 <DropdownMenuItem
+                  onClick={() => setOpenAddFrente(true)}
+                  className="cursor-pointer gap-2"
+                >
+                  <Plus className="h-4 w-4 text-primary" />
+                  Añadir frente
+                </DropdownMenuItem>
+              )}
+              {isOwner && current && (
+                <DropdownMenuItem
+                  onClick={() => setOpenEditFrente(true)}
+                  className="cursor-pointer gap-2"
+                >
+                  <Pencil className="h-4 w-4 text-primary" />
+                  Editar frente
+                </DropdownMenuItem>
+              )}
+              {isOwner && canActOnVouchers && (
+                <DropdownMenuItem
                   onClick={() => setOpenCloseCycle(true)}
                   className="cursor-pointer gap-2"
                 >
@@ -92,17 +121,40 @@ export function TrucksDbHeader({
                   Cerrar ciclo
                 </DropdownMenuItem>
               )}
-              <DropdownMenuItem
-                onClick={() => setOpenDelete(true)}
-                className="cursor-pointer gap-2 text-secondary focus:text-secondary"
-              >
-                <Trash className="h-4 w-4" />
-                Eliminar registros
-              </DropdownMenuItem>
+              {canActOnVouchers && (
+                <>
+                  {isOwner && <DropdownMenuSeparator />}
+                  <DropdownMenuItem
+                    onClick={() => setOpenDelete(true)}
+                    className="cursor-pointer gap-2 text-secondary focus:text-secondary"
+                  >
+                    <Trash className="h-4 w-4" />
+                    Eliminar registros
+                  </DropdownMenuItem>
+                </>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
 
           {isOwner && (
+            <AddFrenteDialog
+              open={openAddFrente}
+              setOpen={setOpenAddFrente}
+            />
+          )}
+          {isOwner && current && (
+            <EditFrenteDialog
+              open={openEditFrente}
+              setOpen={setOpenEditFrente}
+              frente={current}
+              isOwner={isOwner}
+              siblingDisplayName={siblingDisplayName}
+              onFrenteUpdated={() => router.refresh()}
+              onLogoUpdated={() => router.refresh()}
+              onDeleteFrente={() => router.push("/db")}
+            />
+          )}
+          {isOwner && canActOnVouchers && (
             <CloseCycleSheet
               open={openCloseCycle}
               setOpen={setOpenCloseCycle}

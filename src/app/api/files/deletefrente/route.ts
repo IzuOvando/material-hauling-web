@@ -2,8 +2,8 @@ import prisma from "@/lib/db";
 import { getAppUser } from "@/auth/auth.user";
 import { NextRequest, NextResponse } from "next/server";
 import blobClient from "@/lib/blobClient";
-import { invalidateFacetsCache } from "@/actions/tickets";
-import { TicketArea } from "@/types";
+
+
 import { logSecurityEvent, SecurityEventType } from "@/auth/securityLogger";
 
 export async function POST(req: NextRequest) {
@@ -51,8 +51,6 @@ export async function POST(req: NextRequest) {
       where: { nombre },
     });
 
-    await invalidateFacetsCache(nombre, TicketArea.ACARREOS);
-    await invalidateFacetsCache(nombre, TicketArea.GASOLINA);
 
     logSecurityEvent({
       type: SecurityEventType.DATA_DELETE,

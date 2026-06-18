@@ -1,16 +1,16 @@
 import type { Role } from "@/types/roles";
 
-export const publicWebRoutes = new Set(["/trucks/voucher", "/forbidden"]);
+export const publicWebRoutes = new Set(["/voucher", "/forbidden"]);
 
-const restrictedRoleRoutes = ["/trucks/db"];
+const restrictedRoleRoutes = ["/db"];
 
-const ownerGeneralOnlyRoutes = ["/trucks/dashboard"];
+const ownerGeneralOnlyRoutes = ["/dashboard"];
 
 export const roleDefaultRoute: Record<Role, string> = {
   owner: "/",
-  admin: "/trucks/db",
+  admin: "/db",
   user: "/forbidden",
-  general: "/trucks/db",
+  general: "/db",
 };
 
 export function canRoleAccessRoute(role: Role, pathname: string): boolean {
