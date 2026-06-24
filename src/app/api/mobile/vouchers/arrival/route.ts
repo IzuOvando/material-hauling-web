@@ -5,6 +5,7 @@ import { DateTime } from "luxon";
 import { TokenAuthenticator } from "@/auth/TokenAuthenticator";
 import { VoucherCamionStatus } from "@/types/enum";
 import { invalidateDashboardCache } from "@/actions/dashboard";
+import { invalidateTrucksFacetsCache } from "@/actions/trucks";
 import CONFIG from "@/config";
 
 type ArrivalUpdateInput = {
@@ -212,6 +213,7 @@ export async function POST(req: NextRequest) {
 
       const affectedFrentes = new Set(Array.from(byFrenteDate.values()).map((m) => m.frenteNombre));
       await Promise.all(Array.from(affectedFrentes).map((frente) => invalidateDashboardCache(frente)));
+      await Promise.all(Array.from(affectedFrentes).map((frente) => invalidateTrucksFacetsCache(frente)));
     } catch (error) {
       console.error("❌ Error updating dashboard metrics:", error);
     }

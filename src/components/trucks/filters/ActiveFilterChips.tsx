@@ -55,13 +55,11 @@ export function ActiveFilterChips() {
 
   const chips: { key: string; label: string; onRemove: () => void }[] = [];
 
-  if (state.period !== "yesterday") {
-    chips.push({
-      key: "period",
-      label: `Periodo: ${getPeriodChipLabel(state)}`,
-      onRemove: () => setPeriod("yesterday"),
-    });
-  }
+  chips.push({
+    key: "period",
+    label: `Periodo: ${getPeriodChipLabel(state)}`,
+    onRemove: () => setPeriod("yesterday"),
+  });
   if (state.status !== "ALL") {
     chips.push({
       key: "status",

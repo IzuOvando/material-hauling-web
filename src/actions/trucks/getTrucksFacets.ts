@@ -67,7 +67,7 @@ export async function getTrucksFrentesFacet(
   }));
 }
 
-const CACHE_TTL_SECONDS = 21600; // 6 hours
+const CACHE_TTL_SECONDS = 300; // 5 minutes
 
 const cacheKey = (frente: string, filters: string | undefined) =>
   `trucks_facets_${frente}_${filters ? md5(filters).toString() : "none"}`;

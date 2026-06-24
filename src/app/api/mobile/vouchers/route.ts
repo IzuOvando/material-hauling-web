@@ -10,7 +10,7 @@ import {
 } from "@/utils/validators";
 
 import { invalidateDashboardCache } from "@/actions/dashboard";
-import { Section } from "@/types";
+import { invalidateTrucksFacetsCache } from "@/actions/trucks";
 import CONFIG from "@/config";
 
 
@@ -319,6 +319,7 @@ export async function POST(req: NextRequest) {
 
     const affectedFrentes = new Set(newVouchers.map((v) => v.frenteNombre));
     await Promise.all(Array.from(affectedFrentes).map((frente) => invalidateDashboardCache(frente)));
+    await Promise.all(Array.from(affectedFrentes).map((frente) => invalidateTrucksFacetsCache(frente)));
   } catch (error) {
     console.error("❌ Error updating dashboard metrics:", error);
   }

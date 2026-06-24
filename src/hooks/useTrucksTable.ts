@@ -84,7 +84,7 @@ function stateToMap(state: TrucksFilterState): FilterMap {
 
   if (state.period === "custom" && state.range) {
     map.voucherDatetimeRange = [rangeToString(state.range)];
-  } else if (state.period !== DEFAULT_PERIOD) {
+  } else {
     const r = getPeriodRange(state.period as Exclude<PeriodPreset, "custom">);
     map.voucherDatetimeRange = [rangeToString(r)];
   }
