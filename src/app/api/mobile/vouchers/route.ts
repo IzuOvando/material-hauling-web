@@ -254,10 +254,13 @@ export async function POST(req: NextRequest) {
   try {
     await prisma.$transaction(
       vouchersArray.map((voucher, index) => {
-        const data = buildVoucherData(voucher, index, decoded.username);
+        const { frenteNombre, ...restData } = buildVoucherData(voucher, index, decoded.username);
         return prisma.voucherCamion.upsert({
           where: { folio: voucher.folio },
-          create: data,
+          create: {
+            ...restData,
+            frente: { connect: { nombre: frenteNombre } },
+          },
           update: {},
         });
       })
