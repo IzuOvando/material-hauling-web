@@ -97,6 +97,19 @@ function buildVoucherData(voucher: PrismaVoucherCamion, index: number, createdBy
     );
   }
 
+  const cubicacionFloat =
+    typeof voucher.cubicacion === "string"
+      ? parseFloat(voucher.cubicacion)
+      : voucher.cubicacion;
+
+  if (cubicacionFloat === undefined || cubicacionFloat === null || Number.isNaN(cubicacionFloat)) {
+    console.error(`❌ Cubicación inválida en voucher [${index}]`, voucher.cubicacion);
+    throw new Prisma.PrismaClientValidationError(
+      `Cubicación inválida: ${voucher.cubicacion}`,
+      { clientVersion: "5.22.0" }
+    );
+  }
+
   return {
     folio: voucher.folio,
     voucherDatetime: (voucher as any).voucherDatetime,
@@ -111,7 +124,7 @@ function buildVoucherData(voucher: PrismaVoucherCamion, index: number, createdBy
     localidad: voucher.localidad.trim(),
     noEconomico: voucher.noEconomico.trim(),
     empresa: voucher.empresa.trim(),
-    cubicacion: voucher.cubicacion,
+    cubicacion: cubicacionFloat,
     frenteNombre: voucher.frenteNombre,
     checkerName: voucher.checkerName.trim(),
     noEmpleado: voucher.noEmpleado.trim(),
