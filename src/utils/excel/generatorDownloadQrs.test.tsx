@@ -12,6 +12,7 @@ describe("getCamionesQRSVG", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    JSZip.prototype.file = jest.fn();
     JSZip.prototype.generateAsync = jest.fn().mockResolvedValue(new Blob());
     (saveAs as unknown as jest.Mock).mockImplementation(mockSaveAs);
   });
@@ -25,9 +26,9 @@ describe("getCamionesQRSVG", () => {
         operador: "Juan Pérez",
         turno: 1,
         localidad: "Localidad 1",
-        frente: "T6F9",
+        frente: "SDN-F1",
         empresa: "Mabina SA de CV",
-        noempleado: "568TXP"
+        noempleado: "568TXP",
       },
       {
         placas: "XYZ789",
@@ -36,9 +37,9 @@ describe("getCamionesQRSVG", () => {
         operador: "María López",
         turno: 2,
         localidad: "Localidad 2",
-        frente: "T9F5",
+        frente: "SDN-F2",
         empresa: "Mabina SA de CV",
-        noempleado: "568TXP"
+        noempleado: "568TXP",
       },
     ];
 
@@ -49,6 +50,7 @@ describe("getCamionesQRSVG", () => {
         .setNoeconomico(camion.noeconomico)
         .setOperador(camion.operador)
         .setTurno(camion.turno)
+        .setLocalidad(camion.localidad)
         .setFrente(camion.frente)
         .setEmpresa(camion.empresa)
         .setNoempleado(camion.noempleado)
@@ -56,9 +58,7 @@ describe("getCamionesQRSVG", () => {
     );
 
     await getCamionesQRSVG(metadatas);
-    expect(JSZip.prototype.generateAsync).toHaveBeenCalledWith({
-      type: "blob",
-    });
+    expect(JSZip.prototype.generateAsync).toHaveBeenCalledWith({ type: "blob" });
     expect(mockSaveAs).toHaveBeenCalledWith(expect.any(Blob), "qrcodes.zip");
   });
 
@@ -71,7 +71,8 @@ describe("getCamionesQRSVG", () => {
           .setNoeconomico("")
           .setOperador("Juan Pérez")
           .setTurno(1)
-          .setFrente("")
+          .setLocalidad("Localidad 1")
+          .setFrente("SDN-F1")
           .setEmpresa("")
           .setNoempleado("")
           .build(),

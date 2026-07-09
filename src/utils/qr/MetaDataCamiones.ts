@@ -27,14 +27,15 @@ class MetaDataCamiones {
     return this;
   }
 
-  public setVolumen(volumen: number): MetaDataCamiones {
-    if (volumen <= 0) {
+  public setVolumen(volumen: number | string): MetaDataCamiones {
+    const parsed = typeof volumen === "string" ? parseFloat(volumen) : volumen;
+    if (!Number.isFinite(parsed) || parsed <= 0) {
       throw new ValidationError(
         "volumen",
-        "El volumen es requerido y debe ser mayor a 0."
+        "El volumen es requerido y debe ser un número decimal mayor a 0."
       );
     }
-    this.cubicacion = volumen;
+    this.cubicacion = parsed;
     return this;
   }
 

@@ -44,3 +44,8 @@ next-env.d.ts
 # Claude Local Settings
 /.claude/*.local.*
 graphify-out/
+.graphify_detect.json
+.graphify_python
+
+# Local scratch files
+ejemplar_web.txt
