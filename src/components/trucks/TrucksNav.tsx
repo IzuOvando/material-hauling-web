@@ -44,7 +44,7 @@ const NAV_ITEMS: NavItem[] = [
     description: "KPIs y métricas",
     icon: BarChart3,
     href: "/dashboard",
-    allowedRoles: ["owner", "general"],
+    allowedRoles: ["owner", "general", "admin"],
     iconColor: "text-violet-500",
     iconBg:    "bg-violet-500/10 group-hover:bg-violet-500/20",
   },
