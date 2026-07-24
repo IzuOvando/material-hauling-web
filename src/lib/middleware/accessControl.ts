@@ -2,7 +2,7 @@ import type { Role } from "@/types/roles";
 
 export const publicWebRoutes = new Set(["/voucher", "/forbidden"]);
 
-const restrictedRoleRoutes = ["/db"];
+const restrictedRoleRoutes = ["/db", "/dashboard"];
 
 const ownerGeneralOnlyRoutes = ["/dashboard"];
 
