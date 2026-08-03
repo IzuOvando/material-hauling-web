@@ -1,22 +1,3 @@
-/**
- * Migration: resize existing logos in Vercel Blob to max 500px width.
- *
- * Logos uploaded before the resize-at-upload change may still be at full
- * resolution (e.g. 2250×2250 px). This script:
- *   1. Finds all frentes with a logoUrl in the database.
- *   2. Downloads each logo from Vercel Blob.
- *   3. Resizes it to ≤500 px width (maintaining aspect ratio) with sharp.
- *   4. Re-uploads the resized PNG to the same blob path.
- *   5. Updates logoHash and logoUpdatedAt in the database.
- *
- * Usage:
- *   npx ts-node --project tsconfig.json -e "require('./scripts/migrate-logos-resize.ts')"
- *   # or if you have dotenv-cli:
- *   dotenv -e .env -- npx ts-node scripts/migrate-logos-resize.ts
- *
- * Set DRY_RUN=true to preview without writing anything.
- */
-
 import { createHash } from "crypto";
 import sharp from "sharp";
 import { PrismaClient } from "@prisma/client";
@@ -52,7 +33,7 @@ async function main() {
   for (const frente of frentes) {
     const { nombre, frenteKey, logoUrl, logoHash: existingHash } = frente;
 
-    if (!logoUrl || !frenteKey) continue; // narrowing — already filtered above
+    if (!logoUrl || !frenteKey) continue;
 
     process.stdout.write(`[${frenteKey}] Downloading... `);
 

@@ -7,7 +7,7 @@ import blobClient from "@/lib/blobClient";
 import { getAppUser } from "@/auth/auth.user";
 import { normalizeFrenteKey } from "@/utils/normalizeFrenteKey";
 
-const MAX_INPUT_SIZE_BYTES = 10 * 1024 * 1024; // 10 MB limit on raw input
+const MAX_INPUT_SIZE_BYTES = 10 * 1024 * 1024;
 const ALLOWED_TYPES = ["image/png", "image/jpeg"];
 const LOGO_MAX_WIDTH = 500;
 
