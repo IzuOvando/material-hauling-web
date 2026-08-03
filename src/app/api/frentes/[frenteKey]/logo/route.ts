@@ -1,13 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createHash } from "crypto";
 import { revalidatePath } from "next/cache";
+import sharp from "sharp";
 import prisma from "@/lib/db";
 import blobClient from "@/lib/blobClient";
 import { getAppUser } from "@/auth/auth.user";
 import { normalizeFrenteKey } from "@/utils/normalizeFrenteKey";
 
-const MAX_SIZE_BYTES = 500 * 1024;
+const MAX_INPUT_SIZE_BYTES = 10 * 1024 * 1024; // 10 MB limit on raw input
 const ALLOWED_TYPES = ["image/png", "image/jpeg"];
+const LOGO_MAX_WIDTH = 500;
 
 export async function POST(
   req: NextRequest,
@@ -35,9 +37,9 @@ export async function POST(
   const arrayBuffer = await req.arrayBuffer();
   const buffer = Buffer.from(arrayBuffer);
 
-  if (buffer.byteLength > MAX_SIZE_BYTES) {
+  if (buffer.byteLength > MAX_INPUT_SIZE_BYTES) {
     return NextResponse.json(
-      { error: `File too large. Maximum size is 500 KB.` },
+      { error: `File too large. Maximum input size is 10 MB.` },
       { status: 400 }
     );
   }
@@ -55,14 +57,27 @@ export async function POST(
     );
   }
 
-  const logoHash = createHash("sha256").update(buffer).digest("hex");
+  let resizedBuffer: Buffer;
+  try {
+    resizedBuffer = await sharp(buffer)
+      .resize({ width: LOGO_MAX_WIDTH, withoutEnlargement: true })
+      .png()
+      .toBuffer();
+  } catch (err) {
+    console.error("Failed to resize logo:", err);
+    return NextResponse.json(
+      { error: "Invalid or corrupted image file." },
+      { status: 400 }
+    );
+  }
 
-  const ext = mimeType === "image/png" ? "png" : "jpg";
-  const blobPathname = `logos/${frenteKey}.${ext}`;
+  const logoHash = createHash("sha256").update(resizedBuffer).digest("hex");
+
+  const blobPathname = `logos/${frenteKey}.png`;
 
   let newLogoUrl: string;
   try {
-    const result = await blobClient.putBlob(blobPathname, buffer, {
+    const result = await blobClient.putBlob(blobPathname, resizedBuffer, {
       access: "public",
     });
     newLogoUrl = result.url;
