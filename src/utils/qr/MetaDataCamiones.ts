@@ -108,8 +108,8 @@ class MetaDataCamiones {
   public setNoempleado(noempleado: string): MetaDataCamiones {
     if (!noempleado || noempleado.trim() === "") {
       throw new ValidationError(
-        "empresa",
-        "La empresa es requerida y no puede estar vacía."
+        "noempleado",
+        "El No. Empleado es requerido y no puede estar vacío."
       );
     }
     this.noEmpleado = noempleado;
