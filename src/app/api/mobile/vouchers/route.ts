@@ -11,6 +11,7 @@ import {
 
 import { invalidateDashboardCache } from "@/actions/dashboard";
 import { invalidateTrucksFacetsCache } from "@/actions/trucks";
+import { normalizeMaterial } from "@/utils/normalizeMaterial";
 import CONFIG from "@/config";
 
 
@@ -83,7 +84,21 @@ function validateTurnos(vouchers: PrismaVoucherCamion[]): ValidationError[] {
   return errors;
 }
 
-function buildVoucherData(voucher: PrismaVoucherCamion, index: number, createdByUsername: string) {
+async function resolveMaterialName(rawMaterial: string, frenteNombre: string): Promise<string> {
+  const normalized = normalizeMaterial(rawMaterial);
+  const match = await prisma.material.findFirst({
+    where: {
+      normalizedNombre: normalized,
+      isActive: true,
+      frentes: { some: { frenteNombre } },
+    },
+    select: { nombre: true },
+  });
+  // If catalog match found, use the canonical display name; otherwise store normalized
+  return match?.nombre ?? normalized;
+}
+
+function buildVoucherData(voucher: PrismaVoucherCamion, index: number, createdByUsername: string, resolvedMaterial: string) {
   const odometerFloat =
     typeof voucher.odometer === "string"
       ? parseFloat(voucher.odometer)
@@ -112,7 +127,7 @@ function buildVoucherData(voucher: PrismaVoucherCamion, index: number, createdBy
     voucherDatetime: (voucher as any).voucherDatetime,
     destino: voucher.destino.trim(),
     origen: voucher.origen.trim(),
-    material: voucher.material.trim(),
+    material: resolvedMaterial,
     placas: voucher.placas.trim(),
     odometer: odometerFloat,
     status: voucher.status ?? "IN_TRANSIT",
@@ -262,9 +277,13 @@ export async function POST(req: NextRequest) {
   );
 
   try {
+    const resolvedMaterials = await Promise.all(
+      vouchersArray.map((v) => resolveMaterialName(v.material, v.frenteNombre))
+    );
+
     await prisma.$transaction(
       vouchersArray.map((voucher, index) => {
-        const { frenteNombre, ...restData } = buildVoucherData(voucher, index, decoded.username);
+        const { frenteNombre, ...restData } = buildVoucherData(voucher, index, decoded.username, resolvedMaterials[index]);
         return prisma.voucherCamion.upsert({
           where: { folio: voucher.folio },
           create: {

@@ -62,11 +62,12 @@ model Frente {
 }
 
 model Material {
-  id        String   @id @default(uuid())
-  nombre    String   @unique
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id               String   @id @default(uuid())
+  nombre           String   @unique
+  normalizedNombre String   @unique
+  isActive         Boolean  @default(true)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
   frentes MaterialFrente[]
 }

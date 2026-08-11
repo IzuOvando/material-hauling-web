@@ -2,6 +2,7 @@
 
 import prisma from "@/lib/db";
 import { getAppUser } from "@/auth/auth.user";
+import { normalizeMaterial } from "@/utils/normalizeMaterial";
 
 // --- Catalog Actions ---
 
@@ -28,6 +29,8 @@ export async function createMaterial(nombre: string) {
     throw new Error("El nombre del material no puede estar vacío");
   }
 
+  const normalizedNombre = normalizeMaterial(trimmed);
+
   // Check if material exists but is inactive — reactivate it
   const existing = await prisma.material.findUnique({
     where: { nombre: trimmed },
@@ -46,7 +49,7 @@ export async function createMaterial(nombre: string) {
   }
 
   return prisma.material.create({
-    data: { nombre: trimmed },
+    data: { nombre: trimmed, normalizedNombre },
     select: { id: true, nombre: true, isActive: true },
   });
 }
