@@ -5,7 +5,7 @@ ALTER TABLE "Material" ADD COLUMN "normalizedNombre" TEXT;
 
 -- Populate from existing records using unaccent (extension enabled in previous migration)
 UPDATE "Material"
-SET "normalizedNombre" = unaccent(LOWER(TRIM("nombre")));
+SET "normalizedNombre" = immutable_unaccent(LOWER(TRIM("nombre")));
 
 -- Apply NOT NULL and UNIQUE constraints after population
 ALTER TABLE "Material" ALTER COLUMN "normalizedNombre" SET NOT NULL;

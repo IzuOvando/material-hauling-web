@@ -28,15 +28,15 @@
 --                     (means the most frequent variant will be used as canonical)
 -- -----------------------------------------------------------------------------
 SELECT
-  unaccent(LOWER(TRIM(material)))                    AS normalized_key,
+  immutable_unaccent(LOWER(TRIM(material)))                    AS normalized_key,
   array_agg(DISTINCT material ORDER BY material)     AS variants,
   COUNT(*)                                           AS total_vouchers,
   NOT EXISTS (
     SELECT 1 FROM "Material" m
-    WHERE unaccent(LOWER(TRIM(m."nombre"))) = unaccent(LOWER(TRIM(material)))
+    WHERE immutable_unaccent(LOWER(TRIM(m."nombre"))) = immutable_unaccent(LOWER(TRIM(material)))
   )                                                  AS needs_catalog
 FROM "VoucherCamion"
-GROUP BY unaccent(LOWER(TRIM(material)))
+GROUP BY immutable_unaccent(LOWER(TRIM(material)))
 HAVING COUNT(DISTINCT material) > 1
 ORDER BY total_vouchers DESC;
 
@@ -55,26 +55,26 @@ SELECT
   vc.material                                                AS current_value,
   COALESCE(
     (SELECT m."nombre" FROM "Material" m
-     WHERE unaccent(LOWER(TRIM(m."nombre"))) = unaccent(LOWER(TRIM(vc.material)))
+     WHERE immutable_unaccent(LOWER(TRIM(m."nombre"))) = immutable_unaccent(LOWER(TRIM(vc.material)))
      LIMIT 1),
     (SELECT material FROM "VoucherCamion"
-     WHERE unaccent(LOWER(TRIM(material))) = unaccent(LOWER(TRIM(vc.material)))
+     WHERE immutable_unaccent(LOWER(TRIM(material))) = immutable_unaccent(LOWER(TRIM(vc.material)))
      GROUP BY material ORDER BY COUNT(*) DESC LIMIT 1)
   )                                                          AS will_be_set_to,
   CASE
     WHEN EXISTS (
       SELECT 1 FROM "Material" m
-      WHERE unaccent(LOWER(TRIM(m."nombre"))) = unaccent(LOWER(TRIM(vc.material)))
+      WHERE immutable_unaccent(LOWER(TRIM(m."nombre"))) = immutable_unaccent(LOWER(TRIM(vc.material)))
     ) THEN 'catalog'
     ELSE 'most_frequent'
   END                                                        AS source
 FROM "VoucherCamion" vc
 WHERE material != COALESCE(
   (SELECT m."nombre" FROM "Material" m
-   WHERE unaccent(LOWER(TRIM(m."nombre"))) = unaccent(LOWER(TRIM(vc.material)))
+   WHERE immutable_unaccent(LOWER(TRIM(m."nombre"))) = immutable_unaccent(LOWER(TRIM(vc.material)))
    LIMIT 1),
   (SELECT material FROM "VoucherCamion"
-   WHERE unaccent(LOWER(TRIM(material))) = unaccent(LOWER(TRIM(vc.material)))
+   WHERE immutable_unaccent(LOWER(TRIM(material))) = immutable_unaccent(LOWER(TRIM(vc.material)))
    GROUP BY material ORDER BY COUNT(*) DESC LIMIT 1)
 )
 ORDER BY will_be_set_to, current_value;
@@ -89,18 +89,18 @@ ORDER BY will_be_set_to, current_value;
 UPDATE "VoucherCamion" vc
 SET material = COALESCE(
   (SELECT m."nombre" FROM "Material" m
-   WHERE unaccent(LOWER(TRIM(m."nombre"))) = unaccent(LOWER(TRIM(vc.material)))
+   WHERE immutable_unaccent(LOWER(TRIM(m."nombre"))) = immutable_unaccent(LOWER(TRIM(vc.material)))
    LIMIT 1),
   (SELECT material FROM "VoucherCamion"
-   WHERE unaccent(LOWER(TRIM(material))) = unaccent(LOWER(TRIM(vc.material)))
+   WHERE immutable_unaccent(LOWER(TRIM(material))) = immutable_unaccent(LOWER(TRIM(vc.material)))
    GROUP BY material ORDER BY COUNT(*) DESC LIMIT 1)
 )
 WHERE material != COALESCE(
   (SELECT m."nombre" FROM "Material" m
-   WHERE unaccent(LOWER(TRIM(m."nombre"))) = unaccent(LOWER(TRIM(vc.material)))
+   WHERE immutable_unaccent(LOWER(TRIM(m."nombre"))) = immutable_unaccent(LOWER(TRIM(vc.material)))
    LIMIT 1),
   (SELECT material FROM "VoucherCamion"
-   WHERE unaccent(LOWER(TRIM(material))) = unaccent(LOWER(TRIM(vc.material)))
+   WHERE immutable_unaccent(LOWER(TRIM(material))) = immutable_unaccent(LOWER(TRIM(vc.material)))
    GROUP BY material ORDER BY COUNT(*) DESC LIMIT 1)
 );
 
@@ -114,10 +114,10 @@ WHERE material != COALESCE(
 -- the Material catalog if needed, then re-run.
 -- -----------------------------------------------------------------------------
 SELECT
-  unaccent(LOWER(TRIM(material)))                    AS normalized_key,
+  immutable_unaccent(LOWER(TRIM(material)))                    AS normalized_key,
   array_agg(DISTINCT material ORDER BY material)     AS remaining_variants,
   COUNT(*)                                           AS total_vouchers
 FROM "VoucherCamion"
-GROUP BY unaccent(LOWER(TRIM(material)))
+GROUP BY immutable_unaccent(LOWER(TRIM(material)))
 HAVING COUNT(DISTINCT material) > 1
 ORDER BY total_vouchers DESC;

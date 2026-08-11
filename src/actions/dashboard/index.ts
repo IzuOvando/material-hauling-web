@@ -92,7 +92,7 @@ async function _getDashboardTimeseries(
       WHERE "frenteNombre" = ${filters.frenteNombre}
         AND status = 'ARRIVED'::"VoucherStatus"
         AND "voucherDatetime" >= ${filters.dateFrom} AND "voucherDatetime" <= ${filters.dateTo}
-        AND unaccent(LOWER(TRIM(material))) = unaccent(LOWER(TRIM(${material})))
+        AND immutable_unaccent(LOWER(TRIM(material))) = immutable_unaccent(LOWER(TRIM(${material})))
       GROUP BY 1 ORDER BY 1`);
     rowMap = new Map(
       rows.map((r) => [r.date, { date: r.date, trips: Number(r.trips), m3: Number(r.m3) }])
@@ -145,14 +145,14 @@ async function _getDashboardBreakdown(
   if (groupBy === "material") {
     type RawRow = { label: string; trips: bigint; m3: number };
     const rows: RawRow[] = await prisma.$queryRaw(Prisma.sql`
-      SELECT unaccent(LOWER(TRIM(material))) AS label,
+      SELECT immutable_unaccent(LOWER(TRIM(material))) AS label,
              COUNT(*) AS trips,
              COALESCE(SUM(cubicacion), 0) AS m3
       FROM "VoucherCamion"
       WHERE "frenteNombre" = ${filters.frenteNombre}
         AND status = 'ARRIVED'::"VoucherStatus"
         AND "voucherDatetime" >= ${filters.dateFrom} AND "voucherDatetime" <= ${filters.dateTo}
-      GROUP BY unaccent(LOWER(TRIM(material)))
+      GROUP BY immutable_unaccent(LOWER(TRIM(material)))
       ORDER BY m3 DESC
       LIMIT 20`);
     return rows.map((r) => ({ label: r.label, trips: Number(r.trips), m3: Number(r.m3) }));
