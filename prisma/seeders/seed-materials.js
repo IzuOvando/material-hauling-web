@@ -9,7 +9,7 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 const DEFAULT_MATERIALS = [
-  "Terraplén",
+  "Terraplen",
   "Pedraplén",
   "Trancision",
   "Subrasante",

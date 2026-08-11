@@ -31,18 +31,31 @@ export async function createMaterial(nombre: string) {
 
   const normalizedNombre = normalizeMaterial(trimmed);
 
-  // Check if material exists but is inactive — reactivate it
-  const existing = await prisma.material.findUnique({
+  const existingByNormalized = await prisma.material.findUnique({
+    where: { normalizedNombre },
+  });
+
+  if (existingByNormalized) {
+    if (existingByNormalized.isActive) {
+      throw new Error(`Ya existe un material similar: "${existingByNormalized.nombre}"`);
+    }
+    return prisma.material.update({
+      where: { id: existingByNormalized.id },
+      data: { isActive: true },
+      select: { id: true, nombre: true, isActive: true },
+    });
+  }
+
+  const existingByNombre = await prisma.material.findUnique({
     where: { nombre: trimmed },
   });
 
-  if (existing) {
-    if (existing.isActive) {
+  if (existingByNombre) {
+    if (existingByNombre.isActive) {
       throw new Error(`El material "${trimmed}" ya existe`);
     }
-    // Reactivate
     return prisma.material.update({
-      where: { id: existing.id },
+      where: { id: existingByNombre.id },
       data: { isActive: true },
       select: { id: true, nombre: true, isActive: true },
     });
