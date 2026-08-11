@@ -15,11 +15,12 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Trash2, Plus, Loader2 } from "lucide-react";
+import { Trash2, Plus, Loader2, Pencil, Check, X } from "lucide-react";
 import {
   getMaterials,
   createMaterial,
   deactivateMaterial,
+  renameMaterial,
 } from "@/actions/materials";
 
 type Material = {
@@ -38,6 +39,9 @@ export function MaterialCatalogSection({
   const [materials, setMaterials] = useState<Material[]>([]);
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingValue, setEditingValue] = useState("");
+  const [renaming, setRenaming] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
@@ -116,6 +120,41 @@ export function MaterialCatalogSection({
     if (e.key === "Enter") handleCreate();
   };
 
+  const startEditing = (material: Material) => {
+    setEditingId(material.id);
+    setEditingValue(material.nombre);
+  };
+
+  const cancelEditing = () => {
+    setEditingId(null);
+    setEditingValue("");
+  };
+
+  const handleRename = async (id: string) => {
+    if (!editingValue.trim()) return;
+    try {
+      setRenaming(true);
+      const updated = await renameMaterial(id, editingValue);
+      setMaterials((prev) =>
+        prev
+          .map((m) => (m.id === updated.id ? updated : m))
+          .sort((a, b) => a.nombre.localeCompare(b.nombre))
+      );
+      setEditingId(null);
+      toast({ title: "Material actualizado", description: `Renombrado a "${updated.nombre}"`, variant: "success" });
+      onCatalogChange?.();
+    } catch (error: any) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } finally {
+      setRenaming(false);
+    }
+  };
+
+  const handleRenameKeyDown = (e: React.KeyboardEvent, id: string) => {
+    if (e.key === "Enter") handleRename(id);
+    if (e.key === "Escape") cancelEditing();
+  };
+
   const activeMaterials = materials.filter((m) => m.isActive);
 
   return (
@@ -164,39 +203,80 @@ export function MaterialCatalogSection({
                 key={material.id}
                 className="flex items-center justify-between px-3 py-2 rounded-md hover:bg-green-50 transition-colors"
               >
-                <span className="text-sm font-medium">{material.nombre}</span>
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
+                {editingId === material.id ? (
+                  <div className="flex items-center gap-2 flex-1 mr-2">
+                    <Input
+                      autoFocus
+                      value={editingValue}
+                      onChange={(e) => setEditingValue(e.target.value)}
+                      onKeyDown={(e) => handleRenameKeyDown(e, material.id)}
+                      disabled={renaming}
+                      className="h-7 text-sm"
+                    />
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-8 w-8 text-slate-400 hover:text-red-500"
+                      className="h-7 w-7 text-green-600 hover:text-green-700 shrink-0"
+                      onClick={() => handleRename(material.id)}
+                      disabled={renaming}
                     >
-                      <Trash2 className="h-4 w-4" />
+                      {renaming ? <Loader2 className="h-3 w-3 animate-spin" /> : <Check className="h-3 w-3" />}
                     </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Eliminar material</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        ¿Estás seguro que deseas eliminar &quot;
-                        {material.nombre}&quot;? Se removerá de todos los
-                        frentes asignados.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                      <AlertDialogAction
-                        onClick={() =>
-                          handleDeactivate(material.id, material.nombre)
-                        }
-                        className="bg-red-500 hover:bg-red-600"
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-7 w-7 text-slate-400 hover:text-slate-600 shrink-0"
+                      onClick={cancelEditing}
+                      disabled={renaming}
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
+                  </div>
+                ) : (
+                  <>
+                    <span className="text-sm font-medium">{material.nombre}</span>
+                    <div className="flex items-center gap-1">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 text-slate-400 hover:text-primary"
+                        onClick={() => startEditing(material)}
                       >
-                        Eliminar
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-slate-400 hover:text-red-500"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Eliminar material</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              ¿Estás seguro que deseas eliminar &quot;
+                              {material.nombre}&quot;? Se removerá de todos los
+                              frentes asignados.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => handleDeactivate(material.id, material.nombre)}
+                              className="bg-red-500 hover:bg-red-600"
+                            >
+                              Eliminar
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
+                  </>
+                )}
               </div>
             ))}
           </div>

@@ -67,6 +67,40 @@ export async function createMaterial(nombre: string) {
   });
 }
 
+export async function renameMaterial(id: string, newNombre: string) {
+  const user = await getAppUser();
+  if (!user || user.role !== "owner") {
+    throw new Error("No autorizado");
+  }
+
+  const trimmed = newNombre.trim();
+  if (!trimmed) {
+    throw new Error("El nombre del material no puede estar vacío");
+  }
+
+  const normalizedNombre = normalizeMaterial(trimmed);
+
+  const conflictByNormalized = await prisma.material.findFirst({
+    where: { normalizedNombre, NOT: { id } },
+  });
+  if (conflictByNormalized) {
+    throw new Error(`Ya existe un material similar: "${conflictByNormalized.nombre}"`);
+  }
+
+  const conflictByNombre = await prisma.material.findFirst({
+    where: { nombre: trimmed, NOT: { id } },
+  });
+  if (conflictByNombre) {
+    throw new Error(`El material "${trimmed}" ya existe`);
+  }
+
+  return prisma.material.update({
+    where: { id },
+    data: { nombre: trimmed, normalizedNombre },
+    select: { id: true, nombre: true, isActive: true },
+  });
+}
+
 export async function deactivateMaterial(id: string) {
   const user = await getAppUser();
   if (!user || user.role !== "owner") {
