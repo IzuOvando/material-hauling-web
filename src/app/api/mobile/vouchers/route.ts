@@ -86,7 +86,8 @@ function validateTurnos(vouchers: PrismaVoucherCamion[]): ValidationError[] {
 
 async function resolveMaterialName(rawMaterial: string, frenteNombre: string): Promise<string> {
   const normalized = normalizeMaterial(rawMaterial);
-  const match = await prisma.material.findFirst({
+
+  const frenteMatch = await prisma.material.findFirst({
     where: {
       normalizedNombre: normalized,
       isActive: true,
@@ -94,8 +95,18 @@ async function resolveMaterialName(rawMaterial: string, frenteNombre: string): P
     },
     select: { nombre: true },
   });
-  // If catalog match found, use the canonical display name; otherwise store normalized
-  return match?.nombre ?? normalized;
+  if (frenteMatch) return frenteMatch.nombre;
+
+  const globalMatch = await prisma.material.findFirst({
+    where: {
+      normalizedNombre: normalized,
+      isActive: true,
+    },
+    select: { nombre: true },
+  });
+  if (globalMatch) return globalMatch.nombre;
+
+  return normalized;
 }
 
 function buildVoucherData(voucher: PrismaVoucherCamion, index: number, createdByUsername: string, resolvedMaterial: string) {
