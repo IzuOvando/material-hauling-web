@@ -79,35 +79,70 @@ async function _getDashboardTimeseries(
   const fromDateStr = DateTime.fromJSDate(filters.dateFrom).setZone(CONFIG.TIMEZONE).toISODate()!;
   const toDateStr = DateTime.fromJSDate(filters.dateTo).setZone(CONFIG.TIMEZONE).toISODate()!;
 
+  type TurnoRow = { date: string; turno1: bigint; turno2: bigint };
+  const turnoQuery = material
+    ? prisma.$queryRaw<TurnoRow[]>(Prisma.sql`
+        SELECT
+          TO_CHAR(("voucherDatetime" AT TIME ZONE 'UTC') AT TIME ZONE ${CONFIG.TIMEZONE}, 'YYYY-MM-DD') AS date,
+          COUNT(*) FILTER (WHERE turno = 1) AS turno1,
+          COUNT(*) FILTER (WHERE turno = 2) AS turno2
+        FROM "VoucherCamion"
+        WHERE "frenteNombre" = ${filters.frenteNombre}
+          AND status = 'ARRIVED'::"VoucherStatus"
+          AND "voucherDatetime" >= ${filters.dateFrom} AND "voucherDatetime" <= ${filters.dateTo}
+          AND immutable_unaccent(LOWER(TRIM(material))) = immutable_unaccent(LOWER(TRIM(${material})))
+        GROUP BY 1`)
+    : prisma.$queryRaw<TurnoRow[]>(Prisma.sql`
+        SELECT
+          TO_CHAR(("voucherDatetime" AT TIME ZONE 'UTC') AT TIME ZONE ${CONFIG.TIMEZONE}, 'YYYY-MM-DD') AS date,
+          COUNT(*) FILTER (WHERE turno = 1) AS turno1,
+          COUNT(*) FILTER (WHERE turno = 2) AS turno2
+        FROM "VoucherCamion"
+        WHERE "frenteNombre" = ${filters.frenteNombre}
+          AND status = 'ARRIVED'::"VoucherStatus"
+          AND "voucherDatetime" >= ${filters.dateFrom} AND "voucherDatetime" <= ${filters.dateTo}
+        GROUP BY 1`);
+
   let rowMap: Map<string, TimeseriesPoint>;
 
   if (material) {
     type RawRow = { date: string; trips: bigint; m3: number };
-    const rows: RawRow[] = await prisma.$queryRaw(Prisma.sql`
-      SELECT
-        TO_CHAR(("voucherDatetime" AT TIME ZONE 'UTC') AT TIME ZONE ${CONFIG.TIMEZONE}, 'YYYY-MM-DD') AS date,
-        COUNT(*) AS trips,
-        COALESCE(SUM(cubicacion), 0) AS m3
-      FROM "VoucherCamion"
-      WHERE "frenteNombre" = ${filters.frenteNombre}
-        AND status = 'ARRIVED'::"VoucherStatus"
-        AND "voucherDatetime" >= ${filters.dateFrom} AND "voucherDatetime" <= ${filters.dateTo}
-        AND immutable_unaccent(LOWER(TRIM(material))) = immutable_unaccent(LOWER(TRIM(${material})))
-      GROUP BY 1 ORDER BY 1`);
+    const [rows, turnoRows] = await Promise.all([
+      prisma.$queryRaw<RawRow[]>(Prisma.sql`
+        SELECT
+          TO_CHAR(("voucherDatetime" AT TIME ZONE 'UTC') AT TIME ZONE ${CONFIG.TIMEZONE}, 'YYYY-MM-DD') AS date,
+          COUNT(*) AS trips,
+          COALESCE(SUM(cubicacion), 0) AS m3
+        FROM "VoucherCamion"
+        WHERE "frenteNombre" = ${filters.frenteNombre}
+          AND status = 'ARRIVED'::"VoucherStatus"
+          AND "voucherDatetime" >= ${filters.dateFrom} AND "voucherDatetime" <= ${filters.dateTo}
+          AND immutable_unaccent(LOWER(TRIM(material))) = immutable_unaccent(LOWER(TRIM(${material})))
+        GROUP BY 1 ORDER BY 1`),
+      turnoQuery,
+    ]);
+    const turnoMap = new Map(turnoRows.map((r) => [r.date, r]));
     rowMap = new Map(
-      rows.map((r) => [r.date, { date: r.date, trips: Number(r.trips), m3: Number(r.m3) }])
+      rows.map((r) => {
+        const t = turnoMap.get(r.date);
+        return [r.date, { date: r.date, trips: Number(r.trips), m3: Number(r.m3), turno1: Number(t?.turno1 ?? 0), turno2: Number(t?.turno2 ?? 0) }];
+      })
     );
   } else {
-    const rows = await prisma.dashboardDailyMetrics.findMany({
-      where: {
-        frenteNombre: filters.frenteNombre,
-        date: { gte: fromDateStr, lte: toDateStr },
-      },
-      orderBy: { date: "asc" },
-      select: { date: true, totalTrips: true, totalM3: true },
-    });
+    const [rows, turnoRows] = await Promise.all([
+      prisma.dashboardDailyMetrics.findMany({
+        where: { frenteNombre: filters.frenteNombre, date: { gte: fromDateStr, lte: toDateStr } },
+        orderBy: { date: "asc" },
+        select: { date: true, totalTrips: true, totalM3: true },
+      }),
+      turnoQuery,
+    ]);
+    const turnoMap = new Map(turnoRows.map((r) => [r.date, r]));
     rowMap = new Map(
-      rows.map((r) => [r.date, { date: r.date, trips: r.totalTrips, m3: r.totalM3 }])
+      rows.map((r) => {
+        const t = turnoMap.get(r.date);
+        return [r.date, { date: r.date, trips: r.totalTrips, m3: r.totalM3, turno1: Number(t?.turno1 ?? 0), turno2: Number(t?.turno2 ?? 0) }];
+      })
     );
   }
 
@@ -116,7 +151,7 @@ async function _getDashboardTimeseries(
   const end = DateTime.fromISO(toDateStr, { zone: CONFIG.TIMEZONE });
   while (cursor <= end) {
     const d = cursor.toISODate()!;
-    result.push(rowMap.get(d) ?? { date: d, trips: 0, m3: 0 });
+    result.push(rowMap.get(d) ?? { date: d, trips: 0, m3: 0, turno1: 0, turno2: 0 });
     cursor = cursor.plus({ days: 1 });
   }
 

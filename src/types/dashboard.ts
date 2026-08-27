@@ -26,6 +26,8 @@ export interface TimeseriesPoint {
   date: string;
   trips: number;
   m3: number;
+  turno1?: number;
+  turno2?: number;
 }
 
 export interface BreakdownItem {
