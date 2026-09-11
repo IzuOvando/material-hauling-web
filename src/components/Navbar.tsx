@@ -2,16 +2,23 @@
 import Image from "next/image";
 import { signOut } from "@/auth";
 import { LogoutButton } from "./common";
+import CONFIG from "@/config";
 
 const Navbar = ({ userName }: { userName: string | undefined }) => {
+  const { appName, logoUrl, welcomeLabel } = CONFIG.branding;
+
   return (
     <nav className="h-14 bg-primary-dark flex justify-between items-center p-8">
-      <Image
-        src="/images/logos/logo_mexico.svg"
-        width={128}
-        height={48}
-        alt="logo"
-      />
+      {logoUrl ? (
+        <Image
+          src={logoUrl}
+          width={128}
+          height={48}
+          alt={`${appName} logo`}
+        />
+      ) : (
+        <div className="text-white font-semibold tracking-wide">{appName}</div>
+      )}
       <form
         className="flex text-white gap-6 items-center"
         action={async () => {
@@ -24,7 +31,7 @@ const Navbar = ({ userName }: { userName: string | undefined }) => {
       >
         {userName ? (
           <>
-            <span className="hidden md:block">Bienvenido, {userName}</span>
+            <span className="hidden md:block">{welcomeLabel}, {userName}</span>
             <LogoutButton />
           </>
         ) : null}

@@ -6,15 +6,15 @@ import { cn } from "@/lib/utils";
 import { Toaster } from "@/components/ui/toaster";
 import Navbar from "@/components/Navbar";
 import { EnterprisesImagesInitializer } from "@/contexts";
-import { auth } from "@/auth";
 import { UserProvider } from '@/contexts/UserContext';
 import { getAppUser } from "@/auth/auth.user";
+import CONFIG from "@/config";
 
 const montserrat = Montserrat({ subsets: ["latin"], variable: "--montserrat" });
 
 export const metadata: Metadata = {
-  title: "SEDENA: Trucks",
-  description: "Sistema de Acarreos SEDENA",
+  title: `${CONFIG.branding.appName} | Dashboard`,
+  description: CONFIG.branding.tagline,
 };
 
 export default async function RootLayout({
@@ -25,7 +25,7 @@ export default async function RootLayout({
   const user = await getAppUser();
 
   return (
-    <html lang="es" suppressHydrationWarning>
+    <html lang={CONFIG.branding.locale} suppressHydrationWarning>
       <body
         className={cn(
           "min-h-screen bg-background font-sans antialiased",
@@ -34,7 +34,7 @@ export default async function RootLayout({
         )}
       >
         <UserProvider user={user}>
-<Navbar userName={user?.name} />
+          <Navbar userName={user?.name} />
           {children}
           <Toaster />
           <EnterprisesImagesInitializer />

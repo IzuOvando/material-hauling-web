@@ -16,6 +16,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { authenticate } from "@/actions/authorization";
 import sha256 from 'crypto-js/sha256';
 import { Eye, EyeOff, Loader2 } from "lucide-react";
+import CONFIG from "@/config";
 
 const CardLogin = () => {
   const [state, dispatch] = useFormState(authenticate, {
@@ -89,16 +90,16 @@ const CardLogin = () => {
     <Card className="w-[350px]">
       <form onSubmit={handleSubmit}>
         <CardHeader>
-          <CardTitle>Ingresa Credenciales</CardTitle>
+          <CardTitle>{CONFIG.branding.loginSubtitle}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid w-full items-center gap-4">
             <div className="flex flex-col space-y-1.5">
-              <Label htmlFor="username">Nombre de usuario</Label>
-              <Input id="username" name="username" placeholder="Usuario" />
+              <Label htmlFor="username">Username</Label>
+              <Input id="username" name="username" placeholder="Username" />
             </div>
             <div className="flex flex-col space-y-1.5">
-              <Label htmlFor="password">Contraseña</Label>
+              <Label htmlFor="password">Password</Label>
               <div className="relative">
                 <Input
                   id="password"
@@ -111,7 +112,7 @@ const CardLogin = () => {
                   type="button"
                   onClick={() => setShowPassword(prev => !prev)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                  aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
                 >
                   {showPassword
                     ? <EyeOff size={16} />
@@ -128,7 +129,7 @@ const CardLogin = () => {
             disabled={isLoading}
           >
             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {isLoading ? "Ingresando..." : "Entrar"}
+            {isLoading ? "Signing in..." : "Sign in"}
           </Button>
         </CardFooter>
       </form>
