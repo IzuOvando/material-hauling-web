@@ -16,7 +16,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { authenticate } from "@/actions/authorization";
 import sha256 from 'crypto-js/sha256';
 import { Eye, EyeOff, Loader2 } from "lucide-react";
-import CONFIG from "@/config";
+import whiteLabelConfig from "../../../../white-label.config";
 
 const CardLogin = () => {
   const [state, dispatch] = useFormState(authenticate, {
@@ -90,7 +90,7 @@ const CardLogin = () => {
     <Card className="w-[350px]">
       <form onSubmit={handleSubmit}>
         <CardHeader>
-          <CardTitle>{CONFIG.branding.loginSubtitle}</CardTitle>
+          <CardTitle>{whiteLabelConfig.auth.loginSubtitle}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid w-full items-center gap-4">

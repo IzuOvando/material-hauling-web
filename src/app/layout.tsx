@@ -8,13 +8,13 @@ import Navbar from "@/components/Navbar";
 import { EnterprisesImagesInitializer } from "@/contexts";
 import { UserProvider } from '@/contexts/UserContext';
 import { getAppUser } from "@/auth/auth.user";
-import CONFIG from "@/config";
+import whiteLabelConfig from "../../white-label.config";
 
 const montserrat = Montserrat({ subsets: ["latin"], variable: "--montserrat" });
 
 export const metadata: Metadata = {
-  title: `${CONFIG.branding.appName} | Dashboard`,
-  description: CONFIG.branding.tagline,
+  title: `${whiteLabelConfig.app.name} | Dashboard`,
+  description: whiteLabelConfig.app.tagline,
 };
 
 export default async function RootLayout({
@@ -25,7 +25,7 @@ export default async function RootLayout({
   const user = await getAppUser();
 
   return (
-    <html lang={CONFIG.branding.locale} suppressHydrationWarning>
+    <html lang={whiteLabelConfig.app.locale} suppressHydrationWarning>
       <body
         className={cn(
           "min-h-screen bg-background font-sans antialiased",
