@@ -10,11 +10,12 @@ import {
 } from "@/helpers/formatters/datetime";
 import { formatVolume } from "@/helpers/formatters/numbers";
 import { formatVoucherId } from "@/helpers/formatters/formatVoucherId";
+import whiteLabelConfig from "../../../../white-label.config";
 
 export const trucksColumns: ColumnDef<VoucherCamion>[] = [
   {
     accessorKey: "folio",
-    header: ({ column }) => <TrucksColumnHeader column={column} title="Folio" />,
+    header: ({ column }) => <TrucksColumnHeader column={column} title={whiteLabelConfig.ui.trucksTable.folio} />,
     cell: ({ row }) => (
       <span className="font-mono text-xs">
         {formatVoucherId(row.getValue("folio"))}
@@ -24,14 +25,14 @@ export const trucksColumns: ColumnDef<VoucherCamion>[] = [
   {
     accessorKey: "status",
     header: ({ column }) => (
-      <TrucksColumnHeader column={column} title="Estatus" />
+      <TrucksColumnHeader column={column} title={whiteLabelConfig.ui.trucksTable.status} />
     ),
     cell: ({ row }) => {
       const status = row.getValue("status") as string;
       if (status === "IN_TRANSIT") {
         return (
           <Badge className="bg-secondary text-white hover:bg-secondary border-transparent">
-            En tránsito
+            {whiteLabelConfig.ui.dashboard.inTransit}
           </Badge>
         );
       }
@@ -45,52 +46,52 @@ export const trucksColumns: ColumnDef<VoucherCamion>[] = [
   {
     accessorKey: "idCamion",
     header: ({ column }) => (
-      <TrucksColumnHeader column={column} title="ID Camión" />
+      <TrucksColumnHeader column={column} title={whiteLabelConfig.ui.trucksTable.truckId} />
     ),
   },
   {
     accessorKey: "noEconomico",
     header: ({ column }) => (
-      <TrucksColumnHeader column={column} title="No. Económico" />
+      <TrucksColumnHeader column={column} title={whiteLabelConfig.ui.trucksTable.economicNumber} />
     ),
   },
   {
     accessorKey: "placas",
-    header: ({ column }) => <TrucksColumnHeader column={column} title="Placas" />,
+    header: ({ column }) => <TrucksColumnHeader column={column} title={whiteLabelConfig.ui.trucksTable.plates} />,
   },
   {
     accessorKey: "material",
     header: ({ column }) => (
-      <TrucksColumnHeader column={column} title="Material" />
+      <TrucksColumnHeader column={column} title={whiteLabelConfig.ui.trucksTable.material} />
     ),
   },
   {
     accessorKey: "origen",
-    header: ({ column }) => <TrucksColumnHeader column={column} title="Origen" />,
+    header: ({ column }) => <TrucksColumnHeader column={column} title={whiteLabelConfig.ui.trucksTable.origin} />,
   },
   {
     accessorKey: "destino",
     header: ({ column }) => (
-      <TrucksColumnHeader column={column} title="Destino" />
+      <TrucksColumnHeader column={column} title={whiteLabelConfig.ui.trucksTable.destination} />
     ),
   },
   {
     accessorKey: "cubicacion",
     header: ({ column }) => (
-      <TrucksColumnHeader column={column} title="Cubicación" />
+      <TrucksColumnHeader column={column} title={whiteLabelConfig.ui.trucksTable.volume} />
     ),
     cell: ({ row }) => <>{formatVolume(row.getValue("cubicacion"), true)}</>,
   },
   {
     accessorKey: "odometer",
     header: ({ column }) => (
-      <TrucksColumnHeader column={column} title="Odómetro Origen" />
+      <TrucksColumnHeader column={column} title={whiteLabelConfig.ui.trucksTable.originOdometer} />
     ),
   },
   {
     accessorKey: "odometerArrival",
     header: ({ column }) => (
-      <TrucksColumnHeader column={column} title="Odómetro Destino" />
+      <TrucksColumnHeader column={column} title={whiteLabelConfig.ui.trucksTable.destinationOdometer} />
     ),
     cell: ({ row }) => {
       const odometerArrival = row.getValue("odometerArrival") as number | null;
@@ -99,7 +100,7 @@ export const trucksColumns: ColumnDef<VoucherCamion>[] = [
         (odometerArrival === null || odometerArrival === undefined) &&
         status === "IN_TRANSIT"
       ) {
-        return <span className="italic text-accent font-semibold">En tránsito</span>;
+        return <span className="italic text-accent font-semibold">{whiteLabelConfig.ui.dashboard.inTransit}</span>;
       }
       return <>{odometerArrival}</>;
     },
@@ -107,13 +108,13 @@ export const trucksColumns: ColumnDef<VoucherCamion>[] = [
   {
     id: "voucherDate",
     accessorFn: (row) => formatIsoDate(row.voucherDatetime),
-    header: ({ column }) => <TrucksColumnHeader column={column} title="Fecha" />,
+    header: ({ column }) => <TrucksColumnHeader column={column} title={whiteLabelConfig.ui.trucksTable.date} />,
     cell: ({ row }) => <>{row.getValue("voucherDate")}</>,
   },
   {
     id: "voucherTime",
     accessorFn: (row) => row.voucherDatetime,
-    header: ({ column }) => <TrucksColumnHeader column={column} title="Hora" />,
+    header: ({ column }) => <TrucksColumnHeader column={column} title={whiteLabelConfig.ui.trucksTable.time} />,
     cell: ({ row }) => (
       <>{formatTime12Hour(row.getValue("voucherTime") as Date)}</>
     ),
@@ -121,13 +122,13 @@ export const trucksColumns: ColumnDef<VoucherCamion>[] = [
   {
     accessorKey: "arrivalTime",
     header: ({ column }) => (
-      <TrucksColumnHeader column={column} title="Hora Llegada" />
+      <TrucksColumnHeader column={column} title={whiteLabelConfig.ui.trucksTable.arrivalTime} />
     ),
     cell: ({ row }) => {
       const arrivalTime = row.getValue("arrivalTime") as Date | null;
       const status = row.original.status;
       if (!arrivalTime && status === "IN_TRANSIT") {
-        return <span className="italic text-accent font-semibold">En tránsito</span>;
+        return <span className="italic text-accent font-semibold">{whiteLabelConfig.ui.dashboard.inTransit}</span>;
       }
       return formatTime12Hour(arrivalTime);
     },
@@ -135,18 +136,18 @@ export const trucksColumns: ColumnDef<VoucherCamion>[] = [
   {
     accessorKey: "operador",
     header: ({ column }) => (
-      <TrucksColumnHeader column={column} title="Operador" />
+      <TrucksColumnHeader column={column} title={whiteLabelConfig.ui.trucksTable.operator} />
     ),
   },
   {
     accessorKey: "noEmpleado",
     header: ({ column }) => (
-      <TrucksColumnHeader column={column} title="No. Operador" />
+      <TrucksColumnHeader column={column} title={whiteLabelConfig.ui.trucksTable.operatorNumber} />
     ),
   },
   {
     accessorKey: "turno",
-    header: ({ column }) => <TrucksColumnHeader column={column} title="Turno" />,
+    header: ({ column }) => <TrucksColumnHeader column={column} title={whiteLabelConfig.ui.trucksTable.shift} />,
     cell: ({ row }) => (
       <>{row.getValue("turno") === 1 ? "1°" : "2°"}</>
     ),
@@ -154,32 +155,32 @@ export const trucksColumns: ColumnDef<VoucherCamion>[] = [
   {
     accessorKey: "empresa",
     header: ({ column }) => (
-      <TrucksColumnHeader column={column} title="Empresa" />
+      <TrucksColumnHeader column={column} title={whiteLabelConfig.ui.trucksTable.company} />
     ),
   },
   {
     accessorKey: "checkerName",
     header: ({ column }) => (
-      <TrucksColumnHeader column={column} title="Checador Salida" />
+      <TrucksColumnHeader column={column} title={whiteLabelConfig.ui.trucksTable.departureChecker} />
     ),
   },
   {
     accessorKey: "checkerNo",
     header: ({ column }) => (
-      <TrucksColumnHeader column={column} title="No. Checador Salida" />
+      <TrucksColumnHeader column={column} title={whiteLabelConfig.ui.trucksTable.departureCheckerNumber} />
     ),
     cell: ({ row }) => <>{row.getValue("checkerNo") ?? "—"}</>,
   },
   {
     accessorKey: "arrivalCheckerName",
     header: ({ column }) => (
-      <TrucksColumnHeader column={column} title="Checador Llegada" />
+      <TrucksColumnHeader column={column} title={whiteLabelConfig.ui.trucksTable.arrivalChecker} />
     ),
     cell: ({ row }) => {
       const v = row.getValue("arrivalCheckerName") as string | null;
       const status = row.original.status;
       if (!v && status === "IN_TRANSIT") {
-        return <span className="italic text-accent font-semibold">En tránsito</span>;
+        return <span className="italic text-accent font-semibold">{whiteLabelConfig.ui.dashboard.inTransit}</span>;
       }
       return <>{v ?? "—"}</>;
     },
@@ -187,13 +188,13 @@ export const trucksColumns: ColumnDef<VoucherCamion>[] = [
   {
     accessorKey: "arrivalCheckerEmployeeNumber",
     header: ({ column }) => (
-      <TrucksColumnHeader column={column} title="No. Checador Llegada" />
+      <TrucksColumnHeader column={column} title={whiteLabelConfig.ui.trucksTable.arrivalCheckerNumber} />
     ),
     cell: ({ row }) => {
       const v = row.getValue("arrivalCheckerEmployeeNumber") as string | null;
       const status = row.original.status;
       if (!v && status === "IN_TRANSIT") {
-        return <span className="italic text-accent font-semibold">En tránsito</span>;
+        return <span className="italic text-accent font-semibold">{whiteLabelConfig.ui.dashboard.inTransit}</span>;
       }
       return <>{v ?? "—"}</>;
     },

@@ -12,6 +12,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { getMetadataCamionFromFile } from "@/utils/excel/excelValidatorQRs";
 import { getCamionesQRSVG } from "@/utils/excel/generatorDownloadQrs";
 import { cn } from "@/lib/utils";
+import whiteLabelConfig from "../../../white-label.config";
 
 const ACCEPT = {
   "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": [
@@ -31,8 +32,8 @@ export default function QRPage() {
           getCamionesQRSVG(meta);
           setLastFile(file.name);
           toast({
-            title: "Generación exitosa",
-            description: "Tus QRs están en el archivo ZIP descargado.",
+            title: whiteLabelConfig.ui.qrGenerator.successTitle,
+            description: whiteLabelConfig.ui.qrGenerator.successDescription,
             variant: "success",
             duration: 3000,
           });
@@ -53,8 +54,8 @@ export default function QRPage() {
     (accepted: File[]) => {
       if (accepted.length === 0) {
         toast({
-          title: "Archivo incorrecto",
-          description: "Asegúrese de que sea un archivo Excel (.xlsx) válido.",
+          title: whiteLabelConfig.ui.qrGenerator.invalidFileTitle,
+          description: whiteLabelConfig.ui.qrGenerator.invalidFileDescription,
           variant: "destructive",
           duration: 3000,
         });
@@ -76,10 +77,9 @@ export default function QRPage() {
     <div className="max-w-xl mx-auto">
       {/* Header */}
       <div className="mb-7">
-        <h2 className="text-2xl font-semibold">Generador de QRs</h2>
+        <h2 className="text-2xl font-semibold">{whiteLabelConfig.ui.qrGenerator.title}</h2>
         <p className="text-sm text-muted-foreground mt-1">
-          Carga una hoja de cálculo con datos de camiones para generar sus QRs
-          en un archivo ZIP.
+          {whiteLabelConfig.ui.qrGenerator.description}
         </p>
       </div>
 
@@ -100,7 +100,7 @@ export default function QRPage() {
         {isDragActive && (
           <div className="absolute inset-0 flex flex-col items-center justify-center rounded-2xl bg-secondary/10 backdrop-blur-[1px] z-10">
             <UploadCloud className="h-14 w-14 text-secondary mb-3 animate-bounce" />
-            <p className="text-lg font-semibold text-secondary">Suelta aquí</p>
+            <p className="text-lg font-semibold text-secondary">{whiteLabelConfig.ui.qrGenerator.dropActive}</p>
           </div>
         )}
 

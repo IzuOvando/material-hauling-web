@@ -15,6 +15,7 @@ import { DrilldownSection } from "./DrilldownSection";
 import { CheckersTab } from "./CheckersTab";
 import { OrigenDestinoTab } from "./OrigenDestinoTab";
 import type { SummaryResponse, TimeseriesPoint, BreakdownItem } from "@/types/dashboard";
+import whiteLabelConfig from "../../../../white-label.config";
 
 interface DashboardShellProps {
   frente: string;
@@ -115,8 +116,8 @@ export function DashboardShell({ frente }: DashboardShellProps) {
 
       <Tabs defaultValue="resumen">
         <TabsList>
-          <TabsTrigger value="resumen">Resumen</TabsTrigger>
-          <TabsTrigger value="checadores">Checadores</TabsTrigger>
+          <TabsTrigger value="resumen">{whiteLabelConfig.ui.dashboard.summaryTab}</TabsTrigger>
+          <TabsTrigger value="checadores">{whiteLabelConfig.ui.dashboard.checkersTab}</TabsTrigger>
           {/* <TabsTrigger value="origen-destino">Origen / Destino</TabsTrigger> */}
         </TabsList>
         <TabsContent value="resumen">
@@ -124,7 +125,7 @@ export function DashboardShell({ frente }: DashboardShellProps) {
             <TimeseriesCharts data={timeseries} isLoading={loading} period={period} />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <BreakdownChart
-                title="Viajes por material"
+                title={whiteLabelConfig.ui.dashboard.tripsByMaterial}
                 data={breakdown}
                 groupBy="material"
                 primaryMetric="trips"
@@ -133,7 +134,7 @@ export function DashboardShell({ frente }: DashboardShellProps) {
                 onBarClick={(label, color) => { setSelectedMaterial(label); setMaterialColor(color); }}
               />
               <BreakdownChart
-                title="Distribución por material"
+                title={whiteLabelConfig.ui.dashboard.materialDistribution}
                 data={breakdown}
                 groupBy="material"
                 primaryMetric="trips"

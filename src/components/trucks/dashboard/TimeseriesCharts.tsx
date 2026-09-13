@@ -17,6 +17,7 @@ import { BarChart2 } from "lucide-react";
 import { ChartContainer, type ChartConfig } from "@/components/ui/chart";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import type { TimeseriesPoint, DashboardPeriod } from "@/types/dashboard";
+import whiteLabelConfig from "../../../../white-label.config";
 
 const TRIPS_COLOR  = "#133223";
 const M3_COLOR     = "#bc955c";
@@ -111,7 +112,7 @@ function EmptyContent() {
   return (
     <div className="flex flex-col items-center justify-center gap-2 h-36">
       <BarChart2 className="h-6 w-6 text-slate-200" />
-      <p className="text-sm font-medium text-slate-400">Sin datos para el período seleccionado</p>
+      <p className="text-sm font-medium text-slate-400">{whiteLabelConfig.ui.dashboard.noData}</p>
     </div>
   );
 }

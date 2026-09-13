@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { FrenteReset } from "@/store";
+import whiteLabelConfig from "../../white-label.config";
 
 export default function NotFound() {
   return (
@@ -13,9 +14,9 @@ export default function NotFound() {
         </div>
 
         <div className="space-y-2">
-          <h1 className="text-xl font-semibold text-slate-900">Página no encontrada</h1>
+          <h1 className="text-xl font-semibold text-slate-900">{whiteLabelConfig.ui.errors.notFoundTitle}</h1>
           <p className="text-sm text-slate-500">
-            El recurso que buscas no existe o fue movido.
+            {whiteLabelConfig.ui.errors.notFoundDescription}
           </p>
         </div>
 
@@ -23,7 +24,7 @@ export default function NotFound() {
           href="/"
           className="mt-2 px-5 py-2 rounded-lg bg-accent hover:bg-accent-dark text-white text-sm font-semibold transition-colors duration-200"
         >
-          Volver al inicio
+          {whiteLabelConfig.ui.errors.backHome}
         </Link>
       </div>
     </section>

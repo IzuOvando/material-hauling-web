@@ -47,21 +47,21 @@ export function UsersToolbar({
 
       <Select value={roleFilter} onValueChange={onRoleFilter}>
         <SelectTrigger className="w-44 border-2 focus:ring-0 focus:border-accent">
-          <SelectValue placeholder="Todos los roles" />
+          <SelectValue placeholder={(whiteLabelConfig as any)?.ui?.users?.toolbar?.allRoles || "Todos los roles"} />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="all">Todos los roles</SelectItem>
-          <SelectItem value="user">Checador</SelectItem>
-          <SelectItem value="admin">IRO</SelectItem>
+          <SelectItem value="all">{(whiteLabelConfig as any)?.ui?.users?.toolbar?.allRoles || "Todos los roles"}</SelectItem>
+          <SelectItem value="user">{(whiteLabelConfig as any)?.ui?.users?.toolbar?.roleUser || "Checador"}</SelectItem>
+          <SelectItem value="admin">{(whiteLabelConfig as any)?.ui?.users?.toolbar?.roleAdmin || "IRO"}</SelectItem>
         </SelectContent>
       </Select>
 
       <Select value={frenteFilter} onValueChange={onFrenteFilter}>
         <SelectTrigger className="w-52 border-2 focus:ring-0 focus:border-accent">
-          <SelectValue placeholder="Todos los frentes" />
+          <SelectValue placeholder={(whiteLabelConfig as any)?.ui?.users?.toolbar?.allFrentes || "Todos los frentes"} />
         </SelectTrigger>
         <SelectContent className="max-h-64">
-          <SelectItem value="all">Todos los frentes</SelectItem>
+          <SelectItem value="all">{(whiteLabelConfig as any)?.ui?.users?.toolbar?.allFrentes || "Todos los frentes"}</SelectItem>
           {frentes.map((f) => (
             <SelectItem key={f} value={f}>
               {f}

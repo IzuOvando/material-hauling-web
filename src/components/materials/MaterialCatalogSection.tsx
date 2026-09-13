@@ -22,6 +22,7 @@ import {
   deactivateMaterial,
   renameMaterial,
 } from "@/actions/materials";
+import whiteLabelConfig from "../../../white-label.config";
 
 type Material = {
   id: string;
@@ -58,7 +59,7 @@ export function MaterialCatalogSection({
     } catch {
       toast({
         title: "Error",
-        description: "No se pudieron cargar los materiales",
+        description: (whiteLabelConfig as any)?.ui?.materials?.toast?.errorDescription || "No se pudieron cargar los materiales",
         variant: "destructive",
       });
     } finally {
@@ -81,8 +82,8 @@ export function MaterialCatalogSection({
       });
       if (inputRef.current) inputRef.current.value = "";
       toast({
-        title: "Material creado",
-        description: `"${material.nombre}" agregado al catálogo`,
+        title: (whiteLabelConfig as any)?.ui?.materials?.catalog?.createdTitle || "Material creado",
+        description: ((whiteLabelConfig as any)?.ui?.materials?.catalog?.createdDescription || '"{name}" agregado al catálogo').replace("{name}", material.nombre),
         variant: "success",
       });
       onCatalogChange?.();
@@ -102,8 +103,8 @@ export function MaterialCatalogSection({
       await deactivateMaterial(id);
       setMaterials((prev) => prev.filter((m) => m.id !== id));
       toast({
-        title: "Material eliminado",
-        description: `"${nombre}" ha sido eliminado del catálogo`,
+        title: (whiteLabelConfig as any)?.ui?.materials?.catalog?.deletedTitle || "Material eliminado",
+        description: ((whiteLabelConfig as any)?.ui?.materials?.catalog?.deletedDescription || '"{name}" ha sido eliminado del catálogo').replace("{name}", nombre),
         variant: "success",
       });
       onCatalogChange?.();
@@ -141,7 +142,11 @@ export function MaterialCatalogSection({
           .sort((a, b) => a.nombre.localeCompare(b.nombre))
       );
       setEditingId(null);
-      toast({ title: "Material actualizado", description: `Renombrado a "${updated.nombre}"`, variant: "success" });
+      toast({
+        title: (whiteLabelConfig as any)?.ui?.materials?.catalog?.updatedTitle || "Material actualizado",
+        description: ((whiteLabelConfig as any)?.ui?.materials?.catalog?.updatedDescription || 'Renombrado a "{name}"').replace("{name}", updated.nombre),
+        variant: "success",
+      });
       onCatalogChange?.();
     } catch (error: any) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
@@ -161,7 +166,7 @@ export function MaterialCatalogSection({
     <div className="border-2 border-primary-light rounded-lg overflow-hidden">
       <div className="bg-primary px-4 py-3">
         <h2 className="text-lg font-semibold text-accent">
-          Catálogo de Materiales
+          {(whiteLabelConfig as any)?.ui?.materials?.catalog?.heading || "Catálogo de Materiales"}
         </h2>
       </div>
 
@@ -170,7 +175,7 @@ export function MaterialCatalogSection({
         <div className="flex gap-2">
           <Input
             ref={inputRef}
-            placeholder="Nombre del material"
+            placeholder={(whiteLabelConfig as any)?.ui?.materials?.catalog?.inputPlaceholder || "Nombre del material"}
             onKeyDown={handleKeyDown}
             disabled={creating}
           />
@@ -194,7 +199,7 @@ export function MaterialCatalogSection({
           </div>
         ) : activeMaterials.length === 0 ? (
           <p className="text-center text-slate-500 py-8">
-            No hay materiales en el catálogo. Agrega uno.
+            {(whiteLabelConfig as any)?.ui?.materials?.catalog?.empty || "No hay materiales en el catálogo. Agrega uno."}
           </p>
         ) : (
           <div className="space-y-1">
@@ -256,20 +261,22 @@ export function MaterialCatalogSection({
                         </AlertDialogTrigger>
                         <AlertDialogContent>
                           <AlertDialogHeader>
-                            <AlertDialogTitle>Eliminar material</AlertDialogTitle>
+                            <AlertDialogTitle>
+                              {(whiteLabelConfig as any)?.ui?.materials?.catalog?.deleteDialogTitle || "Eliminar material"}
+                            </AlertDialogTitle>
                             <AlertDialogDescription>
-                              ¿Estás seguro que deseas eliminar &quot;
-                              {material.nombre}&quot;? Se removerá de todos los
-                              frentes asignados.
+                              {(((whiteLabelConfig as any)?.ui?.materials?.catalog?.deleteDialogDescription || '¿Estás seguro que deseas eliminar "{name}"? Se removerá de todos los frentes asignados.').replace("{name}", material.nombre))}
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
-                            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                            <AlertDialogCancel>
+                              {(whiteLabelConfig as any)?.ui?.materials?.catalog?.deleteDialogCancel || "Cancelar"}
+                            </AlertDialogCancel>
                             <AlertDialogAction
                               onClick={() => handleDeactivate(material.id, material.nombre)}
                               className="bg-red-500 hover:bg-red-600"
                             >
-                              Eliminar
+                              {(whiteLabelConfig as any)?.ui?.materials?.catalog?.deleteDialogConfirm || "Eliminar"}
                             </AlertDialogAction>
                           </AlertDialogFooter>
                         </AlertDialogContent>
