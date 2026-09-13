@@ -8,13 +8,14 @@ import Navbar from "@/components/Navbar";
 import { EnterprisesImagesInitializer } from "@/contexts";
 import { UserProvider } from '@/contexts/UserContext';
 import { getAppUser } from "@/auth/auth.user";
+import { TenantBrandingProvider } from "@/components/branding/TenantBrandingProvider";
 import whiteLabelConfig from "../../white-label.config";
 
 const montserrat = Montserrat({ subsets: ["latin"], variable: "--montserrat" });
 
 export const metadata: Metadata = {
-  title: `${whiteLabelConfig.app.name} | Dashboard`,
-  description: whiteLabelConfig.app.tagline,
+  title: whiteLabelConfig.app.metadataTitle,
+  description: whiteLabelConfig.app.metadataDescription,
 };
 
 export default async function RootLayout({
@@ -33,13 +34,15 @@ export default async function RootLayout({
           montserrat.className
         )}
       >
-        <UserProvider user={user}>
-          <Navbar userName={user?.name} />
-          {children}
-          <Toaster />
-          <EnterprisesImagesInitializer />
-          <Script src="/lib/epos-2.27.0.js" strategy="beforeInteractive" />
-        </UserProvider>
+        <TenantBrandingProvider>
+          <UserProvider user={user}>
+            <Navbar userName={user?.name} />
+            {children}
+            <Toaster />
+            <EnterprisesImagesInitializer />
+            <Script src="/lib/epos-2.27.0.js" strategy="beforeInteractive" />
+          </UserProvider>
+        </TenantBrandingProvider>
       </body>
     </html>
   );

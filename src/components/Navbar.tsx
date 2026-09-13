@@ -1,28 +1,13 @@
 "use server";
-import Image from "next/image";
 import { signOut } from "@/auth";
 import { LogoutButton } from "./common";
+import { BrandMark } from "./branding/BrandMark";
 import whiteLabelConfig from "../../white-label.config";
 
 const Navbar = ({ userName }: { userName: string | undefined }) => {
-  const { appName, logoUrl, welcomeLabel } = {
-    appName: whiteLabelConfig.app.name,
-    logoUrl: whiteLabelConfig.branding.logoUrl,
-    welcomeLabel: whiteLabelConfig.auth.welcomeLabel,
-  };
-
   return (
     <nav className="h-14 bg-primary-dark flex justify-between items-center p-8">
-      {logoUrl ? (
-        <Image
-          src={logoUrl}
-          width={128}
-          height={48}
-          alt={`${appName} logo`}
-        />
-      ) : (
-        <div className="text-white font-semibold tracking-wide">{appName}</div>
-      )}
+      <BrandMark />
       <form
         className="flex text-white gap-6 items-center"
         action={async () => {
@@ -35,7 +20,7 @@ const Navbar = ({ userName }: { userName: string | undefined }) => {
       >
         {userName ? (
           <>
-            <span className="hidden md:block">{welcomeLabel}, {userName}</span>
+            <span className="hidden md:block">{whiteLabelConfig.auth.welcomeLabel}, {userName}</span>
             <LogoutButton />
           </>
         ) : null}

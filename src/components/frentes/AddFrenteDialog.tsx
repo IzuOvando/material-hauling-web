@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "../ui/use-toast";
 import { useRouter } from "next/navigation";
+import whiteLabelConfig from "../../../white-label.config";
 
 interface AddFrenteDialogProps {
   open: boolean;
@@ -33,13 +34,13 @@ const AddFrenteDialog = ({
     const name = refName.current?.value?.trim().toUpperCase();
 
     if (!name) {
-      setError("Debes ingresar un nombre");
+      setError(whiteLabelConfig.ui.frentesManager.addDialog.requiredName);
       return;
     }
 
     const alphanumericRegex = /^[A-Z0-9]+-F([0-9]+T?[0-9]*|G)$/;
     if (!alphanumericRegex.test(name)) {
-      setError("Formato inválido.");
+      setError(whiteLabelConfig.ui.frentesManager.addDialog.invalidFormat);
       return;
     }
 
@@ -60,7 +61,7 @@ const AddFrenteDialog = ({
       if (response.status === 409) {
         toast({
           title: "Error",
-          description: data.error || `El frente ${name} ya existe.`,
+          description: data.error || whiteLabelConfig.ui.frentesManager.addDialog.duplicateDescription.replace("{name}", name),
           variant: "destructive",
         });
         return;
@@ -70,8 +71,8 @@ const AddFrenteDialog = ({
         throw new Error(data.error || "Error en la solicitud");
       }
       toast({
-        title: "Éxito",
-        description: `Frente ${name} creado con éxito.`,
+        title: whiteLabelConfig.ui.frentesManager.addDialog.successTitle,
+        description: whiteLabelConfig.ui.frentesManager.addDialog.successDescription.replace("{name}", name),
         variant: "success",
       });
       router.refresh();
@@ -81,7 +82,7 @@ const AddFrenteDialog = ({
       console.error("Error al crear nuevo frente:", error);
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "No se pudo crear el nuevo frente.",
+        description: error instanceof Error ? error.message : whiteLabelConfig.ui.frentesManager.addDialog.duplicateDescription,
         variant: "destructive",
       });
     } finally {
@@ -97,20 +98,19 @@ const AddFrenteDialog = ({
     <Dialog open={open} onOpenChange={loading ? undefined : setOpen}>
       <DialogContent className="sm:max-w-[450px]" onKeyDown={handleEnter}>
         <DialogHeader>
-          <DialogTitle>Crear Frente</DialogTitle>
+          <DialogTitle>{whiteLabelConfig.ui.frentesManager.addDialog.title}</DialogTitle>
           <DialogDescription>
-            Ingresa el nombre del frente (ej. ABCD-F1 o ABCD-FG). 
-            Podrás editar los detalles después.
+            {whiteLabelConfig.ui.frentesManager.addDialog.description}
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="name" className="text-right">
-              Nombre
+              {whiteLabelConfig.ui.frentesManager.addDialog.nameLabel}
             </Label>
             <Input
               ref={refName}
-              placeholder="Ex. ABCD-F1"
+              placeholder={whiteLabelConfig.ui.frentesManager.addDialog.namePlaceholder}
               className="col-span-3 uppercase"
               maxLength={20}
               disabled={loading}
@@ -127,7 +127,7 @@ const AddFrenteDialog = ({
             className="bg-secondary hover:bg-secondary-dark text-white"
           >
             {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {loading ? "Creando..." : "Crear"}
+            {loading ? whiteLabelConfig.ui.frentesManager.addDialog.creating : whiteLabelConfig.ui.frentesManager.addDialog.create}
           </Button>
         </DialogFooter>
       </DialogContent>

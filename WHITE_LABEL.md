@@ -18,6 +18,8 @@ The file exposes:
 - `auth`: login text
 - `ui`: all user-facing copy grouped by area
 
+The root layout mounts `TenantBrandingProvider` for client-side branding access. Components can consume the current tenant values with `useTenantBranding()`. The provider currently uses the configured defaults and accepts partial branding overrides, leaving a future tenant resolver free to provide runtime values without changing component APIs.
+
 ## Environment variable override pattern
 
 The config uses `process.env.NEXT_PUBLIC_*` values with safe Spanish defaults.
@@ -44,6 +46,8 @@ NEXT_PUBLIC_UI_USERS_ACTION_RESET="Reset password"
 - `NEXT_PUBLIC_APP_NAME`
 - `NEXT_PUBLIC_APP_SHORT_NAME`
 - `NEXT_PUBLIC_APP_TAGLINE`
+- `NEXT_PUBLIC_APP_METADATA_TITLE`
+- `NEXT_PUBLIC_APP_METADATA_DESCRIPTION`
 - `NEXT_PUBLIC_LOCALE`
 
 ### `branding`

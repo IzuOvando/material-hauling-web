@@ -76,7 +76,7 @@ const EditFrenteDialog = ({
             {isOwner && (
               <>
                 <div className="flex flex-col gap-2">
-                  <Label className="text-sm font-medium">Nombre del proyecto</Label>
+                  <Label className="text-sm font-medium">{(whiteLabelConfig as any)?.ui?.frentesManager?.projectNameLabel || "Nombre del proyecto"}</Label>
                   <div className="flex gap-2">
                     <Input
                       value={displayName}

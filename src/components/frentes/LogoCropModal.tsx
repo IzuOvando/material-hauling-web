@@ -11,6 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import whiteLabelConfig from "../../../white-label.config";
 
 interface Props {
   imageSrc: string;
@@ -96,13 +97,13 @@ export default function LogoCropModal({ imageSrc, open, onConfirm, onClose }: Pr
     <Dialog open={open} onOpenChange={(o) => !o && handleClose()}>
       <DialogContent className="max-w-lg">
         <DialogHeader>
-          <DialogTitle>Recortar logo</DialogTitle>
+          <DialogTitle>{whiteLabelConfig.ui.logoCrop.title}</DialogTitle>
         </DialogHeader>
 
         {!preview ? (
           <div className="flex flex-col gap-4">
             <p className="text-xs text-muted-foreground">
-              Ajusta el recuadro para eliminar márgenes. Si el logo ya está bien, confirma directo.
+              {whiteLabelConfig.ui.logoCrop.instructions}
             </p>
 
             <div className="flex max-h-72 items-center justify-center overflow-auto rounded-md bg-muted/20">
@@ -125,7 +126,7 @@ export default function LogoCropModal({ imageSrc, open, onConfirm, onClose }: Pr
 
             <div className="flex justify-end gap-2">
               <Button variant="outline" size="sm" onClick={handleClose}>
-                Cancelar
+                {whiteLabelConfig.ui.logoCrop.cancel}
               </Button>
               <Button
                 size="sm"
@@ -138,14 +139,14 @@ export default function LogoCropModal({ imageSrc, open, onConfirm, onClose }: Pr
                 ) : (
                   <CropIcon className="mr-1.5 h-3.5 w-3.5" />
                 )}
-                {processing ? "Procesando…" : "Ver resultado"}
+                {processing ? whiteLabelConfig.ui.logoCrop.processing : whiteLabelConfig.ui.logoCrop.previewResult}
               </Button>
             </div>
           </div>
         ) : (
           <div className="flex flex-col items-center gap-4">
             <p className="text-xs text-muted-foreground self-start">
-              Así se verá el logo guardado. ¿Todo bien?
+              {whiteLabelConfig.ui.logoCrop.savedPreview}
             </p>
 
             <div className="flex items-center justify-center rounded-lg border bg-muted/10 p-4 shadow-sm">

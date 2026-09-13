@@ -146,10 +146,10 @@ export function TimeseriesCharts({ data, period, isLoading, className }: Timeser
     return (
       <div className={`flex flex-col gap-4 ${className ?? ""}`}>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <CardShell title="Viajes completados por día"><AreaChartSkeleton /></CardShell>
-          <CardShell title="M³ acarreados por día"><AreaChartSkeleton /></CardShell>
+          <CardShell title={whiteLabelConfig.ui.dashboard.completedTripsByDay}><AreaChartSkeleton /></CardShell>
+          <CardShell title={whiteLabelConfig.ui.dashboard.hauledM3ByDay}><AreaChartSkeleton /></CardShell>
         </div>
-        <CardShell title="Viajes por turno"><AreaChartSkeleton /></CardShell>
+        <CardShell title={whiteLabelConfig.ui.dashboard.tripsByShift}><AreaChartSkeleton /></CardShell>
       </div>
     );
   }
@@ -157,7 +157,7 @@ export function TimeseriesCharts({ data, period, isLoading, className }: Timeser
   return (
     <div className={`flex flex-col gap-4 ${className ?? ""}`}>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <CardShell title="Viajes completados por día">
+        <CardShell title={whiteLabelConfig.ui.dashboard.completedTripsByDay}>
           {!hasTrips ? <EmptyContent /> : (
             <ChartContainer config={tripsConfig} className="h-36 w-full">
               <ResponsiveContainer width="100%" height="100%">
@@ -214,7 +214,7 @@ export function TimeseriesCharts({ data, period, isLoading, className }: Timeser
           )}
         </CardShell>
 
-        <CardShell title="M³ acarreados por día">
+        <CardShell title={whiteLabelConfig.ui.dashboard.hauledM3ByDay}>
           {!hasM3 ? <EmptyContent /> : (
             <ChartContainer config={m3Config} className="h-36 w-full">
               <ResponsiveContainer width="100%" height="100%">
@@ -273,7 +273,7 @@ export function TimeseriesCharts({ data, period, isLoading, className }: Timeser
       </div>
 
       {/* Turno chart — full width */}
-      <CardShell title="Viajes por turno">
+      <CardShell title={whiteLabelConfig.ui.dashboard.tripsByShift}>
         {!hasTurno ? <EmptyContent /> : (
           <ChartContainer config={turnoConfig} className="h-36 w-full">
             <ResponsiveContainer width="100%" height="100%">

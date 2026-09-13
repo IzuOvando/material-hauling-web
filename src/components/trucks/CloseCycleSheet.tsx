@@ -18,6 +18,7 @@ import { formatIsoDate } from "@/helpers/formatters/datetime";
 import { parseVoucherFolios } from "@/utils/normalizeVoucherFolio";
 import { useToast } from "@/components/ui/use-toast";
 import CONFIG from "@/config";
+import whiteLabelConfig from "../../../white-label.config";
 import {
   CheckCircle2,
   XCircle,
@@ -296,9 +297,9 @@ const InputView = ({
   return (
     <div className="flex flex-col flex-1 px-6 py-5 gap-4">
       <div className="flex flex-col gap-1">
-        <label className="text-sm font-medium text-primary">Folios del váucher</label>
+        <label className="text-sm font-medium text-primary">{whiteLabelConfig.ui.vouchers.foliosLabel}</label>
         <p className="text-xs text-primary/50">
-          Ingresa los folios, uno por línea o separados por comas.
+          {whiteLabelConfig.ui.vouchers.foliosHint}
         </p>
       </div>
 
@@ -341,7 +342,7 @@ const InputView = ({
         disabled={!hasValid}
         onClick={onSearch}
       >
-        Buscar váuchers →
+        {whiteLabelConfig.ui.vouchers.searchVouchers}
       </Button>
     </div>
   );
@@ -437,7 +438,7 @@ const PreviewView = ({
                         <Input
                           type="text"
                           inputMode="decimal"
-                          placeholder="km/mi"
+                          placeholder={whiteLabelConfig.ui.vouchers.odometerUnitPlaceholder}
                           className="h-8 w-32 text-sm"
                           value={entry.odometerArrival}
                           onChange={(e) =>
@@ -453,7 +454,7 @@ const PreviewView = ({
                         <DatePicker
                           value={entry.arrivalDate}
                           onChange={(v) => onChangeEntry(ticket.folio, "arrivalDate", v)}
-                          placeholder="dd/mm/aaaa"
+                          placeholder={whiteLabelConfig.ui.vouchers.datePlaceholder}
                           className="h-8 w-36 text-sm"
                         />
                       </div>

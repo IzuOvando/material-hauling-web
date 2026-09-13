@@ -56,7 +56,7 @@ function FrentesBadges({ frentes }: { frentes: string[] }) {
         </Badge>
       )}
       {frentes.length === 0 && (
-        <span className="text-xs text-muted-foreground italic">Sin frentes</span>
+        <span className="text-xs text-muted-foreground italic">Sin {whiteLabelConfig.ui.general.pluralFrentes}</span>
       )}
     </div>
   );
