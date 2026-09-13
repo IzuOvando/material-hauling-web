@@ -20,6 +20,8 @@ The file exposes:
 
 The root layout mounts `TenantBrandingProvider` for client-side branding access. Components can consume the current tenant values with `useTenantBranding()`. The provider currently uses the configured defaults and accepts partial branding overrides, leaving a future tenant resolver free to provide runtime values without changing component APIs.
 
+The shared application composition lives in `src/components/app-shell/AppShell.tsx`. It owns the branding provider, authenticated user context, navbar, toast layer, enterprise-image initializer, and printer script. The root layout is intentionally limited to document metadata, fonts, global styles, and passing the authenticated user and page content into `AppShell`.
+
 ## Environment variable override pattern
 
 The config uses `process.env.NEXT_PUBLIC_*` values with safe Spanish defaults.

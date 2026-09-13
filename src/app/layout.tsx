@@ -1,14 +1,9 @@
 import type { Metadata } from "next";
 import { Montserrat } from "next/font/google";
-import Script from "next/script";
 import "./globals.css";
 import { cn } from "@/lib/utils";
-import { Toaster } from "@/components/ui/toaster";
-import Navbar from "@/components/Navbar";
-import { EnterprisesImagesInitializer } from "@/contexts";
-import { UserProvider } from '@/contexts/UserContext';
 import { getAppUser } from "@/auth/auth.user";
-import { TenantBrandingProvider } from "@/components/branding/TenantBrandingProvider";
+import { AppShell } from "@/components/app-shell";
 import whiteLabelConfig from "../../white-label.config";
 
 const montserrat = Montserrat({ subsets: ["latin"], variable: "--montserrat" });
@@ -34,15 +29,7 @@ export default async function RootLayout({
           montserrat.className
         )}
       >
-        <TenantBrandingProvider>
-          <UserProvider user={user}>
-            <Navbar userName={user?.name} />
-            {children}
-            <Toaster />
-            <EnterprisesImagesInitializer />
-            <Script src="/lib/epos-2.27.0.js" strategy="beforeInteractive" />
-          </UserProvider>
-        </TenantBrandingProvider>
+        <AppShell user={user}>{children}</AppShell>
       </body>
     </html>
   );
