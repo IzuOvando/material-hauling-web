@@ -1,6 +1,7 @@
 "use client";
 
 import { Search, UserPlus } from "lucide-react";
+import whiteLabelConfig from "../../../white-label.config";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -37,7 +38,7 @@ export function UsersToolbar({
       <div className="relative w-64">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
         <Input
-          placeholder="Buscar por usuario..."
+          placeholder={(whiteLabelConfig as any)?.ui?.users?.toolbar?.searchPlaceholder || 'Buscar por usuario...'}
           value={search}
           onChange={(e) => onSearch(e.target.value)}
           className="pl-9 border-2 focus-visible:ring-0 focus-visible:border-accent transition-colors"
@@ -76,7 +77,7 @@ export function UsersToolbar({
         className="bg-secondary hover:bg-secondary-light active:bg-secondary-dark text-white gap-2 transition-all duration-200"
       >
         <UserPlus className="h-4 w-4" />
-        Nuevo Usuario
+        {(whiteLabelConfig as any)?.ui?.users?.toolbar?.newUserButton || 'Nuevo Usuario'}
       </Button>
     </div>
   );

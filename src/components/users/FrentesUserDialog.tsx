@@ -17,6 +17,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { ChevronDown, ChevronRight, Loader2, Search } from "lucide-react";
 import { getProject } from "@/helpers/strings";
 import type { UserRow } from "@/types";
+import whiteLabelConfig from "../../../white-label.config";
 
 interface FrentesUserDialogProps {
   user: UserRow;
@@ -144,22 +145,22 @@ export function FrentesUserDialog({
     <Dialog open={open} onOpenChange={(next) => { if (!isLoading) onOpenChange(next); }}>
       <DialogContent className="sm:max-w-[480px]">
         <DialogHeader>
-          <DialogTitle>Gestionar frentes</DialogTitle>
+          <DialogTitle>{(whiteLabelConfig as any)?.ui?.users?.actions?.manageFrentesTitle || "Gestionar frentes"}</DialogTitle>
           <DialogDescription>
-            Asigna o quita frentes al usuario{" "}
+            {(whiteLabelConfig as any)?.ui?.users?.frentesDialog?.descriptionPrefix || "Asigna o quita frentes al usuario"}{" "}
             <span className="font-mono font-semibold">{user.username}</span>.
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-3 py-2">
           {frentes.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No hay frentes registrados.</p>
+            <p className="text-sm text-muted-foreground">{(whiteLabelConfig as any)?.ui?.frentesManager?.noRegistered || "No hay frentes registrados."}</p>
           ) : (
             <>
               <div className="relative">
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Buscar proyecto o frente..."
+                  placeholder={(whiteLabelConfig as any)?.ui?.users?.create?.searchPlaceholder || "Buscar proyecto o frente..."}
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   className="pl-8 shadow-sm"
@@ -169,7 +170,7 @@ export function FrentesUserDialog({
               <div className="space-y-1 max-h-72 overflow-y-auto pr-1">
                 {noResults ? (
                   <p className="text-sm text-muted-foreground py-4 text-center">
-                    Sin resultados para &quot;{search}&quot;
+                    {(whiteLabelConfig as any)?.ui?.frentesManager?.noResultsPrefix || "Sin resultados para"} &quot;{search}&quot;
                   </p>
                 ) : (
                   projectEntries.map(([project, list]) => {

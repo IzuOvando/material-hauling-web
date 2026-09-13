@@ -19,6 +19,7 @@ import { ResetPasswordDialog } from "@/components/users/ResetPasswordDialog";
 import { UsersToolbar } from "@/components/users/UsersToolbar";
 import { NewUserSheet } from "@/components/users/NewUserSheet";
 import type { UserRow } from "@/types";
+import whiteLabelConfig from "../../../white-label.config";
 
 interface UsersTableProps {
   frentes: string[];
@@ -183,24 +184,24 @@ export function UsersTable({ frentes }: UsersTableProps) {
       <div className="rounded-xl border border-border overflow-hidden shadow-sm">
         <Table>
           <TableHeader>
-            <TableRow className="bg-primary hover:bg-primary border-0">
+              <TableRow className="bg-primary hover:bg-primary border-0">
               <TableHead className="text-xs tracking-wide uppercase text-accent font-semibold w-40">
-                Usuario
+                {(whiteLabelConfig as any)?.ui?.users?.table?.headers?.username || 'Usuario'}
               </TableHead>
               <TableHead className="text-xs tracking-wide uppercase text-accent font-semibold w-24">
-                Rol
+                {(whiteLabelConfig as any)?.ui?.users?.table?.headers?.role || 'Rol'}
               </TableHead>
               <TableHead className="text-xs tracking-wide uppercase text-accent font-semibold">
-                Nombre completo
+                {(whiteLabelConfig as any)?.ui?.users?.table?.headers?.fullname || 'Nombre completo'}
               </TableHead>
               <TableHead className="text-xs tracking-wide uppercase text-accent font-semibold w-32">
-                No. Empleado
+                {(whiteLabelConfig as any)?.ui?.users?.table?.headers?.employeeNo || 'No. Empleado'}
               </TableHead>
               <TableHead className="text-xs tracking-wide uppercase text-accent font-semibold">
-                Frentes asignados
+                {(whiteLabelConfig as any)?.ui?.users?.table?.headers?.frentes || 'Frentes asignados'}
               </TableHead>
               <TableHead className="text-xs tracking-wide uppercase text-accent font-semibold w-40 text-right">
-                Acciones
+                {(whiteLabelConfig as any)?.ui?.users?.table?.headers?.actions || 'Acciones'}
               </TableHead>
             </TableRow>
           </TableHeader>
@@ -210,11 +211,11 @@ export function UsersTable({ frentes }: UsersTableProps) {
             ) : filtered.length === 0 && !hasActiveFilters ? (
               <TableRow>
                 <TableCell colSpan={6}>
-                  <div className="flex flex-col items-center justify-center py-16 gap-3 text-muted-foreground">
+                    <div className="flex flex-col items-center justify-center py-16 gap-3 text-muted-foreground">
                     <Users className="h-12 w-12 opacity-30" />
-                    <p className="text-sm font-medium">No hay usuarios registrados.</p>
+                    <p className="text-sm font-medium">{(whiteLabelConfig as any)?.ui?.users?.empty?.noUsers || 'No hay usuarios registrados.'}</p>
                     <p className="text-xs opacity-70">
-                      Crea el primer usuario con el botón &quot;Nuevo Usuario&quot;.
+                      {(whiteLabelConfig as any)?.ui?.users?.empty?.createHint || 'Crea el primer usuario con el botón "Nuevo Usuario".'}
                     </p>
                   </div>
                 </TableCell>
@@ -225,7 +226,7 @@ export function UsersTable({ frentes }: UsersTableProps) {
                   <div className="flex flex-col items-center justify-center py-16 gap-3 text-muted-foreground">
                     <Search className="h-10 w-10 opacity-30" />
                     <p className="text-sm font-medium">
-                      Sin resultados para los filtros aplicados.
+                      {(whiteLabelConfig as any)?.ui?.users?.empty?.noResults || 'Sin resultados para los filtros aplicados.'}
                     </p>
                     <Button
                       variant="outline"
@@ -233,7 +234,7 @@ export function UsersTable({ frentes }: UsersTableProps) {
                       onClick={clearFilters}
                       className="mt-1"
                     >
-                      Limpiar filtros
+                      {(whiteLabelConfig as any)?.ui?.users?.empty?.clearFilters || 'Limpiar filtros'}
                     </Button>
                   </div>
                 </TableCell>
@@ -270,7 +271,7 @@ export function UsersTable({ frentes }: UsersTableProps) {
                       <Button
                         variant="ghost"
                         size="icon"
-                        title="Editar usuario"
+                        title={(whiteLabelConfig as any)?.ui?.users?.actions?.editTitle || "Editar usuario"}
                         onClick={() => openAction(user, "edit")}
                         className="h-8 w-8 hover:bg-primary/10 hover:text-primary transition-colors"
                       >
@@ -279,7 +280,7 @@ export function UsersTable({ frentes }: UsersTableProps) {
                       <Button
                         variant="ghost"
                         size="icon"
-                        title="Gestionar frentes"
+                        title={(whiteLabelConfig as any)?.ui?.users?.actions?.manageFrentesTitle || "Gestionar frentes"}
                         onClick={() => openAction(user, "frentes")}
                         className="h-8 w-8 hover:bg-accent/10 hover:text-accent-dark transition-colors"
                       >
@@ -288,7 +289,7 @@ export function UsersTable({ frentes }: UsersTableProps) {
                       <Button
                         variant="ghost"
                         size="icon"
-                        title="Eliminar usuario"
+                        title={(whiteLabelConfig as any)?.ui?.users?.actions?.deleteTitle || "Eliminar usuario"}
                         onClick={() => openAction(user, "delete")}
                         className="h-8 w-8 text-muted-foreground/70 hover:bg-red-50 hover:text-red-600 transition-colors"
                       >
@@ -297,7 +298,7 @@ export function UsersTable({ frentes }: UsersTableProps) {
                       <Button
                         variant="ghost"
                         size="icon"
-                        title="Restablecer contraseña"
+                        title={(whiteLabelConfig as any)?.ui?.users?.actions?.resetPasswordTitle || "Restablecer contraseña"}
                         onClick={() => openAction(user, "reset")}
                         className="h-8 w-8 hover:bg-secondary/10 hover:text-secondary transition-colors"
                       >

@@ -17,6 +17,7 @@ import { cn } from "@/lib/utils";
 import { getAllFreentes } from "@/actions/frentes";
 import AddFrenteDialog from "./AddFrenteDialog";
 import EditFrenteDialog from "./EditFrenteDialog";
+import whiteLabelConfig from "../../../white-label.config";
 
 function groupByProject(frentes: Frente[]): Map<string, Frente[]> {
   const map = new Map<string, Frente[]>();
@@ -118,9 +119,9 @@ export function FrentesManagerSheet() {
           <Layers className="h-4 w-4 shrink-0 transition-colors text-accent" />
         </div>
         <div className="min-w-0">
-          <p className="text-sm font-semibold leading-tight">Gestionar Frentes</p>
+          <p className="text-sm font-semibold leading-tight">{(whiteLabelConfig as any)?.ui?.frentesManager?.title || 'Gestionar Frentes'}</p>
           <p className="text-xs leading-tight mt-0.5 truncate text-muted-foreground">
-            Añadir, editar o eliminar
+            {(whiteLabelConfig as any)?.ui?.frentesManager?.description || 'Añadir, editar o eliminar'}
           </p>
         </div>
       </button>
@@ -140,7 +141,7 @@ export function FrentesManagerSheet() {
               onClick={() => setOpenAdd(true)}
             >
               <Plus className="h-4 w-4" />
-              Nuevo Frente
+              {(whiteLabelConfig as any)?.ui?.frentesManager?.newButton || 'Nuevo Frente'}
             </Button>
 
             {/* Search */}
@@ -148,7 +149,7 @@ export function FrentesManagerSheet() {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
               <input
                 type="text"
-                placeholder="Buscar frente o proyecto…"
+                placeholder={(whiteLabelConfig as any)?.ui?.frentesManager?.searchPlaceholder || "Buscar frente o proyecto…"}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className={cn(
@@ -170,11 +171,11 @@ export function FrentesManagerSheet() {
               </div>
             ) : frentes.length === 0 ? (
               <p className="text-sm text-slate-500 text-center py-12">
-                No hay frentes registrados.
+                {(whiteLabelConfig as any)?.ui?.frentesManager?.noRegistered || "No hay frentes registrados."}
               </p>
             ) : filtered.size === 0 ? (
               <p className="text-sm text-slate-500 text-center py-12">
-                Sin resultados para{" "}
+                {(whiteLabelConfig as any)?.ui?.frentesManager?.noResultsPrefix || "Sin resultados para"}{" "}
                 <span className="font-semibold">&quot;{search}&quot;</span>
               </p>
             ) : (
@@ -228,7 +229,7 @@ export function FrentesManagerSheet() {
                                 size="icon"
                                 className="h-7 w-7 shrink-0 text-slate-400 hover:text-secondary hover:bg-secondary/10"
                                 onClick={() => setEditingFrente(frente)}
-                                title="Editar frente"
+                                title={(whiteLabelConfig as any)?.ui?.frentesManager?.editTitle || 'Editar frente'}
                               >
                                 <Pencil className="h-3.5 w-3.5" />
                               </Button>

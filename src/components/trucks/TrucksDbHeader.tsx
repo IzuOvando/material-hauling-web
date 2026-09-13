@@ -16,6 +16,7 @@ import { useFrenteStore } from "@/store";
 import { DeleteVouchersDialog, CloseCycleSheet } from "@/components/trucks";
 import AddFrenteDialog from "@/components/frentes/AddFrenteDialog";
 import EditFrenteDialog from "@/components/frentes/EditFrenteDialog";
+import whiteLabelConfig from "../../../white-label.config";
 
 interface TrucksDbHeaderProps {
   frente: string;
@@ -94,31 +95,31 @@ export function TrucksDbHeader({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48">
-              {isOwner && (
+                {isOwner && (
                 <DropdownMenuItem
                   onClick={() => setOpenAddFrente(true)}
                   className="cursor-pointer gap-2"
                 >
                   <Plus className="h-4 w-4 text-primary" />
-                  Añadir frente
+                  {(whiteLabelConfig as any)?.ui?.frentesManager?.menu?.add || 'Añadir frente'}
                 </DropdownMenuItem>
               )}
-              {isOwner && current && (
+                {isOwner && current && (
                 <DropdownMenuItem
                   onClick={() => setOpenEditFrente(true)}
                   className="cursor-pointer gap-2"
                 >
                   <Pencil className="h-4 w-4 text-primary" />
-                  Editar frente
+                  {(whiteLabelConfig as any)?.ui?.frentesManager?.menu?.edit || 'Editar frente'}
                 </DropdownMenuItem>
               )}
-              {isOwner && canActOnVouchers && (
+                {isOwner && canActOnVouchers && (
                 <DropdownMenuItem
                   onClick={() => setOpenCloseCycle(true)}
                   className="cursor-pointer gap-2"
                 >
                   <CircleCheck className="h-4 w-4 text-primary" />
-                  Cerrar ciclo
+                  {(whiteLabelConfig as any)?.ui?.frentesManager?.menu?.closeCycle || 'Cerrar ciclo'}
                 </DropdownMenuItem>
               )}
               {canActOnVouchers && (
@@ -129,7 +130,7 @@ export function TrucksDbHeader({
                     className="cursor-pointer gap-2 text-secondary focus:text-secondary"
                   >
                     <Trash className="h-4 w-4" />
-                    Eliminar registros
+                    {(whiteLabelConfig as any)?.ui?.frentesManager?.menu?.deleteRecords || 'Eliminar registros'}
                   </DropdownMenuItem>
                 </>
               )}

@@ -94,25 +94,25 @@ const CardLogin = () => {
         </CardHeader>
         <CardContent>
           <div className="grid w-full items-center gap-4">
-            <div className="flex flex-col space-y-1.5">
-              <Label htmlFor="username">Username</Label>
-              <Input id="username" name="username" placeholder="Username" />
+              <div className="flex flex-col space-y-1.5">
+              <Label htmlFor="username">{(whiteLabelConfig as any)?.ui?.login?.usernameLabel || 'Username'}</Label>
+              <Input id="username" name="username" placeholder={(whiteLabelConfig as any)?.ui?.login?.usernamePlaceholder || 'Username'} />
             </div>
             <div className="flex flex-col space-y-1.5">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">{(whiteLabelConfig as any)?.ui?.login?.passwordLabel || 'Password'}</Label>
               <div className="relative">
                 <Input
                   id="password"
                   name="password"
                   type={showPassword ? "text" : "password"}
-                  placeholder="******"
+                  placeholder={(whiteLabelConfig as any)?.ui?.login?.passwordPlaceholder || '******'}
                   className="pr-10"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(prev => !prev)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  aria-label={showPassword ? ((whiteLabelConfig as any)?.ui?.login?.hidePassword || 'Hide password') : ((whiteLabelConfig as any)?.ui?.login?.showPassword || 'Show password')}
                 >
                   {showPassword
                     ? <EyeOff size={16} />
@@ -129,7 +129,9 @@ const CardLogin = () => {
             disabled={isLoading}
           >
             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {isLoading ? "Signing in..." : "Sign in"}
+            {isLoading
+              ? (whiteLabelConfig as any)?.ui?.login?.signingIn || "Signing in..."
+              : (whiteLabelConfig as any)?.auth?.loginTitle || "Sign in"}
           </Button>
         </CardFooter>
       </form>

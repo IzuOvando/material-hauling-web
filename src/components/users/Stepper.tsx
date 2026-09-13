@@ -1,11 +1,12 @@
 import { Check, UserPlus, GitBranch } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { StepId, StepMeta } from "@/types";
+import whiteLabelConfig from "../../../white-label.config";
 
 const STEPS: StepMeta[] = [
-  { id: 1, label: "Datos del usuario", icon: <UserPlus className="h-3.5 w-3.5" /> },
-  { id: 2, label: "Asignar frentes",   icon: <GitBranch className="h-3.5 w-3.5" /> },
-  { id: 3, label: "Confirmación",      icon: <Check className="h-3.5 w-3.5" /> },
+  { id: 1, label: (whiteLabelConfig as any)?.ui?.users?.stepper?.userDetails || "Datos del usuario", icon: <UserPlus className="h-3.5 w-3.5" /> },
+  { id: 2, label: (whiteLabelConfig as any)?.ui?.users?.stepper?.assignFrentes || "Asignar frentes", icon: <GitBranch className="h-3.5 w-3.5" /> },
+  { id: 3, label: (whiteLabelConfig as any)?.ui?.users?.stepper?.confirmation || "Confirmación", icon: <Check className="h-3.5 w-3.5" /> },
 ];
 
 export function Stepper({ currentStep }: { currentStep: StepId }) {

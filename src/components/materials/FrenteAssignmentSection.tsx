@@ -11,6 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import whiteLabelConfig from "../../../white-label.config";
 import { Plus, X, Loader2 } from "lucide-react";
 import {
   getFrenteMaterials,
@@ -46,8 +47,8 @@ export function FrenteAssignmentSection({
       setAvailable(data.available);
     } catch {
       toast({
-        title: "Error",
-        description: "No se pudieron cargar los materiales del frente",
+          title: (whiteLabelConfig as any)?.ui?.materials?.toast?.errorTitle || "Error",
+          description: (whiteLabelConfig as any)?.ui?.materials?.toast?.errorDescription || "No se pudieron cargar los materiales del frente",
         variant: "destructive",
       });
     } finally {
@@ -80,8 +81,8 @@ export function FrenteAssignmentSection({
       );
       setAvailable((prev) => prev.filter((m) => m.id !== material.id));
       toast({
-        title: "Material asignado",
-        description: `"${material.nombre}" asignado a ${selectedFrente}`,
+        title: (whiteLabelConfig as any)?.ui?.materials?.toast?.assignedTitle || "Material asignado",
+        description: `"${material.nombre}" ${ (whiteLabelConfig as any)?.ui?.materials?.toast?.assignedVerb || 'asignado a' } ${selectedFrente}`,
         variant: "success",
       });
     } catch (error: any) {
@@ -101,8 +102,8 @@ export function FrenteAssignmentSection({
       );
       setAssigned((prev) => prev.filter((m) => m.id !== material.id));
       toast({
-        title: "Material removido",
-        description: `"${material.nombre}" removido de ${selectedFrente}`,
+        title: (whiteLabelConfig as any)?.ui?.materials?.toast?.removedTitle || "Material removido",
+        description: `"${material.nombre}" ${ (whiteLabelConfig as any)?.ui?.materials?.toast?.removedVerb || 'removido de' } ${selectedFrente}`,
         variant: "success",
       });
     } catch (error: any) {
@@ -118,7 +119,7 @@ export function FrenteAssignmentSection({
     <div className="border-2 border-primary-light rounded-lg overflow-hidden">
       <div className="bg-primary px-4 py-3">
         <h2 className="text-lg font-semibold text-accent">
-          Materiales por Frente
+          {(whiteLabelConfig as any)?.ui?.materials?.title || "Materiales por Frente"}
         </h2>
       </div>
 
@@ -126,8 +127,8 @@ export function FrenteAssignmentSection({
         {/* Frente selector */}
         <Select value={selectedFrente} onValueChange={setSelectedFrente}>
           <SelectTrigger>
-            <SelectValue placeholder="Selecciona un frente" />
-          </SelectTrigger>
+              <SelectValue placeholder={(whiteLabelConfig as any)?.ui?.general?.searchPlaceholder ?? "Selecciona un frente"} />
+            </SelectTrigger>
           <SelectContent>
             {frentes.map((frente) => (
               <SelectItem key={frente} value={frente}>
@@ -139,7 +140,7 @@ export function FrenteAssignmentSection({
 
         {!selectedFrente ? (
           <p className="text-center text-slate-500 py-8">
-            Selecciona un frente para gestionar sus materiales.
+            {(whiteLabelConfig as any)?.ui?.frenteSelector?.noAssignedSubtitle ?? "Selecciona un frente para gestionar sus materiales."}
           </p>
         ) : loading ? (
           <div className="flex items-center justify-center py-8">
@@ -150,11 +151,11 @@ export function FrenteAssignmentSection({
             {/* Assigned materials */}
             <div>
               <p className="text-sm font-medium text-slate-700 mb-2">
-                Asignados ({assigned.length})
+                {(whiteLabelConfig as any)?.ui?.materials?.assignedLabel || "Asignados"} ({assigned.length})
               </p>
               {assigned.length === 0 ? (
                 <p className="text-sm text-slate-400 px-2">
-                  Sin materiales asignados
+                  {(whiteLabelConfig as any)?.ui?.materials?.emptyAssigned || "Sin materiales asignados"}
                 </p>
               ) : (
                 <div className="flex flex-wrap gap-2">
@@ -186,7 +187,7 @@ export function FrenteAssignmentSection({
               </p>
               {available.length === 0 ? (
                 <p className="text-sm text-slate-400 px-2">
-                  Todos los materiales ya están asignados
+                  {(whiteLabelConfig as any)?.ui?.materials?.emptyAvailable || "Todos los materiales ya están asignados"}
                 </p>
               ) : (
                 <div className="flex flex-wrap gap-2">

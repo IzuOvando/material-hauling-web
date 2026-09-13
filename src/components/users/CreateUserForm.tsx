@@ -26,6 +26,7 @@ import {
 import type { StepId } from "@/types";
 import { Stepper } from "./Stepper";
 import { getProject } from "@/helpers/strings";
+import whiteLabelConfig from "../../../white-label.config";
 
 const FORM_INITIAL = {
   username:   "",
@@ -133,15 +134,15 @@ export function CreateUserForm({ frentes }: CreateUserFormProps) {
     const { username, password, rol, nombre, apPaterno, noEmpleado } = form;
 
     if (!username || !password || !rol || !nombre || !apPaterno || !noEmpleado) {
-      showError("Completa todos los campos obligatorios.");
+      showError((whiteLabelConfig as any)?.ui?.users?.form?.requiredFields || "Completa todos los campos obligatorios.");
       return;
     }
     if (password.length <= 6) {
-      showError("La contraseña debe tener más de 6 caracteres.");
+      showError((whiteLabelConfig as any)?.ui?.users?.form?.passwordMin || "La contraseña debe tener más de 6 caracteres.");
       return;
     }
     if (password !== confirmPassword) {
-      showError("Las contraseñas no coinciden.");
+      showError((whiteLabelConfig as any)?.ui?.users?.form?.passwordMismatch || "Las contraseñas no coinciden.");
       return;
     }
 
@@ -167,11 +168,11 @@ export function CreateUserForm({ frentes }: CreateUserFormProps) {
 
       if (!res.ok) {
         if (data.message === "Username already exists") {
-          showError("El nombre de usuario ya existe.");
+          showError((whiteLabelConfig as any)?.ui?.users?.form?.usernameExists || "El nombre de usuario ya existe.");
         } else if (data.message?.includes("Password length")) {
-          showError("La contraseña debe tener más de 6 caracteres.");
+          showError((whiteLabelConfig as any)?.ui?.users?.form?.passwordMin || "La contraseña debe tener más de 6 caracteres.");
         } else {
-          showError("Ocurrió un error al crear el usuario.");
+          showError((whiteLabelConfig as any)?.ui?.users?.form?.createError || "Ocurrió un error al crear el usuario.");
         }
         return;
       }
@@ -199,7 +200,7 @@ export function CreateUserForm({ frentes }: CreateUserFormProps) {
       });
 
       if (!res.ok) {
-        showError("Error al asignar los frentes.");
+        showError((whiteLabelConfig as any)?.ui?.users?.form?.assignFrentesError || "Error al asignar los frentes.");
         return;
       }
 
@@ -221,20 +222,20 @@ export function CreateUserForm({ frentes }: CreateUserFormProps) {
 
           {step === 1 && (
             <>
-              <div className="bg-primary px-4 py-3">
-                <h2 className="text-lg font-semibold text-accent">Datos del nuevo usuario</h2>
-                <p className="text-xs text-white/70 mt-0.5">Paso 1 de 3 — Información de acceso e identidad</p>
-              </div>
+                      <div className="bg-primary px-4 py-3">
+                      <h2 className="text-lg font-semibold text-accent">{(whiteLabelConfig as any)?.ui?.users?.create?.title || 'Datos del nuevo usuario'}</h2>
+                      <p className="text-xs text-white/70 mt-0.5">{(whiteLabelConfig as any)?.ui?.users?.create?.subtitle || 'Paso 1 de 3 — Información de acceso e identidad'}</p>
+                    </div>
 
               <form onSubmit={handleCrearUsuario}>
                 <div className="p-4 bg-white space-y-3">
                   <div className="grid grid-cols-2 gap-3">
 
                     <div className="flex flex-col gap-1.5">
-                      <Label htmlFor="username">Nombre de usuario *</Label>
+                      <Label htmlFor="username">{(whiteLabelConfig as any)?.ui?.users?.create?.usernameLabel || 'Nombre de usuario *'}</Label>
                       <Input
                         id="username"
-                        placeholder="Ej. checador01"
+                        placeholder={(whiteLabelConfig as any)?.ui?.users?.create?.usernamePlaceholder || 'Ej. checador01'}
                         value={form.username}
                         onChange={(e) => handleFieldChange("username", e.target.value)}
                         className="shadow-sm"
@@ -242,10 +243,10 @@ export function CreateUserForm({ frentes }: CreateUserFormProps) {
                     </div>
 
                     <div className="flex flex-col gap-1.5">
-                      <Label htmlFor="noEmpleado">No. de empleado *</Label>
+                      <Label htmlFor="noEmpleado">{(whiteLabelConfig as any)?.ui?.users?.create?.employeeLabel || 'No. de empleado *'}</Label>
                       <Input
                         id="noEmpleado"
-                        placeholder="Ej. EMP-001"
+                        placeholder={(whiteLabelConfig as any)?.ui?.users?.create?.employeePlaceholder || 'Ej. EMP-001'}
                         value={form.noEmpleado}
                         onChange={(e) => handleFieldChange("noEmpleado", e.target.value)}
                         className="shadow-sm"
@@ -253,12 +254,12 @@ export function CreateUserForm({ frentes }: CreateUserFormProps) {
                     </div>
 
                     <div className="flex flex-col gap-1.5">
-                      <Label htmlFor="password">Contraseña *</Label>
+                      <Label htmlFor="password">{(whiteLabelConfig as any)?.ui?.users?.create?.passwordLabel || 'Contraseña *'}</Label>
                       <div className="relative">
                         <Input
                           id="password"
                           type={showPassword ? "text" : "password"}
-                          placeholder="Mínimo 7 caracteres"
+                          placeholder={(whiteLabelConfig as any)?.ui?.users?.create?.passwordPlaceholder || 'Mínimo 7 caracteres'}
                           value={form.password}
                           onChange={(e) => handleFieldChange("password", e.target.value)}
                           onBlur={() => setPasswordBlurred(true)}
@@ -275,18 +276,18 @@ export function CreateUserForm({ frentes }: CreateUserFormProps) {
                         </button>
                       </div>
                       {passwordBlurred && form.password.length > 0 && form.password.length <= 6 && (
-                        <p className="text-xs text-red-400">La contraseña debe tener más de 6 caracteres</p>
+                        <p className="text-xs text-red-400">{(whiteLabelConfig as any)?.ui?.users?.form?.passwordMin || 'La contraseña debe tener más de 6 caracteres'}</p>
                       )}
                     </div>
 
                     <div className="flex flex-col gap-1.5">
-                      <Label htmlFor="confirmPassword">Confirmar contraseña *</Label>
+                      <Label htmlFor="confirmPassword">{(whiteLabelConfig as any)?.ui?.users?.create?.confirmPasswordLabel || 'Confirmar contraseña *'}</Label>
                       <div className="flex flex-col gap-1">
                         <div className="relative">
                           <Input
                             id="confirmPassword"
                             type={showConfirm ? "text" : "password"}
-                            placeholder="Repetir contraseña"
+                            placeholder={(whiteLabelConfig as any)?.ui?.users?.create?.confirmPasswordPlaceholder || 'Repetir contraseña'}
                             value={confirmPassword}
                             onChange={(e) => setConfirmPassword(e.target.value)}
                             onPaste={(e) => e.preventDefault()}
@@ -302,19 +303,19 @@ export function CreateUserForm({ frentes }: CreateUserFormProps) {
                           </button>
                         </div>
                         {passwordsMatch === false && (
-                          <p className="text-xs text-red-400">Las contraseñas no coinciden</p>
+                          <p className="text-xs text-red-400">{(whiteLabelConfig as any)?.ui?.users?.form?.passwordMismatch || 'Las contraseñas no coinciden'}</p>
                         )}
                         {passwordsMatch === true && (
-                          <p className="text-xs text-green-600">Las contraseñas coinciden ✓</p>
+                          <p className="text-xs text-green-600">{(whiteLabelConfig as any)?.ui?.users?.form?.passwordMatch || 'Las contraseñas coinciden ✓'}</p>
                         )}
                       </div>
                     </div>
 
                     <div className="flex flex-col gap-1.5">
-                      <Label htmlFor="rol">Rol *</Label>
+                      <Label htmlFor="rol">{(whiteLabelConfig as any)?.ui?.users?.create?.roleLabel || 'Rol *'}</Label>
                       <Select value={form.rol} onValueChange={(v) => handleFieldChange("rol", v)}>
                         <SelectTrigger id="rol" className="shadow-sm">
-                          <SelectValue placeholder="Selecciona un rol" />
+                          <SelectValue placeholder={(whiteLabelConfig as any)?.ui?.users?.create?.rolePlaceholder || 'Selecciona un rol'} />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="user">Checador</SelectItem>
@@ -324,10 +325,10 @@ export function CreateUserForm({ frentes }: CreateUserFormProps) {
                     </div>
 
                     <div className="flex flex-col gap-1.5">
-                      <Label htmlFor="nombre">Nombre(s) *</Label>
+                      <Label htmlFor="nombre">{(whiteLabelConfig as any)?.ui?.users?.create?.nameLabel || 'Nombre(s) *'}</Label>
                       <Input
                         id="nombre"
-                        placeholder="Ej. Juan"
+                        placeholder={(whiteLabelConfig as any)?.ui?.users?.form?.namePlaceholder || 'Ej. Juan'}
                         value={form.nombre}
                         onChange={(e) => handleFieldChange("nombre", e.target.value)}
                         className="shadow-sm"
@@ -335,10 +336,10 @@ export function CreateUserForm({ frentes }: CreateUserFormProps) {
                     </div>
 
                     <div className="flex flex-col gap-1.5">
-                      <Label htmlFor="apPaterno">Apellido paterno *</Label>
+                      <Label htmlFor="apPaterno">{(whiteLabelConfig as any)?.ui?.users?.create?.firstSurnameLabel || 'Apellido paterno *'}</Label>
                       <Input
                         id="apPaterno"
-                        placeholder="Ej. García"
+                        placeholder={(whiteLabelConfig as any)?.ui?.users?.form?.surnamePlaceholder || 'Ej. García'}
                         value={form.apPaterno}
                         onChange={(e) => handleFieldChange("apPaterno", e.target.value)}
                         className="shadow-sm"
@@ -347,12 +348,12 @@ export function CreateUserForm({ frentes }: CreateUserFormProps) {
 
                     <div className="flex flex-col gap-1.5">
                       <Label htmlFor="apMaterno">
-                        Apellido materno{" "}
-                        <span className="text-muted-foreground font-normal">(opcional)</span>
+                        {(whiteLabelConfig as any)?.ui?.users?.create?.secondSurnameLabel || 'Apellido materno'}{" "}
+                        <span className="text-muted-foreground font-normal">{(whiteLabelConfig as any)?.ui?.users?.create?.secondSurnameOptional || '(opcional)'}</span>
                       </Label>
                       <Input
                         id="apMaterno"
-                        placeholder="Ej. López"
+                        placeholder={(whiteLabelConfig as any)?.ui?.users?.form?.secondSurnamePlaceholder || 'Ej. López'}
                         value={form.apMaterno}
                         onChange={(e) => handleFieldChange("apMaterno", e.target.value)}
                         className="shadow-sm"
@@ -369,7 +370,7 @@ export function CreateUserForm({ frentes }: CreateUserFormProps) {
                     className="w-full bg-secondary hover:bg-secondary-light active:bg-secondary-dark"
                   >
                     {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    {isLoading ? "Creando usuario..." : "Continuar →"}
+                    {isLoading ? (whiteLabelConfig as any)?.ui?.users?.create?.creating || "Creando usuario..." : (whiteLabelConfig as any)?.ui?.users?.create?.createButton || "Continuar →"}
                   </Button>
                 </div>
               </form>
@@ -383,23 +384,23 @@ export function CreateUserForm({ frentes }: CreateUserFormProps) {
             return (
               <>
                 <div className="bg-primary px-4 py-3">
-                  <h2 className="text-lg font-semibold text-accent">Asignar frentes</h2>
+                  <h2 className="text-lg font-semibold text-accent">{(whiteLabelConfig as any)?.ui?.users?.create?.stepTwoTitle || 'Asignar frentes'}</h2>
                   <p className="text-xs text-white/70 mt-0.5">
-                    Paso 2 de 3 —{" "}
-                    Usuario <span className="font-semibold text-white">{createdUsername}</span> creado.
-                    Selecciona los frentes a los que tendrá acceso.
+                    {(whiteLabelConfig as any)?.ui?.users?.create?.stepTwoDescription || 'Paso 2 de 3 — Usuario {username} creado. Selecciona los frentes a los que tendrá acceso.'}
+                    {" "}
+                    <span className="font-semibold text-white">{createdUsername}</span>
                   </p>
                 </div>
 
                 <div className="p-5 bg-white space-y-3">
                   {frentes.length === 0 ? (
-                    <p className="text-sm text-muted-foreground">No hay frentes registrados.</p>
+                    <p className="text-sm text-muted-foreground">{(whiteLabelConfig as any)?.ui?.frentesManager?.noRegistered || "No hay frentes registrados."}</p>
                   ) : (
                     <>
                       <div className="relative">
                         <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                         <Input
-                          placeholder="Buscar proyecto o frente..."
+                          placeholder={(whiteLabelConfig as any)?.ui?.users?.create?.searchPlaceholder || 'Buscar proyecto o frente...'}
                           value={search}
                           onChange={(e) => setSearch(e.target.value)}
                           className="pl-8 shadow-sm"
@@ -409,7 +410,7 @@ export function CreateUserForm({ frentes }: CreateUserFormProps) {
                       <div className="space-y-1 max-h-80 overflow-y-auto pr-1">
                         {noResults ? (
                           <p className="text-sm text-muted-foreground py-4 text-center">
-                            Sin resultados para &quot;{search}&quot;
+                            {(whiteLabelConfig as any)?.ui?.frentesManager?.noResultsPrefix || "Sin resultados para"} &quot;{search}&quot;
                           </p>
                         ) : (
                           projectEntries.map(([project, frenteList]) => {
@@ -478,7 +479,7 @@ export function CreateUserForm({ frentes }: CreateUserFormProps) {
                       className="w-full bg-secondary hover:bg-secondary-light active:bg-secondary-dark"
                     >
                       {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                      Asignar frentes ({selectedFrentes.length} seleccionados)
+                      {(whiteLabelConfig as any)?.ui?.users?.create?.assignButton || 'Asignar frentes'} ({selectedFrentes.length} seleccionados)
                     </Button>
                     <Button
                       variant="ghost"
@@ -486,7 +487,7 @@ export function CreateUserForm({ frentes }: CreateUserFormProps) {
                       disabled={isLoading}
                       className="w-full"
                     >
-                      Omitir por ahora
+                      {(whiteLabelConfig as any)?.ui?.users?.create?.omitButton || 'Omitir por ahora'}
                     </Button>
 
                     <p className="text-xs text-center text-muted-foreground pt-1">
@@ -496,7 +497,7 @@ export function CreateUserForm({ frentes }: CreateUserFormProps) {
                         onClick={() => setStep(1)}
                         className="underline underline-offset-2 hover:text-foreground transition-colors"
                       >
-                        Volver al paso 1
+                        {(whiteLabelConfig as any)?.ui?.users?.create?.backToStepOne || 'Volver al paso 1'}
                       </button>
                     </p>
                   </div>
@@ -509,21 +510,21 @@ export function CreateUserForm({ frentes }: CreateUserFormProps) {
             <>
               <div className="bg-primary px-4 py-3 flex items-center gap-2">
                 <CheckCircle className="h-5 w-5 text-accent" />
-                <h2 className="text-lg font-semibold text-accent">Usuario registrado exitosamente</h2>
+                <h2 className="text-lg font-semibold text-accent">{(whiteLabelConfig as any)?.ui?.users?.create?.successTitle || 'Usuario registrado exitosamente'}</h2>
               </div>
               <div className="p-5 bg-white">
                 <p className="text-muted-foreground text-sm">
-                  El usuario{" "}
-                  <span className="font-semibold text-foreground">{createdUsername}</span> fue creado
+                  {(whiteLabelConfig as any)?.ui?.users?.create?.successDescription || 'El usuario {username} fue creado {suffix}'}
+                  <span className="font-semibold text-foreground">{createdUsername}</span>
                   {selectedFrentes.length > 0
-                    ? ` y se le asignaron ${selectedFrentes.length} frente(s).`
-                    : " sin frentes asignados."}
+                    ? ` ${(whiteLabelConfig as any)?.ui?.users?.form?.assignSummarySuffix || 'y se le asignaron'} ${selectedFrentes.length} ${(whiteLabelConfig as any)?.ui?.users?.form?.frontsSuffix || 'frente(s).'}`
+                    : ` ${(whiteLabelConfig as any)?.ui?.users?.form?.noFrentesAssigned || 'sin frentes asignados.'}`}
                 </p>
                 <Button
                   onClick={handleReset}
                   className="w-full mt-4 bg-secondary hover:bg-secondary-light active:bg-secondary-dark"
                 >
-                  Registrar otro usuario
+                  {(whiteLabelConfig as any)?.ui?.users?.create?.successButton || 'Registrar otro usuario'}
                 </Button>
               </div>
             </>
