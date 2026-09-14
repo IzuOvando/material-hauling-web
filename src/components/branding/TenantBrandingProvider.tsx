@@ -12,6 +12,11 @@ type TenantBranding = {
   secondaryColor: string;
   accentColor: string;
   welcomeLabel: string;
+  theme: {
+    primary: string;
+    secondary: string;
+    accent: string;
+  };
 };
 
 const defaultBranding: TenantBranding = {
@@ -23,6 +28,7 @@ const defaultBranding: TenantBranding = {
   secondaryColor: whiteLabelConfig.branding.secondaryColor,
   accentColor: whiteLabelConfig.branding.accentColor,
   welcomeLabel: whiteLabelConfig.auth.welcomeLabel,
+  theme: whiteLabelConfig.theme,
 };
 
 const TenantBrandingContext = createContext<TenantBranding>(defaultBranding);
@@ -44,6 +50,9 @@ export function TenantBrandingProvider({
             "--tenant-primary-color": value.primaryColor,
             "--tenant-secondary-color": value.secondaryColor,
             "--tenant-accent-color": value.accentColor,
+            "--primary-color": value.theme.primary,
+            "--secondary-color": value.theme.secondary,
+            "--accent-color": value.theme.accent,
           } as React.CSSProperties
         }
       >

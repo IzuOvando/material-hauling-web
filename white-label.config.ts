@@ -13,6 +13,11 @@ export const whiteLabelConfig = {
     secondaryColor: process.env.NEXT_PUBLIC_SECONDARY_COLOR || "#bc955c",
     accentColor: process.env.NEXT_PUBLIC_ACCENT_COLOR || "#9d2449",
   },
+  theme: {
+    primary: process.env.NEXT_PUBLIC_THEME_PRIMARY || "19 50 43",
+    secondary: process.env.NEXT_PUBLIC_THEME_SECONDARY || "157 36 73",
+    accent: process.env.NEXT_PUBLIC_THEME_ACCENT || "188 149 92",
+  },
   assets: {
     enterpriseImagesFolder: process.env.ENTERPRISE_IMAGES_FOLDER || "public/images/enterprises",
     enterpriseImagesDirectory: process.env.NEXT_PUBLIC_ENTERPRISE_IMAGES_DIRECTORY || "/images/enterprises",

@@ -15,6 +15,7 @@ Use the exported `whiteLabelConfig` object from `white-label.config.ts`.
 The file exposes:
 - `app`: app name, short name, tagline, locale
 - `branding`: logo, brand colors
+- `theme`: semantic UI colors used by Tailwind and global CSS
 - `assets`: customer-owned logo-adjacent asset paths and downloadable templates
 - `auth`: login text
 - `ui`: all user-facing copy grouped by area
@@ -58,6 +59,13 @@ NEXT_PUBLIC_UI_USERS_ACTION_RESET="Reset password"
 - `NEXT_PUBLIC_PRIMARY_COLOR`
 - `NEXT_PUBLIC_SECONDARY_COLOR`
 - `NEXT_PUBLIC_ACCENT_COLOR`
+
+### `theme`
+- `NEXT_PUBLIC_THEME_PRIMARY`
+- `NEXT_PUBLIC_THEME_SECONDARY`
+- `NEXT_PUBLIC_THEME_ACCENT`
+
+Theme values use the existing CSS RGB channel format, for example `19 50 43`. This keeps Tailwind opacity utilities compatible without runtime color conversion. The base theme defaults preserve the current application palette: green primary, magenta secondary, and gold accent.
 
 ### `assets`
 - `NEXT_PUBLIC_LOGO_URL`
