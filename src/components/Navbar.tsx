@@ -6,7 +6,7 @@ import whiteLabelConfig from "../../white-label.config";
 
 const Navbar = ({ userName }: { userName: string | undefined }) => {
   return (
-    <nav className="h-14 bg-primary-dark flex justify-between items-center p-8">
+    <nav className="h-14 bg-primary flex justify-between items-center p-8">
       <BrandMark />
       <form
         className="flex text-white gap-6 items-center"
