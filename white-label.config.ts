@@ -13,6 +13,12 @@ export const whiteLabelConfig = {
     secondaryColor: process.env.NEXT_PUBLIC_SECONDARY_COLOR || "#bc955c",
     accentColor: process.env.NEXT_PUBLIC_ACCENT_COLOR || "#9d2449",
   },
+  assets: {
+    enterpriseImagesFolder: process.env.ENTERPRISE_IMAGES_FOLDER || "public/images/enterprises",
+    enterpriseImagesDirectory: process.env.NEXT_PUBLIC_ENTERPRISE_IMAGES_DIRECTORY || "/images/enterprises",
+    qrTemplateUrl: process.env.NEXT_PUBLIC_QR_TEMPLATE_URL || "/documents/test_metadatacamion.xlsx",
+    qrTemplateFilename: process.env.NEXT_PUBLIC_QR_TEMPLATE_FILENAME || "test_metadatacamion.xlsx",
+  },
   auth: {
     loginTitle: process.env.NEXT_PUBLIC_LOGIN_TITLE || "Iniciar Sesión",
     loginSubtitle: process.env.NEXT_PUBLIC_LOGIN_SUBTITLE || "Ingresa Credenciales",

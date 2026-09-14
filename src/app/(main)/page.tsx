@@ -139,8 +139,8 @@ export default function QRPage() {
       {/* Template download */}
       <div className="mt-5 flex justify-center">
         <a
-          href="/documents/test_metadatacamion.xlsx"
-          download="test_metadatacamion.xlsx"
+          href={whiteLabelConfig.assets.qrTemplateUrl}
+          download={whiteLabelConfig.assets.qrTemplateFilename}
           className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-accent transition-colors group"
         >
           <Download className="h-4 w-4 group-hover:text-accent transition-colors" />

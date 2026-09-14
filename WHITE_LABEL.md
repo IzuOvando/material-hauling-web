@@ -15,6 +15,7 @@ Use the exported `whiteLabelConfig` object from `white-label.config.ts`.
 The file exposes:
 - `app`: app name, short name, tagline, locale
 - `branding`: logo, brand colors
+- `assets`: customer-owned logo-adjacent asset paths and downloadable templates
 - `auth`: login text
 - `ui`: all user-facing copy grouped by area
 
@@ -57,6 +58,15 @@ NEXT_PUBLIC_UI_USERS_ACTION_RESET="Reset password"
 - `NEXT_PUBLIC_PRIMARY_COLOR`
 - `NEXT_PUBLIC_SECONDARY_COLOR`
 - `NEXT_PUBLIC_ACCENT_COLOR`
+
+### `assets`
+- `NEXT_PUBLIC_LOGO_URL`
+- `ENTERPRISE_IMAGES_FOLDER` (server-side filesystem path, relative to the repository root)
+- `NEXT_PUBLIC_ENTERPRISE_IMAGES_DIRECTORY`
+- `NEXT_PUBLIC_QR_TEMPLATE_URL`
+- `NEXT_PUBLIC_QR_TEMPLATE_FILENAME`
+
+Keep customer assets isolated under their configured folders. Database-backed frente logos remain managed by the existing upload flow and are not replaced by these static asset settings.
 
 ### `auth`
 - `NEXT_PUBLIC_LOGIN_TITLE`
