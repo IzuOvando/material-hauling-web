@@ -10,6 +10,7 @@ import {
   formatTime12Hour,
 } from "@/helpers/formatters/datetime";
 import { getMaterialDescription } from "@/helpers/formatters/voucherMaterial";
+import whiteLabelConfig from "../../../../white-label.config";
 
 interface VoucherCardProps {
   voucher: VoucherCamion;
@@ -60,7 +61,7 @@ export function VoucherCard({ voucher, onClick }: VoucherCardProps) {
                 arrived ? "bg-primary" : "bg-secondary"
               )}
             />
-            {arrived ? "Llegó" : "En tránsito"}
+            {arrived ? whiteLabelConfig.ui.trucksFilters.statusArrived : whiteLabelConfig.ui.trucksFilters.statusInTransit}
           </span>
         </div>
 

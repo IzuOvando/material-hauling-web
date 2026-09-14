@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Frente } from "@prisma/client";
 import { DeleteVoucherButton } from ".";
+import whiteLabelConfig from "../../../white-label.config";
 
 interface DeleteVouchersDialogProps {
   open: boolean;
@@ -41,24 +42,25 @@ const DeleteVouchersDialog = ({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="sm:max-w-[450px]">
         <DialogHeader>
-          <DialogTitle>Eliminar datos de Trucks</DialogTitle>
+          <DialogTitle>{whiteLabelConfig.ui.vouchers.deleteDialogTitle}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4 text-left text-sm">
           <p>
-            Al realizar esta acción eliminarás{" "}
-            <b>todos los registros de Trucks</b> en el frente{" "}
-            <b>{frente.nombre}</b>. Esta acción no se puede deshacer.
+            {whiteLabelConfig.ui.vouchers.deleteDialogWarningPrefix}{" "}
+            <b>{whiteLabelConfig.ui.vouchers.deleteDialogWarningBold}</b>{" "}
+            {whiteLabelConfig.ui.vouchers.deleteDialogWarningMiddle}{" "}
+            <b>{frente.nombre}</b>. {whiteLabelConfig.ui.vouchers.deleteDialogWarningSuffix}
           </p>
           <div className="space-y-1.5">
             <label
               htmlFor="confirm-frente"
               className="block text-xs text-slate-500"
             >
-              Escribe{" "}
+              {whiteLabelConfig.ui.vouchers.deleteDialogConfirmPrefix}{" "}
               <span className="font-mono font-semibold text-secondary">
                 {frente.nombre}
               </span>{" "}
-              para confirmar.
+              {whiteLabelConfig.ui.vouchers.deleteDialogConfirmSuffix}
             </label>
             <Input
               id="confirm-frente"
@@ -72,7 +74,7 @@ const DeleteVouchersDialog = ({
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={handleCancel}>
-            Cancelar
+            {whiteLabelConfig.ui.vouchers.deleteDialogCancel}
           </Button>
           <DeleteVoucherButton frente={frente.nombre} disabled={!isConfirmed} />
         </DialogFooter>

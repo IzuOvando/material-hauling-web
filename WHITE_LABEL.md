@@ -183,6 +183,33 @@ This deletes only the named untracked folder under `client-assets/`; it rejects 
 - `NEXT_PUBLIC_UI_EMPTY_MESSAGE`
 - `NEXT_PUBLIC_UI_GENERAL_SAVING`
 
+### `ui.vouchers` (additional keys)
+- `NEXT_PUBLIC_UI_VOUCHERS_DELETE_BUTTON`, `..._DELETE_SUCCESS_TITLE`, `..._DELETE_SUCCESS_DESC`, `..._DELETE_ERROR_TITLE`, `..._DELETE_ERROR_DESC`
+- `NEXT_PUBLIC_UI_VOUCHERS_DELETE_DIALOG_TITLE`, `..._WARNING_PREFIX`, `..._WARNING_BOLD`, `..._WARNING_MIDDLE`, `..._WARNING_SUFFIX`, `..._CONFIRM_PREFIX`, `..._CONFIRM_SUFFIX`, `..._CANCEL`
+- `NEXT_PUBLIC_UI_VOUCHERS_DOWNLOAD_SUCCESS_TITLE`, `..._SUCCESS_DESC`, `..._ERROR_TITLE`, `..._ERROR_DESC`
+- `NEXT_PUBLIC_UI_VOUCHERS_GENERATING_EXCEL`
+- `NEXT_PUBLIC_UI_VOUCHERS_EXCEL_SUCCESS_TITLE`, `..._SUCCESS_DESC`, `..._ERROR_TITLE`, `..._ERROR_DESC`, `..._BUTTON_PREFIX`, `..._BUTTON_EMPTY`
+- `NEXT_PUBLIC_UI_VOUCHERS_EMPTY_TITLE`, `..._EMPTY_SUBTITLE`, `..._LOADING_MORE`, `..._RETRY_BUTTON`, `..._SHOWING_COUNT`
+- `NEXT_PUBLIC_UI_VOUCHERS_DETAIL_SHEET_TITLE`, `..._DETAIL_SHEET_DESC`
+- `NEXT_PUBLIC_UI_VOUCHERS_VIEW_CARDS`, `..._VIEW_TABLE`
+
+Templated values use `{frente}`, `{section}`, `{filename}`, and `{count}` placeholders, substituted at render time (same `.replace("{token}", value)` pattern used throughout the file).
+
+### `ui.trucksFilters`
+- `NEXT_PUBLIC_UI_TRUCKS_FILTERS_PERIOD_PREFIX`, `..._STATUS_PREFIX`, `..._SEARCH_PREFIX`, `..._ACTIVE_LABEL`, `..._CLEAR_ALL`
+- `NEXT_PUBLIC_UI_TRUCKS_FILTERS_STATUS_ALL`, `..._STATUS_IN_TRANSIT`, `..._STATUS_ARRIVED`
+- `NEXT_PUBLIC_UI_TRUCKS_FILTERS_PERIOD_YESTERDAY`, `..._PERIOD_TODAY`, `..._PERIOD_LAST7`, `..._PERIOD_THIS_MONTH`, `..._PERIOD_MONTH_YEAR`, `..._PERIOD_RANGE`, `..._PERIOD_FALLBACK`
+- `NEXT_PUBLIC_UI_TRUCKS_FILTERS_CANCEL`, `..._APPLY`
+
+### `ui.dashboard` (additional keys)
+- `NEXT_PUBLIC_UI_DASHBOARD_STAT_TRIPS`, `..._STAT_M3_HAULED`, `..._STAT_M3_PER_TRIP`, `..._STAT_ARRIVAL_RATE`, `..._STAT_SHIFTS`
+- `NEXT_PUBLIC_UI_DASHBOARD_FILTER_WEEK`, `..._FILTER_MONTH`, `..._FILTER_YEAR`
+
+### `ui.trucksTable` (additional keys)
+- `NEXT_PUBLIC_UI_TRUCKS_TABLE_SORT_ASC`, `..._SORT_DESC`, `..._HIDE_COLUMN`, `..._COLUMNS_BUTTON`, `..._SHOW_COLUMNS`
+
+Not yet externalized (out of scope for this pass): `aria-label`s and the day-picker/month-abbreviation calendar locale (`MonthYearPicker.tsx`, `TrucksDateRangePicker.tsx` use `date-fns/locale/es` directly, independent of `NEXT_PUBLIC_LOCALE`).
+
 ## Recommended rollout
 
 1. Start with the app name, colors, and login copy.

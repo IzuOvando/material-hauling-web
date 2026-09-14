@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
+import whiteLabelConfig from "../../../white-label.config";
 
 const DeleteVouchersButton = ({
   frente,
@@ -31,8 +32,8 @@ const DeleteVouchersButton = ({
       }
 
       const { dismiss } = toast({
-        title: "Eliminación Exitosa",
-        description: `Se eliminaron los registros relacionados con el frente "${frente}".`,
+        title: whiteLabelConfig.ui.vouchers.deleteSuccessTitle,
+        description: whiteLabelConfig.ui.vouchers.deleteSuccessDescription.replace("{frente}", frente),
         variant: "success",
       });
       disableToast = dismiss;
@@ -42,8 +43,8 @@ const DeleteVouchersButton = ({
     } catch (error) {
       console.error("Error al eliminar los registros:", error);
       const { dismiss } = toast({
-        title: "Eliminación Fallida",
-        description: `No se pudieron eliminar los registros del frente "${frente}". Por favor, intente más tarde.`,
+        title: whiteLabelConfig.ui.vouchers.deleteErrorTitle,
+        description: whiteLabelConfig.ui.vouchers.deleteErrorDescription.replace("{frente}", frente),
         variant: "destructive",
       });
       disableToast = dismiss;
@@ -61,7 +62,7 @@ const DeleteVouchersButton = ({
       disabled={disabled}
     >
       <Trash className="mr-2" />
-      Eliminar Registros
+      {whiteLabelConfig.ui.vouchers.deleteButton}
     </Button>
   );
 };

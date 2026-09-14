@@ -1,6 +1,7 @@
 import { CheckCircle2, Package, TrendingUp, PieChart, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { SummaryResponse } from "@/types/dashboard";
+import whiteLabelConfig from "../../../../white-label.config";
 
 interface StatCardsRowProps {
   data: SummaryResponse;
@@ -10,31 +11,31 @@ interface StatCardsRowProps {
 export function StatCardsRow({ data, className }: StatCardsRowProps) {
   const metrics = [
     {
-      label: "Viajes",
+      label: whiteLabelConfig.ui.dashboard.statTrips,
       value: data.totalTrips,
       icon: CheckCircle2,
       color: "text-primary",
     },
     {
-      label: "M³ acarreados",
+      label: whiteLabelConfig.ui.dashboard.statM3Hauled,
       value: data.totalM3.toFixed(2),
       icon: Package,
       color: "text-primary",
     },
     {
-      label: "M³ / viaje",
+      label: whiteLabelConfig.ui.dashboard.statM3PerTrip,
       value: data.avgM3PerTrip.toFixed(2),
       icon: TrendingUp,
       color: "text-accent",
     },
     {
-      label: "Arribo",
+      label: whiteLabelConfig.ui.dashboard.statArrivalRate,
       value: `${data.arrivalRate.toFixed(1)}%`,
       icon: PieChart,
       color: "text-secondary",
     },
     {
-      label: "Turnos",
+      label: whiteLabelConfig.ui.dashboard.statShifts,
       value: `T1: ${data.turno1Arrived} · T2: ${data.turno2Arrived}`,
       icon: Clock,
       color: "text-primary",

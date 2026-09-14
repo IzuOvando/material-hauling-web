@@ -6,6 +6,7 @@ import { useToast } from "@/components/ui/use-toast";
 import FullScreenLoader from "@/components/ui/full-screen-loader";
 import { Download } from "lucide-react";
 import CONFIG from "@/config";
+import whiteLabelConfig from "../../../white-label.config";
 
 const DownloadFrenteButton = ({ frente }: { frente: string }) => {
   const { toast } = useToast();
@@ -42,16 +43,19 @@ const DownloadFrenteButton = ({ frente }: { frente: string }) => {
       const filename = `${frente}_vouchercamion.xlsx`;
       saveFile(blob, filename);
       const { dismiss } = toast({
-        title: "Descarga Exitosa",
-        description: `La base de datos de vouchers para el frente "${frente}" se ha descargado correctamente como ${filename}.`,
+        title: whiteLabelConfig.ui.vouchers.downloadSuccessTitle,
+        description: whiteLabelConfig.ui.vouchers.downloadSuccessDescription
+          .replace("{section}", "vouchers")
+          .replace("{frente}", frente)
+          .replace("{filename}", filename),
         variant: "success",
       });
       disableToast = dismiss;
     } catch (ex) {
       console.error("On Download:", ex);
       const { dismiss } = toast({
-        title: "Descarga Fallida",
-        description: `Tuvimos un problema al descargar la base de datos. Por favor, intente de nuevo más tarde.`,
+        title: whiteLabelConfig.ui.vouchers.downloadErrorTitle,
+        description: whiteLabelConfig.ui.vouchers.downloadErrorDescription,
         variant: "destructive",
       });
       disableToast = dismiss;
@@ -66,7 +70,7 @@ const DownloadFrenteButton = ({ frente }: { frente: string }) => {
 
   return (
     <>
-      {isLoading && <FullScreenLoader message="Generando Excel..." />}
+      {isLoading && <FullScreenLoader message={whiteLabelConfig.ui.vouchers.generatingExcelMessage} />}
       <Button
         className="py-2 px-[0.5rem] bg-white hover:bg-[rgba(var(--accent-light-color)/50%)] group ml-[-2.5px]"
         onClick={downloadDatabase}

@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import whiteLabelConfig from "../../../../white-label.config";
 
 interface TrucksDateRangePickerProps {
   value: { from: string; to: string } | null;
@@ -132,7 +133,7 @@ export function TrucksDateRangePicker({
             }}
             className="border-2 border-primary-light text-primary"
           >
-            Cancelar
+            {whiteLabelConfig.ui.trucksFilters.cancelButton}
           </Button>
           <Button
             size="sm"
@@ -140,7 +141,7 @@ export function TrucksDateRangePicker({
             disabled={!internal?.from || !internal?.to}
             className="bg-accent hover:bg-accent-dark text-white"
           >
-            Aplicar
+            {whiteLabelConfig.ui.trucksFilters.applyButton}
           </Button>
         </div>
       </PopoverContent>

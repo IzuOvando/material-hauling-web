@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { useDashboardStore } from "@/store/dashboardStore";
 import type { DashboardPeriod } from "@/types/dashboard";
 import CONFIG from "@/config";
+import whiteLabelConfig from "../../../../white-label.config";
 
 function currentWeekPeriod(): DashboardPeriod {
   return {
@@ -31,9 +32,9 @@ function periodKey(p: DashboardPeriod): string {
 }
 
 const FILTERS = [
-  { label: "Semana", make: currentWeekPeriod },
-  { label: "Mes",    make: currentMonthPeriod },
-  { label: "Año",    make: currentYearPeriod },
+  { label: whiteLabelConfig.ui.dashboard.filterWeek, make: currentWeekPeriod },
+  { label: whiteLabelConfig.ui.dashboard.filterMonth, make: currentMonthPeriod },
+  { label: whiteLabelConfig.ui.dashboard.filterYear, make: currentYearPeriod },
 ] as const;
 
 export function QuickFilterBar() {

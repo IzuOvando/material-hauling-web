@@ -20,6 +20,7 @@ import {
 import { trucksColumns, DEFAULT_VISIBLE_COLUMNS } from "./columns";
 import { TrucksPagination } from "./TrucksPagination";
 import { TrucksColumnToggle } from "./TrucksColumnToggle";
+import whiteLabelConfig from "../../../../white-label.config";
 
 interface TrucksTableProps {
   vouchers: VoucherCamion[];
@@ -91,7 +92,7 @@ export function TrucksTable({ vouchers, total, page, limit }: TrucksTableProps) 
                   colSpan={trucksColumns.length}
                   className="h-24 text-center text-primary"
                 >
-                  No hay vouchers que coincidan con los filtros aplicados.
+                  {whiteLabelConfig.ui.vouchers.emptyResultsTitle}
                 </TableCell>
               </TableRow>
             )}

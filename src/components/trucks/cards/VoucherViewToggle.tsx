@@ -4,10 +4,11 @@ import { LayoutGrid, Table2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTrucksTable } from "@/hooks/useTrucksTable";
 import type { VoucherView } from "@/types/trucks-filters";
+import whiteLabelConfig from "../../../../white-label.config";
 
 const OPTIONS: { value: VoucherView; label: string; icon: typeof LayoutGrid }[] = [
-  { value: "cards", label: "Tarjetas", icon: LayoutGrid },
-  { value: "table", label: "Tabla", icon: Table2 },
+  { value: "cards", label: whiteLabelConfig.ui.vouchers.viewCards, icon: LayoutGrid },
+  { value: "table", label: whiteLabelConfig.ui.vouchers.viewTable, icon: Table2 },
 ];
 
 export function VoucherViewToggle() {
