@@ -30,6 +30,14 @@ The default logo (`public/images/logos/logo_mexico.svg`) is never overwritten. E
 
 The installer automatically points the app at the newly installed logo by setting `NEXT_PUBLIC_LOGO_URL` when it starts the app (unless `--no-start` is passed, in which case it prints the value to set manually). A client's `brand.env`, if present, can still override `NEXT_PUBLIC_LOGO_URL` explicitly — that value wins over the computed one.
 
+### Using a specific brand env file
+
+By default the installer looks for `client-assets/<client-name>/brand.env` and falls back to the repository `.env` if it's missing. To use a different env file (for example the demo brand at `.env.whitelabel-demo`), pass `--brand-env`:
+
+```bash
+npm run client:install -- client-name --brand-env=.env.whitelabel-demo
+```
+
 ## Demo QR template
 
 The repository includes a dummy QR template at:

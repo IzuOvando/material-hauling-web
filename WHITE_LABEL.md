@@ -114,6 +114,8 @@ The installer validates the logo and enterprise images, then copies them into th
 
 The client's logo is installed as `public/images/logos/logo-client-name.svg`, never overwriting the default `logo_mexico.svg`. The installer sets `NEXT_PUBLIC_LOGO_URL` to that path automatically when it starts the app, so the branding provider picks it up without manual env editing. Pass `--no-start` to install without starting, in which case the installer prints the `NEXT_PUBLIC_LOGO_URL` value to set in the client's `brand.env` or the deployment environment.
 
+By default `client:install` loads `client-assets/<client-name>/brand.env` if present, otherwise the repository `.env`. Pass `--brand-env=<path>` to use a different file instead — for example `npm run client:install -- client-name --brand-env=.env.whitelabel-demo` to validate the fictional Atlas Haul brand's full copy/theme override, not just its logo.
+
 The demo QR template is generated at `client-assets/demo/documents/qr-template.xlsx` with fake records. Run `npm run client:create-qr-template` to recreate it.
 
 ## Resetting the active client
