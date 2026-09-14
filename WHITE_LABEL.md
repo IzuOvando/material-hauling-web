@@ -76,6 +76,32 @@ Theme values use the existing CSS RGB channel format, for example `19 50 43`. Th
 
 Keep customer assets isolated under their configured folders. Database-backed frente logos remain managed by the existing upload flow and are not replaced by these static asset settings.
 
+## Installing client assets
+
+Non-technical users can prepare a client folder under `client-assets/`:
+
+```text
+client-assets/
+└── client-name/
+	├── branding/
+	│   └── logo.svg
+	├── enterprises/
+	│   ├── company-a.png
+	│   └── company-b.jpg
+	└── documents/              # optional
+		└── qr-template.xlsx    # optional
+```
+
+Then run:
+
+```bash
+npm run client:install -- client-name
+```
+
+The installer validates the logo and enterprise images, then copies them into the existing runtime locations under `public/`. A client QR template is optional. If it is not provided, the existing public template remains unchanged. The source folder is preserved, so the same client package can be installed again or reviewed before deployment.
+
+The demo QR template is generated at `client-assets/demo/documents/qr-template.xlsx` with fake records. Run `npm run client:create-qr-template` to recreate it.
+
 ### `auth`
 - `NEXT_PUBLIC_LOGIN_TITLE`
 - `NEXT_PUBLIC_LOGIN_SUBTITLE`
