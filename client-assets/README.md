@@ -39,3 +39,21 @@ npm run client:create-qr-template
 ```
 
 Replace this file with a real client template when available.
+
+## Reset to defaults
+
+Before preparing another brand, restore the committed default runtime assets with:
+
+```bash
+npm run client:reset -- --confirm
+```
+
+This restores the default logo, enterprise images, and QR template under `public/`. It does not delete or modify any folder under `client-assets/`.
+
+To also remove one untracked client source folder after resetting, provide its exact folder name:
+
+```bash
+npm run client:reset -- --confirm --remove-client client-name
+```
+
+This cleanup refuses tracked client folders and does not accept path separators.

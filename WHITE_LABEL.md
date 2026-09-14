@@ -102,6 +102,24 @@ The installer validates the logo and enterprise images, then copies them into th
 
 The demo QR template is generated at `client-assets/demo/documents/qr-template.xlsx` with fake records. Run `npm run client:create-qr-template` to recreate it.
 
+## Resetting the active client
+
+Before installing another brand, run:
+
+```bash
+npm run client:reset -- --confirm
+```
+
+The guarded reset restores the committed default logo, enterprise images, and QR template under `public/`. It refuses to run when those runtime assets have uncommitted changes and never removes source folders under `client-assets/`.
+
+If an untracked client source folder should also be removed, use the explicit cleanup option:
+
+```bash
+npm run client:reset -- --confirm --remove-client client-name
+```
+
+This deletes only the named untracked folder under `client-assets/`; it rejects tracked folders and unsafe path values.
+
 ### `auth`
 - `NEXT_PUBLIC_LOGIN_TITLE`
 - `NEXT_PUBLIC_LOGIN_SUBTITLE`
