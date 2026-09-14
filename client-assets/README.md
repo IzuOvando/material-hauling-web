@@ -24,6 +24,12 @@ npm run client:install -- client-name
 
 The command copies files into the runtime locations under `public/`. It does not delete or modify the source folder. If `documents/qr-template.xlsx` is not present, the installer leaves the existing public QR template unchanged.
 
+### Logo handling
+
+The default logo (`public/images/logos/logo_mexico.svg`) is never overwritten. Each client's logo is installed as its own file, `public/images/logos/logo-client-name.svg`, so the repository default always stays available and installing one client never clobbers another.
+
+The installer automatically points the app at the newly installed logo by setting `NEXT_PUBLIC_LOGO_URL` when it starts the app (unless `--no-start` is passed, in which case it prints the value to set manually). A client's `brand.env`, if present, can still override `NEXT_PUBLIC_LOGO_URL` explicitly — that value wins over the computed one.
+
 ## Demo QR template
 
 The repository includes a dummy QR template at:

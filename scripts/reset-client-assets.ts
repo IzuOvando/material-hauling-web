@@ -8,7 +8,8 @@ const confirm = process.argv.includes("--confirm");
 const removeClientIndex = process.argv.indexOf("--remove-client");
 const clientToRemove = removeClientIndex >= 0 ? process.argv[removeClientIndex + 1] : undefined;
 const assetPaths = [
-  "public/images/logos/logo_mexico.svg",
+  // logo_mexico.svg is intentionally excluded: client:install never overwrites it —
+  // each client gets its own logo-<clientName>.svg file instead.
   "public/images/enterprises",
   "public/documents/test_metadatacamion.xlsx",
 ];

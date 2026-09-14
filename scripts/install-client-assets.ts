@@ -1,8 +1,11 @@
 import { promises as fs } from "fs";
 import path from "path";
+import { startWithBrandEnv } from "./run-with-brand-env";
 
 const projectRoot = process.cwd();
-const clientName = process.argv[2];
+const scriptArgs = process.argv.slice(2);
+const startApp = !scriptArgs.includes("--no-start");
+const clientName = scriptArgs.find((arg) => !arg.startsWith("--"));
 
 const allowedImageExtensions = new Set([".png", ".jpg", ".jpeg", ".webp", ".svg"]);
 
@@ -70,7 +73,12 @@ async function installClientAssets(): Promise<void> {
   const enterpriseImages = await getEnterpriseImages(enterprisesSource);
 
   const publicRoot = path.join(projectRoot, "public");
-  await copyFile(brandingSource, path.join(publicRoot, "images", "logos", "logo_mexico.svg"));
+  // The default logo (logo_mexico.svg) is never overwritten — each client gets its own
+  // file so the repository default always stays available as a fallback.
+  const logoFileName = `logo-${clientName}.svg`;
+  const logoDestination = path.join(publicRoot, "images", "logos", logoFileName);
+  const logoPublicPath = `/images/logos/${logoFileName}`;
+  await copyFile(brandingSource, logoDestination);
   if (availableQrTemplate) {
     await copyFile(availableQrTemplate, path.join(publicRoot, "documents", "test_metadatacamion.xlsx"));
   }
@@ -84,11 +92,21 @@ async function installClientAssets(): Promise<void> {
   );
 
   console.log(`Client assets installed: ${clientName}`);
-  console.log(`- Logo: ${path.relative(projectRoot, path.join(publicRoot, "images", "logos", "logo_mexico.svg"))}`);
+  console.log(`- Logo: ${path.relative(projectRoot, logoDestination)} (NEXT_PUBLIC_LOGO_URL=${logoPublicPath})`);
   console.log(`- Enterprise images: ${enterpriseImages.length}`);
   console.log(availableQrTemplate
     ? `- QR template: ${path.relative(projectRoot, path.join(publicRoot, "documents", "test_metadatacamion.xlsx"))}`
     : "- QR template: skipped; using the existing public template");
+
+  if (startApp) {
+    const brandEnvSource = await findOptionalFile(path.join(sourceRoot, "brand.env"));
+    const envPath = brandEnvSource ?? path.join(projectRoot, ".env");
+    console.log("Starting the app with the base environment and client overrides...");
+    await startWithBrandEnv(envPath, "dev", [], { NEXT_PUBLIC_LOGO_URL: logoPublicPath });
+  } else {
+    console.log("App start skipped (--no-start).");
+    console.log(`Set NEXT_PUBLIC_LOGO_URL=${logoPublicPath} in the client's brand.env or deployment environment.`);
+  }
 }
 
 installClientAssets().catch((error: unknown) => {

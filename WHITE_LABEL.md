@@ -28,6 +28,18 @@ The shared application composition lives in `src/components/app-shell/AppShell.t
 
 The config uses `process.env.NEXT_PUBLIC_*` values with safe Spanish defaults.
 
+## Fictional brand validation
+
+The repository includes a local-only example at `.env.whitelabel-demo`. It defines a fictional `Atlas Haul` brand with a navy, orange, and cyan theme. The file is ignored by git and does not replace or modify `.env`.
+
+Start the app with the demo brand explicitly:
+
+```bash
+npm run brand:dev -- .env.whitelabel-demo
+```
+
+The runner loads `.env` first, applies the selected white-label file second, and starts the dev server with the merged values. This preserves database, authentication, and other base settings while changing only the brand overrides. Stop the server and run `npm run dev` normally to return to the base environment. This validation currently keeps the existing logo asset while changing metadata, theme colors, navigation labels, login copy, and frente terminology.
+
 Example:
 
 ```bash
@@ -99,6 +111,8 @@ npm run client:install -- client-name
 ```
 
 The installer validates the logo and enterprise images, then copies them into the existing runtime locations under `public/`. A client QR template is optional. If it is not provided, the existing public template remains unchanged. The source folder is preserved, so the same client package can be installed again or reviewed before deployment.
+
+The client's logo is installed as `public/images/logos/logo-client-name.svg`, never overwriting the default `logo_mexico.svg`. The installer sets `NEXT_PUBLIC_LOGO_URL` to that path automatically when it starts the app, so the branding provider picks it up without manual env editing. Pass `--no-start` to install without starting, in which case the installer prints the `NEXT_PUBLIC_LOGO_URL` value to set in the client's `brand.env` or the deployment environment.
 
 The demo QR template is generated at `client-assets/demo/documents/qr-template.xlsx` with fake records. Run `npm run client:create-qr-template` to recreate it.
 
