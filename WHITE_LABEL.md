@@ -40,6 +40,14 @@ npm run brand:dev -- .env.whitelabel-demo
 
 The runner loads `.env` first, applies the selected white-label file second, and starts the dev server with the merged values. This preserves database, authentication, and other base settings while changing only the brand overrides. Stop the server and run `npm run dev` normally to return to the base environment. This validation currently keeps the existing logo asset while changing metadata, theme colors, navigation labels, login copy, and frente terminology.
 
+A second fictional brand lives at `.env.whitelabel-violet` — a purple/gold/teal theme ("Violet Peak Hauling") that also swaps terminology (zones/shipments/crew instead of frentes/vouchers/users) to exercise the copy surface differently than Atlas Haul does:
+
+```bash
+npm run brand:dev -- .env.whitelabel-violet
+```
+
+Both demo files are git-ignored (`.env.whitelabel-*`) and safe to edit freely.
+
 Example:
 
 ```bash
