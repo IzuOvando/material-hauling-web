@@ -414,6 +414,7 @@ export const whiteLabelConfig = {
         updateError: process.env.NEXT_PUBLIC_UI_USERS_RESET_UPDATE_ERROR || "Error al actualizar la contraseña.",
         successTitle: process.env.NEXT_PUBLIC_UI_USERS_RESET_SUCCESS_TITLE || "Contraseña actualizada",
         successDescription: process.env.NEXT_PUBLIC_UI_USERS_RESET_SUCCESS_DESC || "La contraseña de {username} fue restablecida correctamente.",
+        newPasswordLabel: process.env.NEXT_PUBLIC_UI_USERS_RESET_NEW_PASSWORD_LABEL || "Nueva contraseña *",
       },
     },
     pagination: {

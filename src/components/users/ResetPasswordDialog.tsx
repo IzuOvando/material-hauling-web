@@ -113,7 +113,7 @@ export function ResetPasswordDialog({
           <div className="flex flex-col gap-3 py-4">
 
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor="reset-password">{(whiteLabelConfig as any)?.ui?.users?.create?.passwordLabel || "Nueva contraseña *"}</Label>
+              <Label htmlFor="reset-password">{(whiteLabelConfig as any)?.ui?.users?.resetDialog?.newPasswordLabel || "Nueva contraseña *"}</Label>
               <div className="relative">
                 <Input
                   id="reset-password"
