@@ -33,7 +33,7 @@ export function StatusToggle() {
   return (
     <div
       role="radiogroup"
-      aria-label="Estatus"
+      aria-label={whiteLabelConfig.ui.trucksFilters.statusLabelPrefix}
       className="inline-flex items-center gap-1 p-1 rounded-full bg-primary-light/10 border border-primary-light/30"
     >
       {OPTIONS.map((opt) => {

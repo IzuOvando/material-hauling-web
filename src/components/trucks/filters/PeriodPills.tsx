@@ -59,7 +59,7 @@ export function PeriodPills() {
             className={pillClass(active)}
             title={
               isToday
-                ? "Datos del día en curso pueden estar incompletos"
+                ? whiteLabelConfig.ui.trucksFilters.todayIncompleteWarning
                 : undefined
             }
           >
@@ -70,7 +70,7 @@ export function PeriodPills() {
                   "h-3.5 w-3.5",
                   active ? "text-accent-light" : "text-secondary/70",
                 )}
-                aria-label="Datos del día pueden estar incompletos"
+                aria-label={whiteLabelConfig.ui.trucksFilters.todayIncompleteWarning}
               />
             )}
           </button>
