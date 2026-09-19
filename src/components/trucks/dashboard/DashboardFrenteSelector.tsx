@@ -5,6 +5,7 @@ import {
   FrenteSelector,
   type FrenteKpiSnapshot,
 } from "@/components/trucks/FrenteSelector";
+import whiteLabelConfig from "../../../../white-label.config";
 
 export type { FrenteKpiSnapshot };
 
@@ -22,9 +23,9 @@ export function DashboardFrenteSelector({
       frentes={frentes}
       todayMetrics={todayMetrics}
       basePath="/dashboard"
-      title="Selecciona un frente"
-      subtitle="Elige el frente para visualizar su dashboard de KPIs"
-      ctaLabel="Ver dashboard"
+      title={(whiteLabelConfig as any)?.ui?.frenteSelector?.title}
+      subtitle={(whiteLabelConfig as any)?.ui?.frenteSelector?.subtitle}
+      ctaLabel={(whiteLabelConfig as any)?.ui?.frenteSelector?.ctaLabel}
     />
   );
 }

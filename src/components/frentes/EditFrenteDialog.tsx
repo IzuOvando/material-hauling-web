@@ -16,6 +16,7 @@ import FrenteLogoUpload from "./FrenteLogoUpload";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { updateFrenteDisplayName } from "@/actions/frentes";
+import whiteLabelConfig from "../../../white-label.config";
 
 interface EditFrenteDialogProps {
   open: boolean;
@@ -63,10 +64,9 @@ const EditFrenteDialog = ({
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="sm:max-w-[450px] flex flex-col max-h-[90vh] p-0 gap-0">
           <DialogHeader className="px-6 pt-6 pb-4 shrink-0">
-            <DialogTitle>Editar Frente</DialogTitle>
+            <DialogTitle>{(whiteLabelConfig as any)?.ui?.frentesManager?.editTitle || 'Editar Frente'}</DialogTitle>
             <DialogDescription>
-              Edita el nombre del proyecto o el logo del{" "}
-              <b>Frente {frente.nombre}</b>.
+              {(whiteLabelConfig as any)?.ui?.frentesManager?.editDescription || 'Edita el nombre del proyecto o el logo del '}<b>Frente {frente.nombre}</b>.
             </DialogDescription>
           </DialogHeader>
 
@@ -76,12 +76,12 @@ const EditFrenteDialog = ({
             {isOwner && (
               <>
                 <div className="flex flex-col gap-2">
-                  <Label className="text-sm font-medium">Nombre del proyecto</Label>
+                  <Label className="text-sm font-medium">{(whiteLabelConfig as any)?.ui?.frentesManager?.projectNameLabel || "Nombre del proyecto"}</Label>
                   <div className="flex gap-2">
                     <Input
                       value={displayName}
                       onChange={(e) => setDisplayName(e.target.value)}
-                      placeholder="Ej. Tren de Pasajeros CDMX-Puebla"
+                      placeholder={(whiteLabelConfig as any)?.ui?.frentesManager?.examplePlaceholder || 'Ej. Tren de Pasajeros CDMX-Puebla'}
                       className="flex-1"
                     />
                     <Button
@@ -94,7 +94,7 @@ const EditFrenteDialog = ({
                       ) : nameSaved ? (
                         <Check className="h-4 w-4 text-green-600" />
                       ) : (
-                        "Guardar"
+                        (whiteLabelConfig as any)?.ui?.frentesManager?.saveButton || 'Guardar'
                       )}
                     </Button>
                   </div>
@@ -120,7 +120,7 @@ const EditFrenteDialog = ({
                 className="w-full flex items-center gap-2 bg-secondary hover:bg-red-600 text-white group"
                 onClick={() => setTimeout(() => setOpen(false), 500)}
               >
-                <Trash color="white" size={18} /> Eliminar Frente
+                <Trash color="white" size={18} /> {(whiteLabelConfig as any)?.ui?.frentesManager?.deleteButton || 'Eliminar Frente'}
               </Button>
             </AlertDialogTrigger>
           </div>

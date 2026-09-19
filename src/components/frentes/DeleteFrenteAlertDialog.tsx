@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Frente } from "@prisma/client";
 import { useToast } from "../ui/use-toast";
+import whiteLabelConfig from "../../../white-label.config";
 
 interface DeleteFrenteAlertDialogProps {
   frente: Frente;
@@ -36,8 +37,8 @@ const DeleteFrenteAlertDialog = ({
       }
 
       toast({
-        title: "Éxito",
-        description: `Frente eliminado con éxito.`,
+        title: whiteLabelConfig.ui.frentesManager.deleteDialog.successTitle,
+        description: whiteLabelConfig.ui.frentesManager.deleteDialog.successDescription,
         variant: "success",
       });
       onDelete(frente.nombre);
@@ -45,7 +46,7 @@ const DeleteFrenteAlertDialog = ({
       console.error("Error al eliminar el frente:", error);
       toast({
         title: "Error",
-        description: "No se pudo eliminar el frente.",
+        description: whiteLabelConfig.ui.frentesManager.deleteDialog.errorDescription,
         variant: "destructive",
       });
     }
@@ -55,16 +56,16 @@ const DeleteFrenteAlertDialog = ({
     <AlertDialogContent>
       <AlertDialogHeader>
         <AlertDialogTitle>
-          ¿Estás seguro de eliminar {frente.nombre}?
+          {whiteLabelConfig.ui.frentesManager.deleteDialog.title.replace("{name}", frente.nombre)}
         </AlertDialogTitle>
         <AlertDialogDescription>
-          Borraras todos los Tickets que estén relacionados con este Frente.
+          {whiteLabelConfig.ui.frentesManager.deleteDialog.description}
         </AlertDialogDescription>
       </AlertDialogHeader>
       <AlertDialogFooter>
-        <AlertDialogCancel>Cancelar</AlertDialogCancel>
+        <AlertDialogCancel>{whiteLabelConfig.ui.frentesManager.deleteDialog.cancel}</AlertDialogCancel>
         <AlertDialogAction className="hover:bg-red-500" onClick={handleDelete}>
-          Sí, Eliminar
+          {whiteLabelConfig.ui.frentesManager.deleteDialog.confirm}
         </AlertDialogAction>
       </AlertDialogFooter>
     </AlertDialogContent>

@@ -4,23 +4,24 @@ import { CircleDot, CircleCheck, Circle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTrucksTable } from "@/hooks/useTrucksTable";
 import type { StatusValue } from "@/types/trucks-filters";
+import whiteLabelConfig from "../../../../white-label.config";
 
 const OPTIONS: { value: StatusValue; label: string; activeClass: string; icon: typeof Circle }[] = [
   {
     value: "ALL",
-    label: "Todos",
+    label: whiteLabelConfig.ui.trucksFilters.statusAll,
     activeClass: "bg-primary-light text-white",
     icon: Circle,
   },
   {
     value: "IN_TRANSIT",
-    label: "En tránsito",
+    label: whiteLabelConfig.ui.trucksFilters.statusInTransit,
     activeClass: "bg-secondary text-white",
     icon: CircleDot,
   },
   {
     value: "ARRIVED",
-    label: "Llegó",
+    label: whiteLabelConfig.ui.trucksFilters.statusArrived,
     activeClass: "bg-primary text-accent",
     icon: CircleCheck,
   },

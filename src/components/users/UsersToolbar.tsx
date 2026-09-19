@@ -1,6 +1,7 @@
 "use client";
 
 import { Search, UserPlus } from "lucide-react";
+import whiteLabelConfig from "../../../white-label.config";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -37,7 +38,7 @@ export function UsersToolbar({
       <div className="relative w-64">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
         <Input
-          placeholder="Buscar por usuario..."
+          placeholder={(whiteLabelConfig as any)?.ui?.users?.toolbar?.searchPlaceholder || 'Buscar por usuario...'}
           value={search}
           onChange={(e) => onSearch(e.target.value)}
           className="pl-9 border-2 focus-visible:ring-0 focus-visible:border-accent transition-colors"
@@ -46,21 +47,21 @@ export function UsersToolbar({
 
       <Select value={roleFilter} onValueChange={onRoleFilter}>
         <SelectTrigger className="w-44 border-2 focus:ring-0 focus:border-accent">
-          <SelectValue placeholder="Todos los roles" />
+          <SelectValue placeholder={(whiteLabelConfig as any)?.ui?.users?.toolbar?.allRoles || "Todos los roles"} />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="all">Todos los roles</SelectItem>
-          <SelectItem value="user">Checador</SelectItem>
-          <SelectItem value="admin">IRO</SelectItem>
+          <SelectItem value="all">{(whiteLabelConfig as any)?.ui?.users?.toolbar?.allRoles || "Todos los roles"}</SelectItem>
+          <SelectItem value="user">{(whiteLabelConfig as any)?.ui?.users?.toolbar?.roleUser || "Checador"}</SelectItem>
+          <SelectItem value="admin">{(whiteLabelConfig as any)?.ui?.users?.toolbar?.roleAdmin || "IRO"}</SelectItem>
         </SelectContent>
       </Select>
 
       <Select value={frenteFilter} onValueChange={onFrenteFilter}>
         <SelectTrigger className="w-52 border-2 focus:ring-0 focus:border-accent">
-          <SelectValue placeholder="Todos los frentes" />
+          <SelectValue placeholder={(whiteLabelConfig as any)?.ui?.users?.toolbar?.allFrentes || "Todos los frentes"} />
         </SelectTrigger>
         <SelectContent className="max-h-64">
-          <SelectItem value="all">Todos los frentes</SelectItem>
+          <SelectItem value="all">{(whiteLabelConfig as any)?.ui?.users?.toolbar?.allFrentes || "Todos los frentes"}</SelectItem>
           {frentes.map((f) => (
             <SelectItem key={f} value={f}>
               {f}
@@ -76,7 +77,7 @@ export function UsersToolbar({
         className="bg-secondary hover:bg-secondary-light active:bg-secondary-dark text-white gap-2 transition-all duration-200"
       >
         <UserPlus className="h-4 w-4" />
-        Nuevo Usuario
+        {(whiteLabelConfig as any)?.ui?.users?.toolbar?.newUserButton || 'Nuevo Usuario'}
       </Button>
     </div>
   );

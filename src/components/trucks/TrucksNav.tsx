@@ -17,11 +17,13 @@ interface NavItem {
   iconBg: string;
 }
 
+import whiteLabelConfig from "../../../white-label.config";
+
 const NAV_ITEMS: NavItem[] = [
   {
     value: "qr",
-    label: "Generador de QRs",
-    description: "Genera QRs para camiones",
+    label: whiteLabelConfig.ui.navbar.qrLabel,
+    description: whiteLabelConfig.ui.navbar.qrDescription,
     icon: QrCode,
     href: "/",
     allowedRoles: ["owner"],
@@ -30,8 +32,8 @@ const NAV_ITEMS: NavItem[] = [
   },
   {
     value: "db",
-    label: "Bases de Datos",
-    description: "Historial de vouchers",
+    label: whiteLabelConfig.ui.navbar.databaseLabel,
+    description: whiteLabelConfig.ui.navbar.databaseDescription,
     icon: Database,
     href: "/db",
     allowedRoles: ["owner", "admin", "general"],
@@ -40,8 +42,8 @@ const NAV_ITEMS: NavItem[] = [
   },
   {
     value: "dashboard",
-    label: "Dashboard",
-    description: "KPIs y métricas",
+    label: whiteLabelConfig.ui.navbar.dashboardLabel,
+    description: whiteLabelConfig.ui.navbar.dashboardDescription,
     icon: BarChart3,
     href: "/dashboard",
     allowedRoles: ["owner", "general", "admin"],
@@ -50,8 +52,8 @@ const NAV_ITEMS: NavItem[] = [
   },
   {
     value: "materials",
-    label: "Materiales",
-    description: "Gestión de materiales",
+    label: whiteLabelConfig.ui.navbar.materialsLabel,
+    description: whiteLabelConfig.ui.navbar.materialsDescription,
     icon: Package,
     href: "/materials",
     allowedRoles: ["owner"],
@@ -60,8 +62,8 @@ const NAV_ITEMS: NavItem[] = [
   },
   {
     value: "users",
-    label: "Usuarios",
-    description: "CRM de usuarios",
+    label: whiteLabelConfig.ui.navbar.usersLabel,
+    description: whiteLabelConfig.ui.navbar.usersDescription,
     icon: Users,
     href: "/users",
     allowedRoles: ["owner"],
@@ -85,7 +87,7 @@ export function TrucksNav({ userRole }: { userRole: Role }) {
     <>
       <nav className="hidden md:flex flex-col gap-1 w-56 shrink-0 pr-4 self-start sticky top-6">
         <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground px-4 mb-2">
-          Módulos
+          {(whiteLabelConfig as any)?.ui?.navbar?.modulesTitle || "Módulos"}
         </p>
         {visibleItems.map((item) => {
           const active = isActive(item);
@@ -131,7 +133,7 @@ export function TrucksNav({ userRole }: { userRole: Role }) {
         {userRole === "owner" && (
           <div className="mt-4 pt-4 border-t border-slate-200">
             <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground px-4 mb-2">
-              Administración
+              {(whiteLabelConfig as any)?.ui?.navbar?.administrationTitle || "Administración"}
             </p>
             <FrentesManagerSheet />
           </div>

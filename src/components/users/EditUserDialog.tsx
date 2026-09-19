@@ -22,6 +22,7 @@ import {
 import { useToast } from "@/components/ui/use-toast";
 import { Loader2 } from "lucide-react";
 import type { UserRow } from "@/types";
+import whiteLabelConfig from "../../../white-label.config";
 
 interface EditUserDialogProps {
   user: UserRow;
@@ -71,7 +72,7 @@ export function EditUserDialog({
     const { nombre, apPaterno, noEmpleado, rol } = form;
 
     if (!nombre || !apPaterno || !noEmpleado || !rol) {
-      setError("Completa todos los campos obligatorios.");
+      setError((whiteLabelConfig as any)?.ui?.users?.form?.requiredFields || "Completa todos los campos obligatorios.");
       return;
     }
 
@@ -118,11 +119,11 @@ export function EditUserDialog({
     <Dialog open={open} onOpenChange={(next) => { if (!isLoading) onOpenChange(next); }}>
       <DialogContent className="sm:max-w-[480px]">
         <DialogHeader>
-          <DialogTitle>Editar usuario</DialogTitle>
+          <DialogTitle>{(whiteLabelConfig as any)?.ui?.users?.actions?.editTitle || "Editar usuario"}</DialogTitle>
           <DialogDescription>
-            Modifica los datos de{" "}
+            {(whiteLabelConfig as any)?.ui?.users?.editDialog?.descriptionPrefix || "Modifica los datos de"}{" "}
             <span className="font-mono font-semibold">{user.username}</span>.
-            El nombre de usuario no puede cambiarse.
+            {(whiteLabelConfig as any)?.ui?.users?.editDialog?.descriptionSuffix || " El nombre de usuario no puede cambiarse."}
           </DialogDescription>
         </DialogHeader>
 
@@ -130,7 +131,7 @@ export function EditUserDialog({
           <div className="grid grid-cols-2 gap-3 py-4">
 
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor="edit-nombre">Nombre(s) *</Label>
+              <Label htmlFor="edit-nombre">{(whiteLabelConfig as any)?.ui?.users?.create?.nameLabel || "Nombre(s) *"}</Label>
               <Input
                 id="edit-nombre"
                 value={form.nombre}
@@ -140,7 +141,7 @@ export function EditUserDialog({
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor="edit-noEmpleado">No. de empleado *</Label>
+              <Label htmlFor="edit-noEmpleado">{(whiteLabelConfig as any)?.ui?.users?.create?.employeeLabel || "No. de empleado *"}</Label>
               <Input
                 id="edit-noEmpleado"
                 value={form.noEmpleado}
@@ -150,7 +151,7 @@ export function EditUserDialog({
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor="edit-apPaterno">Apellido paterno *</Label>
+              <Label htmlFor="edit-apPaterno">{(whiteLabelConfig as any)?.ui?.users?.create?.firstSurnameLabel || "Apellido paterno *"}</Label>
               <Input
                 id="edit-apPaterno"
                 value={form.apPaterno}
@@ -161,8 +162,8 @@ export function EditUserDialog({
 
             <div className="flex flex-col gap-1.5">
               <Label htmlFor="edit-apMaterno">
-                Apellido materno{" "}
-                <span className="text-muted-foreground font-normal">(opcional)</span>
+                {(whiteLabelConfig as any)?.ui?.users?.create?.secondSurnameLabel || "Apellido materno"}{" "}
+                <span className="text-muted-foreground font-normal">{(whiteLabelConfig as any)?.ui?.users?.create?.secondSurnameOptional || "(opcional)"}</span>
               </Label>
               <Input
                 id="edit-apMaterno"
@@ -173,17 +174,17 @@ export function EditUserDialog({
             </div>
 
             <div className="flex flex-col gap-1.5 col-span-2">
-              <Label htmlFor="edit-rol">Rol *</Label>
+              <Label htmlFor="edit-rol">{(whiteLabelConfig as any)?.ui?.users?.create?.roleLabel || "Rol *"}</Label>
               <Select
                 value={form.rol}
                 onValueChange={(v) => handleFieldChange("rol", v)}
               >
                 <SelectTrigger id="edit-rol" className="shadow-sm">
-                  <SelectValue placeholder="Selecciona un rol" />
+                  <SelectValue placeholder={(whiteLabelConfig as any)?.ui?.users?.create?.rolePlaceholder || "Selecciona un rol"} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="user">Checador</SelectItem>
-                  <SelectItem value="admin">IRO</SelectItem>
+                  <SelectItem value="user">{(whiteLabelConfig as any)?.ui?.users?.create?.roleUser || "Checador"}</SelectItem>
+                  <SelectItem value="admin">{(whiteLabelConfig as any)?.ui?.users?.create?.roleAdmin || "IRO"}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -209,7 +210,7 @@ export function EditUserDialog({
               className="bg-secondary hover:bg-secondary-light active:bg-secondary-dark"
             >
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {isLoading ? "Guardando..." : "Guardar cambios"}
+              {isLoading ? (whiteLabelConfig as any)?.ui?.general?.saving || "Guardando..." : (whiteLabelConfig as any)?.ui?.users?.editDialog?.saveChanges || "Guardar cambios"}
             </Button>
           </DialogFooter>
         </form>

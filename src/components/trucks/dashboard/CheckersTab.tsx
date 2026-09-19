@@ -4,6 +4,7 @@ import { LogOut, LogIn, BarChart2 } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { StatCard } from "./StatCard";
 import type { BreakdownItem } from "@/types/dashboard";
+import whiteLabelConfig from "../../../../white-label.config";
 
 const DEPARTURE_COLOR = "#22543d";
 const ARRIVAL_COLOR   = "#bc955c";
@@ -165,30 +166,30 @@ export function CheckersTab({ departureData, arrivalData, isLoading }: CheckersT
         ) : (
           <>
             <StatCard
-              title="Más activo en salida"
+              title={whiteLabelConfig.ui.dashboard.activeDepartureChecker}
               value={topDeparture?.label ?? "—"}
-              subtitle={topDeparture ? `${topDeparture.trips} despachos` : undefined}
+              subtitle={topDeparture ? `${topDeparture.trips} ${whiteLabelConfig.ui.dashboard.departures.toLowerCase()}` : undefined}
               icon={LogOut}
               colorVariant="primary"
             />
             <StatCard
-              title="Más activo en llegada"
+              title={whiteLabelConfig.ui.dashboard.activeArrivalChecker}
               value={topArrival?.label ?? "—"}
-              subtitle={topArrival ? `${topArrival.trips} recepciones` : undefined}
+              subtitle={topArrival ? `${topArrival.trips} ${whiteLabelConfig.ui.dashboard.arrivals.toLowerCase()}` : undefined}
               icon={LogIn}
               colorVariant="accent"
             />
             <StatCard
-              title="Mejor tasa de llegada"
+              title={whiteLabelConfig.ui.dashboard.bestArrivalRate}
               value={bestRateChecker ? `${bestRateChecker.rate ?? 0}%` : "—"}
-              subtitle={bestRateChecker ? bestRateChecker.label : "Sin suficientes datos (mín. 3 viajes)"}
+              subtitle={bestRateChecker ? bestRateChecker.label : whiteLabelConfig.ui.dashboard.noSufficientData}
               icon={LogOut}
               colorVariant="primary"
             />
             <StatCard
-              title="Tránsito más rápido"
+              title={whiteLabelConfig.ui.dashboard.fastestTransit}
               value={fastestChecker ? `${fastestChecker.rate ?? 0} min` : "—"}
-              subtitle={fastestChecker ? fastestChecker.label : "Sin suficientes datos (mín. 3 viajes)"}
+              subtitle={fastestChecker ? fastestChecker.label : whiteLabelConfig.ui.dashboard.noSufficientData}
               icon={LogIn}
               colorVariant="accent"
             />
@@ -201,9 +202,9 @@ export function CheckersTab({ departureData, arrivalData, isLoading }: CheckersT
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-slate-900">
-              Salida por checador
+              {whiteLabelConfig.ui.dashboard.departureByChecker}
             </CardTitle>
-            <p className="text-[11px] text-slate-500">Despachos · tasa de llegada</p>
+            <p className="text-[11px] text-slate-500">{whiteLabelConfig.ui.dashboard.departureRate}</p>
           </CardHeader>
           <CardContent>
             {isLoading ? (
@@ -227,9 +228,9 @@ export function CheckersTab({ departureData, arrivalData, isLoading }: CheckersT
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-slate-900">
-              Llegada por checador
+              {whiteLabelConfig.ui.dashboard.arrivalByChecker}
             </CardTitle>
-            <p className="text-[11px] text-slate-500">Recepciones · tiempo promedio</p>
+            <p className="text-[11px] text-slate-500">{whiteLabelConfig.ui.dashboard.averageTime}</p>
           </CardHeader>
           <CardContent>
             {isLoading ? (

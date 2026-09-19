@@ -7,6 +7,7 @@ import {
   SheetDescription,
 } from "@/components/ui/sheet";
 import { CreateUserForm } from "@/components/users/CreateUserForm";
+import whiteLabelConfig from "../../../white-label.config";
 
 interface NewUserSheetProps {
   frentes: string[];
@@ -34,10 +35,10 @@ export function NewUserSheet({
       >
         <div className="bg-primary px-6 py-5 pr-14 shrink-0">
           <SheetTitle className="text-accent text-xl font-semibold">
-            Registrar nuevo usuario
+            {(whiteLabelConfig as any)?.ui?.users?.create?.title || 'Registrar nuevo usuario'}
           </SheetTitle>
           <SheetDescription className="text-white/70 text-sm mt-1">
-            Completa los tres pasos para crear un nuevo usuario en el sistema.
+            {(whiteLabelConfig as any)?.ui?.users?.create?.subtitle || 'Completa los tres pasos para crear un nuevo usuario en el sistema.'}
           </SheetDescription>
         </div>
         <div className="flex-1 overflow-y-auto">

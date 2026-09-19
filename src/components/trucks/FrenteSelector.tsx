@@ -4,6 +4,7 @@ import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { BarChart3, Truck, Activity, ArrowRight, ChevronDown, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
+import whiteLabelConfig from "../../../white-label.config";
 import type { Frente } from "@prisma/client";
 
 export interface FrenteKpiSnapshot {
@@ -170,9 +171,9 @@ export function FrenteSelector({
   frentes,
   todayMetrics,
   basePath,
-  title = "Selecciona un frente",
-  subtitle = "Elige el frente para visualizar su dashboard de KPIs",
-  ctaLabel = "Ver dashboard",
+  title = (whiteLabelConfig as any)?.ui?.frenteSelector?.title ?? "Selecciona un frente",
+  subtitle = (whiteLabelConfig as any)?.ui?.frenteSelector?.subtitle ?? "Elige el frente para visualizar su dashboard de KPIs",
+  ctaLabel = (whiteLabelConfig as any)?.ui?.frenteSelector?.ctaLabel ?? "Ver dashboard",
 }: FrenteSelectorProps) {
   const router = useRouter();
   const [search, setSearch] = useState("");
@@ -218,10 +219,10 @@ export function FrenteSelector({
       <div className="flex flex-col items-center justify-center py-24 text-center gap-3">
         <BarChart3 className="h-12 w-12 text-slate-400" />
         <p className="text-base font-semibold text-slate-600">
-          No tienes frentes asignados
+          {(whiteLabelConfig as any)?.ui?.frenteSelector?.noAssignedTitle ?? "No tienes frentes asignados"}
         </p>
         <p className="text-sm text-slate-400">
-          Contacta a tu administrador para obtener acceso.
+          {(whiteLabelConfig as any)?.ui?.frenteSelector?.noAssignedSubtitle ?? "Contacta a tu administrador para obtener acceso."}
         </p>
       </div>
     );
@@ -238,7 +239,7 @@ export function FrenteSelector({
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
           <input
             type="text"
-            placeholder="Buscar frente o proyecto…"
+            placeholder={(whiteLabelConfig as any)?.ui?.frenteSelector?.searchPlaceholder || "Buscar frente o proyecto…"}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className={cn(

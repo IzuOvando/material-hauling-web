@@ -11,6 +11,7 @@ import {
   CommandList,
   CommandSeparator,
 } from "@/components/ui/command";
+import whiteLabelConfig from "../../../../white-label.config";
 
 export interface TrucksFacetOption {
   value: string;
@@ -30,8 +31,8 @@ export function TrucksFacetedFilter({
   options,
   selected,
   onChange,
-  placeholder = "Buscar…",
-  emptyMessage = "Sin resultados",
+  placeholder = (whiteLabelConfig as any)?.ui?.general?.searchPlaceholder ?? "Buscar…",
+  emptyMessage = (whiteLabelConfig as any)?.ui?.general?.emptyMessage ?? "Sin resultados",
   maxHeight = "max-h-60",
 }: TrucksFacetedFilterProps) {
   const selectedSet = new Set(selected);

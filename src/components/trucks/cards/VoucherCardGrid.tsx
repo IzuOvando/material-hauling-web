@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { useTrucksInfiniteVouchers } from "@/hooks/useTrucksInfiniteVouchers";
 import { VoucherCard } from "./VoucherCard";
 import { VoucherDetailSheet } from "./VoucherDetailSheet";
+import whiteLabelConfig from "../../../../white-label.config";
 
 interface VoucherCardGridProps {
   frente: string;
@@ -63,10 +64,10 @@ export function VoucherCardGrid({
       <div className="flex flex-col items-center justify-center py-20 text-center gap-3 rounded-lg border-2 border-dashed border-primary-light/50 bg-white">
         <PackageOpen className="h-10 w-10 text-slate-300" />
         <p className="text-sm font-semibold text-slate-600">
-          No hay vouchers que coincidan con los filtros aplicados.
+          {whiteLabelConfig.ui.vouchers.emptyResultsTitle}
         </p>
         <p className="text-xs text-slate-400">
-          Ajusta el periodo o los filtros para ver resultados.
+          {whiteLabelConfig.ui.vouchers.emptyResultsSubtitle}
         </p>
       </div>
     );
@@ -88,7 +89,7 @@ export function VoucherCardGrid({
         {isLoadingMore && (
           <span className="inline-flex items-center gap-2 text-sm text-slate-500">
             <Loader2 className="h-4 w-4 animate-spin" />
-            Cargando más vouchers…
+            {whiteLabelConfig.ui.vouchers.loadingMore}
           </span>
         )}
         {error && (
@@ -98,14 +99,17 @@ export function VoucherCardGrid({
             onClick={loadMore}
             className="border-2 border-primary-light text-primary"
           >
-            Reintentar
+            {whiteLabelConfig.ui.vouchers.retryButton}
           </Button>
         )}
         {!hasMore && !isLoadingMore && !error && (
           <span className="text-xs text-slate-400">
             {liveTotal === 0
               ? null
-              : `Se muestran los ${liveTotal.toLocaleString("es-MX")} vouchers`}
+              : whiteLabelConfig.ui.vouchers.showingCount.replace(
+                  "{count}",
+                  liveTotal.toLocaleString("es-MX")
+                )}
           </span>
         )}
       </div>

@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import prisma from "@/lib/db";
 import { requireAuth } from "@/auth/guards";
 import { FrenteSelector, type FrenteKpiSnapshot } from "@/components/trucks";
+import whiteLabelConfig from "../../../../white-label.config";
 
 function getTodayCDMX(): string {
   return new Date().toLocaleDateString("sv-SE", {
@@ -44,9 +45,9 @@ export default async function DBEmptyPage() {
       frentes={frentes}
       todayMetrics={todayMetrics}
       basePath="/db"
-      title="Selecciona un frente"
-      subtitle="Elige el frente para ver y filtrar sus vouchers"
-      ctaLabel="Ver vouchers"
+      title={(whiteLabelConfig as any)?.ui?.frenteSelector?.title ?? "Selecciona un frente"}
+      subtitle={(whiteLabelConfig as any)?.ui?.frenteSelector?.subtitle ?? "Elige el frente para ver y filtrar sus vouchers"}
+      ctaLabel={(whiteLabelConfig as any)?.ui?.frenteSelector?.ctaLabel ?? "Ver vouchers"}
     />
   );
 }

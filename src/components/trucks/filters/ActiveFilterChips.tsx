@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { useTrucksTable } from "@/hooks/useTrucksTable";
 import { STATUS_LABELS, TURNO_LABELS } from "./labels";
 import { getPeriodChipLabel } from "./PeriodPills";
+import whiteLabelConfig from "../../../../white-label.config";
 
 interface ChipProps {
   label: string;
@@ -57,48 +58,48 @@ export function ActiveFilterChips() {
 
   chips.push({
     key: "period",
-    label: `Periodo: ${getPeriodChipLabel(state)}`,
+    label: `${whiteLabelConfig.ui.trucksFilters.periodLabelPrefix}: ${getPeriodChipLabel(state)}`,
     onRemove: () => setPeriod("yesterday"),
   });
   if (state.status !== "ALL") {
     chips.push({
       key: "status",
-      label: `Estatus: ${STATUS_LABELS[state.status]}`,
+      label: `${whiteLabelConfig.ui.trucksFilters.statusLabelPrefix}: ${STATUS_LABELS[state.status]}`,
       onRemove: () => setStatus("ALL"),
     });
   }
   if (state.q.trim()) {
     chips.push({
       key: "q",
-      label: `Búsqueda: "${state.q}"`,
+      label: `${whiteLabelConfig.ui.trucksFilters.searchLabelPrefix}: "${state.q}"`,
       onRemove: () => setSearch(""),
     });
   }
   if (state.material.length > 0) {
     chips.push({
       key: "material",
-      label: joinedLabel("Material", state.material),
+      label: joinedLabel(whiteLabelConfig.ui.filters.material, state.material),
       onRemove: () => setMaterial([]),
     });
   }
   if (state.checkerName.length > 0) {
     chips.push({
       key: "checkerName",
-      label: joinedLabel("Checador salida", state.checkerName),
+      label: joinedLabel(whiteLabelConfig.ui.filters.departureChecker, state.checkerName),
       onRemove: () => setCheckerName([]),
     });
   }
   if (state.arrivalCheckerName.length > 0) {
     chips.push({
       key: "arrivalCheckerName",
-      label: joinedLabel("Checador llegada", state.arrivalCheckerName),
+      label: joinedLabel(whiteLabelConfig.ui.filters.arrivalChecker, state.arrivalCheckerName),
       onRemove: () => setArrivalCheckerName([]),
     });
   }
   if (state.turno !== "ALL") {
     chips.push({
       key: "turno",
-      label: `Turno: ${TURNO_LABELS[state.turno]}`,
+      label: `${whiteLabelConfig.ui.filters.shift}: ${TURNO_LABELS[state.turno]}`,
       onRemove: () => setTurno("ALL"),
     });
   }
@@ -108,7 +109,7 @@ export function ActiveFilterChips() {
   return (
     <div className="flex items-center gap-2 flex-wrap pt-2">
       <span className="text-xs font-semibold uppercase tracking-wide text-primary/60">
-        Activos:
+        {whiteLabelConfig.ui.trucksFilters.activeLabel}:
       </span>
       {chips.map((chip) => (
         <Chip key={chip.key} label={chip.label} onRemove={chip.onRemove} />
@@ -119,7 +120,7 @@ export function ActiveFilterChips() {
         onClick={clearAll}
         className="h-7 px-2 text-xs text-primary hover:bg-primary-light/15"
       >
-        Limpiar todo
+        {whiteLabelConfig.ui.trucksFilters.clearAllButton}
       </Button>
     </div>
   );

@@ -15,15 +15,15 @@ input[type="password"]::-webkit-credentials-auto-fill-button {
 
 
 :root{
-    --primary-color: 19 50 43;
-    --primary-dark-color: 11 35 30;
-    --primary-light-color: 35 66 59;
-    --secondary-color: 157 36 73;
-    --secondary-dark-color: 132 27 49;
-    --secondary-light-color: 197 75 113;
-    --accent-color: 188 149 92;
-    --accent-dark-color: 163 124 68;
-    --accent-light-color: 212 181 124;
+  --primary-color: 19 50 43;
+  --primary-dark-color: 11 35 30;
+  --primary-light-color: 35 66 59;
+  --secondary-color: 157 36 73;
+  --secondary-dark-color: 132 27 49;
+  --secondary-light-color: 197 75 113;
+  --accent-color: 188 149 92;
+  --accent-dark-color: 163 124 68;
+  --accent-light-color: 212 181 124;
 }
 
 .loader {

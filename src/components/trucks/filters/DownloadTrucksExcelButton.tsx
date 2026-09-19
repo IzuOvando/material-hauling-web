@@ -5,6 +5,7 @@ import { Download, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { useTrucksTable } from "@/hooks/useTrucksTable";
+import whiteLabelConfig from "../../../../white-label.config";
 
 interface DownloadTrucksExcelButtonProps {
   frente: string;
@@ -45,16 +46,18 @@ export function DownloadTrucksExcelButton({
       document.body.removeChild(a);
       window.URL.revokeObjectURL(url);
       toast({
-        title: "Descarga exitosa",
-        description: `Se descargaron ${total.toLocaleString("es-MX")} vouchers en Excel.`,
+        title: whiteLabelConfig.ui.vouchers.excelDownloadSuccessTitle,
+        description: whiteLabelConfig.ui.vouchers.excelDownloadSuccessDescription.replace(
+          "{count}",
+          total.toLocaleString("es-MX")
+        ),
         variant: "success",
       });
     } catch (error) {
       console.error("Excel download failed", error);
       toast({
-        title: "Descarga fallida",
-        description:
-          "No pudimos generar el Excel. Inténtalo de nuevo en unos momentos.",
+        title: whiteLabelConfig.ui.vouchers.excelDownloadErrorTitle,
+        description: whiteLabelConfig.ui.vouchers.excelDownloadErrorDescription,
         variant: "destructive",
       });
     } finally {
@@ -64,8 +67,8 @@ export function DownloadTrucksExcelButton({
 
   const buttonLabel =
     total > 0
-      ? `Descargar ${total.toLocaleString("es-MX")} ${total === 1 ? "voucher" : "vouchers"}`
-      : "Descargar Excel";
+      ? `${whiteLabelConfig.ui.vouchers.excelButtonPrefix} ${total.toLocaleString("es-MX")} ${total === 1 ? "voucher" : "vouchers"}`
+      : whiteLabelConfig.ui.vouchers.excelButtonEmpty;
 
   return (
     <Button

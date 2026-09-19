@@ -7,6 +7,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { Frente } from "@prisma/client";
 import { normalizeFrenteKey } from "@/utils/normalizeFrenteKey";
 import LogoCropModal from "@/components/frentes/LogoCropModal";
+import whiteLabelConfig from "../../../white-label.config";
 
 const MAX_INPUT_BYTES = 5 * 1024 * 1024;
 const ALLOWED_TYPES = ["image/png", "image/jpeg"];
@@ -141,8 +142,8 @@ export default function FrenteLogoUpload({ frente, onLogoUpdated }: Props) {
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-center justify-between">
-        <span className="text-sm font-semibold">Logo del Frente</span>
-        <span className="text-xs text-muted-foreground">PNG o JPG · máx 5 MB</span>
+        <span className="text-sm font-semibold">{whiteLabelConfig.ui.frentesManager.logo.heading}</span>
+        <span className="text-xs text-muted-foreground">{whiteLabelConfig.ui.frentesManager.logo.formatHint}</span>
       </div>
 
       <button
@@ -170,7 +171,7 @@ export default function FrenteLogoUpload({ frente, onLogoUpdated }: Props) {
             {!isDeciding && !isReadyToUpload && (
               <div className="absolute inset-0 flex flex-col items-center justify-center rounded-lg bg-black/0 opacity-0 transition-all duration-200 group-hover:bg-black/40 group-hover:opacity-100">
                 <Upload className="h-5 w-5 text-white" />
-                <span className="mt-1 text-xs font-medium text-white">Reemplazar</span>
+                <span className="mt-1 text-xs font-medium text-white">{whiteLabelConfig.ui.frentesManager.logo.replace}</span>
               </div>
             )}
           </div>
@@ -179,15 +180,15 @@ export default function FrenteLogoUpload({ frente, onLogoUpdated }: Props) {
             <div className="rounded-full border-2 border-dashed border-current p-3 transition-colors">
               <ImageIcon className="h-6 w-6" />
             </div>
-            <span className="text-sm font-medium">Haz clic para subir logo</span>
+            <span className="text-sm font-medium">{whiteLabelConfig.ui.frentesManager.logo.uploadPrompt}</span>
           </div>
         )}
 
         {isDeciding && (
-          <span className="text-xs text-muted-foreground">¿Recortar o subir directo?</span>
+          <span className="text-xs text-muted-foreground">{whiteLabelConfig.ui.frentesManager.logo.cropPrompt}</span>
         )}
         {isReadyToUpload && (
-          <span className="text-xs text-muted-foreground">Vista previa — confirma para guardar</span>
+          <span className="text-xs text-muted-foreground">{whiteLabelConfig.ui.frentesManager.logo.previewPrompt}</span>
         )}
       </button>
 
@@ -200,7 +201,7 @@ export default function FrenteLogoUpload({ frente, onLogoUpdated }: Props) {
             className="flex flex-1 items-center justify-center gap-1.5"
           >
             <Crop className="h-3.5 w-3.5" />
-            Recortar
+            {whiteLabelConfig.ui.frentesManager.logo.crop}
           </Button>
           <Button
             size="sm"
@@ -208,7 +209,7 @@ export default function FrenteLogoUpload({ frente, onLogoUpdated }: Props) {
             className="flex flex-1 items-center justify-center gap-1.5 bg-secondary hover:bg-secondary-dark text-white"
           >
             <Upload className="h-3.5 w-3.5" />
-            Subir imagen
+            {whiteLabelConfig.ui.frentesManager.logo.uploadImage}
           </Button>
           <Button
             size="sm"

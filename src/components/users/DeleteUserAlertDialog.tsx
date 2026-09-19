@@ -13,6 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { Loader2 } from "lucide-react";
+import whiteLabelConfig from "../../../white-label.config";
 
 interface DeleteUserAlertDialogProps {
   username: string;
@@ -39,19 +40,19 @@ export function DeleteUserAlertDialog({
 
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        setError(data.message ?? "No se pudo eliminar el usuario.");
+        setError(data.message ?? ((whiteLabelConfig as any)?.ui?.users?.deleteDialog?.genericError || "No se pudo eliminar el usuario."));
         return;
       }
 
       toast({
-        title: "Usuario eliminado",
-        description: `El usuario ${username} fue eliminado correctamente.`,
+        title: (whiteLabelConfig as any)?.ui?.users?.deleteDialog?.successTitle || "Usuario eliminado",
+        description: ((whiteLabelConfig as any)?.ui?.users?.deleteDialog?.successDescription || "El usuario {username} fue eliminado correctamente.").replace("{username}", username),
         variant: "success",
       });
       onDelete(username);
       onOpenChange(false);
     } catch {
-      setError("Error de conexión. Inténtalo de nuevo.");
+      setError((whiteLabelConfig as any)?.ui?.users?.deleteDialog?.connectionError || "Error de conexión. Inténtalo de nuevo.");
     } finally {
       setIsLoading(false);
     }
@@ -68,12 +69,11 @@ export function DeleteUserAlertDialog({
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>
-            ¿Eliminar al usuario{" "}
+            {(whiteLabelConfig as any)?.ui?.users?.deleteDialog?.titlePrefix || "¿Eliminar al usuario"}{" "}
             <span className="font-mono">{username}</span>?
           </AlertDialogTitle>
           <AlertDialogDescription>
-            Esta acción es permanente y no se puede deshacer. Se eliminarán
-            todos los datos del usuario del sistema.
+            {(whiteLabelConfig as any)?.ui?.users?.deleteDialog?.description || "Esta acción es permanente y no se puede deshacer. Se eliminarán todos los datos del usuario del sistema."}
           </AlertDialogDescription>
         </AlertDialogHeader>
 
@@ -82,14 +82,14 @@ export function DeleteUserAlertDialog({
         )}
 
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={isLoading}>Cancelar</AlertDialogCancel>
+          <AlertDialogCancel disabled={isLoading}>{(whiteLabelConfig as any)?.ui?.users?.deleteDialog?.cancel || "Cancelar"}</AlertDialogCancel>
           <Button
             variant="destructive"
             onClick={handleDelete}
             disabled={isLoading}
           >
             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {isLoading ? "Eliminando..." : "Sí, eliminar"}
+            {isLoading ? ((whiteLabelConfig as any)?.ui?.users?.deleteDialog?.deleting || "Eliminando...") : ((whiteLabelConfig as any)?.ui?.users?.deleteDialog?.confirm || "Sí, eliminar")}
           </Button>
         </AlertDialogFooter>
       </AlertDialogContent>

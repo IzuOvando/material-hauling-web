@@ -7,6 +7,7 @@ import FullScreenLoader from "@/components/ui/full-screen-loader";
 import { Section } from "@/types";
 import { Download } from "lucide-react";
 import CONFIG from "@/config";
+import whiteLabelConfig from "../../../white-label.config";
 
 const DownloadFrenteButton = ({
   frente,
@@ -49,16 +50,19 @@ const DownloadFrenteButton = ({
       const filename = `${frente}_${section}_vouchers.xlsx`;
       saveFile(blob, filename);
       const { dismiss } = toast({
-        title: "Descarga Exitosa",
-        description: `La base de datos de ${section.toLowerCase()} para el frente "${frente}" se ha descargado correctamente como ${filename}.`,
+        title: whiteLabelConfig.ui.vouchers.downloadSuccessTitle,
+        description: whiteLabelConfig.ui.vouchers.downloadSuccessDescription
+          .replace("{section}", section.toLowerCase())
+          .replace("{frente}", frente)
+          .replace("{filename}", filename),
         variant: "success",
       });
       disableToast = dismiss;
     } catch (ex) {
       console.error("On Download:", ex);
       const { dismiss } = toast({
-        title: "Descarga Fallida",
-        description: `Tuvimos un problema al descargar la base de datos. Por favor, intente de nuevo más tarde.`,
+        title: whiteLabelConfig.ui.vouchers.downloadErrorTitle,
+        description: whiteLabelConfig.ui.vouchers.downloadErrorDescription,
         variant: "destructive",
       });
       disableToast = dismiss;
@@ -73,7 +77,7 @@ const DownloadFrenteButton = ({
 
   return (
     <>
-      {isLoading && <FullScreenLoader message="Generando Excel..." />}
+      {isLoading && <FullScreenLoader message={whiteLabelConfig.ui.vouchers.generatingExcelMessage} />}
       <Button
         className="py-2 px-[0.5rem] bg-white hover:bg-[rgba(var(--accent-light-color)/50%)] group ml-[-2.5px]"
         onClick={downloadDatabase}

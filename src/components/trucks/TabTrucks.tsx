@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { usePathname, useRouter } from "next/navigation";
+import whiteLabelConfig from "../../../white-label.config";
 
 const TabTrucks = ({ isOwner }: { isOwner: boolean }) => {
   const [activeTab, setActiveTab] = useState(isOwner ? "qr" : "db");
@@ -46,7 +47,7 @@ const TabTrucks = ({ isOwner }: { isOwner: boolean }) => {
             value="qr"
             className="font-medium text-accent-dark data-[state=active]:bg-accent data-[state=active]:text-white"
           >
-            Generador de QRs
+            {whiteLabelConfig.ui.navbar.qrLabel}
           </TabsTrigger>
         )}
 
@@ -54,7 +55,7 @@ const TabTrucks = ({ isOwner }: { isOwner: boolean }) => {
           value="db"
           className="font-medium text-accent-dark data-[state=active]:bg-accent data-[state=active]:text-white"
         >
-          Bases de Datos
+          {whiteLabelConfig.ui.navbar.databaseLabel}
         </TabsTrigger>
 
         {isOwner && (
@@ -62,7 +63,7 @@ const TabTrucks = ({ isOwner }: { isOwner: boolean }) => {
             value="materials"
             className="font-medium text-accent-dark data-[state=active]:bg-accent data-[state=active]:text-white"
           >
-            Materiales
+            {whiteLabelConfig.ui.navbar.materialsLabel}
           </TabsTrigger>
         )}
 
@@ -71,7 +72,7 @@ const TabTrucks = ({ isOwner }: { isOwner: boolean }) => {
             value="users"
             className="font-medium text-accent-dark data-[state=active]:bg-accent data-[state=active]:text-white"
           >
-            Usuarios
+            {whiteLabelConfig.ui.navbar.usersLabel}
           </TabsTrigger>
         )}
 

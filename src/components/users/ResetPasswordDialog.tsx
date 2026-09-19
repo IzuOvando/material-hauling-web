@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
+import whiteLabelConfig from "../../../white-label.config";
 
 interface ResetPasswordDialogProps {
   username: string;
@@ -54,11 +55,11 @@ export function ResetPasswordDialog({
     e.preventDefault();
 
     if (password.length <= 6) {
-      setError("La contraseña debe tener más de 6 caracteres.");
+      setError((whiteLabelConfig as any)?.ui?.users?.form?.passwordMin || "La contraseña debe tener más de 6 caracteres.");
       return;
     }
     if (password !== confirm) {
-      setError("Las contraseñas no coinciden.");
+      setError((whiteLabelConfig as any)?.ui?.users?.form?.passwordMismatch || "Las contraseñas no coinciden.");
       return;
     }
 
@@ -76,21 +77,21 @@ export function ResetPasswordDialog({
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
         if (data.message?.includes("not found")) {
-          setError("Usuario no encontrado.");
+          setError((whiteLabelConfig as any)?.ui?.users?.resetDialog?.userNotFound || "Usuario no encontrado.");
         } else {
-          setError("Error al actualizar la contraseña.");
+          setError((whiteLabelConfig as any)?.ui?.users?.resetDialog?.updateError || "Error al actualizar la contraseña.");
         }
         return;
       }
 
       toast({
-        title: "Contraseña actualizada",
-        description: `La contraseña de ${username} fue restablecida correctamente.`,
+        title: (whiteLabelConfig as any)?.ui?.users?.resetDialog?.successTitle || "Contraseña actualizada",
+        description: ((whiteLabelConfig as any)?.ui?.users?.resetDialog?.successDescription || `La contraseña de ${username} fue restablecida correctamente.`),
         variant: "success",
       });
       onOpenChange(false);
     } catch {
-      setError("Error de conexión. Inténtalo de nuevo.");
+      setError((whiteLabelConfig as any)?.ui?.users?.form?.connectionError || "Error de conexión. Inténtalo de nuevo.");
     } finally {
       setIsLoading(false);
     }
@@ -100,11 +101,11 @@ export function ResetPasswordDialog({
     <Dialog open={open} onOpenChange={(next) => { if (!isLoading) onOpenChange(next); }}>
       <DialogContent className="sm:max-w-[420px]">
         <DialogHeader>
-          <DialogTitle>Restablecer contraseña</DialogTitle>
+          <DialogTitle>{(whiteLabelConfig as any)?.ui?.users?.actions?.resetPasswordTitle || 'Restablecer contraseña'}</DialogTitle>
           <DialogDescription>
-            Establece una nueva contraseña para{" "}
+            {(whiteLabelConfig as any)?.ui?.users?.actions?.resetPasswordDescription || 'Establece una nueva contraseña para'}{" "}
             <span className="font-mono font-semibold">{username}</span>.
-            No se requiere la contraseña anterior.
+            {(whiteLabelConfig as any)?.ui?.users?.actions?.resetPasswordNote || ' No se requiere la contraseña anterior.'}
           </DialogDescription>
         </DialogHeader>
 
@@ -112,12 +113,12 @@ export function ResetPasswordDialog({
           <div className="flex flex-col gap-3 py-4">
 
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor="reset-password">Nueva contraseña *</Label>
+              <Label htmlFor="reset-password">{(whiteLabelConfig as any)?.ui?.users?.resetDialog?.newPasswordLabel || "Nueva contraseña *"}</Label>
               <div className="relative">
                 <Input
                   id="reset-password"
                   type={showPassword ? "text" : "password"}
-                  placeholder="Mínimo 7 caracteres"
+                  placeholder={(whiteLabelConfig as any)?.ui?.users?.create?.passwordPlaceholder || "Mínimo 7 caracteres"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   onPaste={(e) => e.preventDefault()}
@@ -127,7 +128,7 @@ export function ResetPasswordDialog({
                   type="button"
                   onClick={() => setShowPassword((p) => !p)}
                   className="absolute right-0 top-0 h-full px-3 flex items-center text-muted-foreground hover:text-foreground transition-colors"
-                  aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                  aria-label={showPassword ? ((whiteLabelConfig as any)?.ui?.login?.hidePassword || "Ocultar contraseña") : ((whiteLabelConfig as any)?.ui?.login?.showPassword || "Mostrar contraseña")}
                 >
                   {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
@@ -135,12 +136,12 @@ export function ResetPasswordDialog({
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor="reset-confirm">Confirmar contraseña *</Label>
+              <Label htmlFor="reset-confirm">{(whiteLabelConfig as any)?.ui?.users?.create?.confirmPasswordLabel || "Confirmar contraseña *"}</Label>
               <div className="relative">
                 <Input
                   id="reset-confirm"
                   type={showConfirm ? "text" : "password"}
-                  placeholder="Repetir contraseña"
+                  placeholder={(whiteLabelConfig as any)?.ui?.users?.create?.confirmPasswordPlaceholder || "Repetir contraseña"}
                   value={confirm}
                   onChange={(e) => setConfirm(e.target.value)}
                   onPaste={(e) => e.preventDefault()}
@@ -156,10 +157,10 @@ export function ResetPasswordDialog({
                 </button>
               </div>
               {passwordsMatch === false && (
-                <p className="text-xs text-red-400">Las contraseñas no coinciden</p>
+                <p className="text-xs text-red-400">{(whiteLabelConfig as any)?.ui?.users?.form?.passwordMismatch || "Las contraseñas no coinciden"}</p>
               )}
               {passwordsMatch === true && (
-                <p className="text-xs text-green-600">Las contraseñas coinciden ✓</p>
+                <p className="text-xs text-green-600">{(whiteLabelConfig as any)?.ui?.users?.form?.passwordMatch || "Las contraseñas coinciden ✓"}</p>
               )}
             </div>
 
@@ -184,7 +185,7 @@ export function ResetPasswordDialog({
               className="bg-secondary hover:bg-secondary-light active:bg-secondary-dark"
             >
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {isLoading ? "Guardando..." : "Restablecer contraseña"}
+              {isLoading ? ((whiteLabelConfig as any)?.ui?.general?.saving || 'Guardando...') : ((whiteLabelConfig as any)?.ui?.users?.actions?.resetPasswordTitle || 'Restablecer contraseña')}
             </Button>
           </DialogFooter>
         </form>

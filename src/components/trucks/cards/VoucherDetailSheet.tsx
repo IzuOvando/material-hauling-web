@@ -8,6 +8,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { VoucherDetails } from "@/components/trucks/VoucherDetails";
+import whiteLabelConfig from "../../../../white-label.config";
 
 interface VoucherDetailSheetProps {
   voucher: VoucherCamion | null;
@@ -28,10 +29,10 @@ export function VoucherDetailSheet({
       >
         <div className="px-6 pt-6 pb-4 border-b-2 border-primary-light/40">
           <SheetTitle className="text-2xl font-semibold text-primary">
-            Detalle del voucher
+            {whiteLabelConfig.ui.vouchers.detailSheetTitle}
           </SheetTitle>
           <SheetDescription className="text-sm text-primary/60 mt-1">
-            Información completa del registro seleccionado.
+            {whiteLabelConfig.ui.vouchers.detailSheetDescription}
           </SheetDescription>
         </div>
 

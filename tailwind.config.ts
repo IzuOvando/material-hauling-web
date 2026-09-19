@@ -48,7 +48,7 @@ const config = {
           light: "rgb(var(--secondary-light-color) / <alpha-value>)",
         },
         accent: {
-          DEFAULT: "#bc955c",
+          DEFAULT: "rgb(var(--accent-color) / <alpha-value>)",
           dark: "rgb(var(--accent-dark-color) / <alpha-value>)",
           light: "rgb(var(--accent-light-color) / <alpha-value>)",
         },

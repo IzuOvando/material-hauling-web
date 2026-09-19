@@ -16,6 +16,7 @@ import { ChartContainer, type ChartConfig } from "@/components/ui/chart";
 import { Sheet, SheetContent, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { useDashboardStore, periodToParams } from "@/store/dashboardStore";
 import type { TimeseriesPoint, DashboardPeriod } from "@/types/dashboard";
+import whiteLabelConfig from "../../../../white-label.config";
 
 const TRIPS_COLOR = "#22543d";
 const ACCENT      = "#bc955c";
@@ -153,7 +154,7 @@ function FlatTable({ data }: { data: TimeseriesPoint[] }) {
     <table className="w-full text-xs">
       <thead>
         <tr className="border-b border-slate-100 bg-slate-50/70">
-          <th className="text-left px-6 py-2.5 font-semibold uppercase tracking-wider text-slate-400">Fecha</th>
+          <th className="text-left px-6 py-2.5 font-semibold uppercase tracking-wider text-slate-400">{whiteLabelConfig.ui.drilldown.date}</th>
           <th className="text-right w-16 pr-3 py-2.5 font-semibold uppercase tracking-wider whitespace-nowrap"
             style={{ color: TRIPS_COLOR + "99" }}>Viajes</th>
           <th className="text-right w-20 pl-5 pr-6 py-2.5 font-semibold uppercase tracking-wider whitespace-nowrap border-l border-slate-100"
@@ -164,7 +165,7 @@ function FlatTable({ data }: { data: TimeseriesPoint[] }) {
         {activeRows.length === 0 ? (
           <tr>
             <td colSpan={3} className="px-6 py-8 text-center text-slate-400">
-              Sin actividad esta semana
+              {whiteLabelConfig.ui.drilldown.noActivity}
             </td>
           </tr>
         ) : (
@@ -187,7 +188,7 @@ function FlatTable({ data }: { data: TimeseriesPoint[] }) {
             {inactiveCount > 0 && (
               <tr>
                 <td colSpan={3} className="px-6 py-2 text-[11px] text-black">
-                  {inactiveCount} {inactiveCount === 1 ? "día" : "días"} sin actividad
+                  {inactiveCount} {inactiveCount === 1 ? whiteLabelConfig.ui.drilldown.day : whiteLabelConfig.ui.drilldown.days} {whiteLabelConfig.ui.drilldown.noActivitySuffix}
                 </td>
               </tr>
             )}
@@ -277,16 +278,16 @@ export function DrilldownSection({ frente, period, materialColor }: DrilldownSec
         side="right"
         className="sm:max-w-[520px] p-0 flex flex-col overflow-hidden"
       >
-        <SheetTitle className="sr-only">Detalle de material</SheetTitle>
+        <SheetTitle className="sr-only">{whiteLabelConfig.ui.drilldown.detailTitle}</SheetTitle>
         <SheetDescription className="sr-only">
-          Información detallada del material seleccionado
+          {whiteLabelConfig.ui.drilldown.detailDescription}
         </SheetDescription>
 
         <div className="flex-none border-b border-slate-100 px-6 pt-5 pb-4 pr-12">
           <div className="flex items-center gap-2 mb-4">
             <div className="w-1 h-5 rounded-full flex-none" style={{ backgroundColor: materialColor }} />
             <span className="text-[10px] font-semibold uppercase tracking-widest text-slate-400">
-              Detalle
+              {whiteLabelConfig.ui.drilldown.detailLabel}
             </span>
             <span className="text-base font-bold text-slate-900 capitalize">
               {selectedMaterial ?? "—"}

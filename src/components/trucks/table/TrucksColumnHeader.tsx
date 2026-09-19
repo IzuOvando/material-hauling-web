@@ -17,6 +17,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useTrucksTable } from "@/hooks/useTrucksTable";
+import whiteLabelConfig from "../../../../white-label.config";
 
 interface TrucksColumnHeaderProps<TData, TValue>
   extends React.HTMLAttributes<HTMLDivElement> {
@@ -65,14 +66,14 @@ export function TrucksColumnHeader<TData, TValue>({
             onClick={() => handleSort(false)}
           >
             <ArrowUpIcon className="mr-2 h-3.5 w-3.5 text-muted-foreground/70" />
-            Asc
+            {whiteLabelConfig.ui.trucksTable.sortAscending}
           </DropdownMenuItem>
           <DropdownMenuItem
             className="cursor-pointer"
             onClick={() => handleSort(true)}
           >
             <ArrowDownIcon className="mr-2 h-3.5 w-3.5 text-muted-foreground/70" />
-            Desc
+            {whiteLabelConfig.ui.trucksTable.sortDescending}
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem
@@ -80,7 +81,7 @@ export function TrucksColumnHeader<TData, TValue>({
             onClick={() => column.toggleVisibility(false)}
           >
             <EyeNoneIcon className="mr-2 h-3.5 w-3.5 text-muted-foreground/70" />
-            Ocultar
+            {whiteLabelConfig.ui.trucksTable.hideColumn}
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

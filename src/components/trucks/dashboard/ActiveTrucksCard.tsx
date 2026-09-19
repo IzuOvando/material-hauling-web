@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { Truck } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { ActiveResponse } from "@/types/dashboard";
+import whiteLabelConfig from "../../../../white-label.config";
 
 const POLL_INTERVAL_MS = 30_000;
 
@@ -49,7 +50,7 @@ export function ActiveTrucksCard({ frente, className }: ActiveTrucksCellProps) {
     >
       <div className="flex items-center gap-1.5">
         <Truck className="h-3 w-3 text-white/60 shrink-0" />
-        <p className="text-[11px] text-white/60 leading-none">En tránsito</p>
+        <p className="text-[11px] text-white/60 leading-none">{whiteLabelConfig.ui.dashboard.inTransit}</p>
         <span className="h-1.5 w-1.5 rounded-full bg-accent animate-pulse ml-auto shrink-0" />
       </div>
       {count === null && !error ? (

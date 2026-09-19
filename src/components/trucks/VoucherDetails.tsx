@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import type { VoucherCamion } from "@prisma/client";
 import { cn } from "@/lib/utils";
 import { formatVoucherId } from "@/helpers/formatters/formatVoucherId";
+import whiteLabelConfig from "../../../white-label.config";
 import { formatVolume } from "@/helpers/formatters/numbers";
 import { getMaterialDescription } from "@/helpers/formatters/voucherMaterial";
 
@@ -64,7 +65,7 @@ function Section({ title, fields }: { title: string; fields: Field[] }) {
 }
 
 const inTransit = (
-  <span className="italic text-accent font-semibold">En tránsito</span>
+  <span className="italic text-accent font-semibold">{whiteLabelConfig.ui.dashboard.inTransit}</span>
 );
 
 export function VoucherDetails({ voucher, className }: VoucherDetailsProps) {
@@ -103,7 +104,7 @@ export function VoucherDetails({ voucher, className }: VoucherDetailsProps) {
       </div>
 
       <Section
-        title="Vehículo"
+        title={whiteLabelConfig.ui.vouchers.vehicle}
         fields={[
           { label: "ID Camión", value: voucher.idCamion },
           { label: "No. Económico", value: voucher.noEconomico },
@@ -114,7 +115,7 @@ export function VoucherDetails({ voucher, className }: VoucherDetailsProps) {
       />
 
       <Section
-        title="Carga"
+        title={whiteLabelConfig.ui.vouchers.load}
         fields={[
           { label: "Material", value: getMaterialDescription(voucher.material) },
           {
@@ -131,7 +132,7 @@ export function VoucherDetails({ voucher, className }: VoucherDetailsProps) {
       />
 
       <Section
-        title="Recorrido"
+        title={whiteLabelConfig.ui.vouchers.route}
         fields={[
           { label: "Odómetro origen", value: voucher.odometer },
           {
@@ -147,7 +148,7 @@ export function VoucherDetails({ voucher, className }: VoucherDetailsProps) {
       />
 
       <Section
-        title="Operador y checadores"
+        title={whiteLabelConfig.ui.vouchers.operatorAndCheckers}
         fields={[
           { label: "Operador", value: voucher.operador },
           { label: "No. Operador", value: voucher.noEmpleado },
