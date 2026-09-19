@@ -28,7 +28,11 @@ The command copies files into the runtime locations under `public/`. It does not
 
 The default logo (`public/images/logos/logo_mexico.svg`) is never overwritten. Each client's logo is installed as its own file, `public/images/logos/logo-client-name.svg`, so the repository default always stays available and installing one client never clobbers another.
 
-The installer automatically points the app at the newly installed logo by setting `NEXT_PUBLIC_LOGO_URL` when it starts the app (unless `--no-start` is passed, in which case it prints the value to set manually). A client's `brand.env`, if present, can still override `NEXT_PUBLIC_LOGO_URL` explicitly — that value wins over the computed one.
+### Enterprise images handling
+
+Each client's enterprise images install into their own subfolder, `public/images/enterprises/client-name/`, never the shared default folder. This avoids two clients colliding on a same-named file (e.g. both providing `company-a.png`) and keeps each image's filename-without-extension lookup key intact.
+
+The installer automatically points the app at the newly installed logo and enterprise images folder by setting `NEXT_PUBLIC_LOGO_URL`, `NEXT_PUBLIC_ENTERPRISE_IMAGES_DIRECTORY`, and `ENTERPRISE_IMAGES_FOLDER` when it starts the app (unless `--no-start` is passed, in which case it prints the values to set manually). A client's `brand.env`, if present, can still override any of these explicitly — that value wins over the computed one.
 
 ### Using a specific brand env file
 

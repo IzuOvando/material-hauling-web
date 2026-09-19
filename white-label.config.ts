@@ -80,6 +80,10 @@ export const whiteLabelConfig = {
       emptyMessage: process.env.NEXT_PUBLIC_UI_EMPTY_MESSAGE || "Sin resultados",
       saving: process.env.NEXT_PUBLIC_UI_GENERAL_SAVING || "Guardando...",
       connectionError: process.env.NEXT_PUBLIC_UI_GENERAL_CONNECTION_ERROR || "Error de conexión. Inténtalo de nuevo.",
+      backToSelectionPrefix: process.env.NEXT_PUBLIC_UI_GENERAL_BACK_TO_SELECTION_PREFIX || "Volver a la selección de",
+      changeItemPrefix: process.env.NEXT_PUBLIC_UI_GENERAL_CHANGE_ITEM_PREFIX || "Cambiar de",
+      backToDashboardLabel: process.env.NEXT_PUBLIC_UI_GENERAL_BACK_TO_DASHBOARD || "Volver a proyectos",
+      ofConnector: process.env.NEXT_PUBLIC_UI_GENERAL_OF_CONNECTOR || "del",
     },
     dashboard: {
       summaryTab: process.env.NEXT_PUBLIC_UI_DASHBOARD_SUMMARY_TAB || "Resumen",
@@ -157,6 +161,7 @@ export const whiteLabelConfig = {
       detailSheetDescription: process.env.NEXT_PUBLIC_UI_VOUCHERS_DETAIL_SHEET_DESC || "Información completa del registro seleccionado.",
       viewCards: process.env.NEXT_PUBLIC_UI_VOUCHERS_VIEW_CARDS || "Tarjetas",
       viewTable: process.env.NEXT_PUBLIC_UI_VOUCHERS_VIEW_TABLE || "Tabla",
+      viewGroupLabel: process.env.NEXT_PUBLIC_UI_VOUCHERS_VIEW_GROUP_LABEL || "Vista",
     },
     trucksFilters: {
       periodLabelPrefix: process.env.NEXT_PUBLIC_UI_TRUCKS_FILTERS_PERIOD_PREFIX || "Periodo",
@@ -176,6 +181,11 @@ export const whiteLabelConfig = {
       periodFallbackLabel: process.env.NEXT_PUBLIC_UI_TRUCKS_FILTERS_PERIOD_FALLBACK || "Periodo",
       cancelButton: process.env.NEXT_PUBLIC_UI_TRUCKS_FILTERS_CANCEL || "Cancelar",
       applyButton: process.env.NEXT_PUBLIC_UI_TRUCKS_FILTERS_APPLY || "Aplicar",
+      previousYearLabel: process.env.NEXT_PUBLIC_UI_TRUCKS_FILTERS_PREV_YEAR || "Año anterior",
+      nextYearLabel: process.env.NEXT_PUBLIC_UI_TRUCKS_FILTERS_NEXT_YEAR || "Año siguiente",
+      todayIncompleteWarning: process.env.NEXT_PUBLIC_UI_TRUCKS_FILTERS_TODAY_INCOMPLETE || "Datos del día en curso pueden estar incompletos",
+      clearSearchLabel: process.env.NEXT_PUBLIC_UI_TRUCKS_FILTERS_CLEAR_SEARCH || "Limpiar búsqueda",
+      removeFilterPrefix: process.env.NEXT_PUBLIC_UI_TRUCKS_FILTERS_REMOVE_PREFIX || "Quitar",
     },
     drilldown: {
       date: process.env.NEXT_PUBLIC_UI_DRILLDOWN_DATE || "Fecha",

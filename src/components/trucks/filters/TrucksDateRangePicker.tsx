@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { DayPicker, type DateRange as RDPDateRange } from "react-day-picker";
-import { es } from "date-fns/locale";
+import { es, enUS } from "date-fns/locale";
 import { format, parse, isValid } from "date-fns";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import {
@@ -13,6 +13,11 @@ import {
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import whiteLabelConfig from "../../../../white-label.config";
+
+// date-fns doesn't expose a generic "look up locale by tag" helper, so this
+// maps the tenant's NEXT_PUBLIC_LOCALE to a supported date-fns locale,
+// defaulting to Spanish for anything unrecognized.
+const DAY_PICKER_LOCALE = whiteLabelConfig.app.locale === "en" ? enUS : es;
 
 interface TrucksDateRangePickerProps {
   value: { from: string; to: string } | null;
@@ -66,7 +71,7 @@ export function TrucksDateRangePicker({
             numberOfMonths={2}
             selected={internal}
             onSelect={setInternal}
-            locale={es}
+            locale={DAY_PICKER_LOCALE}
             showOutsideDays
             classNames={{
               months: "flex flex-col sm:flex-row gap-4",

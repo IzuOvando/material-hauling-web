@@ -28,7 +28,7 @@ function Chip({ label, onRemove }: ChipProps) {
         type="button"
         onClick={onRemove}
         className="inline-flex items-center justify-center h-5 w-5 rounded-full hover:bg-primary-light/20"
-        aria-label={`Quitar ${label}`}
+        aria-label={`${whiteLabelConfig.ui.trucksFilters.removeFilterPrefix} ${label}`}
       >
         <X className="h-3 w-3" />
       </button>

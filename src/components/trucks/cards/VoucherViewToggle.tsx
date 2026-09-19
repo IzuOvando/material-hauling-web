@@ -17,7 +17,7 @@ export function VoucherViewToggle() {
   return (
     <div
       role="radiogroup"
-      aria-label="Vista"
+      aria-label={whiteLabelConfig.ui.vouchers.viewGroupLabel}
       className="inline-flex items-center gap-1 p-1 rounded-full bg-primary-light/10 border border-primary-light/30"
     >
       {OPTIONS.map((opt) => {

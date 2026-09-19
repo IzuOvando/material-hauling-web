@@ -86,7 +86,13 @@ async function installClientAssets(): Promise<void> {
     await copyFile(availableQrTemplate, path.join(publicRoot, "documents", "test_metadatacamion.xlsx"));
   }
 
-  const enterpriseDestination = path.join(publicRoot, "images", "enterprises");
+  // Each client's enterprise images live in their own subfolder — never the shared
+  // default — so two clients can't collide on a same-named file (e.g. company-a.png),
+  // and the initializer's filename-without-extension lookup key stays untouched.
+  const enterpriseSubdir = path.join("images", "enterprises", clientName);
+  const enterpriseDestination = path.join(publicRoot, enterpriseSubdir);
+  const enterpriseImagesDirectory = `/${enterpriseSubdir.split(path.sep).join("/")}`;
+  const enterpriseImagesFolder = `public/${enterpriseSubdir.split(path.sep).join("/")}`;
   await fs.mkdir(enterpriseDestination, { recursive: true });
   await Promise.all(
     enterpriseImages.map((fileName) =>
@@ -96,10 +102,16 @@ async function installClientAssets(): Promise<void> {
 
   console.log(`Client assets installed: ${clientName}`);
   console.log(`- Logo: ${path.relative(projectRoot, logoDestination)} (NEXT_PUBLIC_LOGO_URL=${logoPublicPath})`);
-  console.log(`- Enterprise images: ${enterpriseImages.length}`);
+  console.log(`- Enterprise images: ${enterpriseImages.length} (${enterpriseImagesFolder})`);
   console.log(availableQrTemplate
     ? `- QR template: ${path.relative(projectRoot, path.join(publicRoot, "documents", "test_metadatacamion.xlsx"))}`
     : "- QR template: skipped; using the existing public template");
+
+  const computedOverrides = {
+    NEXT_PUBLIC_LOGO_URL: logoPublicPath,
+    NEXT_PUBLIC_ENTERPRISE_IMAGES_DIRECTORY: enterpriseImagesDirectory,
+    ENTERPRISE_IMAGES_FOLDER: enterpriseImagesFolder,
+  };
 
   if (startApp) {
     let brandEnvSource: string | null;
@@ -111,10 +123,11 @@ async function installClientAssets(): Promise<void> {
     }
     const envPath = brandEnvSource ?? path.join(projectRoot, ".env");
     console.log("Starting the app with the base environment and client overrides...");
-    await startWithBrandEnv(envPath, "dev", [], { NEXT_PUBLIC_LOGO_URL: logoPublicPath });
+    await startWithBrandEnv(envPath, "dev", [], computedOverrides);
   } else {
     console.log("App start skipped (--no-start).");
-    console.log(`Set NEXT_PUBLIC_LOGO_URL=${logoPublicPath} in the client's brand.env or deployment environment.`);
+    console.log("Set these in the client's brand.env or deployment environment:");
+    Object.entries(computedOverrides).forEach(([key, value]) => console.log(`  ${key}=${value}`));
   }
 }
 

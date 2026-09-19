@@ -120,7 +120,7 @@ npm run client:install -- client-name
 
 The installer validates the logo and enterprise images, then copies them into the existing runtime locations under `public/`. A client QR template is optional. If it is not provided, the existing public template remains unchanged. The source folder is preserved, so the same client package can be installed again or reviewed before deployment.
 
-The client's logo is installed as `public/images/logos/logo-client-name.svg`, never overwriting the default `logo_mexico.svg`. The installer sets `NEXT_PUBLIC_LOGO_URL` to that path automatically when it starts the app, so the branding provider picks it up without manual env editing. Pass `--no-start` to install without starting, in which case the installer prints the `NEXT_PUBLIC_LOGO_URL` value to set in the client's `brand.env` or the deployment environment.
+The client's logo is installed as `public/images/logos/logo-client-name.svg`, never overwriting the default `logo_mexico.svg`. Enterprise images install into their own subfolder, `public/images/enterprises/client-name/`, never the shared default folder — this avoids two clients colliding on a same-named file and preserves each image's filename-without-extension lookup key (used by `EnterprisesImagesInitializer` to key preloaded canvases by business name). The installer sets `NEXT_PUBLIC_LOGO_URL`, `NEXT_PUBLIC_ENTERPRISE_IMAGES_DIRECTORY`, and `ENTERPRISE_IMAGES_FOLDER` automatically when it starts the app, so the branding provider and `/api/enterprises/images` pick them up without manual env editing. Pass `--no-start` to install without starting, in which case the installer prints these values to set in the client's `brand.env` or the deployment environment.
 
 By default `client:install` loads `client-assets/<client-name>/brand.env` if present, otherwise the repository `.env`. Pass `--brand-env=<path>` to use a different file instead — for example `npm run client:install -- client-name --brand-env=.env.whitelabel-demo` to validate the fictional Atlas Haul brand's full copy/theme override, not just its logo.
 
@@ -216,7 +216,25 @@ Templated values use `{frente}`, `{section}`, `{filename}`, and `{count}` placeh
 ### `ui.trucksTable` (additional keys)
 - `NEXT_PUBLIC_UI_TRUCKS_TABLE_SORT_ASC`, `..._SORT_DESC`, `..._HIDE_COLUMN`, `..._COLUMNS_BUTTON`, `..._SHOW_COLUMNS`
 
-Not yet externalized (out of scope for this pass): `aria-label`s and the day-picker/month-abbreviation calendar locale (`MonthYearPicker.tsx`, `TrucksDateRangePicker.tsx` use `date-fns/locale/es` directly, independent of `NEXT_PUBLIC_LOCALE`).
+### `ui.trucksFilters` (additional keys — aria-labels/tooltips)
+- `NEXT_PUBLIC_UI_TRUCKS_FILTERS_PREV_YEAR`, `..._NEXT_YEAR` (month/year picker navigation)
+- `NEXT_PUBLIC_UI_TRUCKS_FILTERS_TODAY_INCOMPLETE` (today's-data tooltip + icon aria-label)
+- `NEXT_PUBLIC_UI_TRUCKS_FILTERS_CLEAR_SEARCH`
+- `NEXT_PUBLIC_UI_TRUCKS_FILTERS_REMOVE_PREFIX` (used as `"{prefix} {chip label}"` on each active-filter chip's remove button)
+
+### `ui.vouchers` (additional key)
+- `NEXT_PUBLIC_UI_VOUCHERS_VIEW_GROUP_LABEL` (cards/table toggle group aria-label)
+
+### `ui.general` (additional keys)
+- `NEXT_PUBLIC_UI_GENERAL_BACK_TO_SELECTION_PREFIX`, `..._CHANGE_ITEM_PREFIX` (frente header back-navigation)
+- `NEXT_PUBLIC_UI_GENERAL_BACK_TO_DASHBOARD`
+- `NEXT_PUBLIC_UI_GENERAL_OF_CONNECTOR` — a bare grammatical connector ("del" in Spanish) used to assemble compound aria-labels like `"{actions} {of} {frente}"`. Word-order in the assembled phrase follows Spanish grammar; a locale where that reads awkwardly (English's "{actions} for {frente}" wouldn't use a mid-sentence connector at all) is a known limitation of token-substitution over a proper i18n framework — acceptable here since it only affects a screen-reader label, not visible text.
+
+### Locale-aware date/calendar
+- `MonthYearPicker.tsx` derives its month abbreviations from `Intl.DateTimeFormat(NEXT_PUBLIC_LOCALE, { month: "short" })` instead of a hardcoded Spanish array.
+- `TrucksDateRangePicker.tsx` picks a `date-fns` locale (`enUS` for `NEXT_PUBLIC_LOCALE=en`, `es` otherwise) for the day-picker calendar. Only `es`/`en` are mapped explicitly; any other locale value falls back to `es`.
+
+All `aria-label`s in the codebase are now config-driven — verified with a full-repo sweep, not just the components listed above.
 
 ## Recommended rollout
 

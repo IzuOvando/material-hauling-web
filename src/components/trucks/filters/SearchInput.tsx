@@ -46,7 +46,7 @@ export function SearchInput() {
           type="button"
           onClick={handleClear}
           className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-primary-light/15 text-primary/60 hover:text-primary"
-          aria-label="Limpiar búsqueda"
+          aria-label={whiteLabelConfig.ui.trucksFilters.clearSearchLabel}
         >
           <X className="h-3.5 w-3.5" />
         </button>

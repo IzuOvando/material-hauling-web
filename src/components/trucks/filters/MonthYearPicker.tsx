@@ -11,21 +11,15 @@ import {
 import { cn } from "@/lib/utils";
 import { getMonthRange, isFullMonthRange, type DateRange } from "@/actions/trucks/periods";
 import CONFIG from "@/config";
+import whiteLabelConfig from "../../../../white-label.config";
 
-const MONTH_LABELS = [
-  "Ene",
-  "Feb",
-  "Mar",
-  "Abr",
-  "May",
-  "Jun",
-  "Jul",
-  "Ago",
-  "Sep",
-  "Oct",
-  "Nov",
-  "Dic",
-];
+// Derived from NEXT_PUBLIC_LOCALE via Intl, rather than a hardcoded Spanish
+// array, so a different tenant locale gets correctly localized abbreviations.
+const MONTH_LABELS = Array.from({ length: 12 }, (_, i) =>
+  new Intl.DateTimeFormat(whiteLabelConfig.app.locale, { month: "short" }).format(
+    new Date(2000, i, 1)
+  )
+);
 
 interface MonthYearPickerProps {
   value: DateRange | null;
@@ -84,7 +78,7 @@ export function MonthYearPicker({
             type="button"
             onClick={() => setViewYear((y) => y - 1)}
             className="h-7 w-7 flex items-center justify-center rounded-md text-accent hover:bg-accent/10"
-            aria-label="Año anterior"
+            aria-label={whiteLabelConfig.ui.trucksFilters.previousYearLabel}
           >
             <ChevronLeft className="h-4 w-4" />
           </button>
@@ -94,7 +88,7 @@ export function MonthYearPicker({
             onClick={() => setViewYear((y) => y + 1)}
             disabled={viewYear >= current.year}
             className="h-7 w-7 flex items-center justify-center rounded-md text-accent hover:bg-accent/10 disabled:opacity-30 disabled:hover:bg-transparent"
-            aria-label="Año siguiente"
+            aria-label={whiteLabelConfig.ui.trucksFilters.nextYearLabel}
           >
             <ChevronRight className="h-4 w-4" />
           </button>
@@ -110,7 +104,7 @@ export function MonthYearPicker({
               (viewYear === current.year && month > current.month);
             return (
               <button
-                key={label}
+                key={idx}
                 type="button"
                 disabled={isFuture}
                 onClick={() => handlePick(month)}
