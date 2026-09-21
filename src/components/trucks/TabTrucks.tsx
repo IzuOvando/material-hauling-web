@@ -39,13 +39,13 @@ const TabTrucks = ({ isOwner }: { isOwner: boolean }) => {
       <TabsList
         className="p-[6px] h-auto"
         style={{
-          backgroundColor: "rgba(var(--accent-light-color) / 40%)",
+          backgroundColor: "rgba(var(--accent-color) / 20%)",
         }}
       >
         {isOwner && (
           <TabsTrigger
             value="qr"
-            className="font-medium text-accent-dark data-[state=active]:bg-accent data-[state=active]:text-white"
+            className="font-medium text-accent data-[state=active]:bg-accent data-[state=active]:text-white"
           >
             {whiteLabelConfig.ui.navbar.qrLabel}
           </TabsTrigger>
@@ -53,7 +53,7 @@ const TabTrucks = ({ isOwner }: { isOwner: boolean }) => {
 
         <TabsTrigger
           value="db"
-          className="font-medium text-accent-dark data-[state=active]:bg-accent data-[state=active]:text-white"
+          className="font-medium text-accent data-[state=active]:bg-accent data-[state=active]:text-white"
         >
           {whiteLabelConfig.ui.navbar.databaseLabel}
         </TabsTrigger>
@@ -61,7 +61,7 @@ const TabTrucks = ({ isOwner }: { isOwner: boolean }) => {
         {isOwner && (
           <TabsTrigger
             value="materials"
-            className="font-medium text-accent-dark data-[state=active]:bg-accent data-[state=active]:text-white"
+            className="font-medium text-accent data-[state=active]:bg-accent data-[state=active]:text-white"
           >
             {whiteLabelConfig.ui.navbar.materialsLabel}
           </TabsTrigger>
@@ -70,7 +70,7 @@ const TabTrucks = ({ isOwner }: { isOwner: boolean }) => {
         {isOwner && (
           <TabsTrigger
             value="users"
-            className="font-medium text-accent-dark data-[state=active]:bg-accent data-[state=active]:text-white"
+            className="font-medium text-accent data-[state=active]:bg-accent data-[state=active]:text-white"
           >
             {whiteLabelConfig.ui.navbar.usersLabel}
           </TabsTrigger>

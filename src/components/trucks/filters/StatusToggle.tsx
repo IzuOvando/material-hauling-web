@@ -10,7 +10,7 @@ const OPTIONS: { value: StatusValue; label: string; activeClass: string; icon: t
   {
     value: "ALL",
     label: whiteLabelConfig.ui.trucksFilters.statusAll,
-    activeClass: "bg-primary-light text-white",
+    activeClass: "bg-primary text-white",
     icon: Circle,
   },
   {
@@ -34,7 +34,7 @@ export function StatusToggle() {
     <div
       role="radiogroup"
       aria-label={whiteLabelConfig.ui.trucksFilters.statusLabelPrefix}
-      className="inline-flex items-center gap-1 p-1 rounded-full bg-primary-light/10 border border-primary-light/30"
+      className="inline-flex items-center gap-1 p-1 rounded-full bg-primary/10 border border-primary/30"
     >
       {OPTIONS.map((opt) => {
         const active = state.status === opt.value;
@@ -49,7 +49,7 @@ export function StatusToggle() {
             className={cn(
               "inline-flex items-center gap-1.5 h-8 px-3 rounded-full text-sm font-semibold",
               "transition-colors whitespace-nowrap",
-              active ? opt.activeClass : "text-primary hover:bg-primary-light/15"
+              active ? opt.activeClass : "text-primary hover:bg-primary/15"
             )}
           >
             <Icon className="h-3.5 w-3.5" />

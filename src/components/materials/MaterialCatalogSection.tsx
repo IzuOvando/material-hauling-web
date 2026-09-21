@@ -163,7 +163,7 @@ export function MaterialCatalogSection({
   const activeMaterials = materials.filter((m) => m.isActive);
 
   return (
-    <div className="border-2 border-primary-light rounded-lg overflow-hidden">
+    <div className="border-2 border-primary rounded-lg overflow-hidden">
       <div className="bg-primary px-4 py-3">
         <h2 className="text-lg font-semibold text-accent">
           {(whiteLabelConfig as any)?.ui?.materials?.catalog?.heading || "Catálogo de Materiales"}
@@ -182,7 +182,7 @@ export function MaterialCatalogSection({
           <Button
             onClick={handleCreate}
             disabled={creating}
-            className="bg-accent hover:bg-accent-light text-white shrink-0"
+            className="bg-accent hover:bg-accent/90 text-white shrink-0"
           >
             {creating ? (
               <Loader2 className="h-4 w-4 animate-spin" />

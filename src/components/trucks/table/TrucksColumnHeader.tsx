@@ -48,7 +48,7 @@ export function TrucksColumnHeader<TData, TValue>({
           <Button
             variant="ghost"
             size="sm"
-            className="-ml-3 h-8 hover:bg-primary-light hover:text-accent data-[state=open]:bg-primary-light font-bold"
+            className="-ml-3 h-8 hover:bg-primary hover:text-accent data-[state=open]:bg-primary font-bold"
           >
             <span>{title}</span>
             {column.getIsSorted() === "desc" ? (

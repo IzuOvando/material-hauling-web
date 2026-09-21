@@ -56,7 +56,7 @@ export function DatePicker({
           <CalendarDays className="h-4 w-4 text-accent shrink-0" />
         </button>
       </PopoverTrigger>
-      <PopoverContent className="w-auto p-0 border-primary-light" align="start">
+      <PopoverContent className="w-auto p-0 border-primary" align="start">
         <DayPicker
           mode="single"
           selected={selected}
@@ -70,7 +70,7 @@ export function DatePicker({
             caption_label: "text-sm font-medium text-primary capitalize",
             nav: "space-x-1 flex items-center",
             nav_button:
-              "h-7 w-7 bg-transparent p-0 text-accent hover:text-accent-dark flex items-center justify-center rounded-md hover:bg-accent/10",
+              "h-7 w-7 bg-transparent p-0 text-accent hover:text-accent flex items-center justify-center rounded-md hover:bg-accent/10",
             nav_button_previous: "absolute left-1",
             nav_button_next: "absolute right-1",
             table: "w-full border-collapse space-y-1",
@@ -81,7 +81,7 @@ export function DatePicker({
             cell: "h-9 w-9 text-center text-sm p-0 relative [&:has([aria-selected])]:bg-accent/10 first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
             day: "h-9 w-9 p-0 font-normal text-primary rounded-md hover:bg-accent/10 aria-selected:opacity-100 flex items-center justify-center",
             day_selected:
-              "bg-accent text-white hover:bg-accent-dark hover:text-white focus:bg-accent focus:text-white rounded-md",
+              "bg-accent text-white hover:bg-accent/90 hover:text-white focus:bg-accent focus:text-white rounded-md",
             day_today: "font-semibold text-accent",
             day_outside: "text-primary/30 opacity-50",
             day_disabled: "text-primary/30 opacity-50",

@@ -180,7 +180,7 @@ export function FrentesUserDialog({
                     return (
                       <div
                         key={project}
-                        className="rounded-md border border-primary-light/40 shadow-sm"
+                        className="rounded-md border border-primary/40 shadow-sm"
                       >
                         <button
                           type="button"
@@ -203,7 +203,7 @@ export function FrentesUserDialog({
                         </button>
 
                         {isOpen && (
-                          <div className="px-3 pb-2 space-y-2 border-t border-primary-light/30 pt-2 bg-gray-50">
+                          <div className="px-3 pb-2 space-y-2 border-t border-primary/30 pt-2 bg-gray-50">
                             {list.map((frente) => {
                               const subLabel = frente.substring(project.length + 1);
                               return (
@@ -247,7 +247,7 @@ export function FrentesUserDialog({
           <Button
             onClick={handleSubmit}
             disabled={isLoading}
-            className="bg-secondary hover:bg-secondary-light active:bg-secondary-dark"
+            className="bg-secondary hover:bg-secondary/90 active:bg-secondary/80"
           >
             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             {isLoading ? "Guardando..." : "Confirmar cambios"}

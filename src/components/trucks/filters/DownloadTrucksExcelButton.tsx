@@ -74,7 +74,7 @@ export function DownloadTrucksExcelButton({
     <Button
       onClick={handleDownload}
       disabled={isLoading || total === 0}
-      className="h-9 gap-2 bg-accent hover:bg-accent-dark text-white"
+      className="h-9 gap-2 bg-accent hover:bg-accent/90 text-white"
     >
       {isLoading ? (
         <Loader2 className="h-4 w-4 animate-spin" />

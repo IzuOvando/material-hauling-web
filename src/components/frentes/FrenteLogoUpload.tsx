@@ -206,7 +206,7 @@ export default function FrenteLogoUpload({ frente, onLogoUpdated }: Props) {
           <Button
             size="sm"
             onClick={handleDirectUpload}
-            className="flex flex-1 items-center justify-center gap-1.5 bg-secondary hover:bg-secondary-dark text-white"
+            className="flex flex-1 items-center justify-center gap-1.5 bg-secondary hover:bg-secondary/90 text-white"
           >
             <Upload className="h-3.5 w-3.5" />
             {whiteLabelConfig.ui.frentesManager.logo.uploadImage}
@@ -234,7 +234,7 @@ export default function FrenteLogoUpload({ frente, onLogoUpdated }: Props) {
               size="sm"
               onClick={handleConfirmUpload}
               disabled={loading}
-              className="flex flex-1 items-center justify-center gap-1.5 bg-primary hover:bg-primary-dark text-white"
+              className="flex flex-1 items-center justify-center gap-1.5 bg-primary hover:bg-primary/90 text-white"
             >
               {loading ? (
                 <Loader2 className="h-3.5 w-3.5 animate-spin" />

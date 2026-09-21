@@ -67,7 +67,7 @@ const FileUpload: React.FC<FileUpdateProps> = ({
       )}
       <Button
         onClick={triggerFileInput}
-        className={`w-full flex items-center gap-2 ${isLoading ? "bg-secondary-light" : "bg-secondary"} ${!isAdmin ? "opacity-50 cursor-not-allowed" : ""}`}
+        className={`w-full flex items-center gap-2 ${isLoading ? "bg-secondary/60" : "bg-secondary"} ${!isAdmin ? "opacity-50 cursor-not-allowed" : ""}`}
         disabled={isLoading || !isAdmin}
       >
         <Upload size={18} color="white" />

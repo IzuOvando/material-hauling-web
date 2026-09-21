@@ -124,7 +124,7 @@ const CardLogin = () => {
         </CardContent>
         <CardFooter className="flex justify-center">
           <Button
-            className="bg-secondary hover:bg-secondary-light active:bg-secondary-dark text-white"
+            className="bg-secondary hover:bg-secondary/90 active:bg-secondary/80 text-white"
             size={"lg"}
             disabled={isLoading}
           >

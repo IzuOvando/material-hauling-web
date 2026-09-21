@@ -70,7 +70,7 @@ export function MonthYearPicker({
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>{trigger}</PopoverTrigger>
       <PopoverContent
-        className="w-auto p-0 border-2 border-primary-light"
+        className="w-auto p-0 border-2 border-primary"
         align={align}
       >
         <div className="flex items-center justify-between px-3 pt-3">

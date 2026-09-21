@@ -51,11 +51,11 @@ export function TrucksTable({ vouchers, total, page, limit }: TrucksTableProps) 
       <div className="flex items-center justify-end">
         <TrucksColumnToggle table={table} />
       </div>
-      <div className="rounded-lg border-2 border-primary-light overflow-hidden overflow-x-auto">
+      <div className="rounded-lg border-2 border-primary overflow-hidden overflow-x-auto">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id} className="border-primary-light">
+              <TableRow key={headerGroup.id} className="border-primary">
                 {headerGroup.headers.map((header) => (
                   <TableHead
                     key={header.id}
@@ -77,7 +77,7 @@ export function TrucksTable({ vouchers, total, page, limit }: TrucksTableProps) 
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
-                  className="border-primary-light border-b-2 hover:bg-green-50"
+                  className="border-primary border-b-2 hover:bg-green-50"
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id} className="whitespace-nowrap">

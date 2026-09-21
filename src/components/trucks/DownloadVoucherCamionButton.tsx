@@ -79,7 +79,7 @@ const DownloadFrenteButton = ({
     <>
       {isLoading && <FullScreenLoader message={whiteLabelConfig.ui.vouchers.generatingExcelMessage} />}
       <Button
-        className="py-2 px-[0.5rem] bg-white hover:bg-[rgba(var(--accent-light-color)/50%)] group ml-[-2.5px]"
+        className="py-2 px-[0.5rem] bg-white hover:bg-[rgba(var(--accent-color)/20%)] group ml-[-2.5px]"
         onClick={downloadDatabase}
         disabled={isLoading}
       >

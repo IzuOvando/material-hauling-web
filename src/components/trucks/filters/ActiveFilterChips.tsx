@@ -20,14 +20,14 @@ function Chip({ label, onRemove }: ChipProps) {
       variant="outline"
       className={cn(
         "inline-flex items-center gap-1.5 h-7 pl-2.5 pr-1 rounded-full",
-        "border-primary-light bg-primary-light/5 text-primary font-medium"
+        "border-primary bg-primary/5 text-primary font-medium"
       )}
     >
       <span className="truncate max-w-[200px]">{label}</span>
       <button
         type="button"
         onClick={onRemove}
-        className="inline-flex items-center justify-center h-5 w-5 rounded-full hover:bg-primary-light/20"
+        className="inline-flex items-center justify-center h-5 w-5 rounded-full hover:bg-primary/20"
         aria-label={`${whiteLabelConfig.ui.trucksFilters.removeFilterPrefix} ${label}`}
       >
         <X className="h-3 w-3" />
@@ -118,7 +118,7 @@ export function ActiveFilterChips() {
         variant="ghost"
         size="sm"
         onClick={clearAll}
-        className="h-7 px-2 text-xs text-primary hover:bg-primary-light/15"
+        className="h-7 px-2 text-xs text-primary hover:bg-primary/15"
       >
         {whiteLabelConfig.ui.trucksFilters.clearAllButton}
       </Button>

@@ -87,7 +87,7 @@ export function TrucksDbHeader({
               <Button
                 variant="outline"
                 size="icon"
-                className="h-9 w-9 border-2 border-primary-light text-primary hover:bg-primary hover:!text-accent-light"
+                className="h-9 w-9 border-2 border-primary text-primary hover:bg-primary hover:!text-accent"
                 title={whiteLabelConfig.ui.users.table.headers.actions}
                 aria-label={`${whiteLabelConfig.ui.users.table.headers.actions} ${whiteLabelConfig.ui.general.ofConnector} ${whiteLabelConfig.ui.general.singularFrente}`}
               >

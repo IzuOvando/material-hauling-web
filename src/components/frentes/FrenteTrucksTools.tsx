@@ -88,7 +88,7 @@ const FrenteTrucksTools = ({
             />
             {isOwner && (
               <Button
-                className="p-2 bg-transparent hover:bg-[rgba(var(--accent-light-color)/50%)]"
+                className="p-2 bg-transparent hover:bg-[rgba(var(--accent-color)/20%)]"
                 onClick={() => setOpenCloseCycle(true)}
                 title={whiteLabelConfig.ui.frentesManager.menu.closeCycle}
               >
@@ -97,7 +97,7 @@ const FrenteTrucksTools = ({
             )}
             {isOwner && (
               <Button
-                className="p-2 bg-transparent hover:bg-[rgba(var(--accent-light-color)/50%)]"
+                className="p-2 bg-transparent hover:bg-[rgba(var(--accent-color)/20%)]"
                 onClick={() => setOpenDelete(true)}
                 title={whiteLabelConfig.ui.frentesManager.menu.deleteRecords}
               >

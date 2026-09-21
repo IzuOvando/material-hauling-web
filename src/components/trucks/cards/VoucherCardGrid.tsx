@@ -61,7 +61,7 @@ export function VoucherCardGrid({
 
   if (vouchers.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 text-center gap-3 rounded-lg border-2 border-dashed border-primary-light/50 bg-white">
+      <div className="flex flex-col items-center justify-center py-20 text-center gap-3 rounded-lg border-2 border-dashed border-primary/50 bg-white">
         <PackageOpen className="h-10 w-10 text-slate-300" />
         <p className="text-sm font-semibold text-slate-600">
           {whiteLabelConfig.ui.vouchers.emptyResultsTitle}
@@ -97,7 +97,7 @@ export function VoucherCardGrid({
             variant="outline"
             size="sm"
             onClick={loadMore}
-            className="border-2 border-primary-light text-primary"
+            className="border-2 border-primary text-primary"
           >
             {whiteLabelConfig.ui.vouchers.retryButton}
           </Button>

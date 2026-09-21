@@ -20,7 +20,7 @@ export function ForbiddenActions() {
   }
 
   return (
-    <Button asChild className="bg-secondary hover:bg-secondary-light">
+    <Button asChild className="bg-secondary hover:bg-secondary/90">
       <Link href="/">{whiteLabelConfig.ui.errors.backHome}</Link>
     </Button>
   );
