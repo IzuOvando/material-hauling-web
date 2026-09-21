@@ -5,6 +5,7 @@ Create one folder per client using this structure:
 ```text
 client-assets/
 └── client-name/
+    ├── tenant.json             # required: copy, colors, metadata overrides
     ├── branding/
     │   └── logo.svg
     ├── enterprises/
@@ -32,15 +33,11 @@ The default logo (`public/images/logos/logo_mexico.svg`) is never overwritten. E
 
 Each client's enterprise images install into their own subfolder, `public/images/enterprises/client-name/`, never the shared default folder. This avoids two clients colliding on a same-named file (e.g. both providing `company-a.png`) and keeps each image's filename-without-extension lookup key intact.
 
-The installer automatically points the app at the newly installed logo and enterprise images folder by setting `NEXT_PUBLIC_LOGO_URL`, `NEXT_PUBLIC_ENTERPRISE_IMAGES_DIRECTORY`, and `ENTERPRISE_IMAGES_FOLDER` when it starts the app (unless `--no-start` is passed, in which case it prints the values to set manually). A client's `brand.env` can still override any of these explicitly — that value wins over the computed one.
+The app finds the installed logo and images through `NEXT_PUBLIC_TENANT`, which the installer sets when it starts the app. `--no-start` installs the files only and prints the variable to set for a deployment.
 
-### Using a specific brand env file
+### tenant.json
 
-The installer requires `client-assets/<client-name>/brand.env` and stops with an error if it's missing. The file holds the client's copy, colors and metadata (no secrets, so it can be committed); database and auth settings stay in the repository `.env`, which is loaded first. To use a different env file instead, pass `--brand-env`:
-
-```bash
-npm run client:install -- client-name --brand-env=path/to/other.env
-```
+`tenant.json` is required and stops the installer with an error if missing. It holds only the values that differ from the defaults in `white-label.config.ts`, using the same nested structure. Database and auth settings stay in the repository `.env`. See `WHITE_LABEL.md` for the format, and `turist-trucks/tenant.json` for a full example.
 
 ## Demo QR template
 

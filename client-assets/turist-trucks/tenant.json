@@ -1,0 +1,124 @@
+{
+  "app": {
+    "name": "Atlas Haul",
+    "shortName": "ATLAS",
+    "tagline": "Atlas Haul Logistics Platform",
+    "metadataTitle": "Atlas Haul | Operations Dashboard",
+    "metadataDescription": "A fictional white-label logistics operations platform",
+    "locale": "en"
+  },
+  "branding": {
+    "primaryColor": "#1a365d",
+    "secondaryColor": "#b45309",
+    "accentColor": "#0e7490"
+  },
+  "theme": {
+    "primary": "26 54 93",
+    "secondary": "180 83 9",
+    "accent": "14 116 144"
+  },
+  "auth": {
+    "welcomeLabel": "Welcome",
+    "loginTitle": "Sign in to Atlas Haul",
+    "loginSubtitle": "Enter your Atlas Haul credentials"
+  },
+  "ui": {
+    "navbar": {
+      "dashboardLabel": "Operations",
+      "trucksLabel": "Loads",
+      "qrLabel": "Truck QR Builder",
+      "qrDescription": "Create truck access codes",
+      "databaseLabel": "Load Records",
+      "databaseDescription": "Review operational history",
+      "dashboardDescription": "Performance and activity",
+      "materialsLabel": "Catalog",
+      "materialsDescription": "Manage materials",
+      "usersLabel": "Team",
+      "usersDescription": "Manage workspace access",
+      "modulesTitle": "Workspace",
+      "administrationTitle": "Workspace settings"
+    },
+    "frenteSelector": {
+      "title": "Choose a work site",
+      "subtitle": "Select a site to view operational performance",
+      "ctaLabel": "Open dashboard",
+      "searchPlaceholder": "Search site or project..."
+    },
+    "general": {
+      "singularFrente": "site",
+      "pluralFrentes": "sites"
+    },
+    "vouchers": {
+      "deleteButton": "Delete Records",
+      "deleteSuccessTitle": "Deletion Successful",
+      "deleteSuccessDescription": "Records for site \"{frente}\" were deleted.",
+      "deleteErrorTitle": "Deletion Failed",
+      "deleteErrorDescription": "Could not delete records for site \"{frente}\". Please try again later.",
+      "deleteDialogTitle": "Delete Load Data",
+      "deleteDialogWarningPrefix": "This action will delete",
+      "deleteDialogWarningBold": "all load records",
+      "deleteDialogWarningMiddle": "for site",
+      "deleteDialogWarningSuffix": "This cannot be undone.",
+      "deleteDialogConfirmPrefix": "Type",
+      "deleteDialogConfirmSuffix": "to confirm.",
+      "deleteDialogCancel": "Cancel",
+      "downloadSuccessTitle": "Download Successful",
+      "downloadSuccessDescription": "The {section} database for site \"{frente}\" was downloaded as {filename}.",
+      "downloadErrorTitle": "Download Failed",
+      "downloadErrorDescription": "We had a problem downloading the database. Please try again later.",
+      "generatingExcelMessage": "Generating Excel...",
+      "excelDownloadSuccessTitle": "Download successful",
+      "excelDownloadSuccessDescription": "Downloaded {count} loads to Excel.",
+      "excelDownloadErrorTitle": "Download failed",
+      "excelDownloadErrorDescription": "We couldn't generate the Excel file. Please try again shortly.",
+      "excelButtonPrefix": "Download",
+      "excelButtonEmpty": "Download Excel",
+      "emptyResultsTitle": "No loads match the applied filters.",
+      "emptyResultsSubtitle": "Adjust the period or filters to see results.",
+      "loadingMore": "Loading more loads…",
+      "retryButton": "Retry",
+      "showingCount": "Showing {count} loads",
+      "detailSheetTitle": "Load Details",
+      "detailSheetDescription": "Full details for the selected record.",
+      "viewCards": "Cards",
+      "viewTable": "Table"
+    },
+    "trucksFilters": {
+      "periodLabelPrefix": "Period",
+      "statusLabelPrefix": "Status",
+      "searchLabelPrefix": "Search",
+      "activeLabel": "Active",
+      "clearAllButton": "Clear all",
+      "statusAll": "All",
+      "statusInTransit": "In transit",
+      "statusArrived": "Arrived",
+      "periodYesterday": "Yesterday",
+      "periodToday": "Today",
+      "periodLast7": "Last 7 days",
+      "periodThisMonth": "Month",
+      "periodMonthYearPlaceholder": "Month/Year",
+      "periodRangePlaceholder": "Range…",
+      "periodFallbackLabel": "Period",
+      "cancelButton": "Cancel",
+      "applyButton": "Apply"
+    },
+    "dashboard": {
+      "statTrips": "Trips",
+      "statM3Hauled": "M³ hauled",
+      "statM3PerTrip": "M³ / trip",
+      "statArrivalRate": "Arrival rate",
+      "statShifts": "Shifts",
+      "filterWeek": "Week",
+      "filterMonth": "Month",
+      "filterYear": "Year"
+    },
+    "trucksTable": {
+      "hideColumn": "Hide",
+      "columnsButton": "Columns",
+      "showColumnsLabel": "Show columns"
+    }
+  },
+  "assets": {
+    "qrTemplateFilename": "atlas-haul-qr-template.xlsx"
+  }
+}

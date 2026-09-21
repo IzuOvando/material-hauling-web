@@ -1,20 +1,17 @@
 import { promises as fs } from "fs";
 import path from "path";
-import { startWithBrandEnv } from "./run-with-brand-env";
+import { spawn } from "child_process";
 
 const projectRoot = process.cwd();
 const scriptArgs = process.argv.slice(2);
 const startApp = !scriptArgs.includes("--no-start");
 const clientName = scriptArgs.find((arg) => !arg.startsWith("--"));
-const brandEnvFlag = scriptArgs.find((arg) => arg.startsWith("--brand-env="));
-const brandEnvOverride = brandEnvFlag ? brandEnvFlag.slice("--brand-env=".length) : undefined;
 
 const allowedImageExtensions = new Set([".png", ".jpg", ".jpeg", ".webp", ".svg"]);
 
 function printUsage(): void {
-  console.error("Usage: npm run client:install -- <client-folder> [--no-start] [--brand-env=<path>]");
+  console.error("Usage: npm run client:install -- <client-folder> [--no-start]");
   console.error("Example: npm run client:install -- atlas");
-  console.error("Example: npm run client:install -- atlas --brand-env=path/to/other.env");
 }
 
 async function ensureFile(filePath: string, label: string): Promise<void> {
@@ -72,10 +69,7 @@ async function installClientAssets(): Promise<void> {
   const qrTemplateSource = path.join(sourceRoot, "documents", "qr-template.xlsx");
 
   await ensureFile(brandingSource, "branding logo");
-  const brandEnvSource = brandEnvOverride
-    ? path.resolve(projectRoot, brandEnvOverride)
-    : path.join(sourceRoot, "brand.env");
-  await ensureFile(brandEnvSource, "brand env file");
+  await ensureFile(path.join(sourceRoot, "tenant.json"), "tenant config");
   const availableQrTemplate = await findOptionalFile(qrTemplateSource);
   const enterpriseImages = await getEnterpriseImages(enterprisesSource);
 
@@ -84,7 +78,6 @@ async function installClientAssets(): Promise<void> {
   // file so the repository default always stays available as a fallback.
   const logoFileName = `logo-${clientName}.svg`;
   const logoDestination = path.join(publicRoot, "images", "logos", logoFileName);
-  const logoPublicPath = `/images/logos/${logoFileName}`;
   await copyFile(brandingSource, logoDestination);
   if (availableQrTemplate) {
     await copyFile(availableQrTemplate, path.join(publicRoot, "documents", "test_metadatacamion.xlsx"));
@@ -95,7 +88,6 @@ async function installClientAssets(): Promise<void> {
   // and the initializer's filename-without-extension lookup key stays untouched.
   const enterpriseSubdir = path.join("images", "enterprises", clientName);
   const enterpriseDestination = path.join(publicRoot, enterpriseSubdir);
-  const enterpriseImagesDirectory = `/${enterpriseSubdir.split(path.sep).join("/")}`;
   const enterpriseImagesFolder = `public/${enterpriseSubdir.split(path.sep).join("/")}`;
   await fs.mkdir(enterpriseDestination, { recursive: true });
   await Promise.all(
@@ -105,25 +97,33 @@ async function installClientAssets(): Promise<void> {
   );
 
   console.log(`Client assets installed: ${clientName}`);
-  console.log(`- Logo: ${path.relative(projectRoot, logoDestination)} (NEXT_PUBLIC_LOGO_URL=${logoPublicPath})`);
+  console.log(`- Logo: ${path.relative(projectRoot, logoDestination)}`);
   console.log(`- Enterprise images: ${enterpriseImages.length} (${enterpriseImagesFolder})`);
   console.log(availableQrTemplate
     ? `- QR template: ${path.relative(projectRoot, path.join(publicRoot, "documents", "test_metadatacamion.xlsx"))}`
     : "- QR template: skipped; using the existing public template");
 
-  const computedOverrides = {
-    NEXT_PUBLIC_LOGO_URL: logoPublicPath,
-    NEXT_PUBLIC_ENTERPRISE_IMAGES_DIRECTORY: enterpriseImagesDirectory,
-    ENTERPRISE_IMAGES_FOLDER: enterpriseImagesFolder,
-  };
-
   if (startApp) {
-    console.log("Starting the app with the base environment and client overrides...");
-    await startWithBrandEnv(brandEnvSource, "dev", [], computedOverrides);
+    console.log(`Starting the app with NEXT_PUBLIC_TENANT=${clientName}...`);
+    const npmCommand = process.platform === "win32" ? "npm.cmd" : "npm";
+    const child = spawn(npmCommand, ["run", "dev"], {
+      cwd: projectRoot,
+      env: { ...process.env, NEXT_PUBLIC_TENANT: clientName },
+      stdio: "inherit",
+    });
+    await new Promise<void>((resolve) => {
+      child.on("exit", (code, signal) => {
+        if (signal) {
+          process.kill(process.pid, signal);
+          return;
+        }
+        process.exitCode = code ?? 1;
+        resolve();
+      });
+    });
   } else {
     console.log("App start skipped (--no-start).");
-    console.log("Set these in the client's brand.env or deployment environment:");
-    Object.entries(computedOverrides).forEach(([key, value]) => console.log(`  ${key}=${value}`));
+    console.log(`Set NEXT_PUBLIC_TENANT=${clientName} in the deployment environment.`);
   }
 }
 

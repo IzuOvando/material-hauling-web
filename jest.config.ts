@@ -37,6 +37,7 @@ const config: Config = {
   coverageProvider: "v8",
   testEnvironment: "jsdom",
   moduleNameMapper: {
+    "^@tenant$": "<rootDir>/src/config/tenant-empty.json",
     "^@/(.*)$": "<rootDir>/src/$1", // Mapea el alias '@' a la carpeta 'src'
   },
   // A list of reporter names that Jest uses when writing coverage reports
