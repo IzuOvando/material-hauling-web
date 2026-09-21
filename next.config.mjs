@@ -14,6 +14,16 @@ if (tenant && !fs.existsSync(tenantFile)) {
 const nextConfig = {
   webpack: (config) => {
     config.resolve.alias["@tenant"] = tenantFile;
+    // Webpack's persistent cache doesn't notice the alias target changing, so a build
+    // made for one tenant would keep being served for another (or for no tenant).
+    // Keying the cache on the tenant, and watching the tenant file, invalidates it.
+    if (config.cache && typeof config.cache === "object") {
+      config.cache.version = `${config.cache.version ?? ""}|tenant:${tenant ?? "default"}`;
+      config.cache.buildDependencies = {
+        ...config.cache.buildDependencies,
+        tenant: [tenantFile],
+      };
+    }
     return config;
   },
   env: {
