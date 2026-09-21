@@ -74,10 +74,13 @@ export async function startWithBrandEnv(
 
 async function runWithBrandEnv(): Promise<void> {
   const [brandEnvArg, ...commandArgs] = process.argv.slice(2);
-  const brandEnvPath = path.resolve(
-    process.cwd(),
-    brandEnvArg || ".env.whitelabel-demo",
-  );
+  if (!brandEnvArg) {
+    console.error("Usage: npm run brand:dev -- <brand-env-path> [command]");
+    console.error("Example: npm run brand:dev -- client-assets/atlas/brand.env");
+    process.exitCode = 1;
+    return;
+  }
+  const brandEnvPath = path.resolve(process.cwd(), brandEnvArg);
   const command = commandArgs[0] || "dev";
   const args = commandArgs.slice(1);
 

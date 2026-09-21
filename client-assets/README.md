@@ -32,14 +32,14 @@ The default logo (`public/images/logos/logo_mexico.svg`) is never overwritten. E
 
 Each client's enterprise images install into their own subfolder, `public/images/enterprises/client-name/`, never the shared default folder. This avoids two clients colliding on a same-named file (e.g. both providing `company-a.png`) and keeps each image's filename-without-extension lookup key intact.
 
-The installer automatically points the app at the newly installed logo and enterprise images folder by setting `NEXT_PUBLIC_LOGO_URL`, `NEXT_PUBLIC_ENTERPRISE_IMAGES_DIRECTORY`, and `ENTERPRISE_IMAGES_FOLDER` when it starts the app (unless `--no-start` is passed, in which case it prints the values to set manually). A client's `brand.env`, if present, can still override any of these explicitly — that value wins over the computed one.
+The installer automatically points the app at the newly installed logo and enterprise images folder by setting `NEXT_PUBLIC_LOGO_URL`, `NEXT_PUBLIC_ENTERPRISE_IMAGES_DIRECTORY`, and `ENTERPRISE_IMAGES_FOLDER` when it starts the app (unless `--no-start` is passed, in which case it prints the values to set manually). A client's `brand.env` can still override any of these explicitly — that value wins over the computed one.
 
 ### Using a specific brand env file
 
-By default the installer looks for `client-assets/<client-name>/brand.env` and falls back to the repository `.env` if it's missing. To use a different env file (for example the demo brand at `.env.whitelabel-demo`), pass `--brand-env`:
+The installer requires `client-assets/<client-name>/brand.env` and stops with an error if it's missing. The file holds the client's copy, colors and metadata (no secrets, so it can be committed); database and auth settings stay in the repository `.env`, which is loaded first. To use a different env file instead, pass `--brand-env`:
 
 ```bash
-npm run client:install -- client-name --brand-env=.env.whitelabel-demo
+npm run client:install -- client-name --brand-env=path/to/other.env
 ```
 
 ## Demo QR template

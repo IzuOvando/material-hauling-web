@@ -14,7 +14,7 @@ const allowedImageExtensions = new Set([".png", ".jpg", ".jpeg", ".webp", ".svg"
 function printUsage(): void {
   console.error("Usage: npm run client:install -- <client-folder> [--no-start] [--brand-env=<path>]");
   console.error("Example: npm run client:install -- atlas");
-  console.error("Example: npm run client:install -- atlas --brand-env=.env.whitelabel-demo");
+  console.error("Example: npm run client:install -- atlas --brand-env=path/to/other.env");
 }
 
 async function ensureFile(filePath: string, label: string): Promise<void> {
@@ -72,6 +72,10 @@ async function installClientAssets(): Promise<void> {
   const qrTemplateSource = path.join(sourceRoot, "documents", "qr-template.xlsx");
 
   await ensureFile(brandingSource, "branding logo");
+  const brandEnvSource = brandEnvOverride
+    ? path.resolve(projectRoot, brandEnvOverride)
+    : path.join(sourceRoot, "brand.env");
+  await ensureFile(brandEnvSource, "brand env file");
   const availableQrTemplate = await findOptionalFile(qrTemplateSource);
   const enterpriseImages = await getEnterpriseImages(enterprisesSource);
 
@@ -114,16 +118,8 @@ async function installClientAssets(): Promise<void> {
   };
 
   if (startApp) {
-    let brandEnvSource: string | null;
-    if (brandEnvOverride) {
-      brandEnvSource = path.resolve(projectRoot, brandEnvOverride);
-      await ensureFile(brandEnvSource, "brand env file");
-    } else {
-      brandEnvSource = await findOptionalFile(path.join(sourceRoot, "brand.env"));
-    }
-    const envPath = brandEnvSource ?? path.join(projectRoot, ".env");
     console.log("Starting the app with the base environment and client overrides...");
-    await startWithBrandEnv(envPath, "dev", [], computedOverrides);
+    await startWithBrandEnv(brandEnvSource, "dev", [], computedOverrides);
   } else {
     console.log("App start skipped (--no-start).");
     console.log("Set these in the client's brand.env or deployment environment:");

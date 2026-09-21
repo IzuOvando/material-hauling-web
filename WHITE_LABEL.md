@@ -30,23 +30,23 @@ The config uses `process.env.NEXT_PUBLIC_*` values with safe Spanish defaults.
 
 ## Fictional brand validation
 
-The repository includes a local-only example at `.env.whitelabel-demo`. It defines a fictional `Atlas Haul` brand with a navy, orange, and cyan theme. The file is ignored by git and does not replace or modify `.env`.
+The `turist-trucks` client folder includes a `brand.env` that defines a fictional `Atlas Haul` brand with a navy, orange, and cyan theme. It does not replace or modify `.env`.
 
-Start the app with the demo brand explicitly:
+Install the client's assets and start the app with its brand:
 
 ```bash
-npm run brand:dev -- .env.whitelabel-demo
+npm run client:install -- turist-trucks
+```
+
+Or start the app with a brand file only, without installing assets:
+
+```bash
+npm run brand:dev -- client-assets/turist-trucks/brand.env
 ```
 
 The runner loads `.env` first, applies the selected white-label file second, and starts the dev server with the merged values. This preserves database, authentication, and other base settings while changing only the brand overrides. Stop the server and run `npm run dev` normally to return to the base environment. This validation currently keeps the existing logo asset while changing metadata, theme colors, navigation labels, login copy, and frente terminology.
 
-A second fictional brand lives at `.env.whitelabel-violet` — a purple/gold/teal theme ("Violet Peak Hauling") that also swaps terminology (zones/shipments/crew instead of frentes/vouchers/users) to exercise the copy surface differently than Atlas Haul does:
-
-```bash
-npm run brand:dev -- .env.whitelabel-violet
-```
-
-Both demo files are git-ignored (`.env.whitelabel-*`) and safe to edit freely.
+Any other brand env file can be tried the same way with `npm run brand:dev -- <path>`. Files named `.env.whitelabel-*` are git-ignored for local experiments.
 
 Example:
 
@@ -122,7 +122,7 @@ The installer validates the logo and enterprise images, then copies them into th
 
 The client's logo is installed as `public/images/logos/logo-client-name.svg`, never overwriting the default `logo_mexico.svg`. Enterprise images install into their own subfolder, `public/images/enterprises/client-name/`, never the shared default folder — this avoids two clients colliding on a same-named file and preserves each image's filename-without-extension lookup key (used by `EnterprisesImagesInitializer` to key preloaded canvases by business name). The installer sets `NEXT_PUBLIC_LOGO_URL`, `NEXT_PUBLIC_ENTERPRISE_IMAGES_DIRECTORY`, and `ENTERPRISE_IMAGES_FOLDER` automatically when it starts the app, so the branding provider and `/api/enterprises/images` pick them up without manual env editing. Pass `--no-start` to install without starting, in which case the installer prints these values to set in the client's `brand.env` or the deployment environment.
 
-By default `client:install` loads `client-assets/<client-name>/brand.env` if present, otherwise the repository `.env`. Pass `--brand-env=<path>` to use a different file instead — for example `npm run client:install -- client-name --brand-env=.env.whitelabel-demo` to validate the fictional Atlas Haul brand's full copy/theme override, not just its logo.
+`client:install` requires `client-assets/<client-name>/brand.env` and stops with an error if it is missing. Pass `--brand-env=<path>` to use a different file instead.
 
 The demo QR template is generated at `client-assets/demo/documents/qr-template.xlsx` with fake records. Run `npm run client:create-qr-template` to recreate it.
 
