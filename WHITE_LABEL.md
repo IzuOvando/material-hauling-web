@@ -1,12 +1,12 @@
 # White-label configuration guide
 
-Front-end branding and UI copy are defined once in `white-label.config.ts` (the schema and the Spanish defaults) and overridden per client by a JSON file inside that client's folder under `client-assets/`. The backend and database are untouched.
+Front-end branding and UI copy are defined once in `white-label.config.ts` (the schema and the Spanish defaults) and overridden per tenant by a JSON file inside that tenant's folder under `tenant-assets/`. The backend and database are untouched.
 
 ## How it works
 
 1. `white-label.config.ts` holds every label, color and asset path with a Spanish default. Components import `whiteLabelConfig` from it.
-2. `client-assets/<client>/tenant.json` holds only the values that differ from the defaults, as nested keys that mirror the config.
-3. `NEXT_PUBLIC_TENANT=<client>` selects the folder. `next.config.mjs` aliases `@tenant` to that client's `tenant.json`, so only the selected client's file is bundled. With no tenant set, the defaults apply.
+2. `tenant-assets/<tenant>/tenant.json` holds only the values that differ from the defaults, as nested keys that mirror the config.
+3. `NEXT_PUBLIC_TENANT=<tenant>` selects the folder. `next.config.mjs` aliases `@tenant` to that tenant's `tenant.json`, so only the selected tenant's file is bundled. With no tenant set, the defaults apply.
 4. The config deep-merges the tenant file over the defaults. A key missing from `tenant.json` falls back to the default.
 
 `NEXT_PUBLIC_*` values are inlined at build/dev-server start, so one tenant means one build or deployment. Restart the dev server after changing `tenant.json` or the tenant variable.
@@ -26,7 +26,7 @@ The root layout mounts `TenantBrandingProvider`, and components read the current
 
 ## Writing a tenant file
 
-`client-assets/<client>/tenant.json` mirrors the config structure. Include only what changes:
+`tenant-assets/<tenant>/tenant.json` mirrors the config structure. Include only what changes:
 
 ```json
 {
@@ -39,19 +39,19 @@ The root layout mounts `TenantBrandingProvider`, and components read the current
 }
 ```
 
-`client-assets/turist-trucks/tenant.json` is a full working example. Key paths are the ones in `white-label.config.ts`; the exported `TenantConfig` type describes the allowed shape.
+`tenant-assets/turist-trucks/tenant.json` is a full working example. Key paths are the ones in `white-label.config.ts`; the exported `TenantConfig` type describes the allowed shape.
 
 Templated strings keep their `{token}` placeholders (for example `{frente}`, `{count}`, `{filename}`) exactly as in the default.
 
-When a tenant is set, the logo and enterprise images paths are derived automatically: `/images/logos/logo-<client>.svg`, `/images/enterprises/<client>` and `public/images/enterprises/<client>`. A `tenant.json` can still override them.
+When a tenant is set, the logo and enterprise images paths are derived automatically: `/images/logos/logo-<tenant>.svg`, `/images/enterprises/<tenant>` and `public/images/enterprises/<tenant>`. A `tenant.json` can still override them.
 
-## Installing client assets
+## Installing tenant assets
 
-Non-technical users can prepare a client folder under `client-assets/`:
+Non-technical users can prepare a tenant folder under `tenant-assets/`:
 
 ```text
-client-assets/
-└── client-name/
+tenant-assets/
+└── tenant-name/
 	├── tenant.json
 	├── branding/
 	│   └── logo.svg
@@ -65,34 +65,34 @@ client-assets/
 Then run:
 
 ```bash
-npm run client:install -- client-name
+npm run tenant:install -- tenant-name
 ```
 
-The installer validates the logo and enterprise images, then copies them into the existing runtime locations under `public/`. A client QR template is optional. If it is not provided, the existing public template remains unchanged. The source folder is preserved, so the same client package can be installed again or reviewed before deployment.
+The installer validates the logo and enterprise images, then copies them into the existing runtime locations under `public/`. A tenant QR template is optional. If it is not provided, the existing public template remains unchanged. The source folder is preserved, so the same tenant package can be installed again or reviewed before deployment.
 
-The client's logo is installed as `public/images/logos/logo-client-name.svg`, never overwriting the default `logo_mexico.svg`. Enterprise images install into their own subfolder, `public/images/enterprises/client-name/`, never the shared default folder — this avoids two clients colliding on a same-named file and preserves each image's filename-without-extension lookup key (used by `EnterprisesImagesInitializer` to key preloaded canvases by business name). The config derives these paths from `NEXT_PUBLIC_TENANT`. Pass `--no-start` to install without starting; the installer then prints the tenant variable to set in the deployment environment.
+The tenant's logo is installed as `public/images/logos/logo-tenant-name.svg`, never overwriting the default `logo_mexico.svg`. Enterprise images install into their own subfolder, `public/images/enterprises/tenant-name/`, never the shared default folder — this avoids two tenants colliding on a same-named file and preserves each image's filename-without-extension lookup key (used by `EnterprisesImagesInitializer` to key preloaded canvases by business name). The config derives these paths from `NEXT_PUBLIC_TENANT`. Pass `--no-start` to install without starting; the installer then prints the tenant variable to set in the deployment environment.
 
-`client:install` requires `client-assets/<client-name>/tenant.json` and stops with an error if it is missing. It starts the dev server with `NEXT_PUBLIC_TENANT=<client-name>`. Database, auth and other secrets stay in the repository `.env`.
+`tenant:install` requires `tenant-assets/<tenant-name>/tenant.json` and stops with an error if it is missing. It starts the dev server with `NEXT_PUBLIC_TENANT=<tenant-name>`. Database, auth and other secrets stay in the repository `.env`.
 
-The demo QR template is generated at `client-assets/demo/documents/qr-template.xlsx` with fake records. Run `npm run client:create-qr-template` to recreate it.
+The demo QR template is generated at `tenant-assets/demo/documents/qr-template.xlsx` with fake records. Run `npm run tenant:create-qr-template` to recreate it.
 
-## Resetting the active client
+## Resetting the active tenant
 
 Before installing another brand, run:
 
 ```bash
-npm run client:reset -- --confirm
+npm run tenant:reset -- --confirm
 ```
 
-The guarded reset restores the committed default logo, enterprise images, and QR template under `public/`. It refuses to run when those runtime assets have uncommitted changes and never removes source folders under `client-assets/`.
+The guarded reset restores the committed default logo, enterprise images, and QR template under `public/`. It refuses to run when those runtime assets have uncommitted changes and never removes source folders under `tenant-assets/`.
 
-If an untracked client source folder should also be removed, use the explicit cleanup option:
+If an untracked tenant source folder should also be removed, use the explicit cleanup option:
 
 ```bash
-npm run client:reset -- --confirm --remove-client client-name
+npm run tenant:reset -- --confirm --remove-tenant tenant-name
 ```
 
-This deletes only the named untracked folder under `client-assets/`; it rejects tracked folders and unsafe path values.
+This deletes only the named untracked folder under `tenant-assets/`; it rejects tracked folders and unsafe path values.
 
 ## Locale-aware date/calendar
 

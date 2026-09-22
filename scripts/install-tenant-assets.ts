@@ -5,13 +5,13 @@ import { spawn } from "child_process";
 const projectRoot = process.cwd();
 const scriptArgs = process.argv.slice(2);
 const startApp = !scriptArgs.includes("--no-start");
-const clientName = scriptArgs.find((arg) => !arg.startsWith("--"));
+const tenantName = scriptArgs.find((arg) => !arg.startsWith("--"));
 
 const allowedImageExtensions = new Set([".png", ".jpg", ".jpeg", ".webp", ".svg"]);
 
 function printUsage(): void {
-  console.error("Usage: npm run client:install -- <client-folder> [--no-start]");
-  console.error("Example: npm run client:install -- atlas");
+  console.error("Usage: npm run tenant:install -- <tenant-folder> [--no-start]");
+  console.error("Example: npm run tenant:install -- atlas");
 }
 
 async function ensureFile(filePath: string, label: string): Promise<void> {
@@ -56,14 +56,14 @@ async function copyFile(source: string, destination: string): Promise<void> {
   await fs.copyFile(source, destination);
 }
 
-async function installClientAssets(): Promise<void> {
-  if (!clientName || clientName.includes("/") || clientName.includes("\\") || clientName === "." || clientName === "..") {
+async function installTenantAssets(): Promise<void> {
+  if (!tenantName || tenantName.includes("/") || tenantName.includes("\\") || tenantName === "." || tenantName === "..") {
     printUsage();
     process.exitCode = 1;
     return;
   }
 
-  const sourceRoot = path.join(projectRoot, "client-assets", clientName);
+  const sourceRoot = path.join(projectRoot, "tenant-assets", tenantName);
   const brandingSource = path.join(sourceRoot, "branding", "logo.svg");
   const enterprisesSource = path.join(sourceRoot, "enterprises");
   const qrTemplateSource = path.join(sourceRoot, "documents", "qr-template.xlsx");
@@ -74,19 +74,19 @@ async function installClientAssets(): Promise<void> {
   const enterpriseImages = await getEnterpriseImages(enterprisesSource);
 
   const publicRoot = path.join(projectRoot, "public");
-  // The default logo (logo_mexico.svg) is never overwritten — each client gets its own
+  // The default logo (logo_mexico.svg) is never overwritten — each tenant gets its own
   // file so the repository default always stays available as a fallback.
-  const logoFileName = `logo-${clientName}.svg`;
+  const logoFileName = `logo-${tenantName}.svg`;
   const logoDestination = path.join(publicRoot, "images", "logos", logoFileName);
   await copyFile(brandingSource, logoDestination);
   if (availableQrTemplate) {
     await copyFile(availableQrTemplate, path.join(publicRoot, "documents", "test_metadatacamion.xlsx"));
   }
 
-  // Each client's enterprise images live in their own subfolder — never the shared
-  // default — so two clients can't collide on a same-named file (e.g. company-a.png),
+  // Each tenant's enterprise images live in their own subfolder — never the shared
+  // default — so two tenants can't collide on a same-named file (e.g. company-a.png),
   // and the initializer's filename-without-extension lookup key stays untouched.
-  const enterpriseSubdir = path.join("images", "enterprises", clientName);
+  const enterpriseSubdir = path.join("images", "enterprises", tenantName);
   const enterpriseDestination = path.join(publicRoot, enterpriseSubdir);
   const enterpriseImagesFolder = `public/${enterpriseSubdir.split(path.sep).join("/")}`;
   await fs.mkdir(enterpriseDestination, { recursive: true });
@@ -96,7 +96,7 @@ async function installClientAssets(): Promise<void> {
     ),
   );
 
-  console.log(`Client assets installed: ${clientName}`);
+  console.log(`Tenant assets installed: ${tenantName}`);
   console.log(`- Logo: ${path.relative(projectRoot, logoDestination)}`);
   console.log(`- Enterprise images: ${enterpriseImages.length} (${enterpriseImagesFolder})`);
   console.log(availableQrTemplate
@@ -104,11 +104,11 @@ async function installClientAssets(): Promise<void> {
     : "- QR template: skipped; using the existing public template");
 
   if (startApp) {
-    console.log(`Starting the app with NEXT_PUBLIC_TENANT=${clientName}...`);
+    console.log(`Starting the app with NEXT_PUBLIC_TENANT=${tenantName}...`);
     const npmCommand = process.platform === "win32" ? "npm.cmd" : "npm";
     const child = spawn(npmCommand, ["run", "dev"], {
       cwd: projectRoot,
-      env: { ...process.env, NEXT_PUBLIC_TENANT: clientName },
+      env: { ...process.env, NEXT_PUBLIC_TENANT: tenantName },
       stdio: "inherit",
     });
     await new Promise<void>((resolve) => {
@@ -123,11 +123,11 @@ async function installClientAssets(): Promise<void> {
     });
   } else {
     console.log("App start skipped (--no-start).");
-    console.log(`Set NEXT_PUBLIC_TENANT=${clientName} in the deployment environment.`);
+    console.log(`Set NEXT_PUBLIC_TENANT=${tenantName} in the deployment environment.`);
   }
 }
 
-installClientAssets().catch((error: unknown) => {
-  console.error(`Client asset installation failed: ${error instanceof Error ? error.message : String(error)}`);
+installTenantAssets().catch((error: unknown) => {
+  console.error(`Tenant asset installation failed: ${error instanceof Error ? error.message : String(error)}`);
   process.exitCode = 1;
 });
