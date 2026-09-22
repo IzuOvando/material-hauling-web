@@ -63,12 +63,12 @@ Before preparing another brand, restore the committed default runtime assets wit
 npm run tenant:reset -- --confirm
 ```
 
-This restores the default enterprise images and QR template under `public/`. (The logo is never installed under `public/` at all — see "Logo handling" above.) It does not delete or modify any folder under `tenant-assets/`.
+This restores the default enterprise images and QR template under `public/` (the logo is never installed under `public/` at all — see "Logo handling" above), removes any leftover `public/images/logos/logo-<tenant>.*` file from the old pre-normalization pipeline, and clears every tenant's generated `branding/logo.normalized.png`. By itself it does not delete or modify any folder under `tenant-assets/`.
 
-To also remove one untracked tenant source folder after resetting, provide its exact folder name:
+To also strip a tenant's source folder — this repo is a base template you configure per client, not a place to keep every client's folder around, so this works even for a committed one, the shipped `turist-trucks` demo included — provide its exact name:
 
 ```bash
 npm run tenant:reset -- --confirm --remove-tenant tenant-name
 ```
 
-This cleanup refuses tracked tenant folders and does not accept path separators.
+A tracked folder is removed via `git rm` (staged for commit); an untracked one is deleted outright. Path separators (`/`, `\`) and `.`/`..` are rejected.
