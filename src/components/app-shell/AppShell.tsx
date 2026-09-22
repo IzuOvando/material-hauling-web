@@ -19,7 +19,6 @@ export function AppShell({ children, user }: AppShellProps) {
         {children}
         <Toaster />
         <EnterprisesImagesInitializer />
-        {/* <Script src="/lib/epos-2.27.0.js" strategy="beforeInteractive" /> */}
       </UserProvider>
     </TenantBrandingProvider>
   );

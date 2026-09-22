@@ -12,10 +12,6 @@ const defaultConfig = {
   branding: {
     logoUrl: "/images/logos/logo_mexico.svg",
   },
-  // The three tenant colors, as hex. getThemeCssVars (src/lib/theme.ts) converts
-  // them to the space-separated RGB channels Tailwind's `rgb(var(--x) / <alpha-value>)`
-  // opacity syntax needs; hex here stays the single source of truth so it can't drift
-  // out of sync with a separately-maintained RGB copy.
   theme: {
     primary: "#133223",
     secondary: "#9d2449",
