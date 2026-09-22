@@ -1,0 +1,119 @@
+{
+  "app": {
+    "name": "Purple Tucks",
+    "shortName": "PTUCKS",
+    "tagline": "Plataforma de Logística Purple Tucks",
+    "metadataTitle": "Purple Tucks | Panel de Operaciones",
+    "metadataDescription": "Plataforma ficticia de operaciones logísticas de marca blanca",
+    "locale": "es"
+  },
+  "theme": {
+    "primary": "#4c1d95",
+    "secondary": "#9333ea",
+    "accent": "#facc15"
+  },
+  "auth": {
+    "welcomeLabel": "Bienvenido",
+    "loginTitle": "Inicia sesión en Purple Tucks",
+    "loginSubtitle": "Ingresa tus credenciales de Purple Tucks"
+  },
+  "ui": {
+    "navbar": {
+      "dashboardLabel": "Operaciones",
+      "trucksLabel": "Cargas",
+      "qrLabel": "Generador de QR de Camiones",
+      "qrDescription": "Crea códigos de acceso para camiones",
+      "databaseLabel": "Registros de Cargas",
+      "databaseDescription": "Consulta el historial operativo",
+      "dashboardDescription": "Rendimiento y actividad",
+      "materialsLabel": "Catálogo",
+      "materialsDescription": "Gestionar materiales",
+      "usersLabel": "Equipo",
+      "usersDescription": "Gestionar accesos al espacio de trabajo",
+      "modulesTitle": "Espacio de trabajo",
+      "administrationTitle": "Configuración del espacio"
+    },
+    "frenteSelector": {
+      "title": "Elige un sitio de trabajo",
+      "subtitle": "Selecciona un sitio para ver su rendimiento operativo",
+      "ctaLabel": "Abrir panel",
+      "searchPlaceholder": "Buscar sitio o proyecto…"
+    },
+    "general": {
+      "singularFrente": "sitio",
+      "pluralFrentes": "sitios"
+    },
+    "vouchers": {
+      "deleteButton": "Eliminar Registros",
+      "deleteSuccessTitle": "Eliminación Exitosa",
+      "deleteSuccessDescription": "Se eliminaron los registros del sitio \"{frente}\".",
+      "deleteErrorTitle": "Eliminación Fallida",
+      "deleteErrorDescription": "No se pudieron eliminar los registros del sitio \"{frente}\". Inténtalo de nuevo más tarde.",
+      "deleteDialogTitle": "Eliminar Datos de Cargas",
+      "deleteDialogWarningPrefix": "Esta acción eliminará",
+      "deleteDialogWarningBold": "todos los registros de cargas",
+      "deleteDialogWarningMiddle": "del sitio",
+      "deleteDialogWarningSuffix": "Esta acción no se puede deshacer.",
+      "deleteDialogConfirmPrefix": "Escribe",
+      "deleteDialogConfirmSuffix": "para confirmar.",
+      "deleteDialogCancel": "Cancelar",
+      "downloadSuccessTitle": "Descarga Exitosa",
+      "downloadSuccessDescription": "La base de datos de {section} del sitio \"{frente}\" se descargó como {filename}.",
+      "downloadErrorTitle": "Descarga Fallida",
+      "downloadErrorDescription": "Tuvimos un problema al descargar la base de datos. Inténtalo de nuevo más tarde.",
+      "generatingExcelMessage": "Generando Excel...",
+      "excelDownloadSuccessTitle": "Descarga exitosa",
+      "excelDownloadSuccessDescription": "Se descargaron {count} cargas en Excel.",
+      "excelDownloadErrorTitle": "Descarga fallida",
+      "excelDownloadErrorDescription": "No pudimos generar el Excel. Inténtalo de nuevo en unos momentos.",
+      "excelButtonPrefix": "Descargar",
+      "excelButtonEmpty": "Descargar Excel",
+      "emptyResultsTitle": "Ninguna carga coincide con los filtros aplicados.",
+      "emptyResultsSubtitle": "Ajusta el periodo o los filtros para ver resultados.",
+      "loadingMore": "Cargando más cargas…",
+      "retryButton": "Reintentar",
+      "showingCount": "Mostrando {count} cargas",
+      "detailSheetTitle": "Detalle de la Carga",
+      "detailSheetDescription": "Información completa del registro seleccionado.",
+      "viewCards": "Tarjetas",
+      "viewTable": "Tabla"
+    },
+    "trucksFilters": {
+      "periodLabelPrefix": "Periodo",
+      "statusLabelPrefix": "Estatus",
+      "searchLabelPrefix": "Búsqueda",
+      "activeLabel": "Activos",
+      "clearAllButton": "Limpiar todo",
+      "statusAll": "Todos",
+      "statusInTransit": "En tránsito",
+      "statusArrived": "Llegó",
+      "periodYesterday": "Ayer",
+      "periodToday": "Hoy",
+      "periodLast7": "Últimos 7 días",
+      "periodThisMonth": "Mes",
+      "periodMonthYearPlaceholder": "Mes/Año",
+      "periodRangePlaceholder": "Rango…",
+      "periodFallbackLabel": "Periodo",
+      "cancelButton": "Cancelar",
+      "applyButton": "Aplicar"
+    },
+    "dashboard": {
+      "statTrips": "Viajes",
+      "statM3Hauled": "M³ acarreados",
+      "statM3PerTrip": "M³ / viaje",
+      "statArrivalRate": "Tasa de llegada",
+      "statShifts": "Turnos",
+      "filterWeek": "Semana",
+      "filterMonth": "Mes",
+      "filterYear": "Año"
+    },
+    "trucksTable": {
+      "hideColumn": "Ocultar",
+      "columnsButton": "Columnas",
+      "showColumnsLabel": "Mostrar columnas"
+    }
+  },
+  "assets": {
+    "qrTemplateFilename": "purple-tucks-plantilla-qr.xlsx"
+  }
+}
