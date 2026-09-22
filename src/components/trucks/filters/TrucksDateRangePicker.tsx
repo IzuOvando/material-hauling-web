@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import whiteLabelConfig from "../../../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
 
 // date-fns doesn't expose a generic "look up locale by tag" helper, so this
 // maps the tenant's NEXT_PUBLIC_LOCALE to a supported date-fns locale,

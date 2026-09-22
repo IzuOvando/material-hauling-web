@@ -6,7 +6,7 @@ import { useToast } from "@/components/ui/use-toast";
 import FullScreenLoader from "@/components/ui/full-screen-loader";
 import { Download } from "lucide-react";
 import CONFIG from "@/config";
-import whiteLabelConfig from "../../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
 
 const DownloadFrenteButton = ({ frente }: { frente: string }) => {
   const { toast } = useToast();

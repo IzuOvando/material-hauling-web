@@ -20,7 +20,7 @@ import {
 import { trucksColumns, DEFAULT_VISIBLE_COLUMNS } from "./columns";
 import { TrucksPagination } from "./TrucksPagination";
 import { TrucksColumnToggle } from "./TrucksColumnToggle";
-import whiteLabelConfig from "../../../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
 
 interface TrucksTableProps {
   vouchers: VoucherCamion[];

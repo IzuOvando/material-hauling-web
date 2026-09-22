@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Frente } from "@prisma/client";
 import { useToast } from "../ui/use-toast";
-import whiteLabelConfig from "../../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
 
 interface DeleteFrenteAlertDialogProps {
   frente: Frente;

@@ -2,7 +2,7 @@ import { requireOwnerAccess } from "@/auth/guards";
 import prisma from "@/lib/db";
 import { UsersTable } from "@/components/users/UsersTable";
 
-import whiteLabelConfig from "../../../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
 
 export default async function UsersManagementPage() {
   await requireOwnerAccess();

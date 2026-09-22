@@ -17,7 +17,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useTrucksTable } from "@/hooks/useTrucksTable";
-import whiteLabelConfig from "../../../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
 
 interface TrucksColumnHeaderProps<TData, TValue>
   extends React.HTMLAttributes<HTMLDivElement> {

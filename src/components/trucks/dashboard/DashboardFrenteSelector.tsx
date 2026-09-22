@@ -5,7 +5,7 @@ import {
   FrenteSelector,
   type FrenteKpiSnapshot,
 } from "@/components/trucks/FrenteSelector";
-import whiteLabelConfig from "../../../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
 
 export type { FrenteKpiSnapshot };
 

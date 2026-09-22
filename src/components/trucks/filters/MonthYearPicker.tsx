@@ -11,7 +11,7 @@ import {
 import { cn } from "@/lib/utils";
 import { getMonthRange, isFullMonthRange, type DateRange } from "@/actions/trucks/periods";
 import CONFIG from "@/config";
-import whiteLabelConfig from "../../../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
 
 // Derived from NEXT_PUBLIC_LOCALE via Intl, rather than a hardcoded Spanish
 // array, so a different tenant locale gets correctly localized abbreviations.

@@ -18,7 +18,7 @@ import { formatIsoDate } from "@/helpers/formatters/datetime";
 import { parseVoucherFolios } from "@/utils/normalizeVoucherFolio";
 import { useToast } from "@/components/ui/use-toast";
 import CONFIG from "@/config";
-import whiteLabelConfig from "../../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
 import {
   CheckCircle2,
   XCircle,

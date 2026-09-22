@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import prisma from "@/lib/db";
 import { requireAuth } from "@/auth/guards";
 import { FrenteSelector, type FrenteKpiSnapshot } from "@/components/trucks";
-import whiteLabelConfig from "../../../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
 
 function getTodayCDMX(): string {
   return new Date().toLocaleDateString("sv-SE", {

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { usePathname, useRouter } from "next/navigation";
-import whiteLabelConfig from "../../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
 
 const TabTrucks = ({ isOwner }: { isOwner: boolean }) => {
   const [activeTab, setActiveTab] = useState(isOwner ? "qr" : "db");

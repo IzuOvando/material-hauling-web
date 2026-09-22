@@ -5,7 +5,7 @@ import { Download, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { useTrucksTable } from "@/hooks/useTrucksTable";
-import whiteLabelConfig from "../../../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
 
 interface DownloadTrucksExcelButtonProps {
   frente: string;

@@ -16,7 +16,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { authenticate } from "@/actions/authorization";
 import sha256 from 'crypto-js/sha256';
 import { Eye, EyeOff, Loader2 } from "lucide-react";
-import whiteLabelConfig from "../../../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
 
 const CardLogin = () => {
   const [state, dispatch] = useFormState(authenticate, {

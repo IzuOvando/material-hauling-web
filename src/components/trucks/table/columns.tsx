@@ -10,7 +10,7 @@ import {
 } from "@/helpers/formatters/datetime";
 import { formatVolume } from "@/helpers/formatters/numbers";
 import { formatVoucherId } from "@/helpers/formatters/formatVoucherId";
-import whiteLabelConfig from "../../../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
 
 export const trucksColumns: ColumnDef<VoucherCamion>[] = [
   {

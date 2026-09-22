@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { LogoutButton } from "@/components/common";
 import { useUser } from "@/contexts/UserContext";
 import { logout } from "@/actions/logout";
-import whiteLabelConfig from "../../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
 
 export function ForbiddenActions() {
   const { user } = useUser();

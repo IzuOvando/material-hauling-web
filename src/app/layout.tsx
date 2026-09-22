@@ -4,7 +4,7 @@ import "./globals.css";
 import { cn } from "@/lib/utils";
 import { getAppUser } from "@/auth/auth.user";
 import { AppShell } from "@/components/app-shell";
-import whiteLabelConfig from "../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
 
 const montserrat = Montserrat({ subsets: ["latin"], variable: "--montserrat" });
 

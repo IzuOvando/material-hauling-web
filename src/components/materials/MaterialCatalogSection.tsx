@@ -22,7 +22,7 @@ import {
   deactivateMaterial,
   renameMaterial,
 } from "@/actions/materials";
-import whiteLabelConfig from "../../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
 
 type Material = {
   id: string;

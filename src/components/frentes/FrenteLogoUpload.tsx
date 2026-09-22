@@ -7,7 +7,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { Frente } from "@prisma/client";
 import { normalizeFrenteKey } from "@/utils/normalizeFrenteKey";
 import LogoCropModal from "@/components/frentes/LogoCropModal";
-import whiteLabelConfig from "../../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
 
 const MAX_INPUT_BYTES = 5 * 1024 * 1024;
 const ALLOWED_TYPES = ["image/png", "image/jpeg"];

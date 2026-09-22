@@ -1,7 +1,7 @@
 import { TrucksNav } from "@/components/trucks";
 import { TrucksLayoutClient } from "./TrucksLayoutClient";
 import { requireAuth } from "@/auth/guards";
-import whiteLabelConfig from "../../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
 
 export default async function TrucksLayout({
   children,

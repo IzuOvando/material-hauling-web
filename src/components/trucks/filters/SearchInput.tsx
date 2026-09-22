@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Search, X } from "lucide-react";
 import { useTrucksTable } from "@/hooks/useTrucksTable";
-import whiteLabelConfig from "../../../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
 
 const DEBOUNCE_MS = 300;
 

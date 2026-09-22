@@ -19,7 +19,7 @@ import { ResetPasswordDialog } from "@/components/users/ResetPasswordDialog";
 import { UsersToolbar } from "@/components/users/UsersToolbar";
 import { NewUserSheet } from "@/components/users/NewUserSheet";
 import type { UserRow } from "@/types";
-import whiteLabelConfig from "../../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
 
 interface UsersTableProps {
   frentes: string[];

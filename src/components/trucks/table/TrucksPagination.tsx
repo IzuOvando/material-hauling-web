@@ -15,7 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useTrucksTable } from "@/hooks/useTrucksTable";
-import whiteLabelConfig from "../../../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
 
 interface TrucksPaginationProps {
   total: number;

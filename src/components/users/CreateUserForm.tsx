@@ -26,7 +26,7 @@ import {
 import type { StepId } from "@/types";
 import { Stepper } from "./Stepper";
 import { getProject } from "@/helpers/strings";
-import whiteLabelConfig from "../../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
 
 const FORM_INITIAL = {
   username:   "",

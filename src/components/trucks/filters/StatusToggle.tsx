@@ -4,7 +4,7 @@ import { CircleDot, CircleCheck, Circle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTrucksTable } from "@/hooks/useTrucksTable";
 import type { StatusValue } from "@/types/trucks-filters";
-import whiteLabelConfig from "../../../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
 
 const OPTIONS: { value: StatusValue; label: string; activeClass: string; icon: typeof Circle }[] = [
   {

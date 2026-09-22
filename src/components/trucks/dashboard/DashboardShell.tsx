@@ -15,7 +15,7 @@ import { DrilldownSection } from "./DrilldownSection";
 import { CheckersTab } from "./CheckersTab";
 import { OrigenDestinoTab } from "./OrigenDestinoTab";
 import type { SummaryResponse, TimeseriesPoint, BreakdownItem } from "@/types/dashboard";
-import whiteLabelConfig from "../../../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
 
 interface DashboardShellProps {
   frente: string;

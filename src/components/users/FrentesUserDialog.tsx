@@ -17,7 +17,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { ChevronDown, ChevronRight, Loader2, Search } from "lucide-react";
 import { getProject } from "@/helpers/strings";
 import type { UserRow } from "@/types";
-import whiteLabelConfig from "../../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
 
 interface FrentesUserDialogProps {
   user: UserRow;

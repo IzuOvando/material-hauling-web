@@ -7,7 +7,7 @@ import FullScreenLoader from "@/components/ui/full-screen-loader";
 import { Section } from "@/types";
 import { Download } from "lucide-react";
 import CONFIG from "@/config";
-import whiteLabelConfig from "../../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
 
 const DownloadFrenteButton = ({
   frente,

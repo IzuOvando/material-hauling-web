@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { useDashboardStore } from "@/store/dashboardStore";
 import type { DashboardPeriod } from "@/types/dashboard";
 import CONFIG from "@/config";
-import whiteLabelConfig from "../../../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
 
 function currentWeekPeriod(): DashboardPeriod {
   return {

@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 import { useTrucksTable } from "@/hooks/useTrucksTable";
 import { STATUS_LABELS, TURNO_LABELS } from "./labels";
 import { getPeriodChipLabel } from "./PeriodPills";
-import whiteLabelConfig from "../../../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
 
 interface ChipProps {
   label: string;

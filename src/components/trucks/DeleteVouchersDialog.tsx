@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Frente } from "@prisma/client";
 import { DeleteVoucherButton } from ".";
-import whiteLabelConfig from "../../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
 
 interface DeleteVouchersDialogProps {
   open: boolean;

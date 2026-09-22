@@ -8,7 +8,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { VoucherDetails } from "@/components/trucks/VoucherDetails";
-import whiteLabelConfig from "../../../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
 
 interface VoucherDetailSheetProps {
   voucher: VoucherCamion | null;

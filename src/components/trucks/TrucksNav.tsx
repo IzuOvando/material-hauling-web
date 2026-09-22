@@ -17,7 +17,7 @@ interface NavItem {
   iconBg: string;
 }
 
-import whiteLabelConfig from "../../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
 
 const NAV_ITEMS: NavItem[] = [
   {

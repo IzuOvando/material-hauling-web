@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { FrenteReset } from "@/store";
-import whiteLabelConfig from "../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
 
 export default function NotFound() {
   return (

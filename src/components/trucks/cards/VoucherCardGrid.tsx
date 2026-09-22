@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { useTrucksInfiniteVouchers } from "@/hooks/useTrucksInfiniteVouchers";
 import { VoucherCard } from "./VoucherCard";
 import { VoucherDetailSheet } from "./VoucherDetailSheet";
-import whiteLabelConfig from "../../../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
 
 interface VoucherCardGridProps {
   frente: string;

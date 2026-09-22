@@ -19,7 +19,7 @@ import type {
 } from "@/types/trucks-filters";
 import { TrucksFacetedFilter } from "./TrucksFacetedFilter";
 import { cn } from "@/lib/utils";
-import whiteLabelConfig from "../../../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
 
 interface AdvancedFiltersDrawerProps {
   frente: string;

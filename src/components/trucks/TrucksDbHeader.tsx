@@ -16,7 +16,7 @@ import { useFrenteStore } from "@/store";
 import { DeleteVouchersDialog, CloseCycleSheet } from "@/components/trucks";
 import AddFrenteDialog from "@/components/frentes/AddFrenteDialog";
 import EditFrenteDialog from "@/components/frentes/EditFrenteDialog";
-import whiteLabelConfig from "../../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
 
 interface TrucksDbHeaderProps {
   frente: string;

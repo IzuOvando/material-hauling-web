@@ -17,7 +17,7 @@ import { cn } from "@/lib/utils";
 import { getAllFreentes } from "@/actions/frentes";
 import AddFrenteDialog from "./AddFrenteDialog";
 import EditFrenteDialog from "./EditFrenteDialog";
-import whiteLabelConfig from "../../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
 
 function groupByProject(frentes: Frente[]): Map<string, Frente[]> {
   const map = new Map<string, Frente[]>();

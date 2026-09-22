@@ -1,7 +1,7 @@
 import { Check, UserPlus, GitBranch } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { StepId, StepMeta } from "@/types";
-import whiteLabelConfig from "../../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
 
 const STEPS: StepMeta[] = [
   { id: 1, label: (whiteLabelConfig as any)?.ui?.users?.stepper?.userDetails || "Datos del usuario", icon: <UserPlus className="h-3.5 w-3.5" /> },

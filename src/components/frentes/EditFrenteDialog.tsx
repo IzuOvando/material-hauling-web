@@ -16,7 +16,7 @@ import FrenteLogoUpload from "./FrenteLogoUpload";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { updateFrenteDisplayName } from "@/actions/frentes";
-import whiteLabelConfig from "../../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
 
 interface EditFrenteDialogProps {
   open: boolean;

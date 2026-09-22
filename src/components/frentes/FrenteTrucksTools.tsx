@@ -10,7 +10,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useFrenteStore } from "@/store";
-import whiteLabelConfig from "../../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
 import { SelectGroup, SelectLabel } from "@radix-ui/react-select";
 import { Frente } from "@prisma/client";
 import { useEffect } from "react";

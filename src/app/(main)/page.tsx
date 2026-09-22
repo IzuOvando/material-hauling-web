@@ -12,7 +12,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { getMetadataCamionFromFile } from "@/utils/excel/excelValidatorQRs";
 import { getCamionesQRSVG } from "@/utils/excel/generatorDownloadQrs";
 import { cn } from "@/lib/utils";
-import whiteLabelConfig from "../../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
 
 const ACCEPT = {
   "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": [

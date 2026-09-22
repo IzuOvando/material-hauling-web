@@ -39,6 +39,7 @@ const config: Config = {
   moduleNameMapper: {
     "^@tenant$": "<rootDir>/src/config/tenant-empty.json",
     "^@/(.*)$": "<rootDir>/src/$1", // Mapea el alias '@' a la carpeta 'src'
+    "^#/(.*)$": "<rootDir>/$1", // Mapea el alias '#' a la raíz del proyecto
   },
   // A list of reporter names that Jest uses when writing coverage reports
   // coverageReporters: [

@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { Truck } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { ActiveResponse } from "@/types/dashboard";
-import whiteLabelConfig from "../../../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
 
 const POLL_INTERVAL_MS = 30_000;
 

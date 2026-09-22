@@ -12,7 +12,7 @@ import {
 } from "@/actions/trucks/periods";
 import { TrucksDateRangePicker } from "./TrucksDateRangePicker";
 import { MonthYearPicker } from "./MonthYearPicker";
-import whiteLabelConfig from "../../../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
 
 const ORDER: Exclude<PeriodPreset, "custom" | "thisMonth">[] = [
   "yesterday",
