@@ -14,7 +14,6 @@ Front-end branding and UI copy are defined once in `white-label.config.ts` (the 
 ## What the config contains
 
 - `app`: app name, short name, tagline, metadata, locale
-- `branding`: logo (`logoUrl`)
 - `theme`: the three tenant colors as hex (`primary`, `secondary`, `accent`); `getThemeCssVars` (`src/lib/theme.ts`) converts them to the RGB-channel CSS variables Tailwind consumes
 - `assets`: enterprise images paths and the QR template
 - `auth`: login text
@@ -43,7 +42,7 @@ The root layout mounts `TenantBrandingProvider`, and components read the current
 
 Templated strings keep their `{token}` placeholders (for example `{frente}`, `{count}`, `{filename}`) exactly as in the default.
 
-When a tenant is set, the logo and enterprise images paths are derived automatically: `/images/logos/logo-<tenant>.svg`, `/images/enterprises/<tenant>` and `public/images/enterprises/<tenant>`. A `tenant.json` can still override them.
+When a tenant is set, the enterprise images path is derived automatically: `/images/enterprises/<tenant>` and `public/images/enterprises/<tenant>`. A `tenant.json` can still override it. The logo is not part of `tenant.json` at all — see "Installing tenant assets" below.
 
 ## Installing tenant assets
 
@@ -54,7 +53,7 @@ tenant-assets/
 └── tenant-name/
 	├── tenant.json
 	├── branding/
-	│   └── logo.svg
+	│   └── logo.svg             # or .png/.jpg/.jpeg/.webp — any size or shape
 	├── enterprises/
 	│   ├── company-a.png
 	│   └── company-b.jpg
@@ -68,9 +67,13 @@ Then run:
 npm run tenant:install -- tenant-name
 ```
 
-The installer validates the logo and enterprise images, then copies them into the existing runtime locations under `public/`. A tenant QR template is optional. If it is not provided, the existing public template remains unchanged. The source folder is preserved, so the same tenant package can be installed again or reviewed before deployment.
+The installer normalizes the logo (see below) and validates the enterprise images, then copies the enterprise images and QR template into the existing runtime locations under `public/`. A tenant QR template is optional. If it is not provided, the existing public template remains unchanged. The source folder is preserved, so the same tenant package can be installed again or reviewed before deployment.
 
-The tenant's logo is installed as `public/images/logos/logo-tenant-name.svg`, never overwriting the default `logo_mexico.svg`. Enterprise images install into their own subfolder, `public/images/enterprises/tenant-name/`, never the shared default folder — this avoids two tenants colliding on a same-named file and preserves each image's filename-without-extension lookup key (used by `EnterprisesImagesInitializer` to key preloaded canvases by business name). The config derives these paths from `NEXT_PUBLIC_TENANT`. Pass `--no-start` to install without starting; the installer then prints the tenant variable to set in the deployment environment.
+### Logo normalization
+
+Drop any single `logo.{svg,png,jpg,jpeg,webp}` into `branding/` — any pixel size, any aspect ratio (a wide wordmark, a square icon, anything). The installer uses `sharp` to resize it (preserving its aspect ratio, never cropping) and pad it with a transparent background onto a canvas that matches the *proportions* of the default `logo_mexico.svg`, so every tenant's logo renders in the same box in the navbar — not bigger or smaller depending on its own shape. The result is written to `tenant-assets/tenant-name/branding/logo.normalized.png`, which `next.config.mjs`'s `@tenant-logo` webpack alias then points `BrandMark.tsx` at (a build-time import, not a `public/` URL — nothing to copy there). Re-run `tenant:install` any time the source logo changes.
+
+Enterprise images install into their own subfolder, `public/images/enterprises/tenant-name/`, never the shared default folder — this avoids two tenants colliding on a same-named file and preserves each image's filename-without-extension lookup key (used by `EnterprisesImagesInitializer` to key preloaded canvases by business name). Pass `--no-start` to install without starting; the installer then prints the tenant variable to set in the deployment environment.
 
 `tenant:install` requires `tenant-assets/<tenant-name>/tenant.json` and stops with an error if it is missing. It starts the dev server with `NEXT_PUBLIC_TENANT=<tenant-name>`. Database, auth and other secrets stay in the repository `.env`.
 
@@ -84,7 +87,7 @@ Before installing another brand, run:
 npm run tenant:reset -- --confirm
 ```
 
-The guarded reset restores the committed default logo, enterprise images, and QR template under `public/`. It refuses to run when those runtime assets have uncommitted changes and never removes source folders under `tenant-assets/`.
+The guarded reset restores the committed default enterprise images and QR template under `public/` (the logo is never installed under `public/` — see "Logo normalization" above). It refuses to run when those runtime assets have uncommitted changes and never removes source folders under `tenant-assets/`.
 
 If an untracked tenant source folder should also be removed, use the explicit cleanup option:
 

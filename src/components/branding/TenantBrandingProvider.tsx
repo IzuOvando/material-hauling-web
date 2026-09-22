@@ -7,7 +7,6 @@ type TenantBranding = {
   appName: string;
   shortName: string;
   tagline: string;
-  logoUrl: string;
   welcomeLabel: string;
   theme: {
     primary: string;
@@ -20,7 +19,6 @@ const defaultBranding: TenantBranding = {
   appName: whiteLabelConfig.app.name,
   shortName: whiteLabelConfig.app.shortName,
   tagline: whiteLabelConfig.app.tagline,
-  logoUrl: whiteLabelConfig.branding.logoUrl,
   welcomeLabel: whiteLabelConfig.auth.welcomeLabel,
   theme: whiteLabelConfig.theme,
 };

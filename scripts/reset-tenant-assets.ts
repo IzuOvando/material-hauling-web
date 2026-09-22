@@ -8,8 +8,9 @@ const confirm = process.argv.includes("--confirm");
 const removeTenantIndex = process.argv.indexOf("--remove-tenant");
 const tenantToRemove = removeTenantIndex >= 0 ? process.argv[removeTenantIndex + 1] : undefined;
 const assetPaths = [
-  // logo_mexico.svg is intentionally excluded: tenant:install never overwrites it —
-  // each tenant gets its own logo-<tenantName>.svg file instead.
+  // logo_mexico.svg is intentionally excluded: the tenant logo is normalized into
+  // tenant-assets/<tenant>/branding/logo.normalized.png, never into public/, so
+  // there's nothing under public/ for a tenant install to have overwritten.
   "public/images/enterprises",
   "public/documents/test_metadatacamion.xlsx",
 ];

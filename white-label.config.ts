@@ -9,9 +9,6 @@ const defaultConfig = {
     metadataDescription: "Sistema de Acarreos SEDENA",
     locale: "es",
   },
-  branding: {
-    logoUrl: "/images/logos/logo_mexico.svg",
-  },
   theme: {
     primary: "#133223",
     secondary: "#9d2449",
@@ -478,7 +475,6 @@ const tenant = process.env.NEXT_PUBLIC_TENANT;
 
 const tenantAssetPaths: TenantConfig = tenant
   ? {
-      branding: { logoUrl: `/images/logos/logo-${tenant}.svg` },
       assets: {
         enterpriseImagesFolder: `public/images/enterprises/${tenant}`,
         enterpriseImagesDirectory: `/images/enterprises/${tenant}`,

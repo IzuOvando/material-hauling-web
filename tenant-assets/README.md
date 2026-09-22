@@ -7,7 +7,7 @@ tenant-assets/
 └── tenant-name/
     ├── tenant.json             # required: copy, colors, metadata overrides
     ├── branding/
-    │   └── logo.svg
+    │   └── logo.svg            # or .png/.jpg/.jpeg/.webp — any size or shape
     ├── enterprises/
     │   ├── company-a.png
     │   └── company-b.jpg
@@ -15,7 +15,7 @@ tenant-assets/
         └── qr-template.xlsx    # optional
 ```
 
-Supported enterprise image formats: `.png`, `.jpg`, `.jpeg`, `.webp`, and `.svg`.
+Supported image formats (logo and enterprise images): `.png`, `.jpg`, `.jpeg`, `.webp`, and `.svg`.
 
 Install a tenant's assets with:
 
@@ -23,11 +23,11 @@ Install a tenant's assets with:
 npm run tenant:install -- tenant-name
 ```
 
-The command copies files into the runtime locations under `public/`. It does not delete or modify the source folder. If `documents/qr-template.xlsx` is not present, the installer leaves the existing public QR template unchanged.
+The command normalizes the logo (see below), then copies the enterprise images and QR template into the runtime locations under `public/`. It does not delete or modify the source folder. If `documents/qr-template.xlsx` is not present, the installer leaves the existing public QR template unchanged.
 
 ### Logo handling
 
-The default logo (`public/images/logos/logo_mexico.svg`) is never overwritten. Each tenant's logo is installed as its own file, `public/images/logos/logo-tenant-name.svg`, so the repository default always stays available and installing one tenant never clobbers another.
+The logo can be any size or aspect ratio — a wide wordmark, a square icon, whatever the client provides. `tenant:install` uses `sharp` to resize it (preserving its own aspect ratio, never cropping) and pad it with a transparent background onto a canvas matching the default logo's proportions, so every tenant's logo ends up in the same box in the navbar. The output is written to `branding/logo.normalized.png` inside the tenant's own folder — not into `public/` — and is picked up at build time by the `@tenant-logo` webpack alias in `next.config.mjs`. Re-run `tenant:install` whenever the source logo changes; the default `public/images/logos/logo_mexico.svg` itself is never touched.
 
 ### Enterprise images handling
 
@@ -63,7 +63,7 @@ Before preparing another brand, restore the committed default runtime assets wit
 npm run tenant:reset -- --confirm
 ```
 
-This restores the default logo, enterprise images, and QR template under `public/`. It does not delete or modify any folder under `tenant-assets/`.
+This restores the default enterprise images and QR template under `public/`. (The logo is never installed under `public/` at all — see "Logo handling" above.) It does not delete or modify any folder under `tenant-assets/`.
 
 To also remove one untracked tenant source folder after resetting, provide its exact folder name:
 
