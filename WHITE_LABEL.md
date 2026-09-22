@@ -14,8 +14,8 @@ Front-end branding and UI copy are defined once in `white-label.config.ts` (the 
 ## What the config contains
 
 - `app`: app name, short name, tagline, metadata, locale
-- `branding`: logo and brand colors (hex)
-- `theme`: the three tenant colors as space-separated RGB channels (`primary`, `secondary`, `accent`), consumed by Tailwind through CSS variables
+- `branding`: logo (`logoUrl`)
+- `theme`: the three tenant colors as hex (`primary`, `secondary`, `accent`); `getThemeCssVars` (`src/lib/theme.ts`) converts them to the RGB-channel CSS variables Tailwind consumes
 - `assets`: enterprise images paths and the QR template
 - `auth`: login text
 - `ui`: all user-facing copy, grouped by area
@@ -31,7 +31,7 @@ The root layout mounts `TenantBrandingProvider`, and components read the current
 ```json
 {
   "app": { "name": "Atlas Haul", "locale": "en" },
-  "theme": { "primary": "26 54 93", "secondary": "180 83 9", "accent": "14 116 144" },
+  "theme": { "primary": "#1a365d", "secondary": "#f97316", "accent": "#0e7490" },
   "ui": {
     "frenteSelector": { "title": "Choose a work site" },
     "general": { "singularFrente": "site", "pluralFrentes": "sites" }

@@ -7,15 +7,10 @@
     "metadataDescription": "A fictional white-label logistics operations platform",
     "locale": "en"
   },
-  "branding": {
-    "primaryColor": "#1a365d",
-    "secondaryColor": "#b45309",
-    "accentColor": "#0e7490"
-  },
   "theme": {
-    "primary": "26 54 93",
-    "secondary": "180 83 9",
-    "accent": "14 116 144"
+    "primary": "#1a365d",
+    "secondary": "#f97316",
+    "accent": "#0e7490"
   },
   "auth": {
     "welcomeLabel": "Welcome",
