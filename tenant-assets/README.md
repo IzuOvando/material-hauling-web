@@ -27,7 +27,7 @@ The command normalizes the logo (see below), then copies the enterprise images a
 
 ### Logo handling
 
-The logo can be any size or aspect ratio — a wide wordmark, a square icon, whatever the client provides. `tenant:install` uses `sharp` to resize it (preserving its own aspect ratio, never cropping) and pad it with a transparent background onto a canvas matching the default logo's proportions, so every tenant's logo ends up in the same box in the navbar. The output is written to `branding/logo.normalized.png` inside the tenant's own folder — not into `public/` — and is picked up at build time by the `@tenant-logo` webpack alias in `next.config.mjs`. Re-run `tenant:install` whenever the source logo changes; the default `public/images/logos/logo_mexico.svg` itself is never touched.
+The logo can be any size or aspect ratio — a wide wordmark, a square icon, whatever the client provides. `tenant:install` uses `sharp` to resize it (preserving its own aspect ratio, never cropping) and pad it with a transparent background onto a canvas matching the default logo's proportions, so every tenant's logo ends up in the same box in the navbar. The output is written to `branding/logo.normalized.png` inside the tenant's own folder — not into `public/` — and is picked up at build time by the `@tenant-logo` webpack alias in `next.config.mjs`. `tenant:install` also renders a square `branding/favicon.png` from the same source logo for the browser tab icon (the wide logo would be illegible at tab size). Re-run `tenant:install` whenever the source logo changes; the default `public/images/logos/logo_mexico.svg` itself is never touched.
 
 ### Enterprise images handling
 
@@ -63,7 +63,7 @@ Before preparing another brand, restore the committed default runtime assets wit
 npm run tenant:reset -- --confirm
 ```
 
-This restores the default enterprise images and QR template under `public/` (the logo is never installed under `public/` at all — see "Logo handling" above), removes any leftover `public/images/logos/logo-<tenant>.*` file from the old pre-normalization pipeline, and clears every tenant's generated `branding/logo.normalized.png`. By itself it does not delete or modify any folder under `tenant-assets/`.
+This restores the default enterprise images and QR template under `public/` (the logo is never installed under `public/` at all — see "Logo handling" above), removes any leftover `public/images/logos/logo-<tenant>.*` file from the old pre-normalization pipeline, and clears every tenant's generated `branding/logo.normalized.png` and `branding/favicon.png`. By itself it does not delete or modify any folder under `tenant-assets/`.
 
 To also strip a tenant's source folder — this repo is a base template you configure per client, not a place to keep every client's folder around, so this works even for a committed one, the shipped `turist-trucks` demo included — provide its exact name:
 

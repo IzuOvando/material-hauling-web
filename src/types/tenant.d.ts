@@ -8,3 +8,9 @@ declare module "@tenant-logo" {
   const tenantLogo: StaticImageData;
   export default tenantLogo;
 }
+
+declare module "@tenant-favicon" {
+  import type { StaticImageData } from "next/image";
+  const tenantFavicon: StaticImageData;
+  export default tenantFavicon;
+}

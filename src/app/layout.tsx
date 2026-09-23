@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { getAppUser } from "@/auth/auth.user";
 import { AppShell } from "@/components/app-shell";
 import { getThemeCssVars } from "@/lib/theme";
+import tenantFavicon from "@tenant-favicon";
 import whiteLabelConfig from "#/white-label.config";
 
 const montserrat = Montserrat({ subsets: ["latin"], variable: "--montserrat" });
@@ -12,6 +13,7 @@ const montserrat = Montserrat({ subsets: ["latin"], variable: "--montserrat" });
 export const metadata: Metadata = {
   title: whiteLabelConfig.app.metadataTitle,
   description: whiteLabelConfig.app.metadataDescription,
+  icons: { icon: tenantFavicon.src },
 };
 
 export default async function RootLayout({

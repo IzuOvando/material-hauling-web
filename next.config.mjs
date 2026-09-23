@@ -10,6 +10,10 @@ const tenantLogoFile = tenant
   ? path.resolve("tenant-assets", tenant, "branding", "logo.normalized.png")
   : path.resolve("public/images/logos/logo_mexico.svg");
 
+const tenantFaviconFile = tenant
+  ? path.resolve("tenant-assets", tenant, "branding", "favicon.png")
+  : path.resolve("public/favicon.ico");
+
 if (tenant && !fs.existsSync(tenantFile)) {
   throw new Error(`NEXT_PUBLIC_TENANT="${tenant}" but ${tenantFile} does not exist`);
 }
@@ -20,17 +24,24 @@ if (tenant && !fs.existsSync(tenantLogoFile)) {
   );
 }
 
+if (tenant && !fs.existsSync(tenantFaviconFile)) {
+  throw new Error(
+    `NEXT_PUBLIC_TENANT="${tenant}" but ${tenantFaviconFile} does not exist. Run "npm run tenant:install -- ${tenant} --no-start" to generate it.`,
+  );
+}
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   webpack: (config) => {
     config.resolve.alias["@tenant"] = tenantFile;
     config.resolve.alias["@tenant-logo"] = tenantLogoFile;
+    config.resolve.alias["@tenant-favicon"] = tenantFaviconFile;
 
     if (config.cache && typeof config.cache === "object") {
       config.cache.version = `${config.cache.version ?? ""}|tenant:${tenant ?? "default"}`;
       config.cache.buildDependencies = {
         ...config.cache.buildDependencies,
-        tenant: [tenantFile, tenantLogoFile],
+        tenant: [tenantFile, tenantLogoFile, tenantFaviconFile],
       };
     }
     return config;

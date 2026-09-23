@@ -46,7 +46,9 @@ async function findLegacyTenantLogos(): Promise<string[]> {
     .map((name) => path.posix.join("public/images/logos", name));
 }
 
-async function findGeneratedNormalizedLogos(): Promise<string[]> {
+const GENERATED_BRANDING_FILES = ["logo.normalized.png", "favicon.png"];
+
+async function findGeneratedBrandingFiles(): Promise<string[]> {
   const tenantAssetsDir = path.join(process.cwd(), "tenant-assets");
   let entries;
   try {
@@ -58,12 +60,14 @@ async function findGeneratedNormalizedLogos(): Promise<string[]> {
   const found: string[] = [];
   for (const entry of entries) {
     if (!entry.isDirectory()) continue;
-    const candidate = path.join(tenantAssetsDir, entry.name, "branding", "logo.normalized.png");
-    try {
-      await fs.access(candidate);
-      found.push(candidate);
-    } catch {
-      // no generated logo for this tenant — nothing to clean up
+    for (const fileName of GENERATED_BRANDING_FILES) {
+      const candidate = path.join(tenantAssetsDir, entry.name, "branding", fileName);
+      try {
+        await fs.access(candidate);
+        found.push(candidate);
+      } catch {
+        // not generated for this tenant — nothing to clean up
+      }
     }
   }
   return found;
@@ -101,11 +105,11 @@ async function resetTenantAssets(): Promise<void> {
     legacyLogos.forEach((logoPath) => console.log(`- ${logoPath}`));
   }
 
-  const generatedLogos = await findGeneratedNormalizedLogos();
-  if (generatedLogos.length > 0) {
-    await Promise.all(generatedLogos.map((logoPath) => fs.rm(logoPath, { force: true })));
-    console.log("Cleared generated normalized logo(s) (tenant:install regenerates these):");
-    generatedLogos.forEach((logoPath) => console.log(`- ${path.relative(process.cwd(), logoPath)}`));
+  const generatedFiles = await findGeneratedBrandingFiles();
+  if (generatedFiles.length > 0) {
+    await Promise.all(generatedFiles.map((logoPath) => fs.rm(logoPath, { force: true })));
+    console.log("Cleared generated logo/favicon file(s) (tenant:install regenerates these):");
+    generatedFiles.forEach((logoPath) => console.log(`- ${path.relative(process.cwd(), logoPath)}`));
   }
 
   if (!tenantToRemove) {

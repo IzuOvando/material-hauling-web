@@ -16,6 +16,7 @@ const allowedImageExtensions = [".svg", ".png", ".jpg", ".jpeg", ".webp"];
 // own aspect ratio.
 const REFERENCE_LOGO_PATH = path.join(projectRoot, "public", "images", "logos", "logo_mexico.svg");
 const NORMALIZED_LOGO_HEIGHT = 240;
+const FAVICON_SIZE = 256;
 
 function printUsage(): void {
   console.error("Usage: npm run tenant:install -- <tenant-folder> [--no-start]");
@@ -78,6 +79,22 @@ async function normalizeLogo(sourcePath: string, destinationPath: string): Promi
   return { width, height };
 }
 
+// The normalized logo is wide (the reference logo's proportions), which would be
+// illegibly small as a browser tab icon, so the favicon is a separate square render
+// of the same source logo: fitted (never cropped) onto a transparent square canvas.
+async function generateFavicon(sourcePath: string, destinationPath: string): Promise<void> {
+  const isSvg = path.extname(sourcePath).toLowerCase() === ".svg";
+  const pipeline = isSvg ? sharp(sourcePath, { density: 300 }) : sharp(sourcePath);
+
+  await pipeline
+    .resize(FAVICON_SIZE, FAVICON_SIZE, {
+      fit: "contain",
+      background: { r: 0, g: 0, b: 0, alpha: 0 },
+    })
+    .png()
+    .toFile(destinationPath);
+}
+
 async function getEnterpriseImages(folder: string): Promise<string[]> {
   let entries;
   try {
@@ -124,6 +141,8 @@ async function installTenantAssets(): Promise<void> {
   // the @tenant-logo webpack alias (next.config.mjs), not as a runtime URL.
   const normalizedLogoPath = path.join(brandingDir, "logo.normalized.png");
   const { width, height } = await normalizeLogo(brandingSource, normalizedLogoPath);
+  const faviconPath = path.join(brandingDir, "favicon.png");
+  await generateFavicon(brandingSource, faviconPath);
 
   const publicRoot = path.join(projectRoot, "public");
   if (availableQrTemplate) {
@@ -147,6 +166,7 @@ async function installTenantAssets(): Promise<void> {
   console.log(
     `- Logo: ${path.relative(projectRoot, brandingSource)} normalized to ${width}x${height}px (matches the default logo's proportions) → ${path.relative(projectRoot, normalizedLogoPath)}`,
   );
+  console.log(`- Favicon: ${FAVICON_SIZE}x${FAVICON_SIZE}px square → ${path.relative(projectRoot, faviconPath)}`);
   console.log(`- Enterprise images: ${enterpriseImages.length} (${enterpriseImagesFolder})`);
   console.log(availableQrTemplate
     ? `- QR template: ${path.relative(projectRoot, path.join(publicRoot, "documents", "test_metadatacamion.xlsx"))}`
