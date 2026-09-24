@@ -16,7 +16,7 @@ export default function VoucherInfoClient({
       </h1>
       <div className="flex flex-col lg:flex-row items-center lg:items-start gap-10 lg:gap-20 w-full justify-center">
         <div className="flex aspect-square w-[60%] max-w-[360px] items-center justify-center rounded-xl bg-white shadow-2xl">
-          <Truck size={"80%"} className="text-accent-dark" />
+          <Truck size={"80%"} className="text-accent" />
         </div>
         <VoucherDetails voucher={voucher} className="w-full max-w-md" />
       </div>

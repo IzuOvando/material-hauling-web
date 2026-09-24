@@ -7,7 +7,7 @@ import {
   SheetDescription,
 } from "@/components/ui/sheet";
 import { CreateUserForm } from "@/components/users/CreateUserForm";
-import whiteLabelConfig from "../../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
 
 interface NewUserSheetProps {
   frentes: string[];

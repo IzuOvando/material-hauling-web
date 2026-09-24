@@ -2,7 +2,7 @@ import ExcelJS from "exceljs";
 import { promises as fs } from "fs";
 import path from "path";
 
-const outputPath = path.join(process.cwd(), "client-assets", "demo", "documents", "qr-template.xlsx");
+const outputPath = path.join(process.cwd(), "tenant-assets", "demo", "documents", "qr-template.xlsx");
 
 const headers = [
   "Placas",

@@ -4,7 +4,7 @@ import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { BarChart3, Truck, Activity, ArrowRight, ChevronDown, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
-import whiteLabelConfig from "../../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
 import type { Frente } from "@prisma/client";
 
 export interface FrenteKpiSnapshot {

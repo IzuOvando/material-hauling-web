@@ -16,7 +16,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { authenticate } from "@/actions/authorization";
 import sha256 from 'crypto-js/sha256';
 import { Eye, EyeOff, Loader2 } from "lucide-react";
-import whiteLabelConfig from "../../../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
 
 const CardLogin = () => {
   const [state, dispatch] = useFormState(authenticate, {
@@ -124,7 +124,7 @@ const CardLogin = () => {
         </CardContent>
         <CardFooter className="flex justify-center">
           <Button
-            className="bg-secondary hover:bg-secondary-light active:bg-secondary-dark text-white"
+            className="bg-secondary hover:bg-secondary/90 active:bg-secondary/80 text-white"
             size={"lg"}
             disabled={isLoading}
           >

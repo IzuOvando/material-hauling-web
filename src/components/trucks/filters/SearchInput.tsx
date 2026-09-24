@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Search, X } from "lucide-react";
 import { useTrucksTable } from "@/hooks/useTrucksTable";
-import whiteLabelConfig from "../../../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
 
 const DEBOUNCE_MS = 300;
 
@@ -39,14 +39,14 @@ export function SearchInput() {
         value={localValue}
         onChange={(e) => handleChange(e.target.value)}
         placeholder={whiteLabelConfig.ui.vouchers.searchPlaceholder}
-        className="w-full h-9 pl-9 pr-9 rounded-md border-2 border-primary-light bg-white text-sm text-primary placeholder:text-primary/40 focus:outline-none focus:border-accent transition-colors"
+        className="w-full h-9 pl-9 pr-9 rounded-md border-2 border-primary bg-white text-sm text-primary placeholder:text-primary/40 focus:outline-none focus:border-accent transition-colors"
       />
       {localValue && (
         <button
           type="button"
           onClick={handleClear}
-          className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-primary-light/15 text-primary/60 hover:text-primary"
-          aria-label="Limpiar búsqueda"
+          className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-primary/15 text-primary/60 hover:text-primary"
+          aria-label={whiteLabelConfig.ui.trucksFilters.clearSearchLabel}
         >
           <X className="h-3.5 w-3.5" />
         </button>

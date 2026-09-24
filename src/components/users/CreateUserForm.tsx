@@ -26,7 +26,7 @@ import {
 import type { StepId } from "@/types";
 import { Stepper } from "./Stepper";
 import { getProject } from "@/helpers/strings";
-import whiteLabelConfig from "../../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
 
 const FORM_INITIAL = {
   username:   "",
@@ -218,7 +218,7 @@ export function CreateUserForm({ frentes }: CreateUserFormProps) {
     <div className="flex justify-center mt-3 pb-1">
       <div className="w-full max-w-xl">
         <Stepper currentStep={step} />
-        <div className="border-2 border-primary-light rounded-lg overflow-hidden shadow-md">
+        <div className="border-2 border-primary rounded-lg overflow-hidden shadow-md">
 
           {step === 1 && (
             <>
@@ -367,7 +367,7 @@ export function CreateUserForm({ frentes }: CreateUserFormProps) {
                   <Button
                     type="submit"
                     disabled={isLoading}
-                    className="w-full bg-secondary hover:bg-secondary-light active:bg-secondary-dark"
+                    className="w-full bg-secondary hover:bg-secondary/90 active:bg-secondary/80"
                   >
                     {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                     {isLoading ? (whiteLabelConfig as any)?.ui?.users?.create?.creating || "Creando usuario..." : (whiteLabelConfig as any)?.ui?.users?.create?.createButton || "Continuar →"}
@@ -420,7 +420,7 @@ export function CreateUserForm({ frentes }: CreateUserFormProps) {
                             const open = isGroupOpen(project);
 
                             return (
-                              <div key={project} className="rounded-md border border-primary-light/40 shadow-sm">
+                              <div key={project} className="rounded-md border border-primary/40 shadow-sm">
                                 <button
                                   type="button"
                                   onClick={() => toggleGroup(project)}
@@ -442,7 +442,7 @@ export function CreateUserForm({ frentes }: CreateUserFormProps) {
                                 </button>
 
                                 {open && (
-                                  <div className="px-3 pb-2 space-y-2 border-t border-primary-light/30 pt-2 bg-gray-50">
+                                  <div className="px-3 pb-2 space-y-2 border-t border-primary/30 pt-2 bg-gray-50">
                                     {frenteList.map((frente) => {
                                       const subLabel = frente.substring(project.length + 1);
                                       return (
@@ -476,7 +476,7 @@ export function CreateUserForm({ frentes }: CreateUserFormProps) {
                     <Button
                       onClick={handleAsignarFrentes}
                       disabled={isLoading || selectedFrentes.length === 0}
-                      className="w-full bg-secondary hover:bg-secondary-light active:bg-secondary-dark"
+                      className="w-full bg-secondary hover:bg-secondary/90 active:bg-secondary/80"
                     >
                       {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                       {(whiteLabelConfig as any)?.ui?.users?.create?.assignButton || 'Asignar frentes'} ({selectedFrentes.length} seleccionados)
@@ -522,7 +522,7 @@ export function CreateUserForm({ frentes }: CreateUserFormProps) {
                 </p>
                 <Button
                   onClick={handleReset}
-                  className="w-full mt-4 bg-secondary hover:bg-secondary-light active:bg-secondary-dark"
+                  className="w-full mt-4 bg-secondary hover:bg-secondary/90 active:bg-secondary/80"
                 >
                   {(whiteLabelConfig as any)?.ui?.users?.create?.successButton || 'Registrar otro usuario'}
                 </Button>

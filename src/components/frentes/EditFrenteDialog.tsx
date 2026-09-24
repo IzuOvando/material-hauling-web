@@ -16,7 +16,7 @@ import FrenteLogoUpload from "./FrenteLogoUpload";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { updateFrenteDisplayName } from "@/actions/frentes";
-import whiteLabelConfig from "../../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
 
 interface EditFrenteDialogProps {
   open: boolean;
@@ -87,7 +87,7 @@ const EditFrenteDialog = ({
                     <Button
                       onClick={handleSaveDisplayName}
                       disabled={!isDirty || savingName}
-                      className="shrink-0 bg-primary hover:bg-primary-dark text-white border-0"
+                      className="shrink-0 bg-primary hover:bg-primary/90 text-white border-0"
                     >
                       {savingName ? (
                         <Loader2 className="h-4 w-4 animate-spin" />

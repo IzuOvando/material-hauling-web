@@ -5,7 +5,7 @@ import { Download, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { useTrucksTable } from "@/hooks/useTrucksTable";
-import whiteLabelConfig from "../../../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
 
 interface DownloadTrucksExcelButtonProps {
   frente: string;
@@ -74,7 +74,7 @@ export function DownloadTrucksExcelButton({
     <Button
       onClick={handleDownload}
       disabled={isLoading || total === 0}
-      className="h-9 gap-2 bg-accent hover:bg-accent-dark text-white"
+      className="h-9 gap-2 bg-accent hover:bg-accent/90 text-white"
     >
       {isLoading ? (
         <Loader2 className="h-4 w-4 animate-spin" />

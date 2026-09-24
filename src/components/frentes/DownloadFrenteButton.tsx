@@ -6,7 +6,7 @@ import { useToast } from "@/components/ui/use-toast";
 import FullScreenLoader from "@/components/ui/full-screen-loader";
 import { Download } from "lucide-react";
 import CONFIG from "@/config";
-import whiteLabelConfig from "../../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
 
 const DownloadFrenteButton = ({ frente }: { frente: string }) => {
   const { toast } = useToast();
@@ -72,7 +72,7 @@ const DownloadFrenteButton = ({ frente }: { frente: string }) => {
     <>
       {isLoading && <FullScreenLoader message={whiteLabelConfig.ui.vouchers.generatingExcelMessage} />}
       <Button
-        className="py-2 px-[0.5rem] bg-white hover:bg-[rgba(var(--accent-light-color)/50%)] group ml-[-2.5px]"
+        className="py-2 px-[0.5rem] bg-white hover:bg-[rgba(var(--accent-color)/20%)] group ml-[-2.5px]"
         onClick={downloadDatabase}
         disabled={isLoading}
       >

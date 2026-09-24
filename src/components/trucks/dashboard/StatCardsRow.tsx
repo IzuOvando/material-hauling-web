@@ -1,7 +1,7 @@
 import { CheckCircle2, Package, TrendingUp, PieChart, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { SummaryResponse } from "@/types/dashboard";
-import whiteLabelConfig from "../../../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
 
 interface StatCardsRowProps {
   data: SummaryResponse;

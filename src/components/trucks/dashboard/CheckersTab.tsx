@@ -4,7 +4,7 @@ import { LogOut, LogIn, BarChart2 } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { StatCard } from "./StatCard";
 import type { BreakdownItem } from "@/types/dashboard";
-import whiteLabelConfig from "../../../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
 
 const DEPARTURE_COLOR = "#22543d";
 const ARRIVAL_COLOR   = "#bc955c";

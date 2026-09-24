@@ -12,7 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import whiteLabelConfig from "../../../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
 
 interface TrucksColumnToggleProps<TData> {
   table: Table<TData>;
@@ -25,7 +25,7 @@ export function TrucksColumnToggle<TData>({ table }: TrucksColumnToggleProps<TDa
         <Button
           variant="outline"
           size="sm"
-          className="h-9 border-2 border-primary-light text-primary hover:bg-primary hover:!text-accent-light"
+          className="h-9 border-2 border-primary text-primary hover:bg-primary hover:!text-accent"
         >
           <MixerHorizontalIcon className="mr-2 h-4 w-4" />
           {whiteLabelConfig.ui.trucksTable.columnsButton}

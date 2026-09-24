@@ -1,6 +1,6 @@
 import { FrenteReset } from "@/store";
 import CardLogin from "./components/CardLogin";
-import whiteLabelConfig from "../../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
 
 export default function Login() {
   return (

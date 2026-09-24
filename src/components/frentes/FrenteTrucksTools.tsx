@@ -10,7 +10,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useFrenteStore } from "@/store";
-import whiteLabelConfig from "../../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
 import { SelectGroup, SelectLabel } from "@radix-ui/react-select";
 import { Frente } from "@prisma/client";
 import { useEffect } from "react";
@@ -88,7 +88,7 @@ const FrenteTrucksTools = ({
             />
             {isOwner && (
               <Button
-                className="p-2 bg-transparent hover:bg-[rgba(var(--accent-light-color)/50%)]"
+                className="p-2 bg-transparent hover:bg-[rgba(var(--accent-color)/20%)]"
                 onClick={() => setOpenCloseCycle(true)}
                 title={whiteLabelConfig.ui.frentesManager.menu.closeCycle}
               >
@@ -97,7 +97,7 @@ const FrenteTrucksTools = ({
             )}
             {isOwner && (
               <Button
-                className="p-2 bg-transparent hover:bg-[rgba(var(--accent-light-color)/50%)]"
+                className="p-2 bg-transparent hover:bg-[rgba(var(--accent-color)/20%)]"
                 onClick={() => setOpenDelete(true)}
                 title={whiteLabelConfig.ui.frentesManager.menu.deleteRecords}
               >

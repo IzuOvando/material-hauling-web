@@ -10,7 +10,7 @@ import {
   formatTime12Hour,
 } from "@/helpers/formatters/datetime";
 import { getMaterialDescription } from "@/helpers/formatters/voucherMaterial";
-import whiteLabelConfig from "../../../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
 
 interface VoucherCardProps {
   voucher: VoucherCamion;

@@ -15,7 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useTrucksTable } from "@/hooks/useTrucksTable";
-import whiteLabelConfig from "../../../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
 
 interface TrucksPaginationProps {
   total: number;
@@ -65,7 +65,7 @@ export function TrucksPagination({ total, page, limit }: TrucksPaginationProps) 
         <div className="flex items-center gap-2 !m-0">
           <Button
             variant="outline"
-            className="hidden h-8 w-8 p-0 lg:flex border-2 border-primary text-primary hover:bg-primary hover:!text-accent-light"
+            className="hidden h-8 w-8 p-0 lg:flex border-2 border-primary text-primary hover:bg-primary hover:!text-accent"
             onClick={() => setPage(1)}
             disabled={cantGoBack}
           >
@@ -74,7 +74,7 @@ export function TrucksPagination({ total, page, limit }: TrucksPaginationProps) 
           </Button>
           <Button
             variant="outline"
-            className="h-8 w-8 p-0 border-2 border-primary text-primary hover:bg-primary hover:!text-accent-light"
+            className="h-8 w-8 p-0 border-2 border-primary text-primary hover:bg-primary hover:!text-accent"
             onClick={() => setPage(page - 1)}
             disabled={cantGoBack}
           >
@@ -83,7 +83,7 @@ export function TrucksPagination({ total, page, limit }: TrucksPaginationProps) 
           </Button>
           <Button
             variant="outline"
-            className="h-8 w-8 p-0 border-2 border-primary text-primary hover:bg-primary hover:!text-accent-light"
+            className="h-8 w-8 p-0 border-2 border-primary text-primary hover:bg-primary hover:!text-accent"
             onClick={() => setPage(page + 1)}
             disabled={cantGoForward}
           >
@@ -92,7 +92,7 @@ export function TrucksPagination({ total, page, limit }: TrucksPaginationProps) 
           </Button>
           <Button
             variant="outline"
-            className="hidden h-8 w-8 p-0 lg:flex border-2 border-primary text-primary hover:bg-primary hover:!text-accent-light"
+            className="hidden h-8 w-8 p-0 lg:flex border-2 border-primary text-primary hover:bg-primary hover:!text-accent"
             onClick={() => setPage(totalPages)}
             disabled={cantGoForward}
           >

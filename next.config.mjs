@@ -1,5 +1,51 @@
+import fs from "fs";
+import path from "path";
+
+const tenant = process.env.NEXT_PUBLIC_TENANT;
+const tenantFile = tenant
+  ? path.resolve("tenant-assets", tenant, "tenant.json")
+  : path.resolve("src/config/tenant-empty.json");
+
+const tenantLogoFile = tenant
+  ? path.resolve("tenant-assets", tenant, "branding", "logo.normalized.png")
+  : path.resolve("public/images/logos/logo_mexico.svg");
+
+const tenantFaviconFile = tenant
+  ? path.resolve("tenant-assets", tenant, "branding", "favicon.png")
+  : path.resolve("public/favicon.ico");
+
+if (tenant && !fs.existsSync(tenantFile)) {
+  throw new Error(`NEXT_PUBLIC_TENANT="${tenant}" but ${tenantFile} does not exist`);
+}
+
+if (tenant && !fs.existsSync(tenantLogoFile)) {
+  throw new Error(
+    `NEXT_PUBLIC_TENANT="${tenant}" but ${tenantLogoFile} does not exist. Run "npm run tenant:install -- ${tenant} --no-start" to generate it.`,
+  );
+}
+
+if (tenant && !fs.existsSync(tenantFaviconFile)) {
+  throw new Error(
+    `NEXT_PUBLIC_TENANT="${tenant}" but ${tenantFaviconFile} does not exist. Run "npm run tenant:install -- ${tenant} --no-start" to generate it.`,
+  );
+}
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  webpack: (config) => {
+    config.resolve.alias["@tenant"] = tenantFile;
+    config.resolve.alias["@tenant-logo"] = tenantLogoFile;
+    config.resolve.alias["@tenant-favicon"] = tenantFaviconFile;
+
+    if (config.cache && typeof config.cache === "object") {
+      config.cache.version = `${config.cache.version ?? ""}|tenant:${tenant ?? "default"}`;
+      config.cache.buildDependencies = {
+        ...config.cache.buildDependencies,
+        tenant: [tenantFile, tenantLogoFile, tenantFaviconFile],
+      };
+    }
+    return config;
+  },
   env: {
     BASE_URL: process.env.BASE_URL || "http://localhost:3000",
     BATCHES_RECORDS: process.env.BATCHES_RECORDS || 5000,

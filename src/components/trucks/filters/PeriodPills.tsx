@@ -12,7 +12,7 @@ import {
 } from "@/actions/trucks/periods";
 import { TrucksDateRangePicker } from "./TrucksDateRangePicker";
 import { MonthYearPicker } from "./MonthYearPicker";
-import whiteLabelConfig from "../../../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
 
 const ORDER: Exclude<PeriodPreset, "custom" | "thisMonth">[] = [
   "yesterday",
@@ -33,7 +33,7 @@ function pillClass(active: boolean) {
     "transition-colors whitespace-nowrap",
     active
       ? "bg-primary text-accent shadow-sm"
-      : "border-2 border-primary-light/40 text-primary hover:bg-primary-light/10",
+      : "border-2 border-primary/40 text-primary hover:bg-primary/10",
   );
 }
 
@@ -59,7 +59,7 @@ export function PeriodPills() {
             className={pillClass(active)}
             title={
               isToday
-                ? "Datos del día en curso pueden estar incompletos"
+                ? whiteLabelConfig.ui.trucksFilters.todayIncompleteWarning
                 : undefined
             }
           >
@@ -68,9 +68,9 @@ export function PeriodPills() {
               <AlertCircle
                 className={cn(
                   "h-3.5 w-3.5",
-                  active ? "text-accent-light" : "text-secondary/70",
+                  active ? "text-accent" : "text-secondary/70",
                 )}
-                aria-label="Datos del día pueden estar incompletos"
+                aria-label={whiteLabelConfig.ui.trucksFilters.todayIncompleteWarning}
               />
             )}
           </button>

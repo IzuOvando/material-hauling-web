@@ -16,7 +16,7 @@ import { ChartContainer, type ChartConfig } from "@/components/ui/chart";
 import { Sheet, SheetContent, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { useDashboardStore, periodToParams } from "@/store/dashboardStore";
 import type { TimeseriesPoint, DashboardPeriod } from "@/types/dashboard";
-import whiteLabelConfig from "../../../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
 
 const TRIPS_COLOR = "#22543d";
 const ACCENT      = "#bc955c";

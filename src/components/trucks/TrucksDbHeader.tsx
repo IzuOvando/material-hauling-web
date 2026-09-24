@@ -16,7 +16,7 @@ import { useFrenteStore } from "@/store";
 import { DeleteVouchersDialog, CloseCycleSheet } from "@/components/trucks";
 import AddFrenteDialog from "@/components/frentes/AddFrenteDialog";
 import EditFrenteDialog from "@/components/frentes/EditFrenteDialog";
-import whiteLabelConfig from "../../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
 
 interface TrucksDbHeaderProps {
   frente: string;
@@ -65,8 +65,8 @@ export function TrucksDbHeader({
           type="button"
           onClick={() => router.push("/db")}
           className="h-9 w-9 shrink-0 rounded-full border-2 border-accent/50 flex items-center justify-center text-accent hover:bg-accent hover:border-accent hover:text-white transition-all"
-          aria-label={`Volver a la selección de ${whiteLabelConfig.ui.general.pluralFrentes}`}
-          title={`Cambiar de ${whiteLabelConfig.ui.general.singularFrente}`}
+          aria-label={`${whiteLabelConfig.ui.general.backToSelectionPrefix} ${whiteLabelConfig.ui.general.pluralFrentes}`}
+          title={`${whiteLabelConfig.ui.general.changeItemPrefix} ${whiteLabelConfig.ui.general.singularFrente}`}
         >
           <ArrowLeft className="h-4 w-4" />
         </button>
@@ -87,9 +87,9 @@ export function TrucksDbHeader({
               <Button
                 variant="outline"
                 size="icon"
-                className="h-9 w-9 border-2 border-primary-light text-primary hover:bg-primary hover:!text-accent-light"
+                className="h-9 w-9 border-2 border-primary text-primary hover:bg-primary hover:!text-accent"
                 title={whiteLabelConfig.ui.users.table.headers.actions}
-                aria-label={`${whiteLabelConfig.ui.users.table.headers.actions} del ${whiteLabelConfig.ui.general.singularFrente}`}
+                aria-label={`${whiteLabelConfig.ui.users.table.headers.actions} ${whiteLabelConfig.ui.general.ofConnector} ${whiteLabelConfig.ui.general.singularFrente}`}
               >
                 <MoreVertical className="h-4 w-4" />
               </Button>

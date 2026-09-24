@@ -27,7 +27,7 @@ const FileTest = ({
           target="_blank"
           rel="noopener noreferrer"
         >
-          <Button className="bg-secondary hover:bg-secondary-light active:bg-secondary-dark mt-2 gap-2">
+          <Button className="bg-secondary hover:bg-secondary/90 active:bg-secondary/80 mt-2 gap-2">
             <Download className="w-4 h-4" />
             {downloadText}
           </Button>

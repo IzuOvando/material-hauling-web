@@ -17,7 +17,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useTrucksTable } from "@/hooks/useTrucksTable";
-import whiteLabelConfig from "../../../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
 
 interface TrucksColumnHeaderProps<TData, TValue>
   extends React.HTMLAttributes<HTMLDivElement> {
@@ -48,7 +48,7 @@ export function TrucksColumnHeader<TData, TValue>({
           <Button
             variant="ghost"
             size="sm"
-            className="-ml-3 h-8 hover:bg-primary-light hover:text-accent data-[state=open]:bg-primary-light font-bold"
+            className="-ml-3 h-8 hover:bg-primary hover:text-accent data-[state=open]:bg-primary font-bold"
           >
             <span>{title}</span>
             {column.getIsSorted() === "desc" ? (

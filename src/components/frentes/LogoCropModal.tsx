@@ -11,7 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import whiteLabelConfig from "../../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
 
 interface Props {
   imageSrc: string;
@@ -132,7 +132,7 @@ export default function LogoCropModal({ imageSrc, open, onConfirm, onClose }: Pr
                 size="sm"
                 onClick={handlePreview}
                 disabled={processing || !completedCrop}
-                className="bg-secondary hover:bg-secondary-dark text-white"
+                className="bg-secondary hover:bg-secondary/90 text-white"
               >
                 {processing ? (
                   <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
@@ -172,7 +172,7 @@ export default function LogoCropModal({ imageSrc, open, onConfirm, onClose }: Pr
               <Button
                 size="sm"
                 onClick={handleConfirm}
-                className="bg-primary hover:bg-primary-dark text-white"
+                className="bg-primary hover:bg-primary/90 text-white"
               >
                 <Check className="mr-1.5 h-3.5 w-3.5" />
                 Confirmar

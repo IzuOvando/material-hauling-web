@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import type { VoucherCamion } from "@prisma/client";
 import { cn } from "@/lib/utils";
 import { formatVoucherId } from "@/helpers/formatters/formatVoucherId";
-import whiteLabelConfig from "../../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
 import { formatVolume } from "@/helpers/formatters/numbers";
 import { getMaterialDescription } from "@/helpers/formatters/voucherMaterial";
 

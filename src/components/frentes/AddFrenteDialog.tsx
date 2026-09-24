@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "../ui/use-toast";
 import { useRouter } from "next/navigation";
-import whiteLabelConfig from "../../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
 
 interface AddFrenteDialogProps {
   open: boolean;
@@ -124,7 +124,7 @@ const AddFrenteDialog = ({
           <Button
             onClick={handleAction}
             disabled={loading}
-            className="bg-secondary hover:bg-secondary-dark text-white"
+            className="bg-secondary hover:bg-secondary/90 text-white"
           >
             {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             {loading ? whiteLabelConfig.ui.frentesManager.addDialog.creating : whiteLabelConfig.ui.frentesManager.addDialog.create}

@@ -8,7 +8,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { VoucherDetails } from "@/components/trucks/VoucherDetails";
-import whiteLabelConfig from "../../../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
 
 interface VoucherDetailSheetProps {
   voucher: VoucherCamion | null;
@@ -27,7 +27,7 @@ export function VoucherDetailSheet({
         side="right"
         className="w-full sm:max-w-md flex flex-col p-0 gap-0"
       >
-        <div className="px-6 pt-6 pb-4 border-b-2 border-primary-light/40">
+        <div className="px-6 pt-6 pb-4 border-b-2 border-primary/40">
           <SheetTitle className="text-2xl font-semibold text-primary">
             {whiteLabelConfig.ui.vouchers.detailSheetTitle}
           </SheetTitle>

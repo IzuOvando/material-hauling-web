@@ -11,7 +11,7 @@ import {
   CommandList,
   CommandSeparator,
 } from "@/components/ui/command";
-import whiteLabelConfig from "../../../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
 
 export interface TrucksFacetOption {
   value: string;
@@ -48,7 +48,7 @@ export function TrucksFacetedFilter({
   const clearAll = () => onChange([]);
 
   return (
-    <Command className="rounded-md border-2 border-primary-light/40">
+    <Command className="rounded-md border-2 border-primary/40">
       <CommandInput placeholder={placeholder} className="text-primary" />
       <CommandList className={maxHeight}>
         <CommandEmpty>{emptyMessage}</CommandEmpty>
@@ -65,7 +65,7 @@ export function TrucksFacetedFilter({
                   className={cn(
                     "mr-2 flex h-4 w-4 items-center justify-center rounded-sm border-2 border-primary",
                     isSelected
-                      ? "bg-primary-light text-accent"
+                      ? "bg-primary text-accent"
                       : "opacity-50 [&_svg]:invisible"
                   )}
                 >

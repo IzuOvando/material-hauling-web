@@ -17,7 +17,7 @@ import { cn } from "@/lib/utils";
 import { getAllFreentes } from "@/actions/frentes";
 import AddFrenteDialog from "./AddFrenteDialog";
 import EditFrenteDialog from "./EditFrenteDialog";
-import whiteLabelConfig from "../../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
 
 function groupByProject(frentes: Frente[]): Map<string, Frente[]> {
   const map = new Map<string, Frente[]>();
@@ -137,7 +137,7 @@ export function FrentesManagerSheet() {
 
           <div className="px-6 pb-3 shrink-0 flex flex-col gap-3">
             <Button
-              className="w-full flex items-center gap-2 bg-accent hover:bg-accent-dark text-white"
+              className="w-full flex items-center gap-2 bg-accent hover:bg-accent/90 text-white"
               onClick={() => setOpenAdd(true)}
             >
               <Plus className="h-4 w-4" />

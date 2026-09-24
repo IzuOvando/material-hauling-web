@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { DayPicker, type DateRange as RDPDateRange } from "react-day-picker";
-import { es } from "date-fns/locale";
+import { es, enUS } from "date-fns/locale";
 import { format, parse, isValid } from "date-fns";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import {
@@ -12,7 +12,12 @@ import {
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import whiteLabelConfig from "../../../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
+
+// date-fns doesn't expose a generic "look up locale by tag" helper, so this
+// maps the tenant's NEXT_PUBLIC_LOCALE to a supported date-fns locale,
+// defaulting to Spanish for anything unrecognized.
+const DAY_PICKER_LOCALE = whiteLabelConfig.app.locale === "en" ? enUS : es;
 
 interface TrucksDateRangePickerProps {
   value: { from: string; to: string } | null;
@@ -57,7 +62,7 @@ export function TrucksDateRangePicker({
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>{trigger}</PopoverTrigger>
       <PopoverContent
-        className="w-auto p-0 border-2 border-primary-light"
+        className="w-auto p-0 border-2 border-primary"
         align={align}
       >
         <div className="p-3">
@@ -66,7 +71,7 @@ export function TrucksDateRangePicker({
             numberOfMonths={2}
             selected={internal}
             onSelect={setInternal}
-            locale={es}
+            locale={DAY_PICKER_LOCALE}
             showOutsideDays
             classNames={{
               months: "flex flex-col sm:flex-row gap-4",
@@ -76,7 +81,7 @@ export function TrucksDateRangePicker({
                 "text-sm font-semibold text-primary capitalize",
               nav: "space-x-1 flex items-center",
               nav_button: cn(
-                "h-7 w-7 bg-transparent p-0 text-accent hover:text-accent-dark",
+                "h-7 w-7 bg-transparent p-0 text-accent hover:text-accent",
                 "flex items-center justify-center rounded-md hover:bg-accent/10"
               ),
               nav_button_previous: "absolute left-1",
@@ -105,7 +110,7 @@ export function TrucksDateRangePicker({
               // The range classes are prefixed with `aria-selected:` so they win the
               // tie and keep every number legible.
               day_selected:
-                "bg-primary text-accent hover:bg-primary-dark hover:text-accent focus:bg-primary focus:text-accent rounded-md",
+                "bg-primary text-accent hover:bg-primary/90 hover:text-accent focus:bg-primary focus:text-accent rounded-md",
               day_range_start:
                 "aria-selected:bg-primary aria-selected:text-accent rounded-l-md rounded-r-none",
               day_range_end:
@@ -123,7 +128,7 @@ export function TrucksDateRangePicker({
             }}
           />
         </div>
-        <div className="flex justify-end gap-2 border-t border-primary-light/40 p-3">
+        <div className="flex justify-end gap-2 border-t border-primary/40 p-3">
           <Button
             variant="outline"
             size="sm"
@@ -131,7 +136,7 @@ export function TrucksDateRangePicker({
               setInternal(undefined);
               setOpen(false);
             }}
-            className="border-2 border-primary-light text-primary"
+            className="border-2 border-primary text-primary"
           >
             {whiteLabelConfig.ui.trucksFilters.cancelButton}
           </Button>
@@ -139,7 +144,7 @@ export function TrucksDateRangePicker({
             size="sm"
             onClick={handleApply}
             disabled={!internal?.from || !internal?.to}
-            className="bg-accent hover:bg-accent-dark text-white"
+            className="bg-accent hover:bg-accent/90 text-white"
           >
             {whiteLabelConfig.ui.trucksFilters.applyButton}
           </Button>

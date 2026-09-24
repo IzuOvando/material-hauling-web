@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { FrenteReset } from "@/store";
-import whiteLabelConfig from "../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
 
 export default function NotFound() {
   return (
@@ -22,7 +22,7 @@ export default function NotFound() {
 
         <Link
           href="/"
-          className="mt-2 px-5 py-2 rounded-lg bg-accent hover:bg-accent-dark text-white text-sm font-semibold transition-colors duration-200"
+          className="mt-2 px-5 py-2 rounded-lg bg-accent hover:bg-accent/90 text-white text-sm font-semibold transition-colors duration-200"
         >
           {whiteLabelConfig.ui.errors.backHome}
         </Link>

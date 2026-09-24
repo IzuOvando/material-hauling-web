@@ -19,7 +19,7 @@ import { ResetPasswordDialog } from "@/components/users/ResetPasswordDialog";
 import { UsersToolbar } from "@/components/users/UsersToolbar";
 import { NewUserSheet } from "@/components/users/NewUserSheet";
 import type { UserRow } from "@/types";
-import whiteLabelConfig from "../../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
 
 interface UsersTableProps {
   frentes: string[];
@@ -282,7 +282,7 @@ export function UsersTable({ frentes }: UsersTableProps) {
                         size="icon"
                         title={(whiteLabelConfig as any)?.ui?.users?.actions?.manageFrentesTitle || "Gestionar frentes"}
                         onClick={() => openAction(user, "frentes")}
-                        className="h-8 w-8 hover:bg-accent/10 hover:text-accent-dark transition-colors"
+                        className="h-8 w-8 hover:bg-accent/10 hover:text-accent transition-colors"
                       >
                         <Link2 className="h-4 w-4" />
                       </Button>

@@ -12,7 +12,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { getMetadataCamionFromFile } from "@/utils/excel/excelValidatorQRs";
 import { getCamionesQRSVG } from "@/utils/excel/generatorDownloadQrs";
 import { cn } from "@/lib/utils";
-import whiteLabelConfig from "../../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
 
 const ACCEPT = {
   "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": [
@@ -127,7 +127,7 @@ export default function QRPage() {
             onClick={open}
             className={cn(
               "mt-1 px-5 py-2 rounded-lg text-sm font-semibold text-white",
-              "bg-secondary hover:bg-secondary-light active:bg-secondary-dark",
+              "bg-secondary hover:bg-secondary/90 active:bg-secondary/80",
               "transition-colors duration-150 shadow-sm",
             )}
           >

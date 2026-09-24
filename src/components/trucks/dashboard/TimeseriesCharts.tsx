@@ -17,7 +17,7 @@ import { BarChart2 } from "lucide-react";
 import { ChartContainer, type ChartConfig } from "@/components/ui/chart";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import type { TimeseriesPoint, DashboardPeriod } from "@/types/dashboard";
-import whiteLabelConfig from "../../../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
 
 const TRIPS_COLOR  = "#133223";
 const M3_COLOR     = "#bc955c";

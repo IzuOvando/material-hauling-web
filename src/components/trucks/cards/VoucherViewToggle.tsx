@@ -4,7 +4,7 @@ import { LayoutGrid, Table2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTrucksTable } from "@/hooks/useTrucksTable";
 import type { VoucherView } from "@/types/trucks-filters";
-import whiteLabelConfig from "../../../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
 
 const OPTIONS: { value: VoucherView; label: string; icon: typeof LayoutGrid }[] = [
   { value: "cards", label: whiteLabelConfig.ui.vouchers.viewCards, icon: LayoutGrid },
@@ -17,8 +17,8 @@ export function VoucherViewToggle() {
   return (
     <div
       role="radiogroup"
-      aria-label="Vista"
-      className="inline-flex items-center gap-1 p-1 rounded-full bg-primary-light/10 border border-primary-light/30"
+      aria-label={whiteLabelConfig.ui.vouchers.viewGroupLabel}
+      className="inline-flex items-center gap-1 p-1 rounded-full bg-primary/10 border border-primary/30"
     >
       {OPTIONS.map((opt) => {
         const active = view === opt.value;
@@ -35,7 +35,7 @@ export function VoucherViewToggle() {
               "transition-colors whitespace-nowrap",
               active
                 ? "bg-primary text-accent"
-                : "text-primary hover:bg-primary-light/15"
+                : "text-primary hover:bg-primary/15"
             )}
           >
             <Icon className="h-3.5 w-3.5" />

@@ -1,7 +1,7 @@
 // TODO SDN-141: Activar este tab cuando el módulo de Orígenes y Destinos esté rediseñado.
 // BreakdownChart acepta groupBy="origen" y groupBy="destino" sin modificaciones.
 // El endpoint /breakdown requiere añadir "origen" y "destino" a ALLOWED_GROUP_BY (SDN-149).
-import whiteLabelConfig from "../../../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
 
 export function OrigenDestinoTab() {
   return (

@@ -1,14 +1,23 @@
 "use client";
 
 import Image from "next/image";
+import tenantLogo from "@tenant-logo";
+import { cn } from "@/lib/utils";
 import { useTenantBranding } from "./TenantBrandingProvider";
 
-export function BrandMark() {
-  const { appName, logoUrl } = useTenantBranding();
+interface BrandMarkProps {
+  className?: string;
+}
 
-  if (!logoUrl) {
-    return <div className="text-white font-semibold tracking-wide">{appName}</div>;
-  }
+export function BrandMark({ className }: BrandMarkProps) {
+  const { appName } = useTenantBranding();
 
-  return <Image src={logoUrl} width={128} height={48} alt={`${appName} logo`} />;
+  return (
+    <Image
+      src={tenantLogo}
+      alt={`${appName} logo`}
+      unoptimized
+      className={cn("h-12 w-auto max-w-[200px] object-contain", className)}
+    />
+  );
 }

@@ -1,7 +1,7 @@
 import { promises as fs } from "fs";
 import { NextRequest, NextResponse } from "next/server";
 import path from "path";
-import whiteLabelConfig from "../../../../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
 
 export async function GET(req: NextRequest) {
   try {

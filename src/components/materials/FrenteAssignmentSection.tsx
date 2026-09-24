@@ -11,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import whiteLabelConfig from "../../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
 import { Plus, X, Loader2 } from "lucide-react";
 import {
   getFrenteMaterials,
@@ -116,7 +116,7 @@ export function FrenteAssignmentSection({
   };
 
   return (
-    <div className="border-2 border-primary-light rounded-lg overflow-hidden">
+    <div className="border-2 border-primary rounded-lg overflow-hidden">
       <div className="bg-primary px-4 py-3">
         <h2 className="text-lg font-semibold text-accent">
           {(whiteLabelConfig as any)?.ui?.materials?.title || "Materiales por Frente"}
@@ -163,7 +163,7 @@ export function FrenteAssignmentSection({
                     <Badge
                       key={material.id}
                       variant="outline"
-                      className="pl-3 pr-1 py-1 border-primary-light text-sm flex items-center gap-1"
+                      className="pl-3 pr-1 py-1 border-primary text-sm flex items-center gap-1"
                     >
                       {material.nombre}
                       <Button

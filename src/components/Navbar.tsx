@@ -2,7 +2,7 @@
 import { signOut } from "@/auth";
 import { LogoutButton } from "./common";
 import { BrandMark } from "./branding/BrandMark";
-import whiteLabelConfig from "../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
 
 const Navbar = ({ userName }: { userName: string | undefined }) => {
   return (

@@ -1,16 +1,12 @@
 "use client";
 
 import { createContext, useContext, type ReactNode } from "react";
-import whiteLabelConfig from "../../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
 
 type TenantBranding = {
   appName: string;
   shortName: string;
   tagline: string;
-  logoUrl: string;
-  primaryColor: string;
-  secondaryColor: string;
-  accentColor: string;
   welcomeLabel: string;
   theme: {
     primary: string;
@@ -23,10 +19,6 @@ const defaultBranding: TenantBranding = {
   appName: whiteLabelConfig.app.name,
   shortName: whiteLabelConfig.app.shortName,
   tagline: whiteLabelConfig.app.tagline,
-  logoUrl: whiteLabelConfig.branding.logoUrl,
-  primaryColor: whiteLabelConfig.branding.primaryColor,
-  secondaryColor: whiteLabelConfig.branding.secondaryColor,
-  accentColor: whiteLabelConfig.branding.accentColor,
   welcomeLabel: whiteLabelConfig.auth.welcomeLabel,
   theme: whiteLabelConfig.theme,
 };
@@ -42,22 +34,11 @@ export function TenantBrandingProvider({
 }) {
   const value = { ...defaultBranding, ...branding };
 
+  // The CSS variables themselves are set on the document root in RootLayout
+
   return (
     <TenantBrandingContext.Provider value={value}>
-      <div
-        style={
-          {
-            "--tenant-primary-color": value.primaryColor,
-            "--tenant-secondary-color": value.secondaryColor,
-            "--tenant-accent-color": value.accentColor,
-            "--primary-color": value.theme.primary,
-            "--secondary-color": value.theme.secondary,
-            "--accent-color": value.theme.accent,
-          } as React.CSSProperties
-        }
-      >
-        {children}
-      </div>
+      {children}
     </TenantBrandingContext.Provider>
   );
 }

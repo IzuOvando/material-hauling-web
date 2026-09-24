@@ -15,7 +15,7 @@ import { DrilldownSection } from "./DrilldownSection";
 import { CheckersTab } from "./CheckersTab";
 import { OrigenDestinoTab } from "./OrigenDestinoTab";
 import type { SummaryResponse, TimeseriesPoint, BreakdownItem } from "@/types/dashboard";
-import whiteLabelConfig from "../../../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
 
 interface DashboardShellProps {
   frente: string;
@@ -89,7 +89,7 @@ export function DashboardShell({ frente }: DashboardShellProps) {
       <div className="flex items-center gap-3">
         <button
           onClick={() => router.push("/dashboard")}
-          aria-label="Volver a proyectos"
+          aria-label={whiteLabelConfig.ui.general.backToDashboardLabel}
           className="h-8 w-8 rounded-full border-2 border-accent/50 flex items-center justify-center text-accent hover:bg-accent hover:border-accent hover:text-white transition-all shrink-0"
         >
           <ArrowLeft className="h-3.5 w-3.5" />

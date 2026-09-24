@@ -22,7 +22,7 @@ import {
 import { useToast } from "@/components/ui/use-toast";
 import { Loader2 } from "lucide-react";
 import type { UserRow } from "@/types";
-import whiteLabelConfig from "../../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
 
 interface EditUserDialogProps {
   user: UserRow;
@@ -207,7 +207,7 @@ export function EditUserDialog({
             <Button
               type="submit"
               disabled={isLoading}
-              className="bg-secondary hover:bg-secondary-light active:bg-secondary-dark"
+              className="bg-secondary hover:bg-secondary/90 active:bg-secondary/80"
             >
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               {isLoading ? (whiteLabelConfig as any)?.ui?.general?.saving || "Guardando..." : (whiteLabelConfig as any)?.ui?.users?.editDialog?.saveChanges || "Guardar cambios"}

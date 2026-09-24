@@ -18,7 +18,7 @@ import { formatIsoDate } from "@/helpers/formatters/datetime";
 import { parseVoucherFolios } from "@/utils/normalizeVoucherFolio";
 import { useToast } from "@/components/ui/use-toast";
 import CONFIG from "@/config";
-import whiteLabelConfig from "../../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
 import {
   CheckCircle2,
   XCircle,
@@ -241,7 +241,7 @@ const CloseCycleSheet = ({ open, setOpen, onSuccess }: CloseCycleSheetProps) => 
         side="right"
         className="sm:max-w-2xl w-full flex flex-col p-0 gap-0"
       >
-        <SheetHeader className="px-6 pt-6 pb-4 border-b border-primary-light shrink-0">
+        <SheetHeader className="px-6 pt-6 pb-4 border-b border-primary shrink-0">
           <SheetTitle className="text-accent">
             Cierre Manual de Ciclos
           </SheetTitle>
@@ -338,7 +338,7 @@ const InputView = ({
       )}
 
       <Button
-        className="shrink-0 bg-accent hover:bg-accent-dark active:bg-accent-dark text-white"
+        className="shrink-0 bg-accent hover:bg-accent/90 active:bg-accent/80 text-white"
         disabled={!hasValid}
         onClick={onSearch}
       >
@@ -376,7 +376,7 @@ const PreviewView = ({
   return (
     <div className="flex flex-col flex-1 overflow-hidden">
       {/* Summary badges */}
-      <div className="px-6 py-3 border-b border-primary-light flex flex-wrap gap-2 shrink-0">
+      <div className="px-6 py-3 border-b border-primary flex flex-wrap gap-2 shrink-0">
         <Badge className="bg-green-100 text-green-800 border-green-400 hover:bg-green-100">
           <CheckCircle2 className="mr-1 h-3 w-3" />
           {found.length} listo{found.length !== 1 ? "s" : ""}
@@ -541,13 +541,13 @@ const PreviewView = ({
         </div>
       </ScrollArea>
 
-      <div className="shrink-0 px-6 py-4 border-t border-primary-light flex gap-3">
+      <div className="shrink-0 px-6 py-4 border-t border-primary flex gap-3">
         <Button variant="outline" className="flex-1 border-primary/20 text-primary" onClick={onBack}>
           <ArrowLeft className="mr-2 h-4 w-4" />
           Volver
         </Button>
         <Button
-          className="flex-1 bg-accent hover:bg-accent-dark active:bg-accent-dark text-white"
+          className="flex-1 bg-accent hover:bg-accent/90 active:bg-accent/80 text-white"
           disabled={found.length === 0 || hasValidationError}
           onClick={onClose}
         >
@@ -631,9 +631,9 @@ const ResultView = ({
         </div>
       </ScrollArea>
 
-      <div className="shrink-0 px-6 py-4 border-t border-primary-light">
+      <div className="shrink-0 px-6 py-4 border-t border-primary">
         <Button
-          className="w-full bg-accent hover:bg-accent-dark active:bg-accent-dark text-white"
+          className="w-full bg-accent hover:bg-accent/90 active:bg-accent/80 text-white"
           onClick={onFinish}
         >
           {allOk ? "Listo" : "Cerrar"}

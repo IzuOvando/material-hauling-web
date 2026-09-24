@@ -1,7 +1,7 @@
 "use client";
 
 import { Search, UserPlus } from "lucide-react";
-import whiteLabelConfig from "../../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -74,7 +74,7 @@ export function UsersToolbar({
 
       <Button
         onClick={onNewUser}
-        className="bg-secondary hover:bg-secondary-light active:bg-secondary-dark text-white gap-2 transition-all duration-200"
+        className="bg-secondary hover:bg-secondary/90 active:bg-secondary/80 text-white gap-2 transition-all duration-200"
       >
         <UserPlus className="h-4 w-4" />
         {(whiteLabelConfig as any)?.ui?.users?.toolbar?.newUserButton || 'Nuevo Usuario'}

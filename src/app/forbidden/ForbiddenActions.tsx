@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { LogoutButton } from "@/components/common";
 import { useUser } from "@/contexts/UserContext";
 import { logout } from "@/actions/logout";
-import whiteLabelConfig from "../../../white-label.config";
+import whiteLabelConfig from "#/white-label.config";
 
 export function ForbiddenActions() {
   const { user } = useUser();
@@ -20,7 +20,7 @@ export function ForbiddenActions() {
   }
 
   return (
-    <Button asChild className="bg-secondary hover:bg-secondary-light">
+    <Button asChild className="bg-secondary hover:bg-secondary/90">
       <Link href="/">{whiteLabelConfig.ui.errors.backHome}</Link>
     </Button>
   );
