@@ -139,11 +139,28 @@ jobs:
           PROJECT_ID=$(cat clients/${{ matrix.client }}/web-project-id)
           echo "id=$PROJECT_ID" >> $GITHUB_OUTPUT
 
+      - name: Ensure framework is nextjs — ${{ matrix.client }}
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+        run: |
+          PROJECT_ID="${{ steps.project.outputs.id }}"
+          RESPONSE=$(curl -s -X PATCH \
+            "https://api.vercel.com/v9/projects/$PROJECT_ID?teamId=$VERCEL_ORG_ID" \
+            -H "Authorization: Bearer $VERCEL_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d '{"framework":"nextjs"}')
+          FRAMEWORK=$(echo "$RESPONSE" | node -e "let d='';process.stdin.on('data',c=>d+=c);process.stdin.on('end',()=>{const j=JSON.parse(d);if(j.error){console.error('API error:',j.error.message);process.exit(1);}console.log(j.framework);})")
+          echo "Project $PROJECT_ID framework: $FRAMEWORK"
+
       - name: Deploy to Vercel production — ${{ matrix.client }}
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ steps.project.outputs.id }}
         run: |
+          # Remove .git so Vercel treats this as a local deploy, not a repo-linked one.
+          # Without this, vercel deploy would try to resolve the connected git integration
+          # and ignore the VERCEL_PROJECT_ID we set above.
           rm -rf .git
           npx vercel deploy --prod --token "$VERCEL_TOKEN" --yes
