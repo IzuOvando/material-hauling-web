@@ -61,3 +61,4 @@ graphify-out/
 
 # Local scratch files
 ejemplar_web.txt
+.env*

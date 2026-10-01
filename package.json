@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "dev:network": "next dev -H 0.0.0.0",
+    "prebuild": "[ -n \"$NEXT_PUBLIC_TENANT\" ] && npm run tenant:install -- \"$NEXT_PUBLIC_TENANT\" --no-start || true",
     "build": "next build",
     "start": "next start",
     "start:network": "next start -H 0.0.0.0",
