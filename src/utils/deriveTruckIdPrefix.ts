@@ -1,7 +1,7 @@
 /**
  * Derives a 3-character truck ID prefix from a client/app name.
  *
- * - 3+ words  → initials of the first 3 words (e.g. "SEDENA De Nacional" → "SDN")
+ * - 3+ words  → initials of the first 3 words (e.g. "Constructora Veloz SA" → "CVS")
  * - 1-2 words → first 3 characters of the name, uppercased
  * - Result is always padded/truncated to exactly 3 uppercase chars.
  *

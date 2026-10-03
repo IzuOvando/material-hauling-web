@@ -46,7 +46,6 @@ tenant-assets/*/branding/favicon.png
 tenant-assets/*
 !tenant-assets/README.md
 !tenant-assets/demo/
-!tenant-assets/sedena/
 !tenant-assets/turist-trucks/
 
 # Databases
