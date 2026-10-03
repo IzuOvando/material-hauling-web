@@ -1,6 +1,7 @@
 import { InvalidDataError, ValidationError } from "@/errors";
 import generateQRString from "./generateQRString";
 import DataCompressor from "./dataCompressor";
+import whiteLabelConfig from "#/white-label.config";
 
 class MetaDataCamiones {
   private placas: string | null = null;
@@ -87,7 +88,7 @@ class MetaDataCamiones {
     if (!frente || !frenteRegex.test(frente)) {
       throw new ValidationError(
         "frente",
-        "frenteNombre must match format {SIGLAS}-F{identifier} (e.g. TPCDMXP-F1, TPCDMXP-F1T2, TPQI-FG)"
+        "frenteNombre must match format {SIGLAS}-F{identifier} (e.g. PROJ-F1, PROJ-F1T2, PROJ-FG)"
       );
     }
     this.frenteNombre = frente;
@@ -118,7 +119,8 @@ class MetaDataCamiones {
 
   private setIdcamion(): void {
     if (this.frenteNombre && this.noEconomico) {
-      this.idCamion = `SDN-${this.frenteNombre}-${this.noEconomico}`;
+      const prefix = whiteLabelConfig.app.truckIdPrefix;
+      this.idCamion = `${prefix}-${this.frenteNombre}-${this.noEconomico}`;
     } else {
       throw new InvalidDataError(
         "Frente y No Economico deben estar establecidos para generar el ID del camión."

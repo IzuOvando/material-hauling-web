@@ -19,7 +19,7 @@ export const validateFrenteNombre = (frente: string) => {
   if (!frente || !frenteRegex.test(frente)) {
     throw new ValidationError(
       "frente",
-      "frenteNombre must match format {SIGLAS}-F{identifier} (e.g. TPCDMXP-F1, TPCDMXP-F1T2, TPQI-FG)"
+      "frenteNombre must match format {SIGLAS}-F{identifier} (e.g. PROJ-F1, PROJ-F1T2, PROJ-FG)"
     );
   }
 };

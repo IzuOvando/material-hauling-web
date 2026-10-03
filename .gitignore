@@ -46,6 +46,7 @@ tenant-assets/*/branding/favicon.png
 tenant-assets/*
 !tenant-assets/README.md
 !tenant-assets/demo/
+!tenant-assets/sedena/
 !tenant-assets/turist-trucks/
 
 # Databases
@@ -55,6 +56,9 @@ tenant-assets/*
 
 # Claude Local Settings
 /.claude/*.local.*
+/.claude/skills/
+/.agents/skills/
+skills-lock.json
 graphify-out/
 .graphify_detect.json
 .graphify_python

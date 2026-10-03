@@ -4,10 +4,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a Next.js 14 web application for SEDENA that manages and prints tickets for various construction and logistics operations using thermal printers. The system handles multiple ticket types (Gasolina, Acarreos, Concreto, Asfalto, VoucherCamion) and provides both web and mobile API interfaces.
+This is a Next.js 14 white-label web application (multi-tenant) for managing and printing tickets for construction and logistics operations using thermal printers. The system handles multiple ticket types (Gasolina, Acarreos, Concreto, Asfalto, VoucherCamion) and provides both web and mobile API interfaces. Each client/tenant gets its own branding, database, and Vercel deployment via the white-label config system (`white-label.config.ts` + `tenant-assets/<client>/tenant.json`).
 
 > **Architectural note — Frentes vs Projects:**
-> The current data model is organized around **Frentes** (work fronts), where each frente is the primary entity for grouping tickets, users, and dashboard data. The concept of "Project" is currently derived by parsing the frente name (e.g. `TPCDMXP-F1` → project `TPCDMXP`). A `displayName` field on `Frente` stores the full human-readable project name and is shared across all frentes with the same prefix.
+> The current data model is organized around **Frentes** (work fronts), where each frente is the primary entity for grouping tickets, users, and dashboard data. The concept of "Project" is currently derived by parsing the frente name (e.g. `PROJ-F1` → project `PROJ`). A `displayName` field on `Frente` stores the full human-readable project name and is shared across all frentes with the same prefix.
 >
 > **Future direction:** the team plans to introduce a first-class `Project` entity that frentes belong to, making the project/frente hierarchy explicit in the schema. Until then, avoid hardcoding project-level logic that assumes frente names will always follow the current naming convention, and prefer the `displayName` field for any user-facing project labels. Any new feature that touches project grouping should be designed to accommodate this future split.
 

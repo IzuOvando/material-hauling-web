@@ -2,12 +2,13 @@ import tenantOverrides from "@tenant";
 
 const defaultConfig = {
   app: {
-    name: "SEDENA: Trucks",
-    shortName: "SEDENA",
-    tagline: "Sistema de Acarreos SEDENA",
-    metadataTitle: "SEDENA: Trucks | Dashboard",
-    metadataDescription: "Sistema de Acarreos SEDENA",
+    name: "Material Hauling",
+    shortName: "Hauling",
+    tagline: "Sistema de Control de Acarreos",
+    metadataTitle: "Material Hauling | Dashboard",
+    metadataDescription: "Sistema de Control de Acarreos",
     locale: "es",
+    truckIdPrefix: "APP",
   },
   theme: {
     primary: "#133223",
@@ -349,7 +350,7 @@ const defaultConfig = {
         successDescription: "El usuario {username} fue creado {suffix}",
         successButton: "Registrar otro usuario",
         roleUser: "Checador",
-        roleAdmin: "IRO",
+        roleAdmin: "Administrador",
       },
       stepper: {
         userDetails: "Datos del usuario",
@@ -435,7 +436,7 @@ const defaultConfig = {
         allRoles: "Todos los roles",
         allFrentes: "Todos los frentes",
         roleUser: "Checador",
-        roleAdmin: "IRO",
+        roleAdmin: "Administrador",
     },
     login: {
       signingIn: "Signing in...",

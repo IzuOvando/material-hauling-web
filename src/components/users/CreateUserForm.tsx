@@ -319,7 +319,7 @@ export function CreateUserForm({ frentes }: CreateUserFormProps) {
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="user">{(whiteLabelConfig as any)?.ui?.users?.create?.roleUser || "Checador"}</SelectItem>
-                          <SelectItem value="admin">{(whiteLabelConfig as any)?.ui?.users?.create?.roleAdmin || "IRO"}</SelectItem>
+                          <SelectItem value="admin">{(whiteLabelConfig as any)?.ui?.users?.create?.roleAdmin || "Administrador"}</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>

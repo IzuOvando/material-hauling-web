@@ -49,8 +49,8 @@ docker-compose up
 Then for be able to use the instances you must set the following variables in your `.env`:
 ```dosini
 # * DATABASE
-DATABASE_URL=postgresql://postgres:N0M3L0S3@localhost:5432/sedena_tickets
-POSTGRES_URL_NON_POOLING=postgresql://postgres:N0M3L0S3@localhost:5432/sedena_tickets
+DATABASE_URL=postgresql://postgres:N0M3L0S3@localhost:5432/material_hauling_db
+POSTGRES_URL_NON_POOLING=postgresql://postgres:N0M3L0S3@localhost:5432/material_hauling_db
 
 # * VERCEL KV / REDIS 
 KV_REST_API_URL=http://localhost:8079

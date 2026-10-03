@@ -237,7 +237,7 @@ async function main() {
         checkerNo,
         createdByUsername: CREATED_BY,
         frenteNombre: TARGET_FRENTE,
-        idCamion: `SDN-${TARGET_FRENTE}-T${randInt(1, 25)}`,
+        idCamion: `APP-${TARGET_FRENTE}-T${randInt(1, 25)}`,
         createdAt: dt,
       };
 

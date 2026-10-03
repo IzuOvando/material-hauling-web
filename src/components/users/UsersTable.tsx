@@ -29,7 +29,7 @@ function RolBadge({ rol }: { rol: string }) {
   if (rol === "admin") {
     return (
       <Badge className="bg-amber-100 text-amber-800 border border-amber-200 hover:bg-amber-100 font-medium text-xs">
-        IRO
+        {whiteLabelConfig.ui.users.create.roleAdmin}
       </Badge>
     );
   }

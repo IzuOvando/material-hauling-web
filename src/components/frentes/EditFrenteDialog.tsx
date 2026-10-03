@@ -81,7 +81,7 @@ const EditFrenteDialog = ({
                     <Input
                       value={displayName}
                       onChange={(e) => setDisplayName(e.target.value)}
-                      placeholder={(whiteLabelConfig as any)?.ui?.frentesManager?.examplePlaceholder || 'Ej. Tren de Pasajeros CDMX-Puebla'}
+                      placeholder={(whiteLabelConfig as any)?.ui?.frentesManager?.examplePlaceholder || 'Ej. Proyecto Carretero Norte'}
                       className="flex-1"
                     />
                     <Button

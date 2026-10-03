@@ -110,8 +110,8 @@ jobs:
   # 3. Per-client production deploy — matrix: one job per client in parallel
   #
   # Each client must have its Vercel project ID in clients/<client>/web-project-id.
-  # Each Vercel project is configured with NEXT_PUBLIC_TENANT=<client> (except sedena
-  # which uses the default config with no tenant override).
+  # Each Vercel project is configured with NEXT_PUBLIC_TENANT=<client>.
+  # Clients without a tenant override use the generic default config.
   # ─────────────────────────────────────────────────────────────────────────
   deploy:
     name: Deploy production — ${{ matrix.client }}

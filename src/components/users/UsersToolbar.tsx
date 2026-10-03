@@ -52,7 +52,7 @@ export function UsersToolbar({
         <SelectContent>
           <SelectItem value="all">{(whiteLabelConfig as any)?.ui?.users?.toolbar?.allRoles || "Todos los roles"}</SelectItem>
           <SelectItem value="user">{(whiteLabelConfig as any)?.ui?.users?.toolbar?.roleUser || "Checador"}</SelectItem>
-          <SelectItem value="admin">{(whiteLabelConfig as any)?.ui?.users?.toolbar?.roleAdmin || "IRO"}</SelectItem>
+          <SelectItem value="admin">{(whiteLabelConfig as any)?.ui?.users?.toolbar?.roleAdmin || "Administrador"}</SelectItem>
         </SelectContent>
       </Select>
 
