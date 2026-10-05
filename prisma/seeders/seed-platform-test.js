@@ -44,15 +44,12 @@ function normalizeMaterial(value) {
 }
 
 async function main() {
-  console.log("Seeding platform test data...\n");
-
   // 1 — Frente
   await prisma.frente.upsert({
     where: { nombre: TEST_FRENTE },
     update: {},
     create: { nombre: TEST_FRENTE, frenteKey: "FRENTE-TEST-01", displayName: "Frente de prueba 01" },
   });
-  console.log(`✓ Frente: ${TEST_FRENTE}`);
 
   // 2 — Users
   for (const user of USERS) {
@@ -61,7 +58,6 @@ async function main() {
       update: {},
       create: user,
     });
-    console.log(`✓ User: ${user.username} (${user.rol}) — password: Admin123`);
   }
 
   // 3 — Link users to frente
@@ -72,7 +68,6 @@ async function main() {
       create: { userId: user.username, frenteNombre: TEST_FRENTE },
     });
   }
-  console.log(`✓ Users linked to ${TEST_FRENTE}`);
 
   // 4 — Global material catalog
   for (const nombre of MATERIALS) {
@@ -82,7 +77,6 @@ async function main() {
       create: { nombre, normalizedNombre: normalizeMaterial(nombre) },
     });
   }
-  console.log(`✓ ${MATERIALS.length} materials`);
 
   // 5 — Link materials to frente (look up by nombre to get the UUID id)
   const materialRecords = await prisma.material.findMany({ where: { nombre: { in: MATERIALS } } });
@@ -93,11 +87,6 @@ async function main() {
       create: { materialId: mat.id, frenteNombre: TEST_FRENTE },
     });
   }
-  console.log(`✓ ${materialRecords.length} materials linked to ${TEST_FRENTE}`);
-
-  console.log("\nDone. Test credentials:");
-  console.log("  username: admin      password: Admin123  role: owner");
-  console.log("  username: supervisor  password: Admin123  role: general");
 }
 
 main()
