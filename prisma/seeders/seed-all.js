@@ -2,8 +2,6 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log("Inserting data into the database...");
-
   const users = [
     {
       username: "Ruben35",
@@ -28,8 +26,6 @@ async function main() {
       }
     }
   }
-
-  console.log("Succesfully inserted users into the database!");
 
   // Seed global material catalog
   const DEFAULT_MATERIALS = [
@@ -58,7 +54,6 @@ async function main() {
     });
   }
 
-  console.log("Succesfully inserted materials into the database!");
 }
 
 main()
