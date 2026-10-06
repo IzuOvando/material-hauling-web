@@ -66,7 +66,7 @@ const EditFrenteDialog = ({
           <DialogHeader className="px-6 pt-6 pb-4 shrink-0">
             <DialogTitle>{(whiteLabelConfig as any)?.ui?.frentesManager?.editTitle || 'Editar Frente'}</DialogTitle>
             <DialogDescription>
-              {(whiteLabelConfig as any)?.ui?.frentesManager?.editDescription || 'Edita el nombre del proyecto o el logo del '}<b>Frente {frente.nombre}</b>.
+              {(whiteLabelConfig as any)?.ui?.frentesManager?.editDescription || 'Edita el nombre del proyecto o el logo del '} <b>Frente {frente.nombre}</b>.
             </DialogDescription>
           </DialogHeader>
 

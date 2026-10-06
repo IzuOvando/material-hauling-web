@@ -15,11 +15,11 @@ export class ValidationError extends Error {
 }
 
 export const validateFrenteNombre = (frente: string) => {
-  const frenteRegex = /^[A-Z0-9]+-F([0-9]+T?[0-9]*|G)$/;
+  const frenteRegex = /^[A-Z0-9]+-[A-Z0-9]+$/;
   if (!frente || !frenteRegex.test(frente)) {
     throw new ValidationError(
       "frente",
-      "frenteNombre must match format {SIGLAS}-F{identifier} (e.g. PROJ-F1, PROJ-F1T2, PROJ-FG)"
+      "frenteNombre must match format {PROJECT}-{ID} (e.g. PROJ-F1, PROJ-A1, PROJ-01)"
     );
   }
 };

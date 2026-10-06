@@ -25,7 +25,7 @@ describe('POST /mobile/auth', () => {
     const jsonResponse = await response.json();
 
     expect(response.status).toBe(400);
-    expect(jsonResponse.message).toBe('Username and password are required');
+    expect(jsonResponse.message).toBe('Se requiere un nombre de usuario y una contraseña');
   });
 
   it('should return 401 if user is not found or invalid password', async () => {
@@ -41,7 +41,7 @@ describe('POST /mobile/auth', () => {
 
     expect(validateUser).toHaveBeenCalledWith('testuser', 'wrongpassword');
     expect(response.status).toBe(401);
-    expect(jsonResponse.message).toBe('Invalid username/password');
+    expect(jsonResponse.message).toBe('Nombre de usuario o contraseña inválidos');
   });
 
   it('should return 201 and a salt and hash if validation is successful', async () => {
@@ -65,7 +65,7 @@ describe('POST /mobile/auth', () => {
     const jsonResponse = await response.json();
 
     expect(validateUser).toHaveBeenCalledWith('testuser', 'validpassword');
-    expect(generateSaltAndHash).toHaveBeenCalledWith('testuser:hashedpassword');
+    expect(generateSaltAndHash).toHaveBeenCalledWith('testuser:validpassword');
     expect(response.status).toBe(201);
     expect(jsonResponse.authorization).toEqual({
       salt: 'randomsalt',
@@ -85,6 +85,6 @@ describe('POST /mobile/auth', () => {
     const jsonResponse = await response.json();
 
     expect(response.status).toBe(500);
-    expect(jsonResponse.message).toBe('Something went wrong');
+    expect(jsonResponse.message).toBe('Algo salió mal');
   });
 });
