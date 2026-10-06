@@ -5,8 +5,11 @@ on:
     types: [published]
 
 jobs:
-  release:
-    name: Quality Check, Migrate Gate & Deploy to Production
+  # ─────────────────────────────────────────────────────────────────────────
+  # 1. Quality gate — lint, type-check, migration gate, version bump (once)
+  # ─────────────────────────────────────────────────────────────────────────
+  quality:
+    name: Quality check & migration gate
     runs-on: ubuntu-latest
     if: ${{ !github.event.release.prerelease }}
 
@@ -14,14 +17,12 @@ jobs:
       contents: write
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0
 
-      - name: Setup Node.js 20
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
@@ -87,12 +88,79 @@ jobs:
           git commit -m "chore: 🔖 bump version to ${{ steps.extract_version.outputs.version }} [skip ci]"
           git push origin HEAD:main
 
-      - name: Deploy to Vercel production
+  # ─────────────────────────────────────────────────────────────────────────
+  # 2. Load client registry — reads clients/_registry.json for the matrix
+  # ─────────────────────────────────────────────────────────────────────────
+  load-clients:
+    name: Load client registry
+    runs-on: ubuntu-latest
+    needs: quality
+    outputs:
+      clients: ${{ steps.registry.outputs.clients }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Read registry
+        id: registry
+        run: |
+          CLIENTS=$(cat clients/_registry.json)
+          echo "clients=$CLIENTS" >> $GITHUB_OUTPUT
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # 3. Per-client production deploy — matrix: one job per client in parallel
+  #
+  # Each client must have its Vercel project ID in clients/<client>/web-project-id.
+  # Each Vercel project is configured with NEXT_PUBLIC_TENANT=<client>.
+  # Clients without a tenant override use the generic default config.
+  # ─────────────────────────────────────────────────────────────────────────
+  deploy:
+    name: Deploy production — ${{ matrix.client }}
+    runs-on: ubuntu-latest
+    needs: load-clients
+    strategy:
+      matrix:
+        client: ${{ fromJson(needs.load-clients.outputs.clients) }}
+      fail-fast: false
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Read Vercel project ID for ${{ matrix.client }}
+        id: project
+        run: |
+          PROJECT_ID=$(cat clients/${{ matrix.client }}/web-project-id)
+          echo "id=$PROJECT_ID" >> $GITHUB_OUTPUT
+
+      - name: Ensure framework is nextjs — ${{ matrix.client }}
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-
         run: |
+          PROJECT_ID="${{ steps.project.outputs.id }}"
+          RESPONSE=$(curl -s -X PATCH \
+            "https://api.vercel.com/v9/projects/$PROJECT_ID?teamId=$VERCEL_ORG_ID" \
+            -H "Authorization: Bearer $VERCEL_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d '{"framework":"nextjs"}')
+          FRAMEWORK=$(echo "$RESPONSE" | node -e "let d='';process.stdin.on('data',c=>d+=c);process.stdin.on('end',()=>{const j=JSON.parse(d);if(j.error){console.error('API error:',j.error.message);process.exit(1);}console.log(j.framework);})")
+          echo "Project $PROJECT_ID framework: $FRAMEWORK"
+
+      - name: Deploy to Vercel production — ${{ matrix.client }}
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ steps.project.outputs.id }}
+        run: |
+          # Remove .git so Vercel treats this as a local deploy, not a repo-linked one.
+          # Without this, vercel deploy would try to resolve the connected git integration
+          # and ignore the VERCEL_PROJECT_ID we set above.
           rm -rf .git
           npx vercel deploy --prod --token "$VERCEL_TOKEN" --yes

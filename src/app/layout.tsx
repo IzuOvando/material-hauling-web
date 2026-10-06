@@ -1,20 +1,19 @@
 import type { Metadata } from "next";
 import { Montserrat } from "next/font/google";
-import Script from "next/script";
 import "./globals.css";
 import { cn } from "@/lib/utils";
-import { Toaster } from "@/components/ui/toaster";
-import Navbar from "@/components/Navbar";
-import { EnterprisesImagesInitializer } from "@/contexts";
-import { auth } from "@/auth";
-import { UserProvider } from '@/contexts/UserContext';
 import { getAppUser } from "@/auth/auth.user";
+import { AppShell } from "@/components/app-shell";
+import { getThemeCssVars } from "@/lib/theme";
+import tenantFavicon from "@tenant-favicon";
+import whiteLabelConfig from "#/white-label.config";
 
 const montserrat = Montserrat({ subsets: ["latin"], variable: "--montserrat" });
 
 export const metadata: Metadata = {
-  title: "SEDENA: Trucks",
-  description: "Sistema de Acarreos SEDENA",
+  title: whiteLabelConfig.app.metadataTitle,
+  description: whiteLabelConfig.app.metadataDescription,
+  icons: { icon: tenantFavicon.src },
 };
 
 export default async function RootLayout({
@@ -25,7 +24,11 @@ export default async function RootLayout({
   const user = await getAppUser();
 
   return (
-    <html lang="es" suppressHydrationWarning>
+    <html
+      lang={whiteLabelConfig.app.locale}
+      suppressHydrationWarning
+      style={getThemeCssVars(whiteLabelConfig)}
+    >
       <body
         className={cn(
           "min-h-screen bg-background font-sans antialiased",
@@ -33,13 +36,7 @@ export default async function RootLayout({
           montserrat.className
         )}
       >
-        <UserProvider user={user}>
-<Navbar userName={user?.name} />
-          {children}
-          <Toaster />
-          <EnterprisesImagesInitializer />
-          <Script src="/lib/epos-2.27.0.js" strategy="beforeInteractive" />
-        </UserProvider>
+        <AppShell user={user}>{children}</AppShell>
       </body>
     </html>
   );

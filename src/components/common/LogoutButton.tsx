@@ -13,7 +13,7 @@ export default function LogoutButton({ className }: { className?: string }) {
       disabled={pending}
       className={
         className ??
-        "bg-accent hover:bg-accent-light active:bg-accent-dark"
+        "bg-accent hover:bg-accent/90 active:bg-accent/80"
       }
     >
       {pending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}

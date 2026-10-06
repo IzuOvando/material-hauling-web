@@ -19,6 +19,7 @@ import type {
 } from "@/types/trucks-filters";
 import { TrucksFacetedFilter } from "./TrucksFacetedFilter";
 import { cn } from "@/lib/utils";
+import whiteLabelConfig from "#/white-label.config";
 
 interface AdvancedFiltersDrawerProps {
   frente: string;
@@ -114,9 +115,9 @@ export function AdvancedFiltersDrawer({
         <Button
           variant="outline"
           className={cn(
-            "h-9 gap-2 border-2 border-primary-light text-primary",
-            "hover:bg-primary hover:!text-accent-light",
-            activeCount > 0 && "bg-primary text-accent hover:bg-primary-dark"
+            "h-9 gap-2 border-2 border-primary text-primary",
+            "hover:bg-primary hover:!text-accent",
+            activeCount > 0 && "bg-primary text-accent hover:bg-primary/90"
           )}
         >
           <SlidersHorizontal className="h-4 w-4" />
@@ -132,17 +133,17 @@ export function AdvancedFiltersDrawer({
         side="right"
         className="w-full sm:max-w-md flex flex-col p-0 gap-0"
       >
-        <div className="px-6 pt-6 pb-4 border-b-2 border-primary-light/40">
+        <div className="px-6 pt-6 pb-4 border-b-2 border-primary/40">
           <SheetTitle className="text-2xl font-semibold text-primary">
-            Filtros avanzados
+            {whiteLabelConfig.ui.filters.advancedTitle}
           </SheetTitle>
           <SheetDescription className="text-sm text-primary/60 mt-1">
-            Refina la lista con criterios adicionales.
+            {whiteLabelConfig.ui.filters.advancedDescription}
           </SheetDescription>
         </div>
 
         <div className="flex-1 overflow-y-auto px-6 py-4 space-y-6">
-          <DrawerSection title="Material">
+          <DrawerSection title={whiteLabelConfig.ui.filters.material}>
             {loadingFacets && !facets ? (
               <SkeletonList />
             ) : (
@@ -150,12 +151,12 @@ export function AdvancedFiltersDrawer({
                 options={facets?.material ?? []}
                 selected={buffer.material}
                 onChange={(material) => setBuffer((b) => ({ ...b, material }))}
-                placeholder="Buscar material…"
+                placeholder={whiteLabelConfig.ui.filters.materialSearch}
               />
             )}
           </DrawerSection>
 
-          <DrawerSection title="Checador de salida">
+          <DrawerSection title={whiteLabelConfig.ui.filters.departureChecker}>
             {loadingFacets && !facets ? (
               <SkeletonList />
             ) : (
@@ -165,12 +166,12 @@ export function AdvancedFiltersDrawer({
                 onChange={(checkerName) =>
                   setBuffer((b) => ({ ...b, checkerName }))
                 }
-                placeholder="Buscar checador…"
+                placeholder={whiteLabelConfig.ui.filters.checkerSearch}
               />
             )}
           </DrawerSection>
 
-          <DrawerSection title="Checador de llegada">
+          <DrawerSection title={whiteLabelConfig.ui.filters.arrivalChecker}>
             {loadingFacets && !facets ? (
               <SkeletonList />
             ) : (
@@ -180,13 +181,13 @@ export function AdvancedFiltersDrawer({
                 onChange={(arrivalCheckerName) =>
                   setBuffer((b) => ({ ...b, arrivalCheckerName }))
                 }
-                placeholder="Buscar checador de llegada…"
+                placeholder={whiteLabelConfig.ui.filters.arrivalCheckerSearch}
               />
             )}
           </DrawerSection>
 
-          <DrawerSection title="Turno">
-            <div className="inline-flex items-center gap-1 p-1 rounded-full bg-primary-light/10 border border-primary-light/30">
+          <DrawerSection title={whiteLabelConfig.ui.filters.shift}>
+            <div className="inline-flex items-center gap-1 p-1 rounded-full bg-primary/10 border border-primary/30">
               {TURNO_OPTIONS.map((opt) => {
                 const active = buffer.turno === opt.value;
                 return (
@@ -200,7 +201,7 @@ export function AdvancedFiltersDrawer({
                       "h-8 px-4 rounded-full text-sm font-semibold transition-colors",
                       active
                         ? "bg-primary text-accent"
-                        : "text-primary hover:bg-primary-light/15"
+                        : "text-primary hover:bg-primary/15"
                     )}
                   >
                     {opt.label}
@@ -211,17 +212,17 @@ export function AdvancedFiltersDrawer({
           </DrawerSection>
         </div>
 
-        <div className="flex justify-end gap-2 px-6 py-4 border-t-2 border-primary-light/40 bg-white">
+        <div className="flex justify-end gap-2 px-6 py-4 border-t-2 border-primary/40 bg-white">
           <Button
             variant="outline"
             onClick={handleReset}
-            className="border-2 border-primary-light text-primary"
+            className="border-2 border-primary text-primary"
           >
             Restablecer
           </Button>
           <Button
             onClick={handleApply}
-            className="bg-accent hover:bg-accent-dark text-white"
+            className="bg-accent hover:bg-accent/90 text-white"
           >
             Aplicar
           </Button>
@@ -254,7 +255,7 @@ function SkeletonList() {
       {[0, 1, 2].map((i) => (
         <div
           key={i}
-          className="h-8 rounded-md bg-primary-light/10 animate-pulse"
+          className="h-8 rounded-md bg-primary/10 animate-pulse"
         />
       ))}
     </div>

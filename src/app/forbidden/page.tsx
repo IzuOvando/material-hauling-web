@@ -7,7 +7,7 @@ export default function ForbiddenPage() {
       <ShieldX className="h-20 w-20 text-accent" />
 
       <div className="space-y-4">
-        <h1 className="text-2xl font-semibold text-primary-dark">
+        <h1 className="text-2xl font-semibold text-primary">
           Acceso no autorizado
         </h1>
         <p className="text-sm text-muted-foreground max-w-md">

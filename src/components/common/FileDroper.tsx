@@ -42,12 +42,12 @@ const FileDroper = ({
       <CardContent className="pt-6">
         <div
           {...getRootProps()}
-          className="relative border-2 border-dashed border-secondary-light/40 rounded-lg p-8 text-center cursor-pointer transition-colors hover:border-secondary-light"
+          className="relative border-2 border-dashed border-secondary/40 rounded-lg p-8 text-center cursor-pointer transition-colors hover:border-secondary"
         >
           <input {...getInputProps()} />
           <FileSpreadsheet className="mx-auto h-12 w-12 text-muted-foreground text-secondary mb-4" />
           <p className="text-muted-foreground mb-2">{description}</p>
-          <Button className="bg-secondary hover:bg-secondary-light active:bg-secondary-dark mt-2">
+          <Button className="bg-secondary hover:bg-secondary/90 active:bg-secondary/80 mt-2">
             {buttonText}
           </Button>
           {isDragActive && (

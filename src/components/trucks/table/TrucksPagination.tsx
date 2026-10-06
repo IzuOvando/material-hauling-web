@@ -15,6 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useTrucksTable } from "@/hooks/useTrucksTable";
+import whiteLabelConfig from "#/white-label.config";
 
 interface TrucksPaginationProps {
   total: number;
@@ -64,38 +65,38 @@ export function TrucksPagination({ total, page, limit }: TrucksPaginationProps) 
         <div className="flex items-center gap-2 !m-0">
           <Button
             variant="outline"
-            className="hidden h-8 w-8 p-0 lg:flex border-2 border-primary text-primary hover:bg-primary hover:!text-accent-light"
+            className="hidden h-8 w-8 p-0 lg:flex border-2 border-primary text-primary hover:bg-primary hover:!text-accent"
             onClick={() => setPage(1)}
             disabled={cantGoBack}
           >
-            <span className="sr-only">Primera página</span>
+            <span className="sr-only">{whiteLabelConfig.ui.pagination.first}</span>
             <DoubleArrowLeftIcon className="h-4 w-4" />
           </Button>
           <Button
             variant="outline"
-            className="h-8 w-8 p-0 border-2 border-primary text-primary hover:bg-primary hover:!text-accent-light"
+            className="h-8 w-8 p-0 border-2 border-primary text-primary hover:bg-primary hover:!text-accent"
             onClick={() => setPage(page - 1)}
             disabled={cantGoBack}
           >
-            <span className="sr-only">Página anterior</span>
+            <span className="sr-only">{whiteLabelConfig.ui.pagination.previous}</span>
             <ChevronLeftIcon className="h-4 w-4" />
           </Button>
           <Button
             variant="outline"
-            className="h-8 w-8 p-0 border-2 border-primary text-primary hover:bg-primary hover:!text-accent-light"
+            className="h-8 w-8 p-0 border-2 border-primary text-primary hover:bg-primary hover:!text-accent"
             onClick={() => setPage(page + 1)}
             disabled={cantGoForward}
           >
-            <span className="sr-only">Página siguiente</span>
+            <span className="sr-only">{whiteLabelConfig.ui.pagination.next}</span>
             <ChevronRightIcon className="h-4 w-4" />
           </Button>
           <Button
             variant="outline"
-            className="hidden h-8 w-8 p-0 lg:flex border-2 border-primary text-primary hover:bg-primary hover:!text-accent-light"
+            className="hidden h-8 w-8 p-0 lg:flex border-2 border-primary text-primary hover:bg-primary hover:!text-accent"
             onClick={() => setPage(totalPages)}
             disabled={cantGoForward}
           >
-            <span className="sr-only">Última página</span>
+            <span className="sr-only">{whiteLabelConfig.ui.pagination.last}</span>
             <DoubleArrowRightIcon className="h-4 w-4" />
           </Button>
         </div>

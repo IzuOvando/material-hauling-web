@@ -2,13 +2,13 @@ version: "1.0"
 
 services:
   database:
-    image: postgres
+    image: postgres:16
     ports:
       - "5432:5432"
     environment:
-      POSTGRES_DB: sedena_tickets
+      POSTGRES_DB: material_hauling_db
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: N0M3L0S3
+      POSTGRES_PASSWORD: postgres
 
   redis:
     image: redis

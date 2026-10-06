@@ -1,9 +1,12 @@
 import { VoucherCamion } from "@prisma/client";
 import pako from "pako";
 import { Buffer } from "buffer";
+import whiteLabelConfig from "#/white-label.config";
 
 class DataCompressor {
-  public static readonly DATA_CAMION_SUFFIX = "::SDNQR";
+  public static get DATA_CAMION_SUFFIX(): string {
+    return `::${whiteLabelConfig.app.truckIdPrefix}QR`;
+  }
 
   private static fieldMap: { [key: number]: keyof VoucherCamion } = {
     1: "folio",
@@ -104,7 +107,8 @@ class DataCompressor {
 
       if (ticket.idCamion) {
         const idParts = ticket.idCamion.split('-');
-        if (idParts.length >= 3 && idParts[0] === 'SDN') {
+        if (idParts.length >= 3) {
+          // First segment is the tenant prefix (e.g. "SDN", "APP", "TUR")
           ticket.frenteNombre = idParts.slice(1, -1).join('-');
           ticket.noEconomico = idParts[idParts.length - 1];
         }

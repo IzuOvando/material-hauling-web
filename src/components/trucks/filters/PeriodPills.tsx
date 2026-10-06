@@ -12,6 +12,7 @@ import {
 } from "@/actions/trucks/periods";
 import { TrucksDateRangePicker } from "./TrucksDateRangePicker";
 import { MonthYearPicker } from "./MonthYearPicker";
+import whiteLabelConfig from "#/white-label.config";
 
 const ORDER: Exclude<PeriodPreset, "custom" | "thisMonth">[] = [
   "yesterday",
@@ -20,10 +21,10 @@ const ORDER: Exclude<PeriodPreset, "custom" | "thisMonth">[] = [
 ];
 
 const LABEL: Record<Exclude<PeriodPreset, "custom">, string> = {
-  yesterday: "Ayer",
-  today: "Hoy",
-  last7: "7 días",
-  thisMonth: "Mes",
+  yesterday: whiteLabelConfig.ui.trucksFilters.periodYesterday,
+  today: whiteLabelConfig.ui.trucksFilters.periodToday,
+  last7: whiteLabelConfig.ui.trucksFilters.periodLast7,
+  thisMonth: whiteLabelConfig.ui.trucksFilters.periodThisMonth,
 };
 
 function pillClass(active: boolean) {
@@ -32,7 +33,7 @@ function pillClass(active: boolean) {
     "transition-colors whitespace-nowrap",
     active
       ? "bg-primary text-accent shadow-sm"
-      : "border-2 border-primary-light/40 text-primary hover:bg-primary-light/10",
+      : "border-2 border-primary/40 text-primary hover:bg-primary/10",
   );
 }
 
@@ -58,7 +59,7 @@ export function PeriodPills() {
             className={pillClass(active)}
             title={
               isToday
-                ? "Datos del día en curso pueden estar incompletos"
+                ? whiteLabelConfig.ui.trucksFilters.todayIncompleteWarning
                 : undefined
             }
           >
@@ -67,9 +68,9 @@ export function PeriodPills() {
               <AlertCircle
                 className={cn(
                   "h-3.5 w-3.5",
-                  active ? "text-accent-light" : "text-secondary/70",
+                  active ? "text-accent" : "text-secondary/70",
                 )}
-                aria-label="Datos del día pueden estar incompletos"
+                aria-label={whiteLabelConfig.ui.trucksFilters.todayIncompleteWarning}
               />
             )}
           </button>
@@ -82,7 +83,7 @@ export function PeriodPills() {
         trigger={
           <button type="button" className={pillClass(isMonth)}>
             <CalendarDays className="h-4 w-4" />
-            {isMonth && state.range ? formatMonthYear(state.range) : "Mes/Año"}
+            {isMonth && state.range ? formatMonthYear(state.range) : whiteLabelConfig.ui.trucksFilters.periodMonthYearPlaceholder}
           </button>
         }
       />
@@ -95,7 +96,7 @@ export function PeriodPills() {
             <CalendarRange className="h-4 w-4" />
             {isCustomRange && state.range
               ? formatRangeShort(state.range)
-              : "Rango…"}
+              : whiteLabelConfig.ui.trucksFilters.periodRangePlaceholder}
           </button>
         }
       />
@@ -113,7 +114,7 @@ export function getPeriodChipLabel(state: TrucksFilterState): string {
   if (state.period !== "custom") {
     return LABEL[state.period];
   }
-  return "Periodo";
+  return whiteLabelConfig.ui.trucksFilters.periodFallbackLabel;
 }
 
 export function getPeriodEffectiveRange(state: TrucksFilterState) {

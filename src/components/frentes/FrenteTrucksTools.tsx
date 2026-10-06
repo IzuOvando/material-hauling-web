@@ -10,6 +10,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useFrenteStore } from "@/store";
+import whiteLabelConfig from "#/white-label.config";
 import { SelectGroup, SelectLabel } from "@radix-ui/react-select";
 import { Frente } from "@prisma/client";
 import { useEffect } from "react";
@@ -61,11 +62,11 @@ const FrenteTrucksTools = ({
         value={selectedFrente ? selectedFrente?.nombre : undefined}
       >
         <SelectTrigger className="w-[180px] border-2 border-accent text-accent font-bold text-lg">
-          <SelectValue placeholder="Frente..." className="mx-0" />
+          <SelectValue placeholder={whiteLabelConfig.ui.general.singularFrente + "..."} className="mx-0" />
         </SelectTrigger>
         <SelectContent>
           <SelectGroup>
-            <SelectLabel className="ml-3 font-bold">Frentes</SelectLabel>
+            <SelectLabel className="ml-3 font-bold">{whiteLabelConfig.ui.general.pluralFrentes}</SelectLabel>
             {frentesDisplay.map((frente) => (
               <SelectItem
                 key={frente.nombre}
@@ -87,18 +88,18 @@ const FrenteTrucksTools = ({
             />
             {isOwner && (
               <Button
-                className="p-2 bg-transparent hover:bg-[rgba(var(--accent-light-color)/50%)]"
+                className="p-2 bg-transparent hover:bg-[rgba(var(--accent-color)/20%)]"
                 onClick={() => setOpenCloseCycle(true)}
-                title="Cierre manual de ciclos"
+                title={whiteLabelConfig.ui.frentesManager.menu.closeCycle}
               >
                 <CircleCheck className="text-accent" />
               </Button>
             )}
             {isOwner && (
               <Button
-                className="p-2 bg-transparent hover:bg-[rgba(var(--accent-light-color)/50%)]"
+                className="p-2 bg-transparent hover:bg-[rgba(var(--accent-color)/20%)]"
                 onClick={() => setOpenDelete(true)}
-                title="Eliminar registros"
+                title={whiteLabelConfig.ui.frentesManager.menu.deleteRecords}
               >
                 <Trash className="text-accent" />
               </Button>

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { usePathname, useRouter } from "next/navigation";
+import whiteLabelConfig from "#/white-label.config";
 
 const TabTrucks = ({ isOwner }: { isOwner: boolean }) => {
   const [activeTab, setActiveTab] = useState(isOwner ? "qr" : "db");
@@ -38,40 +39,40 @@ const TabTrucks = ({ isOwner }: { isOwner: boolean }) => {
       <TabsList
         className="p-[6px] h-auto"
         style={{
-          backgroundColor: "rgba(var(--accent-light-color) / 40%)",
+          backgroundColor: "rgba(var(--accent-color) / 20%)",
         }}
       >
         {isOwner && (
           <TabsTrigger
             value="qr"
-            className="font-medium text-accent-dark data-[state=active]:bg-accent data-[state=active]:text-white"
+            className="font-medium text-accent data-[state=active]:bg-accent data-[state=active]:text-white"
           >
-            Generador de QRs
+            {whiteLabelConfig.ui.navbar.qrLabel}
           </TabsTrigger>
         )}
 
         <TabsTrigger
           value="db"
-          className="font-medium text-accent-dark data-[state=active]:bg-accent data-[state=active]:text-white"
+          className="font-medium text-accent data-[state=active]:bg-accent data-[state=active]:text-white"
         >
-          Bases de Datos
+          {whiteLabelConfig.ui.navbar.databaseLabel}
         </TabsTrigger>
 
         {isOwner && (
           <TabsTrigger
             value="materials"
-            className="font-medium text-accent-dark data-[state=active]:bg-accent data-[state=active]:text-white"
+            className="font-medium text-accent data-[state=active]:bg-accent data-[state=active]:text-white"
           >
-            Materiales
+            {whiteLabelConfig.ui.navbar.materialsLabel}
           </TabsTrigger>
         )}
 
         {isOwner && (
           <TabsTrigger
             value="users"
-            className="font-medium text-accent-dark data-[state=active]:bg-accent data-[state=active]:text-white"
+            className="font-medium text-accent data-[state=active]:bg-accent data-[state=active]:text-white"
           >
-            Usuarios
+            {whiteLabelConfig.ui.navbar.usersLabel}
           </TabsTrigger>
         )}
 
