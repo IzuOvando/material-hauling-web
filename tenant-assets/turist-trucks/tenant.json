@@ -1,9 +1,9 @@
 {
   "app": {
-    "name": "Atlas Haul",
-    "shortName": "ATLAS",
+    "name": "Turist Trucks",
+    "shortName": "TURIST",
     "tagline": "Haul Logistics Platform",
-    "metadataTitle": "Atlas Haul | Operations Dashboard",
+    "metadataTitle": "Turist Trucks | Operations Dashboard",
     "metadataDescription": "A fictional white-label logistics operations platform",
     "locale": "en"
   },
@@ -14,8 +14,8 @@
   },
   "auth": {
     "welcomeLabel": "Welcome",
-    "loginTitle": "Sign in to Atlas Haul",
-    "loginSubtitle": "Enter your Atlas Haul credentials"
+    "loginTitle": "Sign in to Turist Trucks",
+    "loginSubtitle": "Enter your Turist Trucks credentials"
   },
   "ui": {
     "navbar": {
@@ -114,6 +114,6 @@
     }
   },
   "assets": {
-    "qrTemplateFilename": "atlas-haul-qr-template.xlsx"
+    "qrTemplateFilename": "turist-trucks-qr-template.xlsx"
   }
 }

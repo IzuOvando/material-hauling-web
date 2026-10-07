@@ -1,4 +1,5 @@
 import tenantOverrides from "@tenant";
+import { deriveTruckIdPrefix } from "./src/utils/deriveTruckIdPrefix";
 
 const defaultConfig = {
   app: {
@@ -8,7 +9,7 @@ const defaultConfig = {
     metadataTitle: "Material Hauling | Dashboard",
     metadataDescription: "Sistema de Control de Acarreos",
     locale: "es",
-    truckIdPrefix: "APP",
+    truckIdPrefix: "", // auto-derived from app.name via deriveTruckIdPrefix() at config init
   },
   theme: {
     primary: "#133223",
@@ -483,9 +484,16 @@ const tenantAssetPaths: TenantConfig = tenant
     }
   : {};
 
-export const whiteLabelConfig: WhiteLabelConfig = deepMerge(
+const merged: WhiteLabelConfig = deepMerge(
   deepMerge(defaultConfig, tenantAssetPaths),
   tenantOverrides,
 );
+
+// Auto-derive truckIdPrefix from app name if not explicitly set by tenant
+if (!merged.app.truckIdPrefix) {
+  merged.app.truckIdPrefix = deriveTruckIdPrefix(merged.app.name);
+}
+
+export const whiteLabelConfig: WhiteLabelConfig = merged;
 
 export default whiteLabelConfig;
