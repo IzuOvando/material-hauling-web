@@ -55,9 +55,13 @@ tenant-assets/*
 
 # Claude Local Settings
 /.claude/*.local.*
+/.claude/skills/
+/.agents/skills/
+skills-lock.json
 graphify-out/
 .graphify_detect.json
 .graphify_python
 
 # Local scratch files
 ejemplar_web.txt
+.env*

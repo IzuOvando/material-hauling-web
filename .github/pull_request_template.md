@@ -1,5 +1,5 @@
 ## Related Ticket 🎫
-[SDN-#:#](link)
+[TICKET-#](link)
 
 ## What whats done ❓
 -

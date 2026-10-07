@@ -38,7 +38,7 @@ const AddFrenteDialog = ({
       return;
     }
 
-    const alphanumericRegex = /^[A-Z0-9]+-F([0-9]+T?[0-9]*|G)$/;
+    const alphanumericRegex = /^[A-Z0-9]+-[A-Z0-9]+$/;
     if (!alphanumericRegex.test(name)) {
       setError(whiteLabelConfig.ui.frentesManager.addDialog.invalidFormat);
       return;

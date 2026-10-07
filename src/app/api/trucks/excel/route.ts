@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
     const buffer = await buildTrucksExcel(vouchers);
     const filename = `${frente}_vouchers_${new Date().toISOString().slice(0, 10)}.xlsx`;
 
-    return new Response(buffer, {
+    return new Response(new Uint8Array(buffer), {
       status: 200,
       headers: {
         "Content-Type":

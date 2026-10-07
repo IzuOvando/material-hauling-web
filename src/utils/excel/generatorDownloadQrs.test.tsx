@@ -26,7 +26,7 @@ describe("getCamionesQRSVG", () => {
         operador: "Juan Pérez",
         turno: 1,
         localidad: "Localidad 1",
-        frente: "SDN-F1",
+        frente: "PROJ-F1",
         empresa: "Mabina SA de CV",
         noempleado: "568TXP",
       },
@@ -37,7 +37,7 @@ describe("getCamionesQRSVG", () => {
         operador: "María López",
         turno: 2,
         localidad: "Localidad 2",
-        frente: "SDN-F2",
+        frente: "PROJ-F2",
         empresa: "Mabina SA de CV",
         noempleado: "568TXP",
       },
@@ -72,7 +72,7 @@ describe("getCamionesQRSVG", () => {
           .setOperador("Juan Pérez")
           .setTurno(1)
           .setLocalidad("Localidad 1")
-          .setFrente("SDN-F1")
+          .setFrente("PROJ-F1")
           .setEmpresa("")
           .setNoempleado("")
           .build(),

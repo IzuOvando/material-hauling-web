@@ -2,7 +2,7 @@ import "@testing-library/jest-dom";
 import { render, screen, waitFor, act } from "@testing-library/react";
 import { ActiveTrucksCard } from "../ActiveTrucksCard";
 
-const FRENTE = "TPCDMXP-F1";
+const FRENTE = "PROJ-F1";
 
 beforeEach(() => {
   jest.useFakeTimers();

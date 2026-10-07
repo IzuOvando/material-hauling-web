@@ -1,4 +1,4 @@
-import jwt from 'jsonwebtoken';
+import jwt, { type SignOptions } from 'jsonwebtoken';
 import CONFIG from "@/config";
 
 // TODO (SEC-011): Implement JWT token revocation using Redis (Vercel KV).
@@ -10,8 +10,8 @@ export class TokenAuthenticator {
 
   private static ACCESS_TOKEN_SECRET = CONFIG.ACCESS_TOKEN_SECRET || (() => { throw new Error("ACCESS_TOKEN_SECRET is not defined in CONFIG") })();
   private static REFRESH_TOKEN_SECRET = CONFIG.REFRESH_TOKEN_SECRET || (() => { throw new Error("REFRESH_TOKEN_SECRET is not defined in CONFIG") })();
-  private static ACCESS_TOKEN_EXPIRACY = CONFIG.TOKEN_EXPIRACY.ACCESS;
-  private static REFRESH_TOKEN_EXPIRACY = CONFIG.TOKEN_EXPIRACY.REFRESH;
+  private static ACCESS_TOKEN_EXPIRACY = CONFIG.TOKEN_EXPIRACY.ACCESS as SignOptions["expiresIn"];
+  private static REFRESH_TOKEN_EXPIRACY = CONFIG.TOKEN_EXPIRACY.REFRESH as SignOptions["expiresIn"];
 
   static authenticate(username: string, role: string) {
     const accessToken = jwt.sign(

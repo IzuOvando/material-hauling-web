@@ -2,8 +2,6 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log("Inserting data into the database...");
-
   const users = [
     {
       username: "Ruben35",
@@ -29,8 +27,6 @@ async function main() {
     }
   }
 
-  console.log("Succesfully inserted users into the database!");
-
   // Seed global material catalog
   const DEFAULT_MATERIALS = [
     "Terraplén",
@@ -45,15 +41,19 @@ async function main() {
     "Base Hidráulica",
   ];
 
+  function normalizeMaterial(value) {
+    return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase();
+  }
+
   for (const nombre of DEFAULT_MATERIALS) {
+    const normalizedNombre = normalizeMaterial(nombre);
     await prisma.material.upsert({
       where: { nombre },
-      update: {},
-      create: { nombre },
+      update: { normalizedNombre },
+      create: { nombre, normalizedNombre },
     });
   }
 
-  console.log("Succesfully inserted materials into the database!");
 }
 
 main()

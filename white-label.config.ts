@@ -1,13 +1,15 @@
 import tenantOverrides from "@tenant";
+import { deriveTruckIdPrefix } from "./src/utils/deriveTruckIdPrefix";
 
 const defaultConfig = {
   app: {
-    name: "SEDENA: Trucks",
-    shortName: "SEDENA",
-    tagline: "Sistema de Acarreos SEDENA",
-    metadataTitle: "SEDENA: Trucks | Dashboard",
-    metadataDescription: "Sistema de Acarreos SEDENA",
+    name: "Material Hauling",
+    shortName: "Hauling",
+    tagline: "Sistema de Control de Acarreos",
+    metadataTitle: "Material Hauling | Dashboard",
+    metadataDescription: "Sistema de Control de Acarreos",
     locale: "es",
+    truckIdPrefix: "APP",
   },
   theme: {
     primary: "#133223",
@@ -260,11 +262,11 @@ const defaultConfig = {
       },
       addDialog: {
         title: "Crear Frente",
-        description: "Ingresa el nombre del frente (ej. ABCD-F1 o ABCD-FG). Podrás editar los detalles después.",
+        description: "Ingresa el nombre del frente (ej. PROJ-F1 o PROJ-A1). Podrás editar los detalles después.",
         nameLabel: "Nombre",
-        namePlaceholder: "Ej. ABCD-F1",
+        namePlaceholder: "Ej. PROJ-F1",
         requiredName: "Debes ingresar un nombre",
-        invalidFormat: "Formato inválido.",
+        invalidFormat: "Formato inválido. Usa el formato PROYECTO-ID (ej. PROJ-F1, PROJ-A1).",
         creating: "Creando...",
         create: "Crear",
         successTitle: "Éxito",
@@ -349,7 +351,7 @@ const defaultConfig = {
         successDescription: "El usuario {username} fue creado {suffix}",
         successButton: "Registrar otro usuario",
         roleUser: "Checador",
-        roleAdmin: "IRO",
+        roleAdmin: "Administrador",
       },
       stepper: {
         userDetails: "Datos del usuario",
@@ -435,7 +437,7 @@ const defaultConfig = {
         allRoles: "Todos los roles",
         allFrentes: "Todos los frentes",
         roleUser: "Checador",
-        roleAdmin: "IRO",
+        roleAdmin: "Administrador",
     },
     login: {
       signingIn: "Signing in...",
@@ -482,9 +484,17 @@ const tenantAssetPaths: TenantConfig = tenant
     }
   : {};
 
-export const whiteLabelConfig: WhiteLabelConfig = deepMerge(
+const merged: WhiteLabelConfig = deepMerge(
   deepMerge(defaultConfig, tenantAssetPaths),
   tenantOverrides,
 );
+
+// If a tenant is active but didn't set truckIdPrefix explicitly, derive it from app.name.
+// If no tenant → stays "APP" (default). If tenant set it explicitly → already in merged.
+if (tenant && !tenantOverrides?.app?.truckIdPrefix) {
+  merged.app.truckIdPrefix = deriveTruckIdPrefix(merged.app.name);
+}
+
+export const whiteLabelConfig: WhiteLabelConfig = merged;
 
 export default whiteLabelConfig;
