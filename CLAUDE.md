@@ -326,12 +326,11 @@ The mobile app fetches materials from the server via `MaterialService.fetchAllMa
 
 **Web is the source of truth for the materials catalog.** The mobile's local fallback list (`src/assets/data/materials.ts`) is only used when the API is unreachable and the cache is empty.
 
-**What needs to be built on the web side:**
-1. A materials catalog admin UI — add/remove/edit materials per frente
-2. A `GET /api/mobile/materials` endpoint that returns the full `{ [frenteNombre]: string[] }` map for the authenticated user's accessible frentes
-3. The materials should be stored per frente in the DB (either as a relation or a JSON field on `Frente`)
+**Current state:** `GET /api/mobile/materials` already exists at `src/app/api/mobile/materials/route.ts` and returns the `{ [frenteNombre]: string[] }` map. The mobile app caches this response in Realm with a 1-hour TTL and stale-while-revalidate.
 
-**Current state:** the `/api/mobile` materials endpoint may not exist yet or may return hardcoded data — verify before building the mobile-side cache logic further.
+**What still needs to be built:**
+1. A materials catalog admin UI — add/remove/edit materials per frente (currently managed elsewhere or hardcoded in the route)
+2. Verify the materials data is stored per frente in the DB and not hardcoded in the route logic
 
 ### Multi-tenant QR Compatibility
 
