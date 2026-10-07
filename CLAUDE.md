@@ -320,6 +320,19 @@ The mobile app currently has a per-client `enableCadenamiento: boolean` toggle a
 
 Once `tipoProyecto` is live, the mobile app reads it from the API and drops the per-client toggle entirely.
 
+### Catálogo de Materiales por Frente
+
+The mobile app fetches materials from the server via `MaterialService.fetchAllMaterials()`, which returns a map of `{ [frenteNombre]: string[] }`. It caches them in Realm with a 1-hour TTL and uses stale-while-revalidate to stay fresh.
+
+**Web is the source of truth for the materials catalog.** The mobile's local fallback list (`src/assets/data/materials.ts`) is only used when the API is unreachable and the cache is empty.
+
+**What needs to be built on the web side:**
+1. A materials catalog admin UI — add/remove/edit materials per frente
+2. A `GET /api/mobile/materials` endpoint that returns the full `{ [frenteNombre]: string[] }` map for the authenticated user's accessible frentes
+3. The materials should be stored per frente in the DB (either as a relation or a JSON field on `Frente`)
+
+**Current state:** the `/api/mobile` materials endpoint may not exist yet or may return hardcoded data — verify before building the mobile-side cache logic further.
+
 ### Multi-tenant QR Compatibility
 
 The mobile app validates QR codes using a per-tenant `truckIdPrefix` (e.g. `SDN`, `TUR`). The web must generate QR codes with the matching suffix `::${truckIdPrefix}QR`.
