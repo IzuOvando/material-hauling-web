@@ -282,5 +282,52 @@ The application is designed for deployment on Vercel:
 - Vercel Postgres for production database
 - Vercel KV for Redis
 - Vercel Blob for file storage
-- Automatic deployments from main branch
 - Environment variables configured in Vercel dashboard
+
+## Git Workflow
+
+**All changes go through `dev` first. Never commit or push directly to `main`.**
+
+```
+feature/fix branch → PR → dev → PR → main (release)
+```
+
+- Cut feature/fix branches from `dev`
+- Open PRs targeting `dev`
+- When ready to release: PR from `dev` → `main`
+- `main` is production — only receives merges from `dev` via PR
+- Hotfixes follow the same flow, just faster
+
+**PR checklist:**
+- [ ] Remove all `console.log` / `console.debug` debug statements
+- [ ] No temporary comments or leftover TODO blocks
+- [ ] Branch is up to date with `dev`
+
+## Upcoming Work — Planning Context
+
+### TipoProyecto en el Frente (replaces `enableCadenamiento`)
+
+The mobile app currently has a per-client `enableCadenamiento: boolean` toggle as a **temporary workaround**. The correct design is to configure the project type at the **Frente level** here in the web app.
+
+**Two destination types the mobile app needs:**
+- **Cadenamiento** — obra lineal (carreteras, ferroviario). Format: `km+hm` e.g. `0+980`
+- **Ubicación fija** — destinos fijos (almacén, planta, edificio). Free text.
+
+**Web needs to:**
+1. Add `tipoProyecto: "LINEAL" | "FIJO"` to the `Frente` Prisma model (with migration)
+2. Expose it in the mobile API frente endpoints
+3. Add a selector in the Frente creation/edit UI
+
+Once `tipoProyecto` is live, the mobile app reads it from the API and drops the per-client toggle entirely.
+
+### Multi-tenant QR Compatibility
+
+The mobile app validates QR codes using a per-tenant `truckIdPrefix` (e.g. `SDN`, `TUR`). The web must generate QR codes with the matching suffix `::${truckIdPrefix}QR`.
+
+**Tenant registry — must stay in sync with mobile `src/utils/deriveTruckIdPrefix.test.ts`:**
+| Tenant key | App name | truckIdPrefix |
+|---|---|---|
+| `sedena` | SDN Transportes | `SDN` |
+| `turist-trucks` / `atlas-haul` | (test tenant) | derived from name |
+
+The `white-label.config.ts` already has `deriveTruckIdPrefix` wired in. If a tenant sets `truckIdPrefix` explicitly in `tenant.json`, that value is used; otherwise it is auto-derived from `app.name`. Verify the derived value matches what the mobile app expects before deploying a new tenant.
