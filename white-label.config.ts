@@ -9,7 +9,7 @@ const defaultConfig = {
     metadataTitle: "Material Hauling | Dashboard",
     metadataDescription: "Sistema de Control de Acarreos",
     locale: "es",
-    truckIdPrefix: "", // auto-derived from app.name via deriveTruckIdPrefix() at config init
+    truckIdPrefix: "APP",
   },
   theme: {
     primary: "#133223",
@@ -489,8 +489,9 @@ const merged: WhiteLabelConfig = deepMerge(
   tenantOverrides,
 );
 
-// Auto-derive truckIdPrefix from app name if not explicitly set by tenant
-if (!merged.app.truckIdPrefix) {
+// If a tenant is active but didn't set truckIdPrefix explicitly, derive it from app.name.
+// If no tenant → stays "APP" (default). If tenant set it explicitly → already in merged.
+if (tenant && !tenantOverrides?.app?.truckIdPrefix) {
   merged.app.truckIdPrefix = deriveTruckIdPrefix(merged.app.name);
 }
 
