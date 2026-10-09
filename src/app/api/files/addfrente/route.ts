@@ -14,10 +14,13 @@ export async function POST(req: NextRequest) {
 
 
     try {
-        const { nombre } = await req.json();
+        const { nombre, tipoProyecto } = await req.json();
 
         const frente = await prisma.frente.create({
-            data: { nombre },
+            data: {
+                nombre,
+                ...(tipoProyecto && { tipoProyecto }),
+            },
         });
 
         return NextResponse.json(
