@@ -284,6 +284,12 @@ The application is designed for deployment on Vercel:
 - Vercel Blob for file storage
 - Environment variables configured in Vercel dashboard
 
+```bash
+vercel --prod         # Deploy directly to Vercel production via CLI
+```
+
+> **Important:** The GitHub → Vercel automatic integration is **not connected** for this project. All production deploys must be triggered manually with `vercel --prod` from the project root. Do NOT expect a `git push` to trigger a Vercel deployment.
+
 ## Git Workflow
 
 **All changes go through `dev` first. Never commit or push directly to `main`.**
@@ -305,20 +311,145 @@ feature/fix branch → PR → dev → PR → main (release)
 
 ## Upcoming Work — Planning Context
 
-### TipoProyecto en el Frente (replaces `enableCadenamiento`)
+### tipoProyecto en Frente + Catálogos de Origen y Tiro
 
-The mobile app currently has a per-client `enableCadenamiento: boolean` toggle as a **temporary workaround**. The correct design is to configure the project type at the **Frente level** here in the web app.
+This is the next feature to implement. Full design decisions are finalized — implement exactly as described below.
 
-**Two destination types the mobile app needs:**
-- **Cadenamiento** — obra lineal (carreteras, ferroviario). Format: `km+hm` e.g. `0+980`
-- **Ubicación fija** — destinos fijos (almacén, planta, edificio). Free text.
+#### 1. tipoProyecto
 
-**Web needs to:**
-1. Add `tipoProyecto: "LINEAL" | "FIJO"` to the `Frente` Prisma model (with migration)
-2. Expose it in the mobile API frente endpoints
-3. Add a selector in the Frente creation/edit UI
+Add `tipoProyecto` as an enum field on the `Frente` model:
 
-Once `tipoProyecto` is live, the mobile app reads it from the API and drops the per-client toggle entirely.
+```prisma
+enum TipoProyecto {
+  LINEAL
+  FIJO
+}
+
+model Frente {
+  // ... existing fields
+  tipoProyecto TipoProyecto @default(FIJO)
+}
+```
+
+- **LINEAL** — obra lineal (carreteras, ferroviario). Destination field in mobile = **"Cadenamiento"**, validated format `XX+XXX` (e.g. `12+450`). No dropdown, no free text — only that format.
+- **FIJO** — destino fijo (planta, almacén, edificio). Destination field in mobile = **"Tiro"** (dropdown + free text "Otro").
+- This replaces the per-client `enableCadenamiento` boolean in the mobile app. Once this is live, mobile reads `tipoProyecto` from the frente API response and drops the client-level toggle.
+
+#### 2. Catálogos de Origen y Tiro
+
+Same pattern as the existing `Material` / `MaterialFrente` system. Study that implementation and replicate it exactly.
+
+**Prisma models to add:**
+
+```prisma
+model OrigenCatalogo {
+  id          String        @id @default(uuid())
+  nombre      String        @unique
+  isActive    Boolean       @default(true)
+  frentes     OrigenFrente[]
+}
+
+model OrigenFrente {
+  frenteNombre  String
+  origenId      String
+  frente        Frente          @relation(fields: [frenteNombre], references: [nombre], onDelete: Cascade)
+  origen        OrigenCatalogo  @relation(fields: [origenId], references: [id], onDelete: Cascade)
+  @@id([frenteNombre, origenId])
+}
+
+model TiroCatalogo {
+  id          String       @id @default(uuid())
+  nombre      String       @unique
+  isActive    Boolean      @default(true)
+  frentes     TiroFrente[]
+}
+
+model TiroFrente {
+  frenteNombre  String
+  tiroId        String
+  frente        Frente        @relation(fields: [frenteNombre], references: [nombre], onDelete: Cascade)
+  tiro          TiroCatalogo  @relation(fields: [tiroId], references: [id], onDelete: Cascade)
+  @@id([frenteNombre, tiroId])
+}
+```
+
+**Seed — Origen catalog (9 entries):**
+1. Banco de Material
+2. Banco de Préstamo
+3. Préstamo Lateral
+4. Cantera
+5. Mina
+6. Planta
+7. Demolición
+8. Despalme
+9. Otro
+
+**Seed — Tiro catalog (5 entries, only relevant for FIJO projects):**
+1. Banco de Tiro
+2. Centro de Acopio
+3. Centro de Reciclaje
+4. Obra
+5. Otro
+
+#### 3. Mobile API Endpoints
+
+Add two new endpoints following the same pattern as `/api/mobile/materials/route.ts`:
+
+- `GET /api/mobile/origenes` → returns `{ origenes: Record<string, string[]> }` grouped by `frenteNombre`
+- `GET /api/mobile/tiros` → returns `{ tiros: Record<string, string[]> }` grouped by `frenteNombre`
+
+Also expose `tipoProyecto` in any frente-related endpoint the mobile app calls, so the app knows which field to show.
+
+#### 4. Web Admin UI
+
+Add two sections to the frente admin page, following the exact same UI pattern as the existing materials admin:
+- **Orígenes del frente** — assign/remove items from `OrigenCatalogo` for this frente
+- **Tiros del frente** — assign/remove items from `TiroCatalogo` for this frente (shown/hidden based on `tipoProyecto`)
+- Add `tipoProyecto` selector (LINEAL / FIJO) to the frente creation and edit dialogs
+
+#### 5. Dropdown order in mobile app
+
+When the mobile app renders the Origen or Tiro dropdown:
+```
+── Este frente ──────────────────
+  [custom entries added by admin for this frente — shown first]
+── General ─────────────────────
+  [standard catalog entries]
+── ─────────────────────────────
+  Otro  ← always last, always visible
+```
+
+#### 6. Normalization for open-text entries ("Otro")
+
+When a user selects "Otro" and types a custom value:
+1. **Normalize before saving**: trim, NFC unicode, collapse multiple spaces, remove trailing periods, Title Case
+2. **Fuzzy match while typing**: compare against catalog using normalized Levenshtein distance. If similarity ≥ 0.75, show inline suggestion "¿Quisiste decir [X]? [Usar] [Continuar]"
+3. **Promotion (future)**: repeated "Otro" values in a frente surface in web admin as candidates to add to the catalog
+
+Reuse/extend the existing normalization utility already in the codebase (similar to `normalizeEnterpriseName`). Do not create from scratch.
+
+#### 7. Existing data
+
+Do NOT migrate existing `origen`/`destino` free-text values in `VoucherCamion`. Leave them as-is. The new catalog only applies going forward — when mobile sends a voucher, the origin/destination may now come from the catalog (canonical name) or from a free-text "Otro" entry. Both are strings, backward compatible.
+
+#### 8. Offline caching in mobile (Origen & Tiro)
+
+The mobile app must cache origenes and tiros with the **same stale-while-revalidate strategy already in place for materials** (`useMaterials` hook + Realm cache). Do NOT assume connectivity.
+
+- Cache origenes and tiros in Realm, keyed by `frenteNombre`
+- On load: serve from cache immediately (zero latency), then fetch in background if `isInternetReachable`
+- TTL and force-refresh triggers: same policy as `useMaterials`
+- `tiros` only need to be fetched/cached if `tipoProyecto === 'FIJO'` (no Tiro dropdown on LINEAL projects)
+- The Realm models for origen/tiro cache follow the same shape as the existing materials cache
+
+This is a **web-side constraint**: the API endpoints must return data that maps cleanly to per-frente Realm records (same `{ origenes: Record<string, string[]> }` shape as materials).
+
+#### 9. Implementation order
+
+1. Prisma migration — add `tipoProyecto` to `Frente` + new catalog tables + seed
+2. Mobile API endpoints — `/api/mobile/origenes`, `/api/mobile/tiros`, expose `tipoProyecto` in frente endpoint
+3. Web admin UI — frente dialogs + catalog management pages
+4. (Separate session) Mobile app — consume new endpoints, cache in Realm, show correct field per `tipoProyecto`
 
 ### Multi-tenant QR Compatibility
 
@@ -328,6 +459,6 @@ The mobile app validates QR codes using a per-tenant `truckIdPrefix` (e.g. `SDN`
 | Tenant key | App name | truckIdPrefix |
 |---|---|---|
 | `sedena` | SDN Transportes | `SDN` |
-| `turist-trucks` / `atlas-haul` | (test tenant) | derived from name |
+| `turist-trucks` | Atlas Haul | `TUR` (explicit override in tenant.json) |
 
 The `white-label.config.ts` already has `deriveTruckIdPrefix` wired in. If a tenant sets `truckIdPrefix` explicitly in `tenant.json`, that value is used; otherwise it is auto-derived from `app.name`. Verify the derived value matches what the mobile app expects before deploying a new tenant.
