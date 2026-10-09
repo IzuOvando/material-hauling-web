@@ -15,8 +15,16 @@ import DeleteFrenteAlertDialog from "./DeleteFrenteAlertDialog";
 import FrenteLogoUpload from "./FrenteLogoUpload";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { updateFrenteDisplayName } from "@/actions/frentes";
+import { updateFrenteDisplayName, updateFrenteTipoProyecto } from "@/actions/frentes";
 import whiteLabelConfig from "#/white-label.config";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import type { TipoProyecto } from "@prisma/client";
 
 interface EditFrenteDialogProps {
   open: boolean;
@@ -44,11 +52,17 @@ const EditFrenteDialog = ({
   const [savingName, setSavingName] = useState(false);
   const [nameSaved, setNameSaved] = useState(false);
   const isDirty = displayName !== initialDisplayName;
+  const [currentTipoProyecto, setCurrentTipoProyecto] = useState<TipoProyecto>(frente.tipoProyecto);
+  const [savingTipo, setSavingTipo] = useState(false);
 
   useEffect(() => {
     const next = frente.displayName ?? siblingDisplayName ?? "";
     setDisplayName(next);
   }, [frente.displayName, siblingDisplayName]);
+
+  useEffect(() => {
+    setCurrentTipoProyecto(frente.tipoProyecto);
+  }, [frente.tipoProyecto]);
 
   const handleSaveDisplayName = async () => {
     setSavingName(true);
@@ -56,6 +70,14 @@ const EditFrenteDialog = ({
     setSavingName(false);
     setNameSaved(true);
     setTimeout(() => setNameSaved(false), 2000);
+    onFrenteUpdated();
+  };
+
+  const handleTipoProyectoChange = async (value: TipoProyecto) => {
+    setSavingTipo(true);
+    setCurrentTipoProyecto(value);
+    await updateFrenteTipoProyecto(frente.nombre, value);
+    setSavingTipo(false);
     onFrenteUpdated();
   };
 
@@ -100,6 +122,36 @@ const EditFrenteDialog = ({
                   </div>
                   <p className="text-xs text-slate-400">
                     Se muestra en el dashboard para todos los frentes del proyecto.
+                  </p>
+                </div>
+
+                <Separator />
+
+                <div className="flex flex-col gap-2">
+                  <Label className="text-sm font-medium">
+                    {(whiteLabelConfig as any)?.ui?.frentesManager?.tipoProyecto?.label || "Tipo de proyecto"}
+                  </Label>
+                  <Select
+                    value={currentTipoProyecto}
+                    onValueChange={handleTipoProyectoChange}
+                    disabled={savingTipo}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="FIJO">
+                        {(whiteLabelConfig as any)?.ui?.frentesManager?.tipoProyecto?.fijo || "Fijo"}
+                      </SelectItem>
+                      <SelectItem value="LINEAL">
+                        {(whiteLabelConfig as any)?.ui?.frentesManager?.tipoProyecto?.lineal || "Lineal"}
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-slate-400">
+                    {currentTipoProyecto === "LINEAL"
+                      ? ((whiteLabelConfig as any)?.ui?.frentesManager?.tipoProyecto?.linealHint || "Obra lineal — destino por cadenamiento")
+                      : ((whiteLabelConfig as any)?.ui?.frentesManager?.tipoProyecto?.fijoHint || "Destino fijo — destino por tiro")}
                   </p>
                 </div>
 

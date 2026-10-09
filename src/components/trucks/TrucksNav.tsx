@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import { QrCode, Database, Package, Users, BarChart3 } from "lucide-react";
+import { QrCode, Database, Package, Users, BarChart3, MapPin } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Role } from "@/types/roles";
 import { FrentesManagerSheet } from "@/components/frentes/FrentesManagerSheet";
@@ -59,6 +59,16 @@ const NAV_ITEMS: NavItem[] = [
     allowedRoles: ["owner"],
     iconColor: "text-amber-500",
     iconBg:    "bg-amber-500/10 group-hover:bg-amber-500/20",
+  },
+  {
+    value: "origen-destino",
+    label: (whiteLabelConfig as any)?.ui?.navbar?.origenDestinoLabel || "Origen / Destino",
+    description: (whiteLabelConfig as any)?.ui?.navbar?.origenDestinoDescription || "Gestión de orígenes y tiros",
+    icon: MapPin,
+    href: "/origen-destino",
+    allowedRoles: ["owner"],
+    iconColor: "text-orange-500",
+    iconBg:    "bg-orange-500/10 group-hover:bg-orange-500/20",
   },
   {
     value: "users",

@@ -14,6 +14,13 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "../ui/use-toast";
 import { useRouter } from "next/navigation";
 import whiteLabelConfig from "#/white-label.config";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface AddFrenteDialogProps {
   open: boolean;
@@ -27,6 +34,7 @@ const AddFrenteDialog = ({
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const refName = useRef<HTMLInputElement>(null);
+  const [tipoProyecto, setTipoProyecto] = useState<"LINEAL" | "FIJO">("FIJO");
   const { toast } = useToast();
   const router = useRouter();
 
@@ -53,7 +61,7 @@ const AddFrenteDialog = ({
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ nombre: name }),
+        body: JSON.stringify({ nombre: name, tipoProyecto }),
       });
 
       const data = await response.json();
@@ -115,6 +123,31 @@ const AddFrenteDialog = ({
               maxLength={20}
               disabled={loading}
             />
+          </div>
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="tipoProyecto" className="text-right">
+              {(whiteLabelConfig as any)?.ui?.frentesManager?.tipoProyecto?.label || "Tipo"}
+            </Label>
+            <div className="col-span-3">
+              <Select value={tipoProyecto} onValueChange={(v) => setTipoProyecto(v as "LINEAL" | "FIJO")}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="FIJO">
+                    {(whiteLabelConfig as any)?.ui?.frentesManager?.tipoProyecto?.fijo || "Fijo"}
+                  </SelectItem>
+                  <SelectItem value="LINEAL">
+                    {(whiteLabelConfig as any)?.ui?.frentesManager?.tipoProyecto?.lineal || "Lineal"}
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-slate-400 mt-1">
+                {tipoProyecto === "LINEAL"
+                  ? ((whiteLabelConfig as any)?.ui?.frentesManager?.tipoProyecto?.linealHint || "Obra lineal — destino por cadenamiento")
+                  : ((whiteLabelConfig as any)?.ui?.frentesManager?.tipoProyecto?.fijoHint || "Destino fijo — destino por tiro")}
+              </p>
+            </div>
           </div>
         </div>
         <span className="text-sm mt-[-1.25rem] text-red-500 font-medium">
