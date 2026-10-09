@@ -17,6 +17,11 @@ enum VoucherStatus {
   ARRIVED
 }
 
+enum TipoProyecto {
+  LINEAL
+  FIJO
+}
+
 model User {
   username   String  @id @unique
   password   String
@@ -43,6 +48,7 @@ model Frente {
   nombre                    String          @id @unique
   frenteKey                 String?         @unique
   displayName               String?
+  tipoProyecto              TipoProyecto    @default(FIJO)
   logoUrl                   String?
   logoHash                  String?
   logoUpdatedAt             DateTime?
@@ -58,6 +64,8 @@ model Frente {
   ticketsAsfalto            Asfalto[]       @relation("FrenteAsfalto")
   users                     UserFrente[]
   materials                 MaterialFrente[]
+  origenes                  OrigenFrente[]
+  tiros                     TiroFrente[]
   dashboardDailyMetrics     DashboardDailyMetrics[]
 }
 
@@ -249,4 +257,44 @@ model Asfalto {
   @@index([frenteNombre, material])
   @@index([frenteNombre, noEconomico])
   @@index([frenteNombre, destino])
+}
+
+model OrigenCatalogo {
+  id        String         @id @default(uuid())
+  nombre    String         @unique
+  isActive  Boolean        @default(true)
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+  frentes   OrigenFrente[]
+}
+
+model OrigenFrente {
+  frenteNombre String
+  origenId     String
+
+  frente Frente         @relation(fields: [frenteNombre], references: [nombre], onDelete: Cascade)
+  origen OrigenCatalogo @relation(fields: [origenId], references: [id], onDelete: Cascade)
+
+  @@id([frenteNombre, origenId])
+  @@index([frenteNombre])
+}
+
+model TiroCatalogo {
+  id        String       @id @default(uuid())
+  nombre    String       @unique
+  isActive  Boolean      @default(true)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  frentes   TiroFrente[]
+}
+
+model TiroFrente {
+  frenteNombre String
+  tiroId       String
+
+  frente Frente       @relation(fields: [frenteNombre], references: [nombre], onDelete: Cascade)
+  tiro   TiroCatalogo @relation(fields: [tiroId], references: [id], onDelete: Cascade)
+
+  @@id([frenteNombre, tiroId])
+  @@index([frenteNombre])
 }
