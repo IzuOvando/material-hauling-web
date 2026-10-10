@@ -145,9 +145,16 @@ export async function assignOrigenToFrente(
     throw new Error("El frente no existe");
   }
 
-  await prisma.origenFrente.create({
-    data: { origenId, frenteNombre },
-  });
+  try {
+    await prisma.origenFrente.create({
+      data: { origenId, frenteNombre },
+    });
+  } catch (error: any) {
+    if (error?.code === "P2002") {
+      return { success: true }; // Already assigned, treat as no-op
+    }
+    throw error;
+  }
 
   return { success: true };
 }

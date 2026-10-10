@@ -16,6 +16,10 @@ export async function POST(req: NextRequest) {
     try {
         const { nombre, tipoProyecto } = await req.json();
 
+        if (tipoProyecto && !["LINEAL", "FIJO"].includes(tipoProyecto)) {
+            return NextResponse.json({ error: "Invalid tipoProyecto value" }, { status: 400 });
+        }
+
         const frente = await prisma.frente.create({
             data: {
                 nombre,
@@ -28,7 +32,7 @@ export async function POST(req: NextRequest) {
             { status: 200 }
         );
     } catch (error) {
-        console.log(error)
+        console.error(error)
         if (error instanceof Prisma.PrismaClientKnownRequestError) {
             if (error.code === 'P2002') {
                 return NextResponse.json(

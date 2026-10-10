@@ -16,6 +16,7 @@ import FrenteLogoUpload from "./FrenteLogoUpload";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { updateFrenteDisplayName, updateFrenteTipoProyecto } from "@/actions/frentes";
+import { useToast } from "@/components/ui/use-toast";
 import whiteLabelConfig from "#/white-label.config";
 import {
   Select,
@@ -54,6 +55,7 @@ const EditFrenteDialog = ({
   const isDirty = displayName !== initialDisplayName;
   const [currentTipoProyecto, setCurrentTipoProyecto] = useState<TipoProyecto>(frente.tipoProyecto);
   const [savingTipo, setSavingTipo] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     const next = frente.displayName ?? siblingDisplayName ?? "";
@@ -74,11 +76,31 @@ const EditFrenteDialog = ({
   };
 
   const handleTipoProyectoChange = async (value: TipoProyecto) => {
+    const previous = currentTipoProyecto;
     setSavingTipo(true);
     setCurrentTipoProyecto(value);
-    await updateFrenteTipoProyecto(frente.nombre, value);
-    setSavingTipo(false);
-    onFrenteUpdated();
+    try {
+      const result = await updateFrenteTipoProyecto(frente.nombre, value);
+      if (!result.success) {
+        setCurrentTipoProyecto(previous);
+        toast({
+          title: "Error",
+          description: result.error || "No se pudo actualizar el tipo de proyecto",
+          variant: "destructive",
+        });
+        return;
+      }
+      onFrenteUpdated();
+    } catch {
+      setCurrentTipoProyecto(previous);
+      toast({
+        title: "Error",
+        description: "No se pudo actualizar el tipo de proyecto",
+        variant: "destructive",
+      });
+    } finally {
+      setSavingTipo(false);
+    }
   };
 
   return (

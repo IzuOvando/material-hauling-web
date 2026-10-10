@@ -183,7 +183,7 @@ export function FrenteTiroAssignmentSection({
             {/* Available tiros */}
             <div>
               <p className="text-sm font-medium text-slate-700 mb-2">
-                Disponibles ({available.length})
+                {(whiteLabelConfig as any)?.ui?.tiros?.assignment?.availableLabel || "Disponibles"} ({available.length})
               </p>
               {available.length === 0 ? (
                 <p className="text-sm text-slate-400 px-2">
