@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Loader2 } from "lucide-react";
 import {
   Dialog,
@@ -37,6 +37,13 @@ const AddFrenteDialog = ({
   const [tipoProyecto, setTipoProyecto] = useState<"LINEAL" | "FIJO">("FIJO");
   const { toast } = useToast();
   const router = useRouter();
+
+  useEffect(() => {
+    if (open) {
+      setTipoProyecto("FIJO");
+      setError("");
+    }
+  }, [open]);
 
   const handleAction = async () => {
     const name = refName.current?.value?.trim().toUpperCase();
@@ -130,7 +137,7 @@ const AddFrenteDialog = ({
             </Label>
             <div className="col-span-3">
               <Select value={tipoProyecto} onValueChange={(v) => setTipoProyecto(v as "LINEAL" | "FIJO")}>
-                <SelectTrigger>
+                <SelectTrigger id="tipoProyecto">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>

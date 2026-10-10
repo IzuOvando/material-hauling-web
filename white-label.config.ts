@@ -329,6 +329,7 @@ const defaultConfig = {
       },
     },
     origenes: {
+      tabLabel: "Orígenes",
       title: "Orígenes por Frente",
       assignedLabel: "Asignados",
       availableLabel: "Disponibles",
@@ -355,6 +356,7 @@ const defaultConfig = {
       },
     },
     tiros: {
+      tabLabel: "Tiros",
       title: "Tiros por Frente",
       assignedLabel: "Asignados",
       availableLabel: "Disponibles",
@@ -552,7 +554,7 @@ const merged: WhiteLabelConfig = deepMerge(
 
 // If a tenant is active but didn't set truckIdPrefix explicitly, derive it from app.name.
 // If no tenant → stays "APP" (default). If tenant set it explicitly → already in merged.
-if (tenant && !tenantOverrides?.app?.truckIdPrefix) {
+if (tenant && !(tenantOverrides as TenantConfig)?.app?.truckIdPrefix) {
   merged.app.truckIdPrefix = deriveTruckIdPrefix(merged.app.name);
 }
 

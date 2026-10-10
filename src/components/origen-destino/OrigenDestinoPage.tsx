@@ -28,14 +28,10 @@ export function OrigenDestinoPage({ frentes }: OrigenDestinoPageProps) {
     <Tabs defaultValue="origenes" className="w-full">
       <TabsList>
         <TabsTrigger value="origenes">
-          {(whiteLabelConfig as any)?.ui?.origenes?.catalog?.heading
-            ? (whiteLabelConfig as any).ui.origenes.catalog.heading.replace("Catálogo de ", "")
-            : "Orígenes"}
+          {(whiteLabelConfig as any)?.ui?.origenes?.tabLabel || "Orígenes"}
         </TabsTrigger>
         <TabsTrigger value="tiros">
-          {(whiteLabelConfig as any)?.ui?.tiros?.catalog?.heading
-            ? (whiteLabelConfig as any).ui.tiros.catalog.heading.replace("Catálogo de ", "")
-            : "Tiros"}
+          {(whiteLabelConfig as any)?.ui?.tiros?.tabLabel || "Tiros"}
         </TabsTrigger>
       </TabsList>
 
