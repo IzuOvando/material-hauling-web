@@ -55,7 +55,7 @@ describe("tiros actions", () => {
 
   describe("getTiros", () => {
     it("returns all tiros for owner", async () => {
-      const mockData = [{ id: "1", nombre: "Obra", isActive: true, createdAt: new Date() }];
+      const mockData = [{ id: "1", nombre: "Relleno Sanitario", isActive: true, createdAt: new Date() }];
       (prisma.tiroCatalogo.findMany as jest.Mock).mockResolvedValue(mockData);
 
       const result = await getTiros();
@@ -75,18 +75,18 @@ describe("tiros actions", () => {
   describe("createTiro", () => {
     it("creates a new tiro", async () => {
       (prisma.tiroCatalogo.findUnique as jest.Mock).mockResolvedValue(null);
-      const created = { id: "1", nombre: "Obra", isActive: true };
+      const created = { id: "1", nombre: "Relleno Sanitario", isActive: true };
       (prisma.tiroCatalogo.create as jest.Mock).mockResolvedValue(created);
 
-      const result = await createTiro("Obra");
+      const result = await createTiro("Relleno Sanitario");
       expect(result).toEqual(created);
     });
 
     it("throws if active tiro with same name exists", async () => {
-      const existing = { id: "1", nombre: "Obra", isActive: true };
+      const existing = { id: "1", nombre: "Relleno Sanitario", isActive: true };
       (prisma.tiroCatalogo.findUnique as jest.Mock).mockResolvedValue(existing);
 
-      await expect(createTiro("Obra")).rejects.toThrow('Ya existe un tiro con ese nombre: "Obra"');
+      await expect(createTiro("Relleno Sanitario")).rejects.toThrow('Ya existe un tiro con ese nombre: "Relleno Sanitario"');
     });
 
     it("throws on empty name", async () => {

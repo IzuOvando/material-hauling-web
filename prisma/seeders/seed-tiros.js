@@ -12,8 +12,6 @@ const DEFAULT_TIROS = [
   "Banco de Tiro",
   "Centro de Acopio",
   "Centro de Reciclaje",
-  "Obra",
-  "Otro",
 ];
 
 async function main() {

@@ -17,7 +17,6 @@ const DEFAULT_ORIGENES = [
   "Planta",
   "Demolición",
   "Despalme",
-  "Otro",
 ];
 
 async function main() {

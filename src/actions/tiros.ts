@@ -2,6 +2,11 @@
 
 import prisma from "@/lib/db";
 import { getAppUser } from "@/auth/auth.user";
+import {
+  isStaticTiro,
+  isReservedName,
+  isObraReserved,
+} from "@/constants/mobileCatalogs";
 
 // --- Catalog Actions ---
 
@@ -26,6 +31,20 @@ export async function createTiro(nombre: string) {
   const trimmed = nombre.trim();
   if (!trimmed) {
     throw new Error("El nombre del tiro no puede estar vacío");
+  }
+
+  if (isReservedName(trimmed)) {
+    throw new Error("Este nombre está reservado");
+  }
+
+  if (isObraReserved(trimmed)) {
+    throw new Error(
+      "Este nombre está reservado — la aplicación genera 'Obra' automáticamente desde el nombre del proyecto"
+    );
+  }
+
+  if (isStaticTiro(trimmed)) {
+    throw new Error("Ya existe en el catálogo general de la aplicación");
   }
 
   const existing = await prisma.tiroCatalogo.findUnique({
@@ -58,6 +77,20 @@ export async function renameTiro(id: string, newNombre: string) {
   const trimmed = newNombre.trim();
   if (!trimmed) {
     throw new Error("El nombre del tiro no puede estar vacío");
+  }
+
+  if (isReservedName(trimmed)) {
+    throw new Error("Este nombre está reservado");
+  }
+
+  if (isObraReserved(trimmed)) {
+    throw new Error(
+      "Este nombre está reservado — la aplicación genera 'Obra' automáticamente desde el nombre del proyecto"
+    );
+  }
+
+  if (isStaticTiro(trimmed)) {
+    throw new Error("Ya existe en el catálogo general de la aplicación");
   }
 
   const conflict = await prisma.tiroCatalogo.findFirst({

@@ -2,6 +2,7 @@
 
 import prisma from "@/lib/db";
 import { getAppUser } from "@/auth/auth.user";
+import { isStaticOrigen, isReservedName } from "@/constants/mobileCatalogs";
 
 // --- Catalog Actions ---
 
@@ -26,6 +27,14 @@ export async function createOrigen(nombre: string) {
   const trimmed = nombre.trim();
   if (!trimmed) {
     throw new Error("El nombre del origen no puede estar vacío");
+  }
+
+  if (isReservedName(trimmed)) {
+    throw new Error("Este nombre está reservado");
+  }
+
+  if (isStaticOrigen(trimmed)) {
+    throw new Error("Ya existe en el catálogo general de la aplicación");
   }
 
   const existing = await prisma.origenCatalogo.findUnique({
@@ -58,6 +67,14 @@ export async function renameOrigen(id: string, newNombre: string) {
   const trimmed = newNombre.trim();
   if (!trimmed) {
     throw new Error("El nombre del origen no puede estar vacío");
+  }
+
+  if (isReservedName(trimmed)) {
+    throw new Error("Este nombre está reservado");
+  }
+
+  if (isStaticOrigen(trimmed)) {
+    throw new Error("Ya existe en el catálogo general de la aplicación");
   }
 
   const conflict = await prisma.origenCatalogo.findFirst({
