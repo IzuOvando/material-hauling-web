@@ -161,7 +161,11 @@ export function OrigenCatalogSection({
     if (e.key === "Escape") cancelEditing();
   };
 
-  const activeOrigenes = origenes.filter((m) => m.isActive);
+  // Hide entries that match the mobile static catalog — those are shown read-only below
+  const staticNames = new Set(MOBILE_STATIC_ORIGENES.map((s) => s.toLowerCase()));
+  const activeOrigenes = origenes.filter(
+    (m) => m.isActive && !staticNames.has(m.nombre.toLowerCase())
+  );
 
   return (
     <div className="border-2 border-primary rounded-lg overflow-hidden">

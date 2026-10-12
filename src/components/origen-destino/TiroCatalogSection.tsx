@@ -164,7 +164,11 @@ export function TiroCatalogSection({
     if (e.key === "Escape") cancelEditing();
   };
 
-  const activeTiros = tiros.filter((m) => m.isActive);
+  // Hide entries that match the mobile static catalog — those are shown read-only below
+  const staticNames = new Set(MOBILE_STATIC_TIROS.map((s) => s.toLowerCase()));
+  const activeTiros = tiros.filter(
+    (m) => m.isActive && !staticNames.has(m.nombre.toLowerCase())
+  );
 
   return (
     <div className="border-2 border-primary rounded-lg overflow-hidden">
