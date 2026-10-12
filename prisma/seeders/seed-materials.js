@@ -21,6 +21,10 @@ const DEFAULT_MATERIALS = [
   "Base Hidráulica",
 ];
 
+function normalizeMaterial(value) {
+  return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase();
+}
+
 async function main() {
   const shouldAssign = process.argv.includes("--assign");
 
@@ -28,10 +32,11 @@ async function main() {
 
   const materials = [];
   for (const nombre of DEFAULT_MATERIALS) {
+    const normalizedNombre = normalizeMaterial(nombre);
     const material = await prisma.material.upsert({
-      where: { nombre },
+      where: { normalizedNombre },
       update: {},
-      create: { nombre },
+      create: { nombre, normalizedNombre },
     });
     materials.push(material);
   }

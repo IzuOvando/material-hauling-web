@@ -13,14 +13,14 @@
     "tenant:install": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' scripts/install-tenant-assets.ts",
     "tenant:create-qr-template": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' scripts/create-qr-template.ts",
     "tenant:reset": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' scripts/reset-tenant-assets.ts",
-    "seed": "node prisma/seeders/seed-all.js",
+    "seed": "node prisma/seeders/run-all.js",
     "clear-data": "node ./prisma/clear-data.js",
     "test": "jest",
     "migrate-dev": "npx prisma migrate dev",
     "migrate-prod": "npx prisma migrate deploy"
   },
   "prisma": {
-    "seed": "node prisma/seeders/seed-all.js"
+    "seed": "node prisma/seeders/run-all.js"
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",
