@@ -49,6 +49,7 @@ model Frente {
   frenteKey                 String?         @unique
   displayName               String?
   tipoProyecto              TipoProyecto    @default(FIJO)
+  enableTiroCatalog         Boolean         @default(false)
   logoUrl                   String?
   logoHash                  String?
   logoUpdatedAt             DateTime?

@@ -33,13 +33,13 @@ export async function GET(req: NextRequest) {
 
     const frentes = await prisma.frente.findMany({
       where: frenteNombres ? { nombre: { in: frenteNombres } } : undefined,
-      select: { nombre: true, tipoProyecto: true },
+      select: { nombre: true, tipoProyecto: true, enableTiroCatalog: true },
       orderBy: { nombre: "asc" },
     });
 
     return NextResponse.json({ frentes });
   } catch (error) {
-    console.error("Error al obtener frentes:", error);
+    console.error("Error fetching frentes:", error);
     return NextResponse.json(
       { error: "Error interno del servidor" },
       { status: 500 }

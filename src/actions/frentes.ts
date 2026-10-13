@@ -48,3 +48,27 @@ export async function updateFrenteTipoProyecto(
 
   return { success: true };
 }
+
+export async function updateFrenteEnableTiroCatalog(
+  nombre: string,
+  enableTiroCatalog: boolean
+): Promise<{ success: boolean; error?: string }> {
+  const appUser = await getAppUser();
+  if (!appUser || appUser.role !== "owner") {
+    return { success: false, error: "Unauthorized" };
+  }
+
+  if (typeof enableTiroCatalog !== "boolean") {
+    return { success: false, error: "Invalid enableTiroCatalog value" };
+  }
+
+  const frente = await prisma.frente.findUnique({ where: { nombre } });
+  if (!frente) return { success: false, error: "Frente no encontrado." };
+
+  await prisma.frente.update({
+    where: { nombre },
+    data: { enableTiroCatalog },
+  });
+
+  return { success: true };
+}

@@ -300,6 +300,8 @@ const defaultConfig = {
         fijo: "Fijo",
         linealHint: "Obra lineal (carreteras, ferroviario) — destino por cadenamiento",
         fijoHint: "Destino fijo (planta, almacén, edificio) — destino por tiro",
+        enableTiroCatalogLabel: "Activar catálogo de tiro",
+        enableTiroCatalogHint: "Permite seleccionar tiro además de cadenamiento en proyectos lineales",
       },
     },
     materials: {
