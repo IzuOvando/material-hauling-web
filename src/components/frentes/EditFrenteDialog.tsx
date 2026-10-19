@@ -15,8 +15,18 @@ import DeleteFrenteAlertDialog from "./DeleteFrenteAlertDialog";
 import FrenteLogoUpload from "./FrenteLogoUpload";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { updateFrenteDisplayName } from "@/actions/frentes";
+import { updateFrenteDisplayName, updateFrenteTipoProyecto, updateFrenteEnableTiroCatalog } from "@/actions/frentes";
+import { useToast } from "@/components/ui/use-toast";
 import whiteLabelConfig from "#/white-label.config";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import type { TipoProyecto } from "@prisma/client";
 
 interface EditFrenteDialogProps {
   open: boolean;
@@ -44,11 +54,24 @@ const EditFrenteDialog = ({
   const [savingName, setSavingName] = useState(false);
   const [nameSaved, setNameSaved] = useState(false);
   const isDirty = displayName !== initialDisplayName;
+  const [currentTipoProyecto, setCurrentTipoProyecto] = useState<TipoProyecto>(frente.tipoProyecto);
+  const [savingTipo, setSavingTipo] = useState(false);
+  const [enableTiroCatalog, setEnableTiroCatalog] = useState(frente.enableTiroCatalog);
+  const [savingTiroCatalog, setSavingTiroCatalog] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     const next = frente.displayName ?? siblingDisplayName ?? "";
     setDisplayName(next);
   }, [frente.displayName, siblingDisplayName]);
+
+  useEffect(() => {
+    setCurrentTipoProyecto(frente.tipoProyecto);
+  }, [frente.tipoProyecto]);
+
+  useEffect(() => {
+    setEnableTiroCatalog(frente.enableTiroCatalog);
+  }, [frente.enableTiroCatalog]);
 
   const handleSaveDisplayName = async () => {
     setSavingName(true);
@@ -57,6 +80,66 @@ const EditFrenteDialog = ({
     setNameSaved(true);
     setTimeout(() => setNameSaved(false), 2000);
     onFrenteUpdated();
+  };
+
+  const handleTipoProyectoChange = async (value: TipoProyecto) => {
+    const previous = currentTipoProyecto;
+    setSavingTipo(true);
+    setCurrentTipoProyecto(value);
+    try {
+      const result = await updateFrenteTipoProyecto(frente.nombre, value);
+      if (!result.success) {
+        setCurrentTipoProyecto(previous);
+        toast({
+          title: "Error",
+          description: result.error || "No se pudo actualizar el tipo de proyecto",
+          variant: "destructive",
+        });
+        return;
+      }
+      if (value === "FIJO" && enableTiroCatalog) {
+        setEnableTiroCatalog(false);
+        await updateFrenteEnableTiroCatalog(frente.nombre, false);
+      }
+      onFrenteUpdated();
+    } catch {
+      setCurrentTipoProyecto(previous);
+      toast({
+        title: "Error",
+        description: "No se pudo actualizar el tipo de proyecto",
+        variant: "destructive",
+      });
+    } finally {
+      setSavingTipo(false);
+    }
+  };
+
+  const handleEnableTiroCatalogChange = async (checked: boolean) => {
+    const previous = enableTiroCatalog;
+    setSavingTiroCatalog(true);
+    setEnableTiroCatalog(checked);
+    try {
+      const result = await updateFrenteEnableTiroCatalog(frente.nombre, checked);
+      if (!result.success) {
+        setEnableTiroCatalog(previous);
+        toast({
+          title: "Error",
+          description: result.error || "No se pudo actualizar la configuración de tiro",
+          variant: "destructive",
+        });
+        return;
+      }
+      onFrenteUpdated();
+    } catch {
+      setEnableTiroCatalog(previous);
+      toast({
+        title: "Error",
+        description: "No se pudo actualizar la configuración de tiro",
+        variant: "destructive",
+      });
+    } finally {
+      setSavingTiroCatalog(false);
+    }
   };
 
   return (
@@ -101,6 +184,55 @@ const EditFrenteDialog = ({
                   <p className="text-xs text-slate-400">
                     Se muestra en el dashboard para todos los frentes del proyecto.
                   </p>
+                </div>
+
+                <Separator />
+
+                <div className="flex flex-col gap-2">
+                  <Label className="text-sm font-medium">
+                    {(whiteLabelConfig as any)?.ui?.frentesManager?.tipoProyecto?.label || "Tipo de proyecto"}
+                  </Label>
+                  <Select
+                    value={currentTipoProyecto}
+                    onValueChange={handleTipoProyectoChange}
+                    disabled={savingTipo}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="FIJO">
+                        {(whiteLabelConfig as any)?.ui?.frentesManager?.tipoProyecto?.fijo || "Fijo"}
+                      </SelectItem>
+                      <SelectItem value="LINEAL">
+                        {(whiteLabelConfig as any)?.ui?.frentesManager?.tipoProyecto?.lineal || "Lineal"}
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-slate-400">
+                    {currentTipoProyecto === "LINEAL"
+                      ? ((whiteLabelConfig as any)?.ui?.frentesManager?.tipoProyecto?.linealHint || "Obra lineal — destino por cadenamiento")
+                      : ((whiteLabelConfig as any)?.ui?.frentesManager?.tipoProyecto?.fijoHint || "Destino fijo — destino por tiro")}
+                  </p>
+
+                  {currentTipoProyecto === "LINEAL" && (
+                    <div className="flex items-start gap-2 mt-2">
+                      <Checkbox
+                        id="enableTiroCatalog"
+                        checked={enableTiroCatalog}
+                        onCheckedChange={handleEnableTiroCatalogChange}
+                        disabled={savingTiroCatalog}
+                      />
+                      <div className="flex flex-col gap-0.5">
+                        <Label htmlFor="enableTiroCatalog" className="text-sm font-medium cursor-pointer">
+                          {(whiteLabelConfig as any)?.ui?.frentesManager?.tipoProyecto?.enableTiroCatalogLabel || "Activar catálogo de tiro"}
+                        </Label>
+                        <p className="text-xs text-slate-400">
+                          {(whiteLabelConfig as any)?.ui?.frentesManager?.tipoProyecto?.enableTiroCatalogHint || "Permite seleccionar tiro además de cadenamiento en proyectos lineales"}
+                        </p>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <Separator />

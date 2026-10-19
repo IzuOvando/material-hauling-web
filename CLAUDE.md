@@ -373,7 +373,7 @@ model TiroFrente {
 }
 ```
 
-**Seed — Origen catalog (9 entries):**
+**Seed — Origen catalog (8 entries):**
 1. Banco de Material
 2. Banco de Préstamo
 3. Préstamo Lateral
@@ -382,14 +382,21 @@ model TiroFrente {
 6. Planta
 7. Demolición
 8. Despalme
-9. Otro
 
-**Seed — Tiro catalog (5 entries, only relevant for FIJO projects):**
+**Seed — Tiro catalog (3 entries, only relevant for FIJO projects):**
 1. Banco de Tiro
 2. Centro de Acopio
 3. Centro de Reciclaje
-4. Obra
-5. Otro
+
+> **"Otro" y "Obra" NO van en el catálogo web:**
+> - "Otro" es un mecanismo de UI del mobile que activa un campo de texto libre — no es un entry real.
+> - "Obra" es generado dinámicamente por el mobile desde el frenteNombre (ej. "Obra TPCDMXP").
+> - Ambos están reservados: `src/constants/mobileCatalogs.ts` los valida y rechaza al intentar crearlos.
+>
+> **Catálogo estático del mobile** (mostrado como read-only en admin):
+> - Orígenes: Banco de Material, Banco de Préstamo, Préstamo Lateral, Cantera, Mina, Planta, Demolición, Despalme
+> - Tiros: Banco de Tiro, Centro de Acopio, Centro de Reciclaje
+> - Estos siempre aparecen en el dropdown del mobile (sección "General"). Asignarlos a un frente los prioriza (sección "Este frente").
 
 #### 3. Mobile API Endpoints
 

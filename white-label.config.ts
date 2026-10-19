@@ -49,6 +49,8 @@ const defaultConfig = {
       dashboardDescription: "KPIs y métricas",
       materialsLabel: "Materiales",
       materialsDescription: "Gestión de materiales",
+      origenDestinoLabel: "Origen / Destino",
+      origenDestinoDescription: "Gestión de orígenes y tiros",
       usersLabel: "Usuarios",
       usersDescription: "CRM de usuarios",
     },
@@ -292,6 +294,15 @@ const defaultConfig = {
         crop: "Recortar",
         uploadImage: "Subir imagen",
       },
+      tipoProyecto: {
+        label: "Tipo de proyecto",
+        lineal: "Lineal",
+        fijo: "Fijo",
+        linealHint: "Obra lineal (carreteras, ferroviario) — destino por cadenamiento",
+        fijoHint: "Destino fijo (planta, almacén, edificio) — destino por tiro",
+        enableTiroCatalogLabel: "Activar catálogo de tiro",
+        enableTiroCatalogHint: "Permite seleccionar tiro además de cadenamiento en proyectos lineales",
+      },
     },
     materials: {
       title: "Materiales por Frente",
@@ -317,6 +328,60 @@ const defaultConfig = {
       toast: {
         assignedTitle: "Material asignado",
         removedTitle: "Material removido",
+      },
+    },
+    origenes: {
+      tabLabel: "Orígenes",
+      title: "Orígenes por Frente",
+      assignedLabel: "Asignados",
+      availableLabel: "Disponibles",
+      emptyAssigned: "Sin orígenes asignados",
+      emptyAvailable: "Todos los orígenes ya están asignados",
+      catalog: {
+        heading: "Catálogo de Orígenes",
+        inputPlaceholder: "Nombre del origen",
+        empty: "No hay orígenes en el catálogo. Agrega uno.",
+        createdTitle: "Origen creado",
+        createdDescription: '"{name}" agregado al catálogo',
+        updatedTitle: "Origen actualizado",
+        updatedDescription: 'Renombrado a "{name}"',
+        deletedTitle: "Origen eliminado",
+        deletedDescription: '"{name}" ha sido eliminado del catálogo',
+        deleteDialogTitle: "Eliminar origen",
+        deleteDialogDescription: '¿Estás seguro que deseas eliminar "{name}"? Se removerá de todos los frentes asignados.',
+        deleteDialogCancel: "Cancelar",
+        deleteDialogConfirm: "Eliminar",
+      },
+      toast: {
+        assignedTitle: "Origen asignado",
+        removedTitle: "Origen removido",
+      },
+    },
+    tiros: {
+      tabLabel: "Tiros",
+      title: "Tiros por Frente",
+      assignedLabel: "Asignados",
+      availableLabel: "Disponibles",
+      emptyAssigned: "Sin tiros asignados",
+      emptyAvailable: "Todos los tiros ya están asignados",
+      catalog: {
+        heading: "Catálogo de Tiros",
+        inputPlaceholder: "Nombre del tiro",
+        empty: "No hay tiros en el catálogo. Agrega uno.",
+        createdTitle: "Tiro creado",
+        createdDescription: '"{name}" agregado al catálogo',
+        updatedTitle: "Tiro actualizado",
+        updatedDescription: 'Renombrado a "{name}"',
+        deletedTitle: "Tiro eliminado",
+        deletedDescription: '"{name}" ha sido eliminado del catálogo',
+        deleteDialogTitle: "Eliminar tiro",
+        deleteDialogDescription: '¿Estás seguro que deseas eliminar "{name}"? Se removerá de todos los frentes asignados.',
+        deleteDialogCancel: "Cancelar",
+        deleteDialogConfirm: "Eliminar",
+      },
+      toast: {
+        assignedTitle: "Tiro asignado",
+        removedTitle: "Tiro removido",
       },
     },
     users: {
@@ -491,7 +556,7 @@ const merged: WhiteLabelConfig = deepMerge(
 
 // If a tenant is active but didn't set truckIdPrefix explicitly, derive it from app.name.
 // If no tenant → stays "APP" (default). If tenant set it explicitly → already in merged.
-if (tenant && !tenantOverrides?.app?.truckIdPrefix) {
+if (tenant && !(tenantOverrides as TenantConfig)?.app?.truckIdPrefix) {
   merged.app.truckIdPrefix = deriveTruckIdPrefix(merged.app.name);
 }
 

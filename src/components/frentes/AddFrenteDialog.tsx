@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Loader2 } from "lucide-react";
 import {
   Dialog,
@@ -14,6 +14,14 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "../ui/use-toast";
 import { useRouter } from "next/navigation";
 import whiteLabelConfig from "#/white-label.config";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface AddFrenteDialogProps {
   open: boolean;
@@ -27,8 +35,18 @@ const AddFrenteDialog = ({
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const refName = useRef<HTMLInputElement>(null);
+  const [tipoProyecto, setTipoProyecto] = useState<"LINEAL" | "FIJO">("FIJO");
+  const [enableTiroCatalog, setEnableTiroCatalog] = useState(false);
   const { toast } = useToast();
   const router = useRouter();
+
+  useEffect(() => {
+    if (open) {
+      setTipoProyecto("FIJO");
+      setEnableTiroCatalog(false);
+      setError("");
+    }
+  }, [open]);
 
   const handleAction = async () => {
     const name = refName.current?.value?.trim().toUpperCase();
@@ -53,7 +71,7 @@ const AddFrenteDialog = ({
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ nombre: name }),
+        body: JSON.stringify({ nombre: name, tipoProyecto, enableTiroCatalog: tipoProyecto === "LINEAL" ? enableTiroCatalog : false }),
       });
 
       const data = await response.json();
@@ -79,7 +97,6 @@ const AddFrenteDialog = ({
       setOpen(false);
 
     } catch (error) {
-      console.error("Error al crear nuevo frente:", error);
       toast({
         title: "Error",
         description: error instanceof Error ? error.message : whiteLabelConfig.ui.frentesManager.addDialog.duplicateDescription,
@@ -115,6 +132,50 @@ const AddFrenteDialog = ({
               maxLength={20}
               disabled={loading}
             />
+          </div>
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="tipoProyecto" className="text-right">
+              {(whiteLabelConfig as any)?.ui?.frentesManager?.tipoProyecto?.label || "Tipo"}
+            </Label>
+            <div className="col-span-3">
+              <Select value={tipoProyecto} onValueChange={(v) => { setTipoProyecto(v as "LINEAL" | "FIJO"); if (v === "FIJO") setEnableTiroCatalog(false); }}>
+                <SelectTrigger id="tipoProyecto">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="FIJO">
+                    {(whiteLabelConfig as any)?.ui?.frentesManager?.tipoProyecto?.fijo || "Fijo"}
+                  </SelectItem>
+                  <SelectItem value="LINEAL">
+                    {(whiteLabelConfig as any)?.ui?.frentesManager?.tipoProyecto?.lineal || "Lineal"}
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-slate-400 mt-1">
+                {tipoProyecto === "LINEAL"
+                  ? ((whiteLabelConfig as any)?.ui?.frentesManager?.tipoProyecto?.linealHint || "Obra lineal — destino por cadenamiento")
+                  : ((whiteLabelConfig as any)?.ui?.frentesManager?.tipoProyecto?.fijoHint || "Destino fijo — destino por tiro")}
+              </p>
+
+              {tipoProyecto === "LINEAL" && (
+                <div className="flex items-start gap-2 mt-2">
+                  <Checkbox
+                    id="enableTiroCatalogAdd"
+                    checked={enableTiroCatalog}
+                    onCheckedChange={(checked) => setEnableTiroCatalog(checked === true)}
+                    disabled={loading}
+                  />
+                  <div className="flex flex-col gap-0.5">
+                    <Label htmlFor="enableTiroCatalogAdd" className="text-sm font-medium cursor-pointer">
+                      {(whiteLabelConfig as any)?.ui?.frentesManager?.tipoProyecto?.enableTiroCatalogLabel || "Activar catálogo de tiro"}
+                    </Label>
+                    <p className="text-xs text-slate-400">
+                      {(whiteLabelConfig as any)?.ui?.frentesManager?.tipoProyecto?.enableTiroCatalogHint || "Permite seleccionar tiro además de cadenamiento en proyectos lineales"}
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
         <span className="text-sm mt-[-1.25rem] text-red-500 font-medium">

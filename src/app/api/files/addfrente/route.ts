@@ -14,10 +14,22 @@ export async function POST(req: NextRequest) {
 
 
     try {
-        const { nombre } = await req.json();
+        const { nombre, tipoProyecto, enableTiroCatalog } = await req.json();
+
+        if (tipoProyecto && !["LINEAL", "FIJO"].includes(tipoProyecto)) {
+            return NextResponse.json({ error: "Invalid tipoProyecto value" }, { status: 400 });
+        }
+
+        if (enableTiroCatalog !== undefined && typeof enableTiroCatalog !== "boolean") {
+            return NextResponse.json({ error: "Invalid enableTiroCatalog value" }, { status: 400 });
+        }
 
         const frente = await prisma.frente.create({
-            data: { nombre },
+            data: {
+                nombre,
+                ...(tipoProyecto && { tipoProyecto }),
+                ...(typeof enableTiroCatalog === "boolean" && { enableTiroCatalog }),
+            },
         });
 
         return NextResponse.json(
@@ -25,7 +37,6 @@ export async function POST(req: NextRequest) {
             { status: 200 }
         );
     } catch (error) {
-        console.log(error)
         if (error instanceof Prisma.PrismaClientKnownRequestError) {
             if (error.code === 'P2002') {
                 return NextResponse.json(
@@ -35,7 +46,7 @@ export async function POST(req: NextRequest) {
             }
         }
 
-        console.error("Error al crear nuevo frente:", error);
+        console.error("Error creating frente:", error);
         return NextResponse.json(
             { error: "No se pudo crear el nuevo frente." },
             { status: 500 }

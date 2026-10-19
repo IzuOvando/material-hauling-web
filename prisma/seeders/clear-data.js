@@ -6,6 +6,10 @@ async function clearAllData() {
     try {
         await prisma.gasolina.deleteMany({});
         await prisma.acarreos.deleteMany({});
+        await prisma.origenFrente.deleteMany({});
+        await prisma.tiroFrente.deleteMany({});
+        await prisma.origenCatalogo.deleteMany({});
+        await prisma.tiroCatalogo.deleteMany({});
         await prisma.frente.deleteMany({});
 
         console.log('Todos los registros han sido eliminados.');
