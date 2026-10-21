@@ -122,7 +122,7 @@ const AddFrenteDialog = ({
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="name" className="text-right">
+            <Label htmlFor="name" className="text-center">
               {whiteLabelConfig.ui.frentesManager.addDialog.nameLabel}
             </Label>
             <Input
@@ -133,8 +133,8 @@ const AddFrenteDialog = ({
               disabled={loading}
             />
           </div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="tipoProyecto" className="text-right">
+          <div className="grid grid-cols-4 items-start gap-4 pt-1">
+            <Label htmlFor="tipoProyecto" className="text-center pt-2">
               {(whiteLabelConfig as any)?.ui?.frentesManager?.tipoProyecto?.label || "Tipo"}
             </Label>
             <div className="col-span-3">

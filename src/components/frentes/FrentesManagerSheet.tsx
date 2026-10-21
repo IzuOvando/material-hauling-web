@@ -22,7 +22,7 @@ import whiteLabelConfig from "#/white-label.config";
 function groupByProject(frentes: Frente[]): Map<string, Frente[]> {
   const map = new Map<string, Frente[]>();
   for (const f of frentes) {
-    const project = f.nombre.split(/-F\d/)[0] ?? f.nombre;
+    const project = f.nombre.split("-")[0] ?? f.nombre;
     const list = map.get(project) ?? [];
     list.push(f);
     map.set(project, list);

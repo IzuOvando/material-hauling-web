@@ -50,7 +50,7 @@ export function TrucksDbHeader({
     }
   }, [current, selectedFrente?.nombre, setSelectedFrente]);
 
-  const project = current?.nombre.split(/-F\d/)[0] ?? frente;
+  const project = current?.nombre.split("-")[0] ?? frente;
 
   // Find sibling frentes (same project prefix) to share displayName
   const siblingDisplayName =
