@@ -1,7 +1,8 @@
 "use client";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
-import { Trash } from "lucide-react";
+import { Trash, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import whiteLabelConfig from "#/white-label.config";
 
@@ -14,8 +15,12 @@ const DeleteVouchersButton = ({
 }) => {
   const { toast } = useToast();
   const router = useRouter();
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const deleteVouchers = async () => {
+    if (isDeleting) return;
+    setIsDeleting(true);
+
     let disableToast: () => void;
 
     try {
@@ -48,6 +53,8 @@ const DeleteVouchersButton = ({
         variant: "destructive",
       });
       disableToast = dismiss;
+    } finally {
+      setIsDeleting(false);
     }
 
     setTimeout(() => {
@@ -59,9 +66,9 @@ const DeleteVouchersButton = ({
     <Button
       className="py-2 px-4 bg-red-500 text-white hover:bg-red-600 disabled:opacity-50 disabled:hover:bg-red-500"
       onClick={deleteVouchers}
-      disabled={disabled}
+      disabled={disabled || isDeleting}
     >
-      <Trash className="mr-2" />
+      {isDeleting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Trash className="mr-2" />}
       {whiteLabelConfig.ui.vouchers.deleteButton}
     </Button>
   );

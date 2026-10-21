@@ -98,7 +98,7 @@ export function FrentesManagerSheet() {
   const isSearching = search.trim().length > 0;
 
   const getSiblingDisplayName = (frente: Frente): string | null => {
-    const project = frente.nombre.split(/-F\d/)[0] ?? frente.nombre;
+    const project = frente.nombre.split("-")[0] ?? frente.nombre;
     return (
       frentes.find(
         (f) =>

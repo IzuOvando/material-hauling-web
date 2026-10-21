@@ -39,14 +39,30 @@ describe("deriveTruckIdPrefix — tenant contract registry", () => {
    * AND in the mobile app's client config for the same tenant.
    */
   const TENANT_REGISTRY: Array<{ tenant: string; appName: string; expectedPrefix: string }> = [
-    { tenant: "turist-trucks", appName: "Turist Trucks", expectedPrefix: "TUR" },
-    // { tenant: "next-client", appName: "Next Client Name", expectedPrefix: "NEX" },
+    { tenant: "sedena", appName: "SDN Transportes", expectedPrefix: "SDN" },
+    { tenant: "constructora-aeris", appName: "Constructora Aeris", expectedPrefix: "CON" },
+  ];
+
+  /**
+   * Tenants whose prefix is explicitly set (not derived from app.name).
+   * The app name would derive a different prefix, so an explicit override is needed.
+   */
+  const EXPLICIT_REGISTRY: Array<{ tenant: string; appName: string; explicitPrefix: string }> = [
+    // "Atlas Haul" would derive "ATL", but keeps "TUR" from its old name "Turist Trucks"
+    { tenant: "turist-trucks", appName: "Atlas Haul", explicitPrefix: "TUR" },
   ];
 
   it.each(TENANT_REGISTRY)(
     "$tenant: deriveTruckIdPrefix('$appName') === '$expectedPrefix'",
     ({ appName, expectedPrefix }) => {
       expect(deriveTruckIdPrefix(appName)).toBe(expectedPrefix);
+    }
+  );
+
+  it.each(EXPLICIT_REGISTRY)(
+    '$tenant: explicit prefix "$explicitPrefix" (appName "$appName" would derive differently)',
+    ({ appName, explicitPrefix }) => {
+      expect(deriveTruckIdPrefix(appName)).not.toBe(explicitPrefix);
     }
   );
 });

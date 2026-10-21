@@ -508,7 +508,7 @@ const defaultConfig = {
       signingIn: "Signing in...",
       usernameLabel: "Username",
       usernamePlaceholder: "Username",
-      passwordLabel: "Password",
+      passwordLabel: "Contraseña",
       passwordPlaceholder: "******",
       showPassword: "Mostrar contraseña",
       hidePassword: "Ocultar contraseña",

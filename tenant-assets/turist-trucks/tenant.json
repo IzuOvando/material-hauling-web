@@ -2,6 +2,7 @@
   "app": {
     "name": "Atlas Haul",
     "shortName": "ATLAS",
+    "truckIdPrefix": "TUR",
     "tagline": "Haul Logistics Platform",
     "metadataTitle": "Atlas Haul | Operations Dashboard",
     "metadataDescription": "A fictional white-label logistics operations platform",

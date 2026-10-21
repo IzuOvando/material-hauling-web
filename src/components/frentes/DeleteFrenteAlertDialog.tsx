@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   AlertDialogContent,
   AlertDialogHeader,
@@ -8,6 +9,7 @@ import {
   AlertDialogCancel,
 } from "@/components/ui/alert-dialog";
 import { Frente } from "@prisma/client";
+import { Loader2 } from "lucide-react";
 import { useToast } from "../ui/use-toast";
 import whiteLabelConfig from "#/white-label.config";
 
@@ -21,8 +23,12 @@ const DeleteFrenteAlertDialog = ({
   onDelete,
 }: DeleteFrenteAlertDialogProps) => {
   const { toast } = useToast();
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = async () => {
+    if (isDeleting) return;
+    setIsDeleting(true);
+
     try {
       const response = await fetch("/api/files/deletefrente", {
         method: "POST",
@@ -49,6 +55,8 @@ const DeleteFrenteAlertDialog = ({
         description: whiteLabelConfig.ui.frentesManager.deleteDialog.errorDescription,
         variant: "destructive",
       });
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -63,8 +71,9 @@ const DeleteFrenteAlertDialog = ({
         </AlertDialogDescription>
       </AlertDialogHeader>
       <AlertDialogFooter>
-        <AlertDialogCancel>{whiteLabelConfig.ui.frentesManager.deleteDialog.cancel}</AlertDialogCancel>
-        <AlertDialogAction className="hover:bg-red-500" onClick={handleDelete}>
+        <AlertDialogCancel disabled={isDeleting}>{whiteLabelConfig.ui.frentesManager.deleteDialog.cancel}</AlertDialogCancel>
+        <AlertDialogAction className="hover:bg-red-500" onClick={handleDelete} disabled={isDeleting}>
+          {isDeleting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           {whiteLabelConfig.ui.frentesManager.deleteDialog.confirm}
         </AlertDialogAction>
       </AlertDialogFooter>
