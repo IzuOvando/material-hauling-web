@@ -47,10 +47,10 @@ export async function POST(req: NextRequest) {
     ].filter(Boolean) as string[];
 
     await Promise.allSettled(blobsToDelete.map((url) => blobClient.deleteBlob(url)));
+    // DashboardDailyMetrics rows are cascade-deleted with the frente
     await prisma.frente.delete({
       where: { nombre },
     });
-
 
     logSecurityEvent({
       type: SecurityEventType.DATA_DELETE,

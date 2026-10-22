@@ -157,7 +157,7 @@ function KpiSection({
               style={{ width: `${(kpi.turno2Arrived / kpi.totalTrips) * 100}%` }}
             />
           </div>
-          <div className="flex justify-between text-[9px] text-slate-400 font-medium uppercase tracking-wide">
+          <div className="flex justify-between text-[9px] text-slate-400 font-medium uppercase tracking-wide pr-6">
             <span>T1 · {kpi.turno1Arrived}</span>
             <span>{kpi.turno2Arrived} · T2</span>
           </div>

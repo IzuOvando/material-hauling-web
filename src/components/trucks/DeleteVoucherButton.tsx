@@ -21,8 +21,6 @@ const DeleteVouchersButton = ({
     if (isDeleting) return;
     setIsDeleting(true);
 
-    let disableToast: () => void;
-
     try {
       const response = await fetch("/api/trucks/deleteVoucher", {
         method: "POST",
@@ -41,25 +39,19 @@ const DeleteVouchersButton = ({
         description: whiteLabelConfig.ui.vouchers.deleteSuccessDescription.replace("{frente}", frente),
         variant: "success",
       });
-      disableToast = dismiss;
       setTimeout(() => {
+        dismiss();
         router.push("/db");
-      }, 2000);
+      }, 1000);
     } catch (error) {
       console.error("Error al eliminar los registros:", error);
-      const { dismiss } = toast({
+      toast({
         title: whiteLabelConfig.ui.vouchers.deleteErrorTitle,
         description: whiteLabelConfig.ui.vouchers.deleteErrorDescription.replace("{frente}", frente),
         variant: "destructive",
       });
-      disableToast = dismiss;
-    } finally {
       setIsDeleting(false);
     }
-
-    setTimeout(() => {
-      disableToast();
-    }, 3000);
   };
 
   return (

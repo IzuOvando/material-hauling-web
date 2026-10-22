@@ -6,7 +6,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { AlertDialog, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { AlertDialog } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Frente } from "@prisma/client";
 import { Separator } from "@/components/ui/separator";
@@ -58,6 +58,7 @@ const EditFrenteDialog = ({
   const [savingTipo, setSavingTipo] = useState(false);
   const [enableTiroCatalog, setEnableTiroCatalog] = useState(frente.enableTiroCatalog);
   const [savingTiroCatalog, setSavingTiroCatalog] = useState(false);
+  const [showDeleteAlert, setShowDeleteAlert] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -143,7 +144,7 @@ const EditFrenteDialog = ({
   };
 
   return (
-    <AlertDialog>
+    <>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="sm:max-w-[450px] flex flex-col max-h-[90vh] p-0 gap-0">
           <DialogHeader className="px-6 pt-6 pb-4 shrink-0">
@@ -247,20 +248,28 @@ const EditFrenteDialog = ({
 
           <Separator className="shrink-0" />
           <div className="px-6 py-4 shrink-0">
-            <AlertDialogTrigger asChild>
-              <Button
-                className="w-full flex items-center gap-2 bg-secondary hover:bg-red-600 text-white group"
-                onClick={() => setTimeout(() => setOpen(false), 500)}
-              >
-                <Trash color="white" size={18} /> {(whiteLabelConfig as any)?.ui?.frentesManager?.deleteButton || 'Eliminar Frente'}
-              </Button>
-            </AlertDialogTrigger>
+            <Button
+              className="w-full flex items-center gap-2 bg-secondary hover:bg-red-600 text-white group"
+              onClick={() => setShowDeleteAlert(true)}
+            >
+              <Trash color="white" size={18} /> {(whiteLabelConfig as any)?.ui?.frentesManager?.deleteButton || 'Eliminar Frente'}
+            </Button>
           </div>
 
         </DialogContent>
       </Dialog>
-      <DeleteFrenteAlertDialog frente={frente} onDelete={onDeleteFrente} />
-    </AlertDialog>
+
+      <AlertDialog open={showDeleteAlert} onOpenChange={setShowDeleteAlert}>
+        <DeleteFrenteAlertDialog
+          frente={frente}
+          onDelete={(name) => {
+            setShowDeleteAlert(false);
+            setOpen(false);
+            onDeleteFrente(name);
+          }}
+        />
+      </AlertDialog>
+    </>
   );
 };
 

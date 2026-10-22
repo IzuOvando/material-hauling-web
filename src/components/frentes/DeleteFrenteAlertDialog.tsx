@@ -25,7 +25,8 @@ const DeleteFrenteAlertDialog = ({
   const { toast } = useToast();
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const handleDelete = async () => {
+  const handleDelete = async (e: React.MouseEvent) => {
+    e.preventDefault();
     if (isDeleting) return;
     setIsDeleting(true);
 
