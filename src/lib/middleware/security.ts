@@ -19,7 +19,7 @@ function buildCspHeader(nonce: string): string {
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data: blob: https://*.public.blob.vercel-storage.com",
     "font-src 'self'",
-    "connect-src 'self' http: https:",
+    "connect-src 'self' https://*.public.blob.vercel-storage.com",
     "frame-ancestors 'none'",
     "base-uri 'self'",
     "form-action 'self'",

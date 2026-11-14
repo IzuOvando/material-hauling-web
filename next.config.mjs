@@ -48,7 +48,6 @@ const nextConfig = {
   },
   env: {
     BASE_URL: process.env.BASE_URL || "http://localhost:3000",
-    PRINTERS_TIMEOUT: process.env.PRINTERS_TIMEOUT || "10000",
   },
 };
 

@@ -1,6 +1,5 @@
 declare global {
   interface Window {
-    epson: any;
     enterprises: {
       images: {
         [key: string]: {
