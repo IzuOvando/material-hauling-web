@@ -72,19 +72,12 @@ src/
 ├── actions/                     # Server actions
 ├── components/                  # React components
 │   ├── ui/                      # Reusable UI components (shadcn/ui)
-│   ├── printers/                # Printer management components
 │   ├── tickets/                 # Ticket table and display components
 │   └── frentes/                 # Frente management components
 ├── lib/                         # Core libraries
-│   ├── printers/                # Printer abstraction layer
-│   │   ├── epson.ts             # Low-level Epson printer protocol
-│   │   ├── ticketPrinter.ts     # Single printer abstraction
-│   │   ├── distributedTicketPrinterV2.ts  # Multi-printer queue management
-│   │   └── schemas/             # Ticket formatting schemas
 │   ├── db.ts                    # Prisma client singleton
 │   └── blobClient.ts            # Vercel Blob client
 ├── store/                       # Zustand stores
-│   ├── printerStore.ts          # Printer state management
 │   ├── frenteStore.ts           # Frente selection state
 │   └── ticketsSelectionStore.tsx # Ticket selection for printing
 ├── types/                       # TypeScript type definitions
@@ -133,31 +126,12 @@ All ticket models have:
 ### State Management
 
 **Zustand Stores:**
-- **printerStore**: Manages connected thermal printers (IP, status, device instances)
-  - Persisted to localStorage (excluding device instances)
-  - Auto-reconnects printers on page load
 - **frenteStore**: Current selected frente
 - **ticketsSelectionStore**: Selected tickets for batch printing
 
-### Printer System Architecture
+### Printing
 
-**Three-layer abstraction:**
-
-1. **EpsonPrinter** (`lib/printers/epson.ts`): Low-level ESC/POS protocol over TCP/IP
-2. **TicketPrinter** (`lib/printers/ticketPrinter.ts`): Single printer with connection management
-   - Handles connection status callbacks
-   - Configurable timeout (PRINTERS_TIMEOUT env var)
-   - Paper end detection
-3. **DistributedTicketPrinter** (`lib/printers/distributedTicketPrinterV2.ts`): Multi-printer job queue
-   - Distributes tickets across multiple printers
-   - Automatic retry on failures
-   - Tracks successful/failed prints
-   - Status callbacks for UI updates
-
-**Ticket Schemas** (`lib/printers/schemas/`):
-- Define layout and formatting for each ticket type
-- Handle QR code generation and encryption
-- Different schemas for different areas (Acarreos, Gasolina, etc.)
+The web app does not print. Vouchers are printed from the mobile app over Bluetooth; the web app only manages and displays the data. The old browser-to-printer Epson code and its `PRINTERS_TIMEOUT` setting were removed.
 
 ### File Processing Pipeline
 
@@ -200,7 +174,6 @@ All mobile endpoints:
 
 **Server vs Client:**
 - Database queries only in API routes or server actions
-- Printer operations are client-side (browser connects to printer IPs)
 - State stores are client-side with persistence
 
 **Testing:**
@@ -272,7 +245,7 @@ Required environment variables (see `.env.example`):
 - Redis/Vercel KV (KV_REST_API_URL, KV_REST_API_TOKEN)
 - Vercel Blob (BLOB_READ_WRITE_TOKEN) - required even in local dev
 - Auth secrets (AUTH_SECRET, ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET)
-- Optional: BATCHES_RECORDS, BATCHES_CSV_LINES, PRINTERS_TIMEOUT
+- Optional: BATCHES_RECORDS, BATCHES_CSV_LINES
 
 For local development with Docker, use the provided `docker-compose.yaml` which sets up PostgreSQL and Redis instances. Note: Vercel Blob is still required for file uploads even in local development.
 
