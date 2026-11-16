@@ -27,7 +27,6 @@ export function canRoleAccessRoute(role: Role, pathname: string): boolean {
 const publicApiRoutes = new Set([
   "/api/mobile/auth",
   "/api/mobile/auth/refresh",
-  "/api/enterprises/images",
 ]);
 
 export const AUTH_LOGIN_ROUTE = "/api/mobile/auth";
