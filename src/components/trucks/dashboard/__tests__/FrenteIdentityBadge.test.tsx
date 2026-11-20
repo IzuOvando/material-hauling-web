@@ -19,11 +19,10 @@ describe("FrenteIdentityBadge", () => {
     expect(screen.getByText("F1")).toBeInTheDocument();
   });
 
-  it("shows the frente id in place of the logo when it has none", () => {
+  it("shows the frente id in the placeholder and in the label when there is no logo", () => {
     render(<FrenteIdentityBadge frente="PROJ-A1" />);
 
     expect(screen.queryByRole("img")).not.toBeInTheDocument();
-    // once in the placeholder, once in the PROJECT · ID label
     expect(screen.getAllByText("A1")).toHaveLength(2);
     expect(screen.getByText("PROJ")).toBeInTheDocument();
   });
@@ -34,10 +33,9 @@ describe("FrenteIdentityBadge", () => {
     expect(screen.queryByText("Tren Pachuca")).not.toBeInTheDocument();
   });
 
-  it("handles a frente name without a dash", () => {
+  it("uses the whole name as the project, without a separator, when there is no dash", () => {
     render(<FrenteIdentityBadge frente="SOLO" />);
 
-    // placeholder and label both use the project; no separator or empty suffix
     expect(screen.getAllByText("SOLO")).toHaveLength(2);
     expect(screen.queryByText("·")).not.toBeInTheDocument();
   });

@@ -16,12 +16,11 @@ export default async function DashboardFrentePage({
     select: { displayName: true, logoUrl: true },
   });
 
-  // A frente without displayName takes the one of a sibling of the same project.
-  // The dash in the prefix keeps project "AB" from matching "ABC-F1".
   let displayName = frenteData?.displayName ?? null;
   if (!displayName) {
     const sibling = await prisma.frente.findFirst({
       where: {
+        // The dash keeps project "AB" from matching "ABC-F1".
         nombre: { startsWith: `${getProject(params.frente)}-` },
         displayName: { not: null },
       },
