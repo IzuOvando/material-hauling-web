@@ -91,6 +91,7 @@ const defaultConfig = {
       tripsByMaterial: "Viajes por material",
       materialDistribution: "Distribución por material",
       noData: "Sin datos para el período seleccionado",
+      frenteLogoAlt: "Logo {frente}",
       inTransit: "En tránsito",
       completedTripsByDay: "Viajes completados por día",
       hauledM3ByDay: "M³ acarreados por día",
