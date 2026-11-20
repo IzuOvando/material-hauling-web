@@ -31,7 +31,6 @@ npm test              # Run all Jest tests with coverage
 npm run migrate-dev   # Run Prisma migrations in development
 npm run migrate-prod  # Deploy Prisma migrations to production
 npm run seed          # Seed database with initial data
-npm run clear-data    # Clear all data from database
 ```
 
 ### Docker
