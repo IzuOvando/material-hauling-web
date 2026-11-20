@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a Next.js 14 white-label web application (multi-tenant) for managing and printing tickets for construction and logistics operations using thermal printers. The system handles multiple ticket types (Gasolina, Acarreos, Concreto, Asfalto, VoucherCamion) and provides both web and mobile API interfaces. Each client/tenant gets its own branding, database, and Vercel deployment via the white-label config system (`white-label.config.ts` + `tenant-assets/<client>/tenant.json`).
+This is a Next.js 14 white-label web application (multi-tenant) for managing and displaying truck vouchers (VoucherCamion) for construction and logistics operations, with both web and mobile API interfaces. **The web app does not print**: vouchers are created and printed from the mobile app over Bluetooth. Each client/tenant gets its own branding, database, and Vercel deployment via the white-label config system (`white-label.config.ts` + `tenant-assets/<client>/tenant.json`).
 
 > **Architectural note — Frentes vs Projects:**
 > The current data model is organized around **Frentes** (work fronts), where each frente is the primary entity for grouping tickets, users, and dashboard data. The concept of "Project" is currently derived by parsing the frente name (e.g. `PROJ-F1` → project `PROJ`). A `displayName` field on `Frente` stores the full human-readable project name and is shared across all frentes with the same prefix.
@@ -26,6 +26,13 @@ npm run lint          # Run ESLint
 npm test              # Run all Jest tests with coverage
 ```
 
+### Tenants (white-label)
+```bash
+npm run tenant:install -- <tenant>   # Install a tenant's assets (also run by prebuild when NEXT_PUBLIC_TENANT is set)
+npm run tenant:create-qr-template    # Create the QR template for a tenant
+npm run tenant:reset                 # Reset the installed tenant assets
+```
+
 ### Database
 ```bash
 npm run migrate-dev   # Run Prisma migrations in development
@@ -42,8 +49,8 @@ docker-compose up     # Start local PostgreSQL and Redis containers
 
 ### Tech Stack
 - **Framework**: Next.js 14 (App Router)
-- **Database**: PostgreSQL with Prisma ORM
-- **Cache/Session**: Redis via Vercel KV (Upstash)
+- **Database**: PostgreSQL 16 with Prisma ORM (each tenant has its own database)
+- **Cache**: Redis via Vercel KV (Upstash): dashboard and facets caches. Web sessions are JWT, not stored in Redis
 - **Storage**: Vercel Blob for file uploads (Excel files)
 - **Authentication**: NextAuth.js v5 with JWT strategy
 - **State Management**: Zustand with persistence
@@ -54,93 +61,99 @@ docker-compose up     # Start local PostgreSQL and Redis containers
 
 ```
 src/
-├── app/                          # Next.js App Router pages
-│   ├── (dashboard)/             # Protected dashboard routes
-│   │   └── tickets/[frente]/[area]/  # Dynamic ticket viewing by frente and area
-│   ├── trucks/                  # Truck voucher management
-│   ├── api/                     # API routes
-│   │   ├── mobile/              # Mobile app endpoints (JWT auth)
-│   │   ├── files/               # File upload/processing endpoints
-│   │   ├── frente/              # Frente and ticket management
-│   │   └── trucks/              # Truck voucher endpoints
-│   └── login/                   # Login page
+├── app/                          # Next.js App Router
+│   ├── (main)/                  # Protected web routes
+│   │   ├── dashboard/[frente]/  # Dashboard (KPIs and charts)
+│   │   ├── db/[frente]/         # Vouchers table
+│   │   ├── materials/           # Materials catalog
+│   │   ├── origen-destino/      # Origen and Tiro catalogs and their assignment per frente
+│   │   └── users/               # User management
+│   ├── voucher/                 # Public voucher view (QR target)
+│   ├── login/                   # Login
+│   ├── forbidden/               # Shown to roles without access
+│   └── api/
+│       ├── mobile/              # Mobile app endpoints (JWT Bearer auth)
+│       ├── trucks/              # Vouchers, facets, dashboard, cleanup
+│       ├── files/               # Frente creation and deletion (addfrente, deletefrente)
+│       ├── frentes/             # Frente logos
+│       └── user/, users/        # User management
+├── middleware.ts                # Security headers/CSP, CORS, rate limit, access control
 ├── auth/                        # Authentication configuration
 │   ├── auth.config.ts           # NextAuth configuration
 │   ├── auth.ts                  # Auth handlers
 │   └── TokenAuthenticator.ts    # JWT token utilities for mobile API
-├── actions/                     # Server actions
+├── actions/                     # Server actions (dashboard/, trucks/, voucherCamion/, origenes, tiros, ...)
 ├── components/                  # React components
 │   ├── ui/                      # Reusable UI components (shadcn/ui)
-│   ├── tickets/                 # Ticket table and display components
-│   └── frentes/                 # Frente management components
+│   ├── app-shell/, branding/    # Tenant-aware shell and branding provider
+│   ├── trucks/                  # Vouchers table, filters, cards and dashboard/ charts
+│   ├── frentes/                 # Frente management components
+│   ├── origen-destino/, materials/, users/, common/
+├── config/                      # Constants, variables and the empty tenant template
+├── constants/                   # Mobile catalogs
+├── hooks/                       # Data hooks (infinite vouchers, table)
 ├── lib/                         # Core libraries
+│   ├── middleware/              # accessControl, cors, security, handlers
+│   ├── schemas/                 # Excel header definitions
+│   ├── theme.ts                 # Tenant colors to CSS variables
 │   ├── db.ts                    # Prisma client singleton
-│   └── blobClient.ts            # Vercel Blob client
-├── store/                       # Zustand stores
-│   ├── frenteStore.ts           # Frente selection state
-│   └── ticketsSelectionStore.tsx # Ticket selection for printing
+│   └── blobClient.ts            # Vercel Blob client (frente logos)
+├── store/                       # Zustand stores (frenteStore, dashboardStore)
 ├── types/                       # TypeScript type definitions
+├── errors/                      # Custom error classes
 ├── utils/                       # Utility functions
 │   ├── validators.ts            # Input validation utilities
 │   ├── crypto/                  # Encryption utilities
+│   ├── excel/                   # Excel/QR validators
 │   └── qr/                      # QR code generation
 ├── helpers/                     # Helper functions
 │   └── formatters/              # Date, number, and data formatters
 └── contexts/                    # React contexts
 ```
 
+Outside `src/`: `white-label.config.ts` (config schema and Spanish defaults), `tenant-assets/<tenant>/` (per-tenant branding), `clients/` (deploy registry: one Vercel project ID per client) and `scripts/` (tenant tooling). See `WHITE_LABEL.md`.
+
 ### Database Schema (Prisma)
 
 The database is organized around **Frentes** (construction sites/projects):
 
-- **User**: Users with roles and frente assignments (many-to-many via UserFrente)
-- **Frente**: Construction site with Excel file URLs for each ticket type
-- **VoucherCamion**: Truck vouchers with odometer, material tracking
-- **Acarreos**: Material transport tickets
-- **Gasolina**: Fuel purchase tickets
-- **Concreto**: Concrete delivery tickets
-- **Asfalto**: Asphalt delivery tickets
+- **User**: Users with a role (`rol`) and frente assignments (many-to-many via UserFrente)
+- **Frente**: Construction site/work front: `displayName`, project type (`TipoProyecto`: LINEAL or FIJO), `enableTiroCatalog`, logo fields
+- **VoucherCamion**: Truck vouchers with odometer, material, status (`VoucherStatus`) and arrival tracking. This is what the web app shows
+- **Material / MaterialFrente**: Materials catalog and its assignment per frente
+- **OrigenCatalogo / OrigenFrente** and **TiroCatalogo / TiroFrente**: Origin and dump-site catalogs and their assignment per frente
+- **DashboardDailyMetrics**: Per-frente daily aggregates used by the dashboard
+- **Acarreos / Gasolina / Concreto / Asfalto**: Legacy ticket tables inherited from SEDENA. The web app does not use them; they are kept because cleaning the schema needs its own evaluation
 
-All ticket models have:
-- UUID primary key
-- `frenteNombre` foreign key to Frente (cascade delete)
-- `createdAt` timestamp for record creation
-- Date/time fields for ticket operations
-- Database indexes optimized for filtering by frente, date, and common fields
+All of these hang from Frente with `frenteNombre` and cascade delete: deleting a frente deletes its vouchers, tickets, metrics and assignments. Indexes are tuned for filtering by frente, date, and common fields. The `excelUrl*Blob` columns on `Frente` are no longer written; `deletefrente` still reads them to remove old blobs.
 
 ### Authentication & Authorization
 
 **Web App (NextAuth.js):**
 - Session-based JWT authentication (24h expiry)
-- Middleware protects all routes except `/login` and `/trucks/voucher`
-- User roles: `ADMIN`, `USER`, `CHECKER` (defined in `src/types/roles.ts`)
-- Role-based access control in components and server actions
+- `src/middleware.ts` protects all routes except `/login`, `/voucher` and `/forbidden` (`publicWebRoutes` in `src/lib/middleware/accessControl.ts`)
+- User roles: `owner`, `admin`, `user`, `general` (defined in `src/types/roles.ts`). Which role can open which route is decided in `src/lib/middleware/accessControl.ts` (`user` has no web access)
+- Role-based access control in middleware, components and server actions
 
 **Mobile API:**
 - Separate JWT token system using `TokenAuthenticator`
 - Endpoints under `/api/mobile/*` use Bearer token authentication
 - Access tokens (short-lived) and refresh tokens (long-lived)
-- Tokens stored in Redis (Vercel KV) for revocation
+- Tokens are only signed and verified; they are **not** stored in Redis and there is no revocation yet (planned, see the SEC-011 TODO in `TokenAuthenticator.ts`)
 
 ### State Management
 
 **Zustand Stores:**
-- **frenteStore**: Current selected frente
-- **ticketsSelectionStore**: Selected tickets for batch printing
+- **frenteStore**: Current selected frente (persisted)
+- **dashboardStore**: Dashboard period and selected material
 
 ### Printing
 
 The web app does not print. Vouchers are printed from the mobile app over Bluetooth; the web app only manages and displays the data. The old browser-to-printer Epson code and its `PRINTERS_TIMEOUT` setting were removed.
 
-### File Processing Pipeline
+### Excel
 
-Excel file uploads are processed through:
-1. **Upload**: Client uploads Excel via `/api/files/vercel` or `/api/files/local`
-2. **Storage**: Saved to Vercel Blob (cloud) or local filesystem (dev)
-3. **Processing**: `/api/files/process` parses Excel and inserts records
-   - Validation before insertion
-   - Deduplicate based on business logic per ticket type
-4. **Association**: File URL stored in Frente record for future reference
+The web app does not import Excel files: vouchers enter through the mobile API. The vouchers table can be exported with `POST /api/trucks/excel`. Vercel Blob is used for frente logos.
 
 ### Mobile API Endpoints
 
@@ -148,6 +161,11 @@ Excel file uploads are processed through:
 - `POST /api/mobile/auth/refresh`: Refresh access token
 - `POST /api/mobile/vouchers`: Create truck vouchers (batch)
 - `GET /api/mobile/vouchers/latest`: Get recent vouchers for a frente
+- `POST /api/mobile/vouchers/arrival`: Register voucher arrivals
+- `GET /api/mobile/frentes`: Frentes for the mobile app
+- `GET /api/mobile/materials`: Materials catalog
+- `GET /api/mobile/origenes`, `GET /api/mobile/tiros`: Origin and dump-site catalogs
+- `GET /api/mobile/logos`: Logos of the frentes the user can access
 
 All mobile endpoints:
 - Require Bearer token authentication
@@ -167,12 +185,12 @@ All mobile endpoints:
 
 **Component Organization:**
 - UI primitives in `components/ui/` (shadcn/ui pattern)
-- Feature-specific components in domain folders (printers, tickets, frentes)
+- Feature-specific components in domain folders (trucks, frentes, materials, origen-destino, users)
 - Use TypeScript for all components with proper typing
 
 **Server vs Client:**
 - Database queries only in API routes or server actions
-- State stores are client-side with persistence
+- State stores are client-side (`frenteStore` is persisted to localStorage)
 
 **Testing:**
 - Test files co-located with source (`.test.ts` suffix)
@@ -193,9 +211,9 @@ All mobile endpoints:
 - **Key exports**: `ChartContainer`, `ChartTooltip`, `ChartTooltipContent`, `ChartLegend`, `ChartLegendContent`, `ChartConfig`
 
 ### Location & Naming
-- Domain folder: `src/components/dashboard/` — same convention as `printers/`, `tickets/`
+- Domain folder: `src/components/trucks/dashboard/` — same convention as `frentes/`, `materials/`
 - File naming: `{Domain}{ChartType}Chart.tsx` (e.g. `AcarreosTripsBarChart.tsx`)
-- Shared empty state: `src/components/dashboard/EmptyChart.tsx`
+- Shared empty state: `src/components/trucks/dashboard/EmptyChart.tsx` (to be created: it does not exist yet)
 - Barrel export in `index.ts` — only what is used outside the folder
 
 ### Color System
@@ -232,27 +250,30 @@ Colors are declared per-chart inside `chartConfig` using explicit hex. `ChartCon
 |---|---|---|
 | Types | `src/types/dashboard.ts` | `DashboardFilters`, `TimeseriesPoint`, `BreakdownItem`, etc. |
 | Validation | `src/actions/dashboard/helpers.ts` | `getDashboardFilters()` |
-| API | `src/app/api/dashboard/*` | Endpoints returning typed data |
-| Charts | `src/components/dashboard/*Chart.tsx` | Pure visual, receives data as props |
-| Pages | `src/app/(dashboard)/trucks/dashboard/` | Composes charts, fetches data |
+| API | `src/app/api/trucks/dashboard/*` | Endpoints returning typed data |
+| Charts | `src/components/trucks/dashboard/*Chart.tsx` | Pure visual, receives data as props |
+| Pages | `src/app/(main)/dashboard/` | Composes charts, fetches data |
 
 ## Environment Setup
 
 Required environment variables (see `.env.example`):
 - PostgreSQL connection (DATABASE_URL, POSTGRES_URL_NON_POOLING)
-- Redis/Vercel KV (KV_REST_API_URL, KV_REST_API_TOKEN)
+- Redis/Vercel KV (KV_REST_API_URL, KV_REST_API_TOKEN, KV_URL, KV_REST_API_READ_ONLY_TOKEN)
 - Vercel Blob (BLOB_READ_WRITE_TOKEN) - required even in local dev
-- Auth secrets (AUTH_SECRET, ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET)
+- Auth secrets (AUTH_SECRET, ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET) and token lifetimes (TOKEN_EXPIRACY_ACCESS, TOKEN_EXPIRACY_REFRESH)
+- URLs (BASE_URL, NEXT_PUBLIC_API_URL, AUTH_URL)
+- Tenant selection: `NEXT_PUBLIC_TENANT` (see `WHITE_LABEL.md`)
 
-For local development with Docker, use the provided `docker-compose.yaml` which sets up PostgreSQL and Redis instances. Note: Vercel Blob is still required for file uploads even in local development.
+For local development with Docker, use the provided `docker-compose.yaml` which sets up PostgreSQL and Redis instances. Note: Vercel Blob is still required for frente logo uploads even in local development.
 
 ## Deployment
 
-The application is designed for deployment on Vercel:
-- Vercel Postgres for production database
-- Vercel KV for Redis
-- Vercel Blob for file storage
-- Environment variables configured in Vercel dashboard
+The application runs on Vercel, one project per client, with its own PostgreSQL database, Vercel KV for Redis and Vercel Blob for logos. Environment variables are configured in each Vercel project.
+
+GitHub Actions (`.github/workflows/`) deploy with the Vercel CLI, one job per client listed in `clients/_registry.json` (each client needs its Vercel project ID in `clients/<client>/web-project-id`):
+- **Staging** (`staging.yml`): every push to `main` runs lint and type check, applies pending Prisma migrations to the staging database, and deploys every client to Vercel staging.
+- **Production** (`release.yml`): publishing a (non-pre-)release runs lint and type check, **fails if the production database has pending migrations**, and deploys every client to Vercel production.
+- **Migrations** (`migrate.yml`, manual): apply or roll back migrations on staging or production.
 
 ```bash
 vercel --prod         # Deploy directly to Vercel production via CLI
