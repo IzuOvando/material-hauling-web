@@ -138,7 +138,6 @@ Excel file uploads are processed through:
 1. **Upload**: Client uploads Excel via `/api/files/vercel` or `/api/files/local`
 2. **Storage**: Saved to Vercel Blob (cloud) or local filesystem (dev)
 3. **Processing**: `/api/files/process` parses Excel and inserts records
-   - Batch processing (BATCHES_RECORDS and BATCHES_CSV_LINES env vars)
    - Validation before insertion
    - Deduplicate based on business logic per ticket type
 4. **Association**: File URL stored in Frente record for future reference
@@ -244,7 +243,6 @@ Required environment variables (see `.env.example`):
 - Redis/Vercel KV (KV_REST_API_URL, KV_REST_API_TOKEN)
 - Vercel Blob (BLOB_READ_WRITE_TOKEN) - required even in local dev
 - Auth secrets (AUTH_SECRET, ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET)
-- Optional: BATCHES_RECORDS, BATCHES_CSV_LINES
 
 For local development with Docker, use the provided `docker-compose.yaml` which sets up PostgreSQL and Redis instances. Note: Vercel Blob is still required for file uploads even in local development.
 
