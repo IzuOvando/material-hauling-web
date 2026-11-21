@@ -52,21 +52,22 @@ export function useTrucksInfiniteVouchers({
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [error, setError] = useState(false);
 
-  // The query identity. When filters/sort/frente change, the server re-renders
-  // and feeds fresh page-1 data through `initialVouchers`; reset to that.
-  const key = `${frente}|${filtersString ?? ""}|${sort ?? ""}|${limit}`;
-  const prevKey = useRef(key);
+  // Reset on every fresh page-1 payload from the server, not only when the query
+  // changes: router.refresh() (delete, close cycle) keeps the query but changes
+  // the rows. A client re-render keeps the same reference, so loaded pages stay.
+  const isFirstRender = useRef(true);
 
   useEffect(() => {
-    if (prevKey.current !== key) {
-      prevKey.current = key;
-      setVouchers(initialVouchers);
-      setTotal(initialTotal);
-      setLoadedPage(1);
-      setError(false);
-      setIsLoadingMore(false);
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
     }
-  }, [key, initialVouchers, initialTotal]);
+    setVouchers(initialVouchers);
+    setTotal(initialTotal);
+    setLoadedPage(1);
+    setError(false);
+    setIsLoadingMore(false);
+  }, [initialVouchers, initialTotal]);
 
   const hasMore = vouchers.length < total;
 

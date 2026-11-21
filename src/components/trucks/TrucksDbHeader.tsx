@@ -26,6 +26,7 @@ interface TrucksDbHeaderProps {
   canActOnVouchers?: boolean;
   appliedFilters: string;
   total: number;
+  onVouchersChanged?: () => void;
 }
 
 export function TrucksDbHeader({
@@ -36,6 +37,7 @@ export function TrucksDbHeader({
   canActOnVouchers = false,
   appliedFilters,
   total,
+  onVouchersChanged,
 }: TrucksDbHeaderProps) {
   const router = useRouter();
   const { selectedFrente, setSelectedFrente } = useFrenteStore();
@@ -163,7 +165,7 @@ export function TrucksDbHeader({
             <CloseCycleSheet
               open={openCloseCycle}
               setOpen={setOpenCloseCycle}
-              onSuccess={() => router.refresh()}
+              onSuccess={() => (onVouchersChanged ? onVouchersChanged() : router.refresh())}
             />
           )}
           {current && (
@@ -173,7 +175,7 @@ export function TrucksDbHeader({
               frente={current}
               filters={appliedFilters}
               total={total}
-              onDeleted={() => router.refresh()}
+              onDeleted={onVouchersChanged}
             />
           )}
         </div>

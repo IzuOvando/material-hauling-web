@@ -1,6 +1,9 @@
 "use client";
 
+import { useTransition } from "react";
+import { useRouter } from "next/navigation";
 import type { Frente, VoucherCamion } from "@prisma/client";
+import { cn } from "@/lib/utils";
 import { useTrucksTable } from "@/hooks/useTrucksTable";
 import { TrucksDbHeader } from "./TrucksDbHeader";
 import { TrucksTableFilters, DownloadTrucksExcelButton } from "./filters";
@@ -33,9 +36,21 @@ export function TrucksDbView({
   isReadOnly,
 }: TrucksDbViewProps) {
   const { view } = useTrucksTable();
+  const router = useRouter();
+  const [isRefreshing, startRefresh] = useTransition();
+
+  // The dimming only shows if the refresh takes over 300 ms, so a fast one looks
+  // like a plain update.
+  const refreshData = () => startRefresh(() => router.refresh());
 
   return (
-    <div className="space-y-4">
+    <div
+      className={cn(
+        "space-y-4 transition-opacity duration-200",
+        isRefreshing && "pointer-events-none opacity-60 delay-300"
+      )}
+      aria-busy={isRefreshing}
+    >
       <TrucksDbHeader
         frente={frente}
         frentes={frentes}
@@ -44,6 +59,7 @@ export function TrucksDbView({
         canActOnVouchers={total > 0}
         appliedFilters={appliedFilters}
         total={total}
+        onVouchersChanged={refreshData}
       />
 
       <TrucksTableFilters frente={frente} />
