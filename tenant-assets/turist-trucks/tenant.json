@@ -47,7 +47,7 @@
     "vouchers": {
       "deleteButton": "Delete Records",
       "deleteSuccessTitle": "Deletion Successful",
-      "deleteSuccessDescription": "Records for site \"{frente}\" were deleted.",
+      "deleteSuccessDescription": "Loads deleted from site \"{frente}\": {count}.",
       "deleteErrorTitle": "Deletion Failed",
       "deleteErrorDescription": "Could not delete records for site \"{frente}\". Please try again later.",
       "deleteDialogTitle": "Delete Load Data",
@@ -55,6 +55,9 @@
       "deleteDialogWarningBold": "all load records",
       "deleteDialogWarningMiddle": "for site",
       "deleteDialogWarningSuffix": "This cannot be undone.",
+    "deleteDialogScopedOne": "{count} load will be deleted from site {frente}: only the one the table shows with the current filters.",
+    "deleteDialogScopedMany": "{count} loads will be deleted from site {frente}: only the ones the table shows with the current filters.",
+    "deleteDialogScopedKeep": "The rest of the site's loads are not touched. This cannot be undone.",
       "deleteDialogConfirmPrefix": "Type",
       "deleteDialogConfirmSuffix": "to confirm.",
       "deleteDialogCancel": "Cancel",

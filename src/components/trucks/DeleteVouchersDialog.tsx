@@ -11,21 +11,37 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Frente } from "@prisma/client";
-import { DeleteVoucherButton } from ".";
+import DeleteVoucherButton from "./DeleteVoucherButton";
+import { describeTrucksFilters } from "./filters/describeFilters";
 import whiteLabelConfig from "#/white-label.config";
 
 interface DeleteVouchersDialogProps {
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   frente: Frente;
+  filters: string;
+  total: number;
+  onDeleted?: () => void;
+}
+
+function withBold(template: string, values: Record<string, string>) {
+  return template.split(/(\{\w+\})/).map((part, i) => {
+    const key = part.slice(1, -1);
+    return part.startsWith("{") && key in values ? <b key={i}>{values[key]}</b> : part;
+  });
 }
 
 const DeleteVouchersDialog = ({
   open,
   setOpen,
   frente,
+  filters,
+  total,
+  onDeleted,
 }: DeleteVouchersDialogProps) => {
   const [confirmText, setConfirmText] = useState("");
+  const activeFilters = describeTrucksFilters(filters);
+  const copy = whiteLabelConfig.ui.vouchers;
 
   // Reset the confirmation field whenever the dialog opens or closes.
   useEffect(() => {
@@ -45,12 +61,27 @@ const DeleteVouchersDialog = ({
           <DialogTitle>{whiteLabelConfig.ui.vouchers.deleteDialogTitle}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4 text-left text-sm">
-          <p>
-            {whiteLabelConfig.ui.vouchers.deleteDialogWarningPrefix}{" "}
-            <b>{whiteLabelConfig.ui.vouchers.deleteDialogWarningBold}</b>{" "}
-            {whiteLabelConfig.ui.vouchers.deleteDialogWarningMiddle}{" "}
-            <b>{frente.nombre}</b>. {whiteLabelConfig.ui.vouchers.deleteDialogWarningSuffix}
-          </p>
+          {activeFilters.length > 0 ? (
+            <>
+              <p>
+                {withBold(total === 1 ? copy.deleteDialogScopedOne : copy.deleteDialogScopedMany, {
+                  count: total.toLocaleString("es-MX"),
+                  frente: frente.nombre,
+                })}
+              </p>
+              <ul className="list-disc space-y-0.5 pl-5 text-slate-600">
+                {activeFilters.map((line) => (
+                  <li key={line}>{line}</li>
+                ))}
+              </ul>
+              <p>{copy.deleteDialogScopedKeep}</p>
+            </>
+          ) : (
+            <p>
+              {copy.deleteDialogWarningPrefix} <b>{copy.deleteDialogWarningBold}</b>{" "}
+              {copy.deleteDialogWarningMiddle} <b>{frente.nombre}</b>. {copy.deleteDialogWarningSuffix}
+            </p>
+          )}
           <div className="space-y-1.5">
             <label
               htmlFor="confirm-frente"
@@ -76,7 +107,16 @@ const DeleteVouchersDialog = ({
           <Button variant="outline" onClick={handleCancel}>
             {whiteLabelConfig.ui.vouchers.deleteDialogCancel}
           </Button>
-          <DeleteVoucherButton frente={frente.nombre} disabled={!isConfirmed} />
+          <DeleteVoucherButton
+            frente={frente.nombre}
+            filters={filters}
+            expectedCount={total}
+            disabled={!isConfirmed}
+            onDeleted={() => {
+              setOpen(false);
+              onDeleted?.();
+            }}
+          />
         </DialogFooter>
       </DialogContent>
     </Dialog>
