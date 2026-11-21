@@ -105,8 +105,16 @@ async function main() {
 
   const fixed = await prisma.$transaction(fixDrift, { maxWait: 10_000, timeout: 60_000 });
   const frentes = [...new Set(drift.map((r) => r.frenteNombre))];
-  for (const frente of frentes) await clearDashboardCache(frente);
-  console.log(`\nCorregidos ${fixed} día(s) en ${frentes.length} frente(s); caché del dashboard limpiada.`);
+  let cacheCleared = true;
+  try {
+    for (const frente of frentes) await clearDashboardCache(frente);
+  } catch (error) {
+    cacheCleared = false;
+    console.warn(`\nNo se pudo limpiar la caché del dashboard (${error.message}); se renueva sola en unos minutos.`);
+  }
+  console.log(
+    `\nCorregidos ${fixed} día(s) en ${frentes.length} frente(s)${cacheCleared ? "; caché del dashboard limpiada." : "."}`,
+  );
 
   const remaining = await findDrift(prisma);
   console.log(
