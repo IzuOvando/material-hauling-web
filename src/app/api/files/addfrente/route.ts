@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
 import prisma from "@/lib/db";
 import { getAppUser } from "@/auth/auth.user";
+import { ValidationError, validateFrenteNombre } from "@/utils/validators";
+import whiteLabelConfig from "#/white-label.config";
 
 export async function POST(req: NextRequest) {
   const user = await getAppUser();
@@ -14,7 +16,21 @@ export async function POST(req: NextRequest) {
 
 
     try {
-        const { nombre, tipoProyecto, enableTiroCatalog } = await req.json();
+        const { nombre: rawNombre, tipoProyecto, enableTiroCatalog } = await req.json();
+        const nombre = typeof rawNombre === "string" ? rawNombre.trim().toUpperCase() : "";
+
+        // The form checks the format too; this keeps a direct API call from creating a frente the app cannot group.
+        try {
+            validateFrenteNombre(nombre);
+        } catch (validationError) {
+            if (validationError instanceof ValidationError) {
+                return NextResponse.json(
+                    { error: whiteLabelConfig.ui.frentesManager.addDialog.invalidFormat },
+                    { status: 400 }
+                );
+            }
+            throw validationError;
+        }
 
         if (tipoProyecto && !["LINEAL", "FIJO"].includes(tipoProyecto)) {
             return NextResponse.json({ error: "Invalid tipoProyecto value" }, { status: 400 });
