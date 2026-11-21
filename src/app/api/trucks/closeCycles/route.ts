@@ -3,6 +3,14 @@ import { getAppUser } from "@/auth/auth.user";
 import { logSecurityEvent, SecurityEventType } from "@/auth/securityLogger";
 import { NextRequest, NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
+import {
+  METRICS_SELECT,
+  METRICS_TRANSACTION_OPTIONS,
+  applyVoucherMetrics,
+  refreshVoucherCaches,
+  type MetricsVoucher,
+} from "@/lib/dashboardMetrics";
+import { VoucherCamionStatus } from "@/types/enum";
 
 const MAX_ENTRIES = 100;
 
@@ -17,7 +25,15 @@ interface CloseResult {
   failed: Array<{ folio: string; reason: string }>;
 }
 
-async function closeOne(entry: CloseEntry): Promise<{ folio: string; ok: true } | { folio: string; ok: false; reason: string }> {
+type CloseOutcome =
+  | { folio: string; ok: true; voucher: MetricsVoucher }
+  | { folio: string; ok: false; reason: string };
+
+/** Closes one IN_TRANSIT voucher; the row it returns is what gets added to the metrics. */
+async function closeOne(
+  tx: Pick<typeof prisma, "voucherCamion">,
+  entry: CloseEntry
+): Promise<CloseOutcome> {
   const arrivalTime = entry.arrivalTime ? new Date(entry.arrivalTime) : null;
 
   if (arrivalTime !== null && isNaN(arrivalTime.getTime())) {
@@ -25,18 +41,19 @@ async function closeOne(entry: CloseEntry): Promise<{ folio: string; ok: true } 
   }
 
   try {
-    await prisma.voucherCamion.update({
+    const voucher = await tx.voucherCamion.update({
       where: {
         folio: entry.folio,
-        status: "IN_TRANSIT",
+        status: VoucherCamionStatus.IN_TRANSIT,
       },
       data: {
-        status: "ARRIVED",
+        status: VoucherCamionStatus.ARRIVED,
         odometerArrival: entry.odometerArrival ?? null,
         arrivalTime: arrivalTime,
       },
+      select: METRICS_SELECT,
     });
-    return { folio: entry.folio, ok: true };
+    return { folio: entry.folio, ok: true, voucher };
   } catch (error) {
     if (
       error instanceof Prisma.PrismaClientKnownRequestError &&
@@ -48,7 +65,7 @@ async function closeOne(entry: CloseEntry): Promise<{ folio: string; ok: true } 
         reason: "No encontrado o ya cerrado.",
       };
     }
-    return { folio: entry.folio, ok: false, reason: "Error interno al actualizar." };
+    throw error;
   }
 }
 
@@ -93,29 +110,32 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  const results = await Promise.allSettled(
-    (entries as CloseEntry[]).map(closeOne)
-  );
-
-  const response: CloseResult = { closed: [], failed: [] };
-
-  for (const result of results) {
-    if (result.status === "fulfilled") {
-      if (result.value.ok) {
-        response.closed.push(result.value.folio);
-      } else {
-        response.failed.push({
-          folio: result.value.folio,
-          reason: result.value.reason,
-        });
+  let outcomes: CloseOutcome[];
+  try {
+    outcomes = await prisma.$transaction(async (tx) => {
+      const results: CloseOutcome[] = [];
+      for (const entry of entries as CloseEntry[]) {
+        results.push(await closeOne(tx, entry));
       }
-    } else {
-      response.failed.push({
-        folio: "desconocido",
-        reason: "Error inesperado.",
-      });
-    }
+      const closed = results.flatMap((r) => (r.ok ? [r.voucher] : []));
+      await applyVoucherMetrics(tx, "arrived", closed);
+      return results;
+    }, METRICS_TRANSACTION_OPTIONS);
+  } catch (error) {
+    console.error("Error al cerrar ciclos:", error);
+    return NextResponse.json(
+      { error: "Error interno al cerrar ciclos. No se cerró ninguno." },
+      { status: 500 }
+    );
   }
+
+  const closedVouchers = outcomes.flatMap((r) => (r.ok ? [r.voucher] : []));
+  await refreshVoucherCaches(closedVouchers);
+
+  const response: CloseResult = {
+    closed: outcomes.flatMap((r) => (r.ok ? [r.folio] : [])),
+    failed: outcomes.flatMap((r) => (r.ok ? [] : [{ folio: r.folio, reason: r.reason }])),
+  };
 
   logSecurityEvent({
     type: SecurityEventType.DATA_UPDATE,

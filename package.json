@@ -14,6 +14,7 @@
     "tenant:create-qr-template": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' scripts/create-qr-template.ts",
     "tenant:reset": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' scripts/reset-tenant-assets.ts",
     "seed": "node prisma/seeders/run-all.js",
+    "metrics:rebuild": "node --env-file-if-exists=.env ./scripts/rebuild-dashboard-metrics.js",
     "test": "jest",
     "migrate-dev": "npx prisma migrate dev",
     "migrate-prod": "npx prisma migrate deploy"
