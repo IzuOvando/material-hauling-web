@@ -3,18 +3,22 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { Trash, Loader2 } from "lucide-react";
-import { useRouter } from "next/navigation";
 import whiteLabelConfig from "#/white-label.config";
 
 const DeleteVouchersButton = ({
   frente,
+  filters,
+  expectedCount,
   disabled = false,
+  onDeleted,
 }: {
   frente: string;
+  filters: string;
+  expectedCount: number;
   disabled?: boolean;
+  onDeleted?: () => void;
 }) => {
   const { toast } = useToast();
-  const router = useRouter();
   const [isDeleting, setIsDeleting] = useState(false);
 
   const deleteVouchers = async () => {
@@ -25,7 +29,7 @@ const DeleteVouchersButton = ({
       const response = await fetch("/api/trucks/deleteVoucher", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ frenteNombre: frente }),
+        body: JSON.stringify({ frenteNombre: frente, filters, expectedCount }),
       });
 
       const data = await response.json();
@@ -36,18 +40,22 @@ const DeleteVouchersButton = ({
 
       const { dismiss } = toast({
         title: whiteLabelConfig.ui.vouchers.deleteSuccessTitle,
-        description: whiteLabelConfig.ui.vouchers.deleteSuccessDescription.replace("{frente}", frente),
+        description: whiteLabelConfig.ui.vouchers.deleteSuccessDescription
+          .replace("{frente}", frente)
+          .replace("{count}", String(data.deleted)),
         variant: "success",
       });
-      setTimeout(() => {
-        dismiss();
-        router.push("/db");
-      }, 1000);
+      setTimeout(dismiss, 3000);
+      onDeleted?.();
+      setIsDeleting(false);
     } catch (error) {
       console.error("Error al eliminar los registros:", error);
       toast({
         title: whiteLabelConfig.ui.vouchers.deleteErrorTitle,
-        description: whiteLabelConfig.ui.vouchers.deleteErrorDescription.replace("{frente}", frente),
+        description:
+          error instanceof Error && error.message
+            ? error.message
+            : whiteLabelConfig.ui.vouchers.deleteErrorDescription.replace("{frente}", frente),
         variant: "destructive",
       });
       setIsDeleting(false);

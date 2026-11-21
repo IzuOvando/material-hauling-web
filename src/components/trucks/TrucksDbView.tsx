@@ -42,6 +42,8 @@ export function TrucksDbView({
         readOnly={isReadOnly}
         isOwner={isOwner}
         canActOnVouchers={total > 0}
+        appliedFilters={appliedFilters}
+        total={total}
       />
 
       <TrucksTableFilters frente={frente} />

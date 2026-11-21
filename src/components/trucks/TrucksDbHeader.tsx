@@ -24,6 +24,8 @@ interface TrucksDbHeaderProps {
   readOnly?: boolean;
   isOwner?: boolean;
   canActOnVouchers?: boolean;
+  appliedFilters: string;
+  total: number;
 }
 
 export function TrucksDbHeader({
@@ -32,6 +34,8 @@ export function TrucksDbHeader({
   readOnly = false,
   isOwner = false,
   canActOnVouchers = false,
+  appliedFilters,
+  total,
 }: TrucksDbHeaderProps) {
   const router = useRouter();
   const { selectedFrente, setSelectedFrente } = useFrenteStore();
@@ -167,6 +171,9 @@ export function TrucksDbHeader({
               open={openDelete}
               setOpen={setOpenDelete}
               frente={current}
+              filters={appliedFilters}
+              total={total}
+              onDeleted={() => router.refresh()}
             />
           )}
         </div>
