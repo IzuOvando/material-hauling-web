@@ -29,8 +29,12 @@ function dashboardTTL(period: DashboardPeriod): number {
 
 export async function invalidateDashboardCache(frente: string): Promise<void> {
   try {
-    const [, keys] = await kv.scan(0, { match: `dashboard:${frente}:*`, count: 1000 });
-    if (keys.length > 0) await Promise.all(keys.map((k) => kv.del(k)));
+    let cursor = 0;
+    do {
+      const [next, keys] = await kv.scan(cursor, { match: `dashboard:${frente}:*`, count: 1000 });
+      if (keys.length > 0) await kv.del(...keys);
+      cursor = Number(next);
+    } while (cursor !== 0);
   } catch (error) {
     console.error("Failed to invalidate dashboard cache", error);
   }
