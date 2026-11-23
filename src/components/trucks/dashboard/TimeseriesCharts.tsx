@@ -28,9 +28,19 @@ const tripsConfig = { trips: { label: "Viajes", color: TRIPS_COLOR } } satisfies
 const m3Config    = { m3:    { label: "M³",     color: M3_COLOR    } } satisfies ChartConfig;
 const turnoConfig = { turno1: { label: "T1", color: TURNO1_COLOR }, turno2: { label: "T2", color: TURNO2_COLOR } } satisfies ChartConfig;
 
-function formatTick(date: string, periodType: DashboardPeriod["type"]): string {
+/** Axis tick: in the year view each point is a day but the axis only needs the month. */
+export function formatTick(date: string, periodType: DashboardPeriod["type"]): string {
   const dt = DateTime.fromISO(date).setLocale("es");
   return periodType === "year" ? dt.toFormat("MMM yy") : dt.toFormat("d MMM");
+}
+
+/**
+ * In the year view the axis says "oct 26" (October 2026), which reads like
+ * "October 26th" on a single day, so the tooltip spells out the full date.
+ */
+export function formatTooltipLabel(date: string, periodType: DashboardPeriod["type"]): string {
+  const dt = DateTime.fromISO(date).setLocale("es");
+  return periodType === "year" ? dt.toFormat("ccc d LLL yyyy") : dt.toFormat("d MMM");
 }
 
 function niceMax(values: number[], tickCount = 4): number {
@@ -127,6 +137,7 @@ interface TimeseriesChartsProps {
 export function TimeseriesCharts({ data, period, isLoading, className }: TimeseriesChartsProps) {
   const periodType   = period.type;
   const ticker       = (date: string) => formatTick(date, periodType);
+  const tooltipLabel = (date: string) => formatTooltipLabel(date, periodType);
   const tickInterval = data.length > 14 ? Math.floor(data.length / 7) : 0;
 
   const hasTrips = data.some((d) => d.trips > 0);
@@ -195,7 +206,7 @@ export function TimeseriesCharts({ data, period, isLoading, className }: Timeser
                         {...props}
                         color={TRIPS_COLOR}
                         seriesLabel="Viajes"
-                        formatLabel={ticker}
+                        formatLabel={tooltipLabel}
                       />
                     )}
                   />
@@ -252,7 +263,7 @@ export function TimeseriesCharts({ data, period, isLoading, className }: Timeser
                         {...props}
                         color={M3_COLOR}
                         seriesLabel="M³"
-                        formatLabel={ticker}
+                        formatLabel={tooltipLabel}
                       />
                     )}
                   />
@@ -311,7 +322,7 @@ export function TimeseriesCharts({ data, period, isLoading, className }: Timeser
                     const t2 = (payload.find((p) => p.dataKey === "turno2")?.value as number) ?? 0;
                     return (
                       <div className="bg-white rounded-xl border border-slate-200 shadow-md px-3 py-2 text-xs">
-                        <p className="font-bold text-slate-900 mb-1">{ticker(label as string)}</p>
+                        <p className="font-bold text-slate-900 mb-1">{tooltipLabel(label as string)}</p>
                         <p className="flex items-baseline gap-1">
                           <span style={{ color: TURNO1_COLOR, fontWeight: 700 }}>T1</span>
                           <span style={{ color: TURNO1_COLOR }}>{t1}</span>
