@@ -2,6 +2,8 @@ import prisma from "@/lib/db";
 import { getAppUser } from "@/auth/auth.user";
 import { NextRequest, NextResponse } from "next/server";
 import blobClient from "@/lib/blobClient";
+import { invalidateDashboardCache } from "@/actions/dashboard";
+import { invalidateTrucksFacetsCache } from "@/actions/trucks";
 
 
 import { logSecurityEvent, SecurityEventType } from "@/auth/securityLogger";
@@ -51,6 +53,7 @@ export async function POST(req: NextRequest) {
     await prisma.frente.delete({
       where: { nombre },
     });
+    await Promise.all([invalidateDashboardCache(nombre), invalidateTrucksFacetsCache(nombre)]);
 
     logSecurityEvent({
       type: SecurityEventType.DATA_DELETE,
