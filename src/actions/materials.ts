@@ -3,6 +3,13 @@
 import prisma from "@/lib/db";
 import { getAppUser } from "@/auth/auth.user";
 import { normalizeMaterial } from "@/utils/normalizeMaterial";
+import { invalidateDashboardCache } from "@/actions/dashboard";
+import { invalidateTrucksFacetsCache } from "@/actions/trucks";
+
+/** A catalog change relabels materials everywhere, so every frente's cached labels go ("*" matches all). */
+async function invalidateLabelCaches() {
+  await Promise.all([invalidateDashboardCache("*"), invalidateTrucksFacetsCache("*")]);
+}
 
 // --- Catalog Actions ---
 
@@ -19,6 +26,12 @@ export async function getMaterials() {
 }
 
 export async function createMaterial(nombre: string) {
+  const material = await saveCatalogMaterial(nombre);
+  await invalidateLabelCaches();
+  return material;
+}
+
+async function saveCatalogMaterial(nombre: string) {
   const user = await getAppUser();
   if (!user || user.role !== "owner") {
     throw new Error("No autorizado");
@@ -94,11 +107,13 @@ export async function renameMaterial(id: string, newNombre: string) {
     throw new Error(`El material "${trimmed}" ya existe`);
   }
 
-  return prisma.material.update({
+  const renamed = await prisma.material.update({
     where: { id },
     data: { nombre: trimmed, normalizedNombre },
     select: { id: true, nombre: true, isActive: true },
   });
+  await invalidateLabelCaches();
+  return renamed;
 }
 
 export async function deactivateMaterial(id: string) {
@@ -117,6 +132,7 @@ export async function deactivateMaterial(id: string) {
       data: { isActive: false },
     }),
   ]);
+  await invalidateLabelCaches();
 
   return { success: true };
 }
