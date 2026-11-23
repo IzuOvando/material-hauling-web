@@ -314,6 +314,14 @@ const defaultConfig = {
       availableLabel: "Disponibles",
       emptyAssigned: "Sin materiales asignados",
       emptyAvailable: "Todos los materiales ya están asignados",
+      uncataloged: {
+        prefix: "Materiales en viajes de los últimos {days} días que no están en el catálogo:",
+        suffix: "Créalos con su nombre correcto y se corregirán solos en las vistas.",
+        tripOne: "viaje",
+        tripMany: "viajes",
+        in: "en",
+        more: "y {n} más",
+      },
       catalog: {
         heading: "Catálogo de Materiales",
         inputPlaceholder: "Nombre del material",
