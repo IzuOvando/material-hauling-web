@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { getAllFreentes } from "@/actions/frentes";
+import { findSiblingDisplayName } from "@/helpers/frentes";
 import AddFrenteDialog from "./AddFrenteDialog";
 import EditFrenteDialog from "./EditFrenteDialog";
 import whiteLabelConfig from "#/white-label.config";
@@ -97,17 +98,8 @@ export function FrentesManagerSheet() {
 
   const isSearching = search.trim().length > 0;
 
-  const getSiblingDisplayName = (frente: Frente): string | null => {
-    const project = frente.nombre.split("-")[0] ?? frente.nombre;
-    return (
-      frentes.find(
-        (f) =>
-          f.nombre !== frente.nombre &&
-          f.nombre.startsWith(project) &&
-          f.displayName
-      )?.displayName ?? null
-    );
-  };
+  const getSiblingDisplayName = (frente: Frente): string | null =>
+    findSiblingDisplayName(frentes, frente.nombre);
 
   return (
     <>

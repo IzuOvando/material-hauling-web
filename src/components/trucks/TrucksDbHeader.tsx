@@ -13,6 +13,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useFrenteStore } from "@/store";
+import { findSiblingDisplayName } from "@/helpers/frentes";
 import { DeleteVouchersDialog, CloseCycleSheet } from "@/components/trucks";
 import AddFrenteDialog from "@/components/frentes/AddFrenteDialog";
 import EditFrenteDialog from "@/components/frentes/EditFrenteDialog";
@@ -58,11 +59,7 @@ export function TrucksDbHeader({
 
   const project = current?.nombre.split("-")[0] ?? frente;
 
-  // Find sibling frentes (same project prefix) to share displayName
-  const siblingDisplayName =
-    frentes.find(
-      (f) => f.nombre !== frente && f.nombre.startsWith(project) && f.displayName
-    )?.displayName ?? null;
+  const siblingDisplayName = findSiblingDisplayName(frentes, frente);
 
   return (
     <div className="flex flex-wrap items-center justify-between gap-3">
