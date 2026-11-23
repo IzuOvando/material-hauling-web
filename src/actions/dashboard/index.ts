@@ -184,14 +184,15 @@ async function _getDashboardBreakdown(
   if (groupBy === "material") {
     type RawRow = { label: string; trips: bigint; m3: number };
     const rows: RawRow[] = await prisma.$queryRaw(Prisma.sql`
-      SELECT immutable_unaccent(LOWER(TRIM(material))) AS label,
+      SELECT COALESCE(m.nombre, immutable_unaccent(LOWER(TRIM(v.material)))) AS label,
              COUNT(*) AS trips,
-             COALESCE(SUM(cubicacion), 0) AS m3
-      FROM "VoucherCamion"
-      WHERE "frenteNombre" = ${filters.frenteNombre}
-        AND status = 'ARRIVED'::"VoucherStatus"
-        AND "voucherDatetime" >= ${filters.dateFrom} AND "voucherDatetime" <= ${filters.dateTo}
-      GROUP BY immutable_unaccent(LOWER(TRIM(material)))
+             COALESCE(SUM(v.cubicacion), 0) AS m3
+      FROM "VoucherCamion" v
+      LEFT JOIN "Material" m ON m."normalizedNombre" = immutable_unaccent(LOWER(TRIM(v.material)))
+      WHERE v."frenteNombre" = ${filters.frenteNombre}
+        AND v.status = 'ARRIVED'::"VoucherStatus"
+        AND v."voucherDatetime" >= ${filters.dateFrom} AND v."voucherDatetime" <= ${filters.dateTo}
+      GROUP BY m.nombre, immutable_unaccent(LOWER(TRIM(v.material)))
       ORDER BY m3 DESC
       LIMIT 20`);
     return rows.map((r) => ({ label: r.label, trips: Number(r.trips), m3: Number(r.m3) }));

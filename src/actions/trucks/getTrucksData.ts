@@ -1,6 +1,7 @@
 import prisma from "@/lib/db";
 import { VoucherCamion } from "@prisma/client";
 import { getTrucksFilters, getTrucksOrderBy } from "./filters";
+import { withCatalogMaterial, withMaterialVariants } from "./materialCatalog";
 
 interface PaginationConfig {
   page: number;
@@ -25,7 +26,7 @@ export async function getTrucksData(
 
   const { page, limit } = pagination;
   const orderBy = getTrucksOrderBy(sort);
-  const extra = getTrucksFilters(filters);
+  const extra = await withMaterialVariants(frente, getTrucksFilters(filters));
 
   const where: any = { frenteNombre: frente };
   if (extra) where.AND = extra;
@@ -40,7 +41,7 @@ export async function getTrucksData(
     prisma.voucherCamion.count({ where }),
   ]);
 
-  return { vouchers, total };
+  return { vouchers: await withCatalogMaterial(vouchers), total };
 }
 
 export async function getAllTrucksForExport(
@@ -49,13 +50,14 @@ export async function getAllTrucksForExport(
   sort?: string
 ): Promise<VoucherCamion[]> {
   const orderBy = getTrucksOrderBy(sort);
-  const extra = getTrucksFilters(filters);
+  const extra = await withMaterialVariants(frente, getTrucksFilters(filters));
 
   const where: any = { frenteNombre: frente };
   if (extra) where.AND = extra;
 
-  return prisma.voucherCamion.findMany({
+  const vouchers = await prisma.voucherCamion.findMany({
     where,
     orderBy: orderBy ?? { voucherDatetime: "desc" },
   });
+  return withCatalogMaterial(vouchers);
 }

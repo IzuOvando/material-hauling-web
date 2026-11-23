@@ -3,6 +3,8 @@ import { kv } from "@vercel/kv";
 import { MD5 as md5 } from "crypto-js";
 import type { TrucksFacets } from "@/types/trucks-filters";
 import { getTrucksFilters } from "./filters";
+import { resolveMaterialLabel, toMaterialLabels } from "@/utils/materialLabel";
+import { withMaterialVariants } from "./materialCatalog";
 
 const FACET_FIELDS = [
   "material",
@@ -16,7 +18,7 @@ export async function getTrucksFacets(
   frente: string,
   filters: string | undefined
 ): Promise<TrucksFacets> {
-  const extra = getTrucksFilters(filters);
+  const extra = await withMaterialVariants(frente, getTrucksFilters(filters));
 
   const facets: TrucksFacets = {
     material: [],
@@ -25,28 +27,42 @@ export async function getTrucksFacets(
     frenteNombre: [],
   };
 
-  await Promise.all(
-    FACET_FIELDS.map(async (field) => {
-      const where: any = { frenteNombre: frente };
-      if (extra) {
-        const scoped = { ...extra } as any;
-        delete scoped[field];
-        where.AND = scoped;
-      }
-      const groups = await prisma.voucherCamion.groupBy({
-        by: [field as any],
-        where,
-        _count: { [field]: true } as any,
-        orderBy: { [field]: "asc" } as any,
-      });
-      facets[field] = groups
-        .map((g: any) => ({
-          value: String(g[field] ?? ""),
-          count: g._count?.[field] ?? 0,
-        }))
-        .filter((opt) => opt.value !== "");
-    })
-  );
+  const [, materialCatalog] = await Promise.all([
+    Promise.all(
+      FACET_FIELDS.map(async (field) => {
+        const where: any = { frenteNombre: frente };
+        if (extra) {
+          const scoped = { ...extra } as any;
+          delete scoped[field];
+          where.AND = scoped;
+        }
+        const groups = await prisma.voucherCamion.groupBy({
+          by: [field as any],
+          where,
+          _count: { [field]: true } as any,
+          orderBy: { [field]: "asc" } as any,
+        });
+        facets[field] = groups
+          .map((g: any) => ({
+            value: String(g[field] ?? ""),
+            count: g._count?.[field] ?? 0,
+          }))
+          .filter((opt) => opt.value !== "");
+      })
+    ),
+    prisma.material.findMany({
+      where: { isActive: true },
+      select: { nombre: true, normalizedNombre: true },
+    }),
+  ]);
+
+  const labels = toMaterialLabels(materialCatalog);
+  const countByLabel = new Map<string, number>();
+  for (const opt of facets.material) {
+    const label = resolveMaterialLabel(opt.value, labels);
+    countByLabel.set(label, (countByLabel.get(label) ?? 0) + opt.count);
+  }
+  facets.material = Array.from(countByLabel, ([value, count]) => ({ value, count }));
 
   return facets;
 }
