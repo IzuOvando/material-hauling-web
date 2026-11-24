@@ -15,7 +15,7 @@
     "tenant:reset": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' scripts/reset-tenant-assets.ts",
     "seed": "node prisma/seeders/run-all.js",
     "metrics:rebuild": "node --env-file-if-exists=.env ./scripts/rebuild-dashboard-metrics.js",
-    "test": "jest",
+    "test": "node --max-old-space-size=1024 node_modules/jest/bin/jest.js",
     "migrate-dev": "npx prisma migrate dev",
     "migrate-prod": "npx prisma migrate deploy"
   },
