@@ -2,9 +2,10 @@ import "@testing-library/jest-dom";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { ResetPasswordDialog } from "./ResetPasswordDialog";
 
-jest.mock("@/components/ui/use-toast", () => ({
-  useToast: () => ({ toast: jest.fn() }),
-}));
+jest.mock("@/components/ui/use-toast", () => {
+  const toast = jest.fn();
+  return { useToast: () => ({ toast }) };
+});
 jest.mock("crypto-js/sha256", () => jest.fn(() => ({ toString: () => "sha256mockhash" })));
 
 const defaultProps = {

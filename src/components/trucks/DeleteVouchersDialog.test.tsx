@@ -4,9 +4,10 @@ import type { Frente } from "@prisma/client";
 import whiteLabelConfig from "#/white-label.config";
 import DeleteVouchersDialog from "./DeleteVouchersDialog";
 
-jest.mock("@/components/ui/use-toast", () => ({
-  useToast: () => ({ toast: jest.fn(() => ({ dismiss: jest.fn() })) }),
-}));
+jest.mock("@/components/ui/use-toast", () => {
+  const toast = jest.fn(() => ({ dismiss: jest.fn() }));
+  return { useToast: () => ({ toast }) };
+});
 
 const copy = whiteLabelConfig.ui.vouchers;
 const frente = { nombre: "PROJ-A1" } as Frente;

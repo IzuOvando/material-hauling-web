@@ -2,9 +2,10 @@ import "@testing-library/jest-dom";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { DeleteUserAlertDialog } from "./DeleteUserAlertDialog";
 
-jest.mock("@/components/ui/use-toast", () => ({
-  useToast: () => ({ toast: jest.fn() }),
-}));
+jest.mock("@/components/ui/use-toast", () => {
+  const toast = jest.fn();
+  return { useToast: () => ({ toast }) };
+});
 
 const defaultProps = {
   username: "operador01",

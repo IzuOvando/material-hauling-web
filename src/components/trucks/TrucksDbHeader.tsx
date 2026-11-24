@@ -155,7 +155,11 @@ export function TrucksDbHeader({
               siblingDisplayName={siblingDisplayName}
               onFrenteUpdated={() => router.refresh()}
               onLogoUpdated={() => router.refresh()}
-              onDeleteFrente={() => router.push("/db")}
+              onDeleteFrente={() => {
+                router.push("/db");
+                // Without it the router reuses the frente list it cached on the way in, deleted frente included.
+                router.refresh();
+              }}
             />
           )}
           {isOwner && canActOnVouchers && (

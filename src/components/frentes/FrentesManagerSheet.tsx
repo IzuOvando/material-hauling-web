@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback, useMemo } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Plus, Pencil, Loader2, Layers, Search, ChevronDown } from "lucide-react";
 import type { Frente } from "@prisma/client";
 import {
@@ -16,6 +16,7 @@ import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { getAllFreentes } from "@/actions/frentes";
 import { findSiblingDisplayName } from "@/helpers/frentes";
+import { sectionLeftByDeletedFrente } from "@/helpers/frenteRoutes";
 import AddFrenteDialog from "./AddFrenteDialog";
 import EditFrenteDialog from "./EditFrenteDialog";
 import whiteLabelConfig from "#/white-label.config";
@@ -33,6 +34,7 @@ function groupByProject(frentes: Frente[]): Map<string, Frente[]> {
 
 export function FrentesManagerSheet() {
   const router = useRouter();
+  const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [frentes, setFreentes] = useState<Frente[]>([]);
   const [loading, setLoading] = useState(false);
@@ -67,6 +69,8 @@ export function FrentesManagerSheet() {
 
   const handleDeleteFrente = (nombre: string) => {
     setFreentes((prev) => prev.filter((f) => f.nombre !== nombre));
+    const section = sectionLeftByDeletedFrente(pathname, nombre);
+    if (section) router.push(section);
     router.refresh();
   };
 
