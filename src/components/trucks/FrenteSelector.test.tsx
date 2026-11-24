@@ -4,7 +4,8 @@ import type { Frente } from "@prisma/client";
 import { FrenteSelector } from "./FrenteSelector";
 
 const push = jest.fn();
-jest.mock("next/navigation", () => ({ useRouter: () => ({ push }) }));
+const router = { push };
+jest.mock("next/navigation", () => ({ useRouter: () => router }));
 
 const frentes = [{ nombre: "PROJ-A1", displayName: "Proyecto" }, { nombre: "PROJ-A2", displayName: "Proyecto" }] as Frente[];
 

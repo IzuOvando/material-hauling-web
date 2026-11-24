@@ -61,5 +61,6 @@ describe("MaterialCatalogSection deactivating a material", () => {
 
     expect(screen.getByRole("alertdialog")).toBeInTheDocument();
     finish();
+    await waitFor(() => expect(screen.queryByText("Basalto")).not.toBeInTheDocument());
   });
 });
