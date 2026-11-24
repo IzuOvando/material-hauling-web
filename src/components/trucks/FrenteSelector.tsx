@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { BarChart3, Truck, Activity, ArrowRight, ChevronDown, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 import whiteLabelConfig from "#/white-label.config";
+import FullScreenLoader from "@/components/ui/full-screen-loader";
 import type { Frente } from "@prisma/client";
 
 export interface FrenteKpiSnapshot {
@@ -178,6 +179,12 @@ export function FrenteSelector({
   const router = useRouter();
   const [search, setSearch] = useState("");
   const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
+  const [isNavigating, startNavigation] = useTransition();
+
+  function openFrente(nombre: string) {
+    if (isNavigating) return;
+    startNavigation(() => router.push(`${basePath}/${nombre}`));
+  }
 
   const allGrouped = useMemo(() => groupByProject(frentes), [frentes]);
 
@@ -230,6 +237,9 @@ export function FrenteSelector({
 
   return (
     <div className="space-y-8">
+      {isNavigating && (
+        <FullScreenLoader message={(whiteLabelConfig as any)?.ui?.frenteSelector?.openingFrente ?? "Abriendo frente..."} />
+      )}
       <div className="flex flex-col sm:flex-row sm:items-end gap-4">
         <div className="flex-1">
           <h2 className="text-xl font-semibold">{title}</h2>
@@ -310,7 +320,8 @@ export function FrenteSelector({
                     return (
                       <button
                         key={frente.nombre}
-                        onClick={() => router.push(`${basePath}/${frente.nombre}`)}
+                        onClick={() => openFrente(frente.nombre)}
+                        disabled={isNavigating}
                         className={cn(
                           "group relative text-left w-full rounded-xl border bg-white",
                           "bg-gradient-to-br from-transparent to-transparent",

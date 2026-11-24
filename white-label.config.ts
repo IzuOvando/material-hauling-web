@@ -36,6 +36,7 @@ const defaultConfig = {
       noAssignedTitle: "No tienes frentes asignados",
       noAssignedSubtitle: "Contacta a tu administrador para obtener acceso.",
       noResultsPrefix: "Sin resultados para",
+      openingFrente: "Abriendo frente...",
     },
     navbar: {
       dashboardLabel: "Dashboard",
