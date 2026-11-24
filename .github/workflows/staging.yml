@@ -11,14 +11,14 @@ jobs:
   # ─────────────────────────────────────────────────────────────────────────
   quality:
     name: Quality check & migrate
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
-          node-version: "20"
+          node-version: "24"
           cache: "npm"
 
       - name: Install dependencies
@@ -41,12 +41,12 @@ jobs:
   # ─────────────────────────────────────────────────────────────────────────
   load-clients:
     name: Load client registry
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     needs: quality
     outputs:
       clients: ${{ steps.registry.outputs.clients }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Read registry
         id: registry
@@ -63,7 +63,7 @@ jobs:
   # ─────────────────────────────────────────────────────────────────────────
   deploy:
     name: Deploy staging — ${{ matrix.client }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     needs: load-clients
     strategy:
       matrix:
@@ -71,11 +71,11 @@ jobs:
       fail-fast: false
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
-          node-version: "20"
+          node-version: "24"
           cache: "npm"
 
       - name: Install dependencies
