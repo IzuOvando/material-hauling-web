@@ -328,6 +328,7 @@ const defaultConfig = {
         deleteDialogDescription: '¿Estás seguro que deseas eliminar "{name}"? Se removerá de todos los frentes asignados.',
         deleteDialogCancel: "Cancelar",
         deleteDialogConfirm: "Eliminar",
+        deleting: "Eliminando...",
       },
       toast: {
         assignedTitle: "Material asignado",
@@ -355,6 +356,7 @@ const defaultConfig = {
         deleteDialogDescription: '¿Estás seguro que deseas eliminar "{name}"? Se removerá de todos los frentes asignados.',
         deleteDialogCancel: "Cancelar",
         deleteDialogConfirm: "Eliminar",
+        deleting: "Eliminando...",
       },
       toast: {
         assignedTitle: "Origen asignado",
@@ -382,6 +384,7 @@ const defaultConfig = {
         deleteDialogDescription: '¿Estás seguro que deseas eliminar "{name}"? Se removerá de todos los frentes asignados.',
         deleteDialogCancel: "Cancelar",
         deleteDialogConfirm: "Eliminar",
+        deleting: "Eliminando...",
       },
       toast: {
         assignedTitle: "Tiro asignado",

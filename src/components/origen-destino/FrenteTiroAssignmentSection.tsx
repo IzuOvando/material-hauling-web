@@ -37,6 +37,7 @@ export function FrenteTiroAssignmentSection({
   const [assigned, setAssigned] = useState<TiroItem[]>([]);
   const [available, setAvailable] = useState<TiroItem[]>([]);
   const [loading, setLoading] = useState(false);
+  const [operatingId, setOperatingId] = useState<string | null>(null);
   const { toast } = useToast();
 
   const loadFrenteTiros = useCallback(async (frente: string) => {
@@ -74,6 +75,9 @@ export function FrenteTiroAssignmentSection({
   }, [refreshRef, selectedFrente, loadFrenteTiros]);
 
   const handleAssign = async (tiro: TiroItem) => {
+    if (operatingId) return;
+    setOperatingId(tiro.id);
+
     try {
       await assignTiroToFrente(tiro.id, selectedFrente);
       setAssigned((prev) =>
@@ -91,10 +95,15 @@ export function FrenteTiroAssignmentSection({
         description: error.message,
         variant: "destructive",
       });
+    } finally {
+      setOperatingId(null);
     }
   };
 
   const handleUnassign = async (tiro: TiroItem) => {
+    if (operatingId) return;
+    setOperatingId(tiro.id);
+
     try {
       await unassignTiroFromFrente(tiro.id, selectedFrente);
       setAvailable((prev) =>
@@ -112,6 +121,8 @@ export function FrenteTiroAssignmentSection({
         description: error.message,
         variant: "destructive",
       });
+    } finally {
+      setOperatingId(null);
     }
   };
 
@@ -171,8 +182,9 @@ export function FrenteTiroAssignmentSection({
                         size="icon"
                         className="h-5 w-5 rounded-full hover:bg-red-100 hover:text-red-600"
                         onClick={() => handleUnassign(tiro)}
+                        disabled={!!operatingId}
                       >
-                        <X className="h-3 w-3" />
+                        {operatingId === tiro.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <X className="h-3 w-3" />}
                       </Button>
                     </Badge>
                   ))}
@@ -203,8 +215,9 @@ export function FrenteTiroAssignmentSection({
                         size="icon"
                         className="h-5 w-5 rounded-full hover:bg-green-100 hover:text-green-600"
                         onClick={() => handleAssign(tiro)}
+                        disabled={!!operatingId}
                       >
-                        <Plus className="h-3 w-3" />
+                        {operatingId === tiro.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Plus className="h-3 w-3" />}
                       </Button>
                     </Badge>
                   ))}

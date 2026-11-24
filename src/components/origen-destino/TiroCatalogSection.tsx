@@ -47,6 +47,7 @@ export function TiroCatalogSection({
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingValue, setEditingValue] = useState("");
   const [renaming, setRenaming] = useState(false);
+  const [deactivatingId, setDeactivatingId] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
@@ -102,7 +103,11 @@ export function TiroCatalogSection({
     }
   };
 
-  const handleDeactivate = async (id: string, nombre: string) => {
+  const handleDeactivate = async (e: React.MouseEvent, id: string, nombre: string) => {
+    e.preventDefault();
+    if (deactivatingId) return;
+    setDeactivatingId(id);
+
     try {
       await deactivateTiro(id);
       setTiros((prev) => prev.filter((m) => m.id !== id));
@@ -118,6 +123,8 @@ export function TiroCatalogSection({
         description: error.message,
         variant: "destructive",
       });
+    } finally {
+      setDeactivatingId(null);
     }
   };
 
@@ -277,14 +284,16 @@ export function TiroCatalogSection({
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
-                            <AlertDialogCancel>
+                            <AlertDialogCancel disabled={deactivatingId === tiro.id}>
                               {(whiteLabelConfig as any)?.ui?.tiros?.catalog?.deleteDialogCancel || "Cancelar"}
                             </AlertDialogCancel>
                             <AlertDialogAction
-                              onClick={() => handleDeactivate(tiro.id, tiro.nombre)}
+                              onClick={(e) => handleDeactivate(e, tiro.id, tiro.nombre)}
                               className="bg-red-500 hover:bg-red-600"
+                              disabled={!!deactivatingId}
                             >
-                              {(whiteLabelConfig as any)?.ui?.tiros?.catalog?.deleteDialogConfirm || "Eliminar"}
+                              {deactivatingId === tiro.id && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                              {deactivatingId === tiro.id ? whiteLabelConfig.ui.tiros.catalog.deleting : (whiteLabelConfig as any)?.ui?.tiros?.catalog?.deleteDialogConfirm || "Eliminar"}
                             </AlertDialogAction>
                           </AlertDialogFooter>
                         </AlertDialogContent>

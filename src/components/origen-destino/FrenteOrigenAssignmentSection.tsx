@@ -37,6 +37,7 @@ export function FrenteOrigenAssignmentSection({
   const [assigned, setAssigned] = useState<OrigenItem[]>([]);
   const [available, setAvailable] = useState<OrigenItem[]>([]);
   const [loading, setLoading] = useState(false);
+  const [operatingId, setOperatingId] = useState<string | null>(null);
   const { toast } = useToast();
 
   const loadFrenteOrigenes = useCallback(async (frente: string) => {
@@ -74,6 +75,9 @@ export function FrenteOrigenAssignmentSection({
   }, [refreshRef, selectedFrente, loadFrenteOrigenes]);
 
   const handleAssign = async (origen: OrigenItem) => {
+    if (operatingId) return;
+    setOperatingId(origen.id);
+
     try {
       await assignOrigenToFrente(origen.id, selectedFrente);
       setAssigned((prev) =>
@@ -91,10 +95,15 @@ export function FrenteOrigenAssignmentSection({
         description: error.message,
         variant: "destructive",
       });
+    } finally {
+      setOperatingId(null);
     }
   };
 
   const handleUnassign = async (origen: OrigenItem) => {
+    if (operatingId) return;
+    setOperatingId(origen.id);
+
     try {
       await unassignOrigenFromFrente(origen.id, selectedFrente);
       setAvailable((prev) =>
@@ -112,6 +121,8 @@ export function FrenteOrigenAssignmentSection({
         description: error.message,
         variant: "destructive",
       });
+    } finally {
+      setOperatingId(null);
     }
   };
 
@@ -171,8 +182,9 @@ export function FrenteOrigenAssignmentSection({
                         size="icon"
                         className="h-5 w-5 rounded-full hover:bg-red-100 hover:text-red-600"
                         onClick={() => handleUnassign(origen)}
+                        disabled={!!operatingId}
                       >
-                        <X className="h-3 w-3" />
+                        {operatingId === origen.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <X className="h-3 w-3" />}
                       </Button>
                     </Badge>
                   ))}
@@ -203,8 +215,9 @@ export function FrenteOrigenAssignmentSection({
                         size="icon"
                         className="h-5 w-5 rounded-full hover:bg-green-100 hover:text-green-600"
                         onClick={() => handleAssign(origen)}
+                        disabled={!!operatingId}
                       >
-                        <Plus className="h-3 w-3" />
+                        {operatingId === origen.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Plus className="h-3 w-3" />}
                       </Button>
                     </Badge>
                   ))}
