@@ -4,7 +4,10 @@ import CONFIG from "@/config";
 import whiteLabelConfig from "#/white-label.config";
 import { MaterialsPage } from "./MaterialsPage";
 
-jest.mock("next/navigation", () => ({ useRouter: () => ({ refresh: jest.fn() }) }));
+jest.mock("next/navigation", () => {
+  const router = { refresh: jest.fn() };
+  return { useRouter: () => router };
+});
 jest.mock("./MaterialCatalogSection", () => ({ MaterialCatalogSection: () => null }));
 jest.mock("./FrenteAssignmentSection", () => ({ FrenteAssignmentSection: () => null }));
 
