@@ -4,6 +4,9 @@ const CONSTANTS = {
     DEFAULT_PAGE: 1,
     DEFAULT_LIMIT: 10,
   },
+  MATERIALS: {
+    UNCATALOGED_WINDOW_DAYS: 90,
+  },
   TOKEN_EXPIRACY: {
     ACCESS: process.env.TOKEN_EXPIRACY_ACCESS || "1h",
     REFRESH: process.env.TOKEN_EXPIRACY_REFRESH || "1d",

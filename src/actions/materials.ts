@@ -1,8 +1,47 @@
 "use server";
 
+import { kv } from "@vercel/kv";
 import prisma from "@/lib/db";
+import CONFIG from "@/config";
 import { getAppUser } from "@/auth/auth.user";
 import { normalizeMaterial } from "@/utils/normalizeMaterial";
+import { invalidateDashboardCache } from "@/actions/dashboard";
+import { invalidateTrucksFacetsCache } from "@/actions/trucks";
+
+export interface UncatalogedMaterial {
+  nombre: string;
+  viajes: number;
+  frentes: string[];
+}
+
+const UNCATALOGED_CACHE_KEY = "materials:uncataloged";
+const UNCATALOGED_CACHE_TTL_SECONDS = 600;
+const UNCATALOGED_TIMEOUT_MS = 5000;
+
+async function bestEffort<T>(what: string, run: () => Promise<T>): Promise<T | undefined> {
+  try {
+    return await run();
+  } catch (error) {
+    console.error(`Failed to ${what}`, error);
+    return undefined;
+  }
+}
+
+function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error(`timed out after ${ms} ms`)), ms);
+    promise.then(resolve, reject).finally(() => clearTimeout(timer));
+  });
+}
+
+/** A catalog change relabels materials everywhere, so every frente's cached labels go ("*" matches all). */
+async function invalidateLabelCaches() {
+  await Promise.all([
+    invalidateDashboardCache("*"),
+    invalidateTrucksFacetsCache("*"),
+    bestEffort("clear the uncataloged materials cache", () => kv.del(UNCATALOGED_CACHE_KEY)),
+  ]);
+}
 
 // --- Catalog Actions ---
 
@@ -19,6 +58,12 @@ export async function getMaterials() {
 }
 
 export async function createMaterial(nombre: string) {
+  const material = await saveCatalogMaterial(nombre);
+  await invalidateLabelCaches();
+  return material;
+}
+
+async function saveCatalogMaterial(nombre: string) {
   const user = await getAppUser();
   if (!user || user.role !== "owner") {
     throw new Error("No autorizado");
@@ -94,11 +139,13 @@ export async function renameMaterial(id: string, newNombre: string) {
     throw new Error(`El material "${trimmed}" ya existe`);
   }
 
-  return prisma.material.update({
+  const renamed = await prisma.material.update({
     where: { id },
     data: { nombre: trimmed, normalizedNombre },
     select: { id: true, nombre: true, isActive: true },
   });
+  await invalidateLabelCaches();
+  return renamed;
 }
 
 export async function deactivateMaterial(id: string) {
@@ -117,8 +164,54 @@ export async function deactivateMaterial(id: string) {
       data: { isActive: false },
     }),
   ]);
+  await invalidateLabelCaches();
 
   return { success: true };
+}
+
+/**
+ * Materials used by vouchers saved in the last CONFIG.MATERIALS.UNCATALOGED_WINDOW_DAYS days
+ * that have no active catalog match, grouped by normalized name. Concrete JSON specs and empty values
+ * are not material names and are skipped. It is a warning, so it never fails the page:
+ * on an error or a slow query it returns an empty list.
+ */
+export async function getUncatalogedMaterials(): Promise<UncatalogedMaterial[]> {
+  const user = await getAppUser();
+  if (!user || user.role !== "owner") {
+    throw new Error("No autorizado");
+  }
+
+  const cached = await bestEffort("read the uncataloged materials cache", () =>
+    kv.get<UncatalogedMaterial[]>(UNCATALOGED_CACHE_KEY),
+  );
+  if (cached) return cached;
+
+  const rows = await bestEffort("load the uncataloged materials", () =>
+    withTimeout(queryUncatalogedMaterials(), UNCATALOGED_TIMEOUT_MS),
+  );
+  if (!rows) return [];
+
+  await bestEffort("cache the uncataloged materials", () =>
+    kv.set(UNCATALOGED_CACHE_KEY, rows, { ex: UNCATALOGED_CACHE_TTL_SECONDS }),
+  );
+  return rows;
+}
+
+async function queryUncatalogedMaterials(): Promise<UncatalogedMaterial[]> {
+  return prisma.$queryRaw<UncatalogedMaterial[]>`
+    SELECT MIN(v.material)                    AS nombre,
+           COUNT(*)::int                      AS viajes,
+           ARRAY_AGG(DISTINCT v."frenteNombre") AS frentes
+    FROM "VoucherCamion" v
+    LEFT JOIN "Material" m
+      ON m."isActive" AND m."normalizedNombre" = immutable_unaccent(LOWER(TRIM(v.material)))
+    WHERE v."createdAt" >= NOW() - (${CONFIG.MATERIALS.UNCATALOGED_WINDOW_DAYS} * INTERVAL '1 day')
+      AND m.id IS NULL
+      AND TRIM(v.material) NOT IN ('', 'undefined')
+      AND LEFT(TRIM(v.material), 1) <> '{'
+    GROUP BY immutable_unaccent(LOWER(TRIM(v.material)))
+    ORDER BY viajes DESC, nombre
+    LIMIT 50`;
 }
 
 // --- Frente Assignment Actions ---

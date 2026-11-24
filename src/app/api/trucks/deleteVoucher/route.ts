@@ -10,6 +10,7 @@ import {
   type MetricsVoucher,
 } from "@/lib/dashboardMetrics";
 import { getTrucksFilters } from "@/actions/trucks/filters";
+import { withMaterialVariants } from "@/actions/trucks/materialCatalog";
 
 class CountMismatchError extends Error {
   constructor(readonly actual: number) {
@@ -47,7 +48,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const extra = getTrucksFilters(filters);
+    const extra = await withMaterialVariants(frenteNombre, getTrucksFilters(filters));
     const where = { frenteNombre, ...(extra ? { AND: extra } : {}) };
 
     const deleted = await prisma.$transaction(async (tx) => {
