@@ -37,6 +37,7 @@ export function FrenteAssignmentSection({
   const [assigned, setAssigned] = useState<MaterialItem[]>([]);
   const [available, setAvailable] = useState<MaterialItem[]>([]);
   const [loading, setLoading] = useState(false);
+  const [operatingId, setOperatingId] = useState<string | null>(null);
   const { toast } = useToast();
 
   const loadFrenteMaterials = useCallback(async (frente: string) => {
@@ -74,6 +75,9 @@ export function FrenteAssignmentSection({
   }, [refreshRef, selectedFrente, loadFrenteMaterials]);
 
   const handleAssign = async (material: MaterialItem) => {
+    if (operatingId) return;
+    setOperatingId(material.id);
+
     try {
       await assignMaterialToFrente(material.id, selectedFrente);
       setAssigned((prev) =>
@@ -91,10 +95,15 @@ export function FrenteAssignmentSection({
         description: error.message,
         variant: "destructive",
       });
+    } finally {
+      setOperatingId(null);
     }
   };
 
   const handleUnassign = async (material: MaterialItem) => {
+    if (operatingId) return;
+    setOperatingId(material.id);
+
     try {
       await unassignMaterialFromFrente(material.id, selectedFrente);
       setAvailable((prev) =>
@@ -112,6 +121,8 @@ export function FrenteAssignmentSection({
         description: error.message,
         variant: "destructive",
       });
+    } finally {
+      setOperatingId(null);
     }
   };
 
@@ -171,8 +182,9 @@ export function FrenteAssignmentSection({
                         size="icon"
                         className="h-5 w-5 rounded-full hover:bg-red-100 hover:text-red-600"
                         onClick={() => handleUnassign(material)}
+                        disabled={!!operatingId}
                       >
-                        <X className="h-3 w-3" />
+                        {operatingId === material.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <X className="h-3 w-3" />}
                       </Button>
                     </Badge>
                   ))}
@@ -203,8 +215,9 @@ export function FrenteAssignmentSection({
                         size="icon"
                         className="h-5 w-5 rounded-full hover:bg-green-100 hover:text-green-600"
                         onClick={() => handleAssign(material)}
+                        disabled={!!operatingId}
                       >
-                        <Plus className="h-3 w-3" />
+                        {operatingId === material.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Plus className="h-3 w-3" />}
                       </Button>
                     </Badge>
                   ))}

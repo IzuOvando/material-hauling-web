@@ -36,6 +36,7 @@ const defaultConfig = {
       noAssignedTitle: "No tienes frentes asignados",
       noAssignedSubtitle: "Contacta a tu administrador para obtener acceso.",
       noResultsPrefix: "Sin resultados para",
+      openingFrente: "Abriendo frente...",
     },
     navbar: {
       dashboardLabel: "Dashboard",
@@ -336,6 +337,7 @@ const defaultConfig = {
         deleteDialogDescription: '¿Estás seguro que deseas eliminar "{name}"? Se removerá de todos los frentes asignados.',
         deleteDialogCancel: "Cancelar",
         deleteDialogConfirm: "Eliminar",
+        deleting: "Eliminando...",
       },
       toast: {
         assignedTitle: "Material asignado",
@@ -363,6 +365,7 @@ const defaultConfig = {
         deleteDialogDescription: '¿Estás seguro que deseas eliminar "{name}"? Se removerá de todos los frentes asignados.',
         deleteDialogCancel: "Cancelar",
         deleteDialogConfirm: "Eliminar",
+        deleting: "Eliminando...",
       },
       toast: {
         assignedTitle: "Origen asignado",
@@ -390,6 +393,7 @@ const defaultConfig = {
         deleteDialogDescription: '¿Estás seguro que deseas eliminar "{name}"? Se removerá de todos los frentes asignados.',
         deleteDialogCancel: "Cancelar",
         deleteDialogConfirm: "Eliminar",
+        deleting: "Eliminando...",
       },
       toast: {
         assignedTitle: "Tiro asignado",

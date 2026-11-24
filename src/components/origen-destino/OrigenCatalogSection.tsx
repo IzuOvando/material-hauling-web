@@ -44,6 +44,7 @@ export function OrigenCatalogSection({
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingValue, setEditingValue] = useState("");
   const [renaming, setRenaming] = useState(false);
+  const [deactivatingId, setDeactivatingId] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
@@ -99,7 +100,11 @@ export function OrigenCatalogSection({
     }
   };
 
-  const handleDeactivate = async (id: string, nombre: string) => {
+  const handleDeactivate = async (e: React.MouseEvent, id: string, nombre: string) => {
+    e.preventDefault();
+    if (deactivatingId) return;
+    setDeactivatingId(id);
+
     try {
       await deactivateOrigen(id);
       setOrigenes((prev) => prev.filter((m) => m.id !== id));
@@ -115,6 +120,8 @@ export function OrigenCatalogSection({
         description: error.message,
         variant: "destructive",
       });
+    } finally {
+      setDeactivatingId(null);
     }
   };
 
@@ -274,14 +281,16 @@ export function OrigenCatalogSection({
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
-                            <AlertDialogCancel>
+                            <AlertDialogCancel disabled={deactivatingId === origen.id}>
                               {(whiteLabelConfig as any)?.ui?.origenes?.catalog?.deleteDialogCancel || "Cancelar"}
                             </AlertDialogCancel>
                             <AlertDialogAction
-                              onClick={() => handleDeactivate(origen.id, origen.nombre)}
+                              onClick={(e) => handleDeactivate(e, origen.id, origen.nombre)}
                               className="bg-red-500 hover:bg-red-600"
+                              disabled={!!deactivatingId}
                             >
-                              {(whiteLabelConfig as any)?.ui?.origenes?.catalog?.deleteDialogConfirm || "Eliminar"}
+                              {deactivatingId === origen.id && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                              {deactivatingId === origen.id ? whiteLabelConfig.ui.origenes.catalog.deleting : (whiteLabelConfig as any)?.ui?.origenes?.catalog?.deleteDialogConfirm || "Eliminar"}
                             </AlertDialogAction>
                           </AlertDialogFooter>
                         </AlertDialogContent>

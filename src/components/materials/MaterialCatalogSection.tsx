@@ -43,6 +43,7 @@ export function MaterialCatalogSection({
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingValue, setEditingValue] = useState("");
   const [renaming, setRenaming] = useState(false);
+  const [deactivatingId, setDeactivatingId] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
@@ -98,7 +99,11 @@ export function MaterialCatalogSection({
     }
   };
 
-  const handleDeactivate = async (id: string, nombre: string) => {
+  const handleDeactivate = async (e: React.MouseEvent, id: string, nombre: string) => {
+    e.preventDefault();
+    if (deactivatingId) return;
+    setDeactivatingId(id);
+
     try {
       await deactivateMaterial(id);
       setMaterials((prev) => prev.filter((m) => m.id !== id));
@@ -114,6 +119,8 @@ export function MaterialCatalogSection({
         description: error.message,
         variant: "destructive",
       });
+    } finally {
+      setDeactivatingId(null);
     }
   };
 
@@ -269,14 +276,16 @@ export function MaterialCatalogSection({
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
-                            <AlertDialogCancel>
+                            <AlertDialogCancel disabled={deactivatingId === material.id}>
                               {(whiteLabelConfig as any)?.ui?.materials?.catalog?.deleteDialogCancel || "Cancelar"}
                             </AlertDialogCancel>
                             <AlertDialogAction
-                              onClick={() => handleDeactivate(material.id, material.nombre)}
+                              onClick={(e) => handleDeactivate(e, material.id, material.nombre)}
                               className="bg-red-500 hover:bg-red-600"
+                              disabled={!!deactivatingId}
                             >
-                              {(whiteLabelConfig as any)?.ui?.materials?.catalog?.deleteDialogConfirm || "Eliminar"}
+                              {deactivatingId === material.id && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                              {deactivatingId === material.id ? whiteLabelConfig.ui.materials.catalog.deleting : (whiteLabelConfig as any)?.ui?.materials?.catalog?.deleteDialogConfirm || "Eliminar"}
                             </AlertDialogAction>
                           </AlertDialogFooter>
                         </AlertDialogContent>
